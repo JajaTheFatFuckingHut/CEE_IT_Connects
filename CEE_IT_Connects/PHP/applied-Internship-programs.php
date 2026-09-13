@@ -137,7 +137,8 @@ $internships = $stmt->fetchAll(PDO::FETCH_ASSOC);
             padding: 22px 20px;
             position: sticky;
             top: 20px;
-            background: var(--cream); border:1px solid #ffd4b8; 
+            background: var(--cream);
+            border: 1px solid #ffd4b8;
         }
 
         .sidebar-card .sidebar-title {
@@ -147,7 +148,7 @@ $internships = $stmt->fetchAll(PDO::FETCH_ASSOC);
             text-transform: uppercase;
             color: var(--muted);
             margin-bottom: 16px;
-            
+
         }
 
         .search-wrap {
@@ -292,7 +293,7 @@ $internships = $stmt->fetchAll(PDO::FETCH_ASSOC);
             overflow: hidden;
             position: relative;
             /* background:#fff5f0;  */
-            border:1px solid #ffd4b8; 
+            border: 1px solid #ffd4b8;
         }
 
         .listing-card:hover {
@@ -739,7 +740,7 @@ $internships = $stmt->fetchAll(PDO::FETCH_ASSOC);
         .mobile-filter-icon-btn {
             display: none;
         }
-        
+
         .page-banner {
             background: #e8f1ff;
             border: 1px solid #2563eb;
@@ -793,16 +794,20 @@ $internships = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 margin-top: 24px;
                 gap: 12px;
             }
+
             .page-banner-icon {
                 width: 38px;
                 height: 38px;
             }
+
             .page-banner-icon i {
                 font-size: 20px;
             }
+
             .page-banner-text h2 {
                 font-size: 1.2rem;
             }
+
             .page-banner-text p {
                 font-size: 14px;
             }
@@ -840,12 +845,12 @@ $internships = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </div> -->
 
         <div class="page-banner">
-                <div class="page-banner-icon"><i class="fa fa-briefcase"></i></div>
-                <div class="page-banner-text">
-                    <h2>Internship Opportunities</h2>
-                    <p>Find and apply for internships matching your interests.</p>
-                </div>
+            <div class="page-banner-icon"><i class="fa fa-briefcase"></i></div>
+            <div class="page-banner-text">
+                <h2>Internship Opportunities</h2>
+                <p>Find and apply for internships matching your interests.</p>
             </div>
+        </div>
     </div>
 
     <section class="listing-wrapper">
