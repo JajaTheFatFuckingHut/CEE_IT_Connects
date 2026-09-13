@@ -103,8 +103,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $stmt = $pdo->prepare("
-        INSERT INTO advisers (full_name, email, password_hash, role, title, created_at, department)
-        VALUES (:name, :email, :password, :role, :title, NOW(), :department)
+        INSERT INTO advisers (full_name, email, password_hash, role, created_at, department)
+        VALUES (:name, :email, :password, :role, NOW(), :department)
         ");
 
         $stmt->execute([
@@ -112,7 +112,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'email' => $email,
             'password' => $password,
             'role' => $role,
-            'title' => $title,
+            // 'title' => $title,
             'department' => $department
         ]);
 
