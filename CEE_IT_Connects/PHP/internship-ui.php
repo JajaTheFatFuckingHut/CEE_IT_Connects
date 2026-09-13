@@ -2778,6 +2778,10 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                 ).addTo(postingMap);
 
 
+                setTimeout(function () {
+                    postingMap.invalidateSize();
+                }, 300);
+
                 postingMarker.bindTooltip(
                     'Internship Location',
                     {
