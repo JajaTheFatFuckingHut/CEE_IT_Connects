@@ -1481,9 +1481,9 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                                 </div>
 
                                 <div id="posting-map" style="width:100%;
-                height:350px;
-                border-radius:10px;
-                border:1px solid #dee2e6;">
+                                    height:350px;
+                                    border-radius:10px;
+                                    border:1px solid #dee2e6;">
                                 </div>
 
                                 <div class="row g-3 mt-2">
