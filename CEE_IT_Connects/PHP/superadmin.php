@@ -1626,6 +1626,13 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
                     <input type="password" name="password" placeholder="Password" required>
                     <div style="color: #888; font-size: 10px;">Password must be at least 8 characters long, contains an
                         uppercase and lowercase letter, a number, and a special character.</div>
+                    <label>Department</label>
+                    <select name="department" required style="width:100%;">
+                        <option value="" disabled selected>Select Department</option>
+                        <option value="information technology">Information Technology</option>
+                        <option value="electrical engineering">Electrical Engineering</option>
+                        <option value="civil engineering">Civil Engineering</option>
+                    </select>
                     <select name="role" id="adviserRole" required>
                         <option value="" disabled selected>Select Role</option>
                         <option value="HTE_adviser">HTE Adviser</option>

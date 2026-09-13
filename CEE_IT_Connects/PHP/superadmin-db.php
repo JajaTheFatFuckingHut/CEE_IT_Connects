@@ -81,6 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $name = $_POST['name'];
         $email = $_POST['email'];
         $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+        $department = $_POST['department'];
         $role = $_POST['role'];
         $title = $_POST['title'];
 
@@ -100,8 +101,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $stmt = $pdo->prepare("
-        INSERT INTO advisers (full_name, email, password_hash, role, title, created_at)
-        VALUES (:name, :email, :password, :role, :title, NOW())
+        INSERT INTO advisers (full_name, email, password_hash, role, title, created_at, department)
+        VALUES (:name, :email, :password, :role, :title, NOW(), :department)
         ");
 
         $stmt->execute([
@@ -109,7 +110,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'email' => $email,
             'password' => $password,
             'role' => $role,
-            'title' => $title
+            'title' => $title,
+            'department' => $department
         ]);
 
         $newAdviserId = $pdo->lastInsertId();
@@ -348,57 +350,57 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 if (isset($_POST['save_program_hours'])) {
 
-        $programs = $_POST['program'] ?? [];
-        $hours = $_POST['required_hours'] ?? [];
+$programs = $_POST['program'] ?? [];
+$hours = $_POST['required_hours'] ?? [];
 
-        $updateStmt = $pdo->prepare("
-        UPDATE internships
-        SET required_hours = ?
-        WHERE program = ?
-    ");
+$updateStmt = $pdo->prepare("
+UPDATE internships
+SET required_hours = ?
+WHERE program = ?
+");
 
-        $updatedCount = 0;
+$updatedCount = 0;
 
-        foreach ($programs as $i => $prog) {
+foreach ($programs as $i => $prog) {
 
-            $prog = trim($prog);
+$prog = trim($prog);
 
-            $hrs = max(
-                1,
-                (int) ($hours[$i] ?? 486)
-            );
+$hrs = max(
+1,
+(int) ($hours[$i] ?? 486)
+);
 
-            if ($prog !== '') {
+if ($prog !== '') {
 
-                $updateStmt->execute([
-                    $hrs,
-                    $prog
-                ]);
+$updateStmt->execute([
+$hrs,
+$prog
+]);
 
-                $updatedCount += $updateStmt->rowCount();
-            }
-        }
+$updatedCount += $updateStmt->rowCount();
+}
+}
 
-        $pdo->prepare("
-        INSERT INTO audits (
-            user_id,
-            roles,
-            activity,
-            activity_date
-        )
-        VALUES (?, 'superadmin', ?, NOW())
-    ")->execute([
-                    $_SESSION['user_id'],
-                    "Updated required OJT hours for "
-                    . count($programs)
-                    . " program(s), affecting "
-                    . $updatedCount
-                    . " internship(s)"
-                ]);
+$pdo->prepare("
+INSERT INTO audits (
+user_id,
+roles,
+activity,
+activity_date
+)
+VALUES (?, 'superadmin', ?, NOW())
+")->execute([
+$_SESSION['user_id'],
+"Updated required OJT hours for "
+. count($programs)
+. " program(s), affecting "
+. $updatedCount
+. " internship(s)"
+]);
 
-        $_SESSION['success'] =
-            "Required hours updated for {$updatedCount} internship(s).";
+$_SESSION['success'] =
+"Required hours updated for {$updatedCount} internship(s).";
 
-        header("Location: superadmin.php?section=ojt_hours");
-        exit;
-    }
+header("Location: superadmin.php?section=ojt_hours");
+exit;
+}
