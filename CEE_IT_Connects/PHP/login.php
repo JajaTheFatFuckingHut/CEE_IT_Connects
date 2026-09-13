@@ -55,9 +55,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // centralized redirect (cleaner)
             $dashboards = [
-                'superadmin' => '../PHP/superadmin.php',
-                'internship_admin' => '../PHP/internship-ui.php',
-                'cma' => '../PHP/bsbsasdadw.php'
+                'superadmin' => '../superadmin.php',
+                'internship_admin' => '../internship-ui.php',
+                // 'cma' => '../bsbsasdadw.php'
             ];
 
             header("Location: " . ($dashboards[$user['role']] ?? 'no-access.php'));
@@ -91,8 +91,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $normalizedRole = strtolower(trim($user['role']));
 
             $dashboards = [
-                'hte_adviser' => '../PHP/hte-ui.php',
-                'internship_adviser' => '../PHP/ojt-rooms.php',
+                'hte_adviser' => '../hte-ui.php',
+                'internship_adviser' => '../ojt-rooms.php',
             ];
 
             if (isset($dashboards[$normalizedRole])) {
