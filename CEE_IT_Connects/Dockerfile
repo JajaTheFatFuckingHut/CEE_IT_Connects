@@ -7,7 +7,7 @@ RUN apt-get update \
     && docker-php-ext-install pdo pdo_pgsql \
     && rm -rf /var/lib/apt/lists/*
 
-COPY PHP /var/www/html
+COPY PHP /var/www/html/PHP
 COPY CSS /var/www/html/CSS
 COPY Sources /var/www/html/Sources
 

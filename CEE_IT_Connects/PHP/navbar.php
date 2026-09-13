@@ -550,7 +550,7 @@ function timeAgo($datetime)
                 <?php if (!$hideStudentNav): ?>
                     <li class="nav-item">
                         <a class="nav-link <?= ($page == 'opportunity') ? 'active' : '' ?>"
-                            href="../applied-internship-programs.php">Internships</a>
+                            href="applied-internship-programs.php">Internships</a>
                     </li>
                 <?php endif; ?>
                 <?php if (!$hideAdviserNav): ?>
