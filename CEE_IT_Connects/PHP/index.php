@@ -250,99 +250,163 @@ $now = new DateTime();
     <script>
         let map;
         let markers = {};
+        // CUSTOM LEAFLET MARKER ICONS
 
+        const greenIcon = L.icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+        });
+
+
+        const redIcon = L.icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+        });
+
+        // INITIALIZE MAP
         function initMap() {
 
-            // Create Leaflet map
             map = L.map('map').setView(
                 [14.70, 120.98],
                 10
             );
+
 
             // OpenStreetMap tiles
             L.tileLayer(
                 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
                 {
                     maxZoom: 19,
+
                     attribution:
                         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 }
             ).addTo(map);
 
 
-            // PHP locations
+            // Get internship locations from PHP
             const locations = <?php echo json_encode($locations); ?>;
 
             const now = new Date();
 
 
+            // CREATE MARKERS
             locations.forEach(loc => {
 
                 const lat = parseFloat(loc.latitude);
                 const lng = parseFloat(loc.longtitude);
 
-                // Skip invalid coordinates
-                if (isNaN(lat) || isNaN(lng)) return;
+
+                // Ignore invalid coordinates
+                if (isNaN(lat) || isNaN(lng)) {
+                    return;
+                }
 
 
-                // ================================
-                // OPEN / CLOSED STATUS
-                // ================================
-
+                // CALCULATE OPEN / CLOSED
                 const openTime = new Date();
                 const closeTime = new Date();
 
-                const [openH, openM] = loc.time_open.split(':');
-                const [closeH, closeM] = loc.time_close.split(':');
 
-                openTime.setHours(openH, openM, 0);
-                closeTime.setHours(closeH, closeM, 0);
+                const [openH, openM] =
+                    loc.time_open.split(':');
+
+
+                const [closeH, closeM] =
+                    loc.time_close.split(':');
+
+
+                openTime.setHours(
+                    parseInt(openH),
+                    parseInt(openM),
+                    0,
+                    0
+                );
+
+
+                closeTime.setHours(
+                    parseInt(closeH),
+                    parseInt(closeM),
+                    0,
+                    0
+                );
+
 
                 const isOpen =
                     now >= openTime &&
                     now <= closeTime;
 
+                // SELECT ICON
+                const markerIcon =
+                    isOpen ? greenIcon : redIcon;
 
-                // ================================
-                // MARKER
-                // ================================
 
+                // CREATE MARKER
                 const marker = L.marker(
                     [lat, lng],
                     {
+                        icon: markerIcon,
                         title: loc.title
                     }
                 ).addTo(map);
 
 
-                // Store marker using internship ID
+                // Save marker using internship ID
                 markers[loc.id] = marker;
 
 
-                // ================================
-                // INFO WINDOW
-                // ================================
+                // ========================================
+                // POPUP
+                // ========================================
 
-                const info = `
-            <div>
-                <b>${escapeHtml(loc.title)}</b><br>
-                ${escapeHtml(loc.company)}<br>
+                const statusText =
+                    isOpen ? 'OPEN' : 'CLOSED';
+
+
+                const popupContent = `
+            < div div style = "min-width:180px;" >
+                <strong>${escapeHtml(loc.title)}</strong>
+                <br>
+
+                ${escapeHtml(loc.company)}
+                <br>
+
                 ${escapeHtml(loc.location)}
-            </div>
+                <br><br>
+
+                <span style="
+                    display:inline-block;
+                    padding:3px 8px;
+                    border-radius:4px;
+                    background:${isOpen ? '#198754' : '#dc3545'};
+                    color:white;
+                    font-size:12px;
+                    font-weight:bold;
+                ">
+                    ${statusText}
+                </span>
+            </>
         `;
 
-                marker.bindPopup(info);
 
+                marker.bindPopup(
+                    popupContent
+                );
 
-                // Optional:
-                // Open popup when marker is clicked automatically
-                // Leaflet does this through bindPopup()
             });
 
 
-            // ================================
             // FIX MAP SIZE
-            // ================================
 
             setTimeout(function () {
 
@@ -353,13 +417,11 @@ $now = new DateTime();
         }
 
 
-        // ================================
-        // HTML ESCAPE
-        // ================================
-
         function escapeHtml(text) {
 
-            if (!text) return '';
+            if (!text) {
+                return '';
+            }
 
             return String(text)
                 .replace(/&/g, '&amp;')
