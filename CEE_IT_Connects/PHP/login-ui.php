@@ -48,7 +48,7 @@ $registerVisible = file_exists($statePath) ? trim(file_get_contents($statePath))
                 <div class="role-toggle">
                     <a href="login-ui.php?role=student"
                         class="btn-role <?= $role === 'student' ? 'active' : 'inactive' ?>">
-                        Student
+                        Gay Student
                     </a>
                     <a href="login-ui.php?role=adviser"
                         class="btn-role <?= $role === 'adviser' ? 'active' : 'inactive' ?>">
