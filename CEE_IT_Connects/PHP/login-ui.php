@@ -27,9 +27,9 @@ $registerVisible = file_exists($statePath) ? trim(file_get_contents($statePath))
     <?php endif; ?>
 
     <!-- LOADING SCREEN -->
-    <div id="loading-screen">
+    <!-- <div id="loading-screen">
         <img src="../Sources/CEE IT Connects Logo.png" alt="Logo" class="loading-logo">
-    </div>
+    </div> -->
 
     <div class="container-fluid login-container">
         <div class="row h-100">
