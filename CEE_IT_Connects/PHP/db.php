@@ -9,8 +9,8 @@ if (!$databaseUrl) {
 try {
     $db = parse_url($databaseUrl);
 
-    if ($db === false) {
-        throw new Exception("Invalid DATABASE_URL.");
+    if (!$db || !isset($db['host'], $db['user'], $db['pass'], $db['path'])) {
+        throw new Exception("Invalid DATABASE_URL format.");
     }
 
     $host = $db['host'];
@@ -21,10 +21,10 @@ try {
 
     $dsn = "pgsql:host=$host;port=$port;dbname=$dbname";
 
-    $pdo = new PDO($dsn, $user, $password);
-
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+    $pdo = new PDO($dsn, $user, $password, [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
+    ]);
 
 } catch (Exception $e) {
     die("Database connection failed: " . $e->getMessage());
