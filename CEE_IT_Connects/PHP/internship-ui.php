@@ -1420,20 +1420,33 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                                         <option value="public-private">Public-Private Sector</option>
                                     </select>
                                 </div>
+                                <br>
                                 <div>
-                                    <label>Contact Number</label>
+                                    <label>Is Valenzuela LGU?</label>
 
-                                    Yes
-                                    <input value="true" type="radio" checked=true name="is_valenzuela_lgu">
-                                    No
-                                    <input value="false" type="radio" name="is_valenzuela_lgu"></label>
+                                    <label>
+                                        <input type="radio" name="is_valenzuela_lgu" value="true" checked>
+                                        Yes
+                                    </label>
 
-                                    <label>Contact Number</label>
+                                    <label>
+                                        <input type="radio" name="is_valenzuela_lgu" value="false">
+                                        No
+                                    </label>
 
-                                    Yes
-                                    <input value="true" type="radio" checked=true name="is_plv_ojt">
-                                    No
-                                    <input value="false" type="radio" name="is_plv_ojt"></label>
+                                    <br>
+
+                                    <label>Is PLV OJT?</label>
+
+                                    <label>
+                                        <input type="radio" name="is_plv_ojt" value="true" checked>
+                                        Yes
+                                    </label>
+
+                                    <label>
+                                        <input type="radio" name="is_plv_ojt" value="false">
+                                        No
+                                    </label>
                                 </div>
                                 <div style="grid-column:span 2;">
                                     <label>Description</label>
