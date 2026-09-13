@@ -134,6 +134,7 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CEE IT Connects</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
     <link rel="stylesheet" href="../CSS/intern-admin.css" />
@@ -1433,40 +1434,46 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                             <!-- Map Pin -->
                             <div class="mt-3">
                                 <label>Pin Location on Map</label>
-                                <p class="text-muted" style="font-size:13px;">Click on the map to pin the internship
-                                    location.</p>
+
+                                <p class="text-muted" style="font-size:13px;">
+                                    Search for a location or click on the map to pin the internship location.
+                                </p>
+
                                 <div class="input-group mb-2">
                                     <span class="input-group-text">
                                         <i class="bi bi-search"></i>
                                     </span>
+
                                     <input type="text" id="map-search" class="form-control"
                                         placeholder="Search internship location...">
+
+                                    <button type="button" class="btn btn-primary" id="search-location">
+                                        Search
+                                    </button>
                                 </div>
-                                <div id="posting-map"
-                                    style="width:100%;height:350px;border-radius:10px;border:1px solid #dee2e6;"></div>
+
+                                <div id="posting-map" style="width:100%;
+                height:350px;
+                border-radius:10px;
+                border:1px solid #dee2e6;">
+                                </div>
+
                                 <div class="row g-3 mt-2">
+
                                     <div class="col-md-6">
-                                        <!-- <label>Latitude</label> -->
-                                        <input type="hidden" name="latitude" id="post-lat"
-                                            placeholder="Click map to set" readonly>
+                                        <input type="hidden" name="latitude" id="post-lat">
                                     </div>
+
                                     <div class="col-md-6">
-                                        <!-- <label>Longitude</label> -->
-                                        <input type="hidden" name="longitude" id="post-lng"
-                                            placeholder="Click map to set" readonly>
+                                        <input type="hidden" name="longitude" id="post-lng">
                                     </div>
+
                                 </div>
-                                <!-- <div class="row g-3 mt-2">
-                                    <div type="text" name="latitude" id="post-lat" placeholder="Click map to set"
-                                        readonly>
-                                    </div>
-                                    <div type="text" name="longitude" id="post-lng" placeholder="Click map to set"
-                                        readonly>
-                                    </div>
-                                </div> -->
+
                                 <div id="pin-label" class="d-none mt-2">
                                     <span class="p-1 rounded text-bg-success">
-                                        <i class="bi bi-geo-alt-fill"></i> Location pinned — drag or click to adjust
+                                        <i class="bi bi-geo-alt-fill"></i>
+                                        Location pinned — drag or click to adjust
                                     </span>
                                 </div>
                             </div>
@@ -2563,121 +2570,291 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
             document.getElementById('mou-form-panel').style.display = 'none';
         }
         // Map
-        let postingMap, postingMarker;
+        let postingMap;
+        let postingMarker;
+
+        // Default location: Philippines / Metro Manila area
+        const defaultLat = 14.7011;
+        const defaultLng = 120.9830;
+
+
+        // ================================
+        // INITIALIZE LEAFLET MAP
+        // ================================
 
         function initPostingMap() {
 
-            postingMap = new google.maps.Map(
-                document.getElementById('posting-map'),
-                {
-                    zoom: 12,
-                    center: { lat: 14.7011, lng: 120.9830 }
-                }
+            // Create map
+            postingMap = L.map('posting-map').setView(
+                [defaultLat, defaultLng],
+                12
             );
 
-            // SEARCH BOX
-            const searchInput = document.getElementById('map-search');
 
-            const autocomplete = new google.maps.places.Autocomplete(
-                searchInput,
+            // OpenStreetMap tiles
+            L.tileLayer(
+                'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
                 {
-                    fields: ['geometry', 'name', 'formatted_address'],
-                    componentRestrictions: {
-                        country: 'ph'
+                    maxZoom: 19,
+                    attribution:
+                        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                }
+            ).addTo(postingMap);
+
+
+            // ================================
+            // MAP CLICK
+            // ================================
+
+            postingMap.on('click', function (e) {
+
+                const lat = e.latlng.lat;
+                const lng = e.latlng.lng;
+
+                setPostingMarker(lat, lng);
+
+                saveCoordinates(lat, lng);
+
+            });
+
+
+            // ================================
+            // SEARCH BUTTON
+            // ================================
+
+            document
+                .getElementById('search-location')
+                .addEventListener('click', searchLocation);
+
+
+            // Allow pressing ENTER in search box
+            document
+                .getElementById('map-search')
+                .addEventListener('keydown', function (e) {
+
+                    if (e.key === 'Enter') {
+
+                        e.preventDefault();
+
+                        searchLocation();
+
                     }
+
+                });
+
+        }
+
+
+        // ================================
+        // SEARCH LOCATION
+        // ================================
+
+        async function searchLocation() {
+
+            const searchInput =
+                document.getElementById('map-search');
+
+            const query = searchInput.value.trim();
+
+
+            if (!query) {
+
+                alert('Please enter a location to search.');
+
+                return;
+
+            }
+
+
+            try {
+
+                // Search OpenStreetMap using Nominatim
+                const response = await fetch(
+                    'https://nominatim.openstreetmap.org/search?' +
+                    new URLSearchParams({
+                        q: query,
+                        format: 'json',
+                        limit: 5,
+                        countrycodes: 'ph',
+                        addressdetails: 1
+                    }),
+                    {
+                        headers: {
+                            'Accept': 'application/json'
+                        }
+                    }
+                );
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        'Location search failed.'
+                    );
+
                 }
-            );
 
-            autocomplete.bindTo('bounds', postingMap);
 
-            autocomplete.addListener('place_changed', function () {
+                const results = await response.json();
 
-                const place = autocomplete.getPlace();
 
-                if (!place.geometry || !place.geometry.location) {
-                    alert('Please select a location from the search suggestions.');
+                if (!results.length) {
+
+                    alert(
+                        'Location not found. Please try another search.'
+                    );
+
                     return;
+
                 }
 
-                const location = place.geometry.location;
 
-                // Move map to searched location
-                postingMap.setCenter(location);
-                postingMap.setZoom(17);
+                // Use first result
+                const result = results[0];
 
-                // Move/create marker
-                setPostingMarker(location);
+                const lat = parseFloat(result.lat);
+                const lng = parseFloat(result.lon);
+
+
+                // Move map
+                postingMap.setView(
+                    [lat, lng],
+                    17
+                );
+
+
+                // Create/move marker
+                setPostingMarker(
+                    lat,
+                    lng
+                );
+
 
                 // Save coordinates
-                document.getElementById('post-lat').value =
-                    location.lat().toFixed(7);
+                saveCoordinates(
+                    lat,
+                    lng
+                );
 
-                document.getElementById('post-lng').value =
-                    location.lng().toFixed(7);
 
-                // Show pinned message
-                document.getElementById('pin-label')
-                    .classList.remove('d-none');
-            });
+            } catch (error) {
 
-            // CLICK MAP
+                console.error(
+                    'Location search error:',
+                    error
+                );
 
-            postingMap.addListener('click', function (e) {
+                alert(
+                    'Unable to search for the location. Please try again.'
+                );
 
-                const lat = e.latLng.lat();
-                const lng = e.latLng.lng();
+            }
 
-                document.getElementById('post-lat').value =
-                    lat.toFixed(7);
-
-                document.getElementById('post-lng').value =
-                    lng.toFixed(7);
-
-                document.getElementById('pin-label')
-                    .classList.remove('d-none');
-
-                setPostingMarker(e.latLng);
-            });
         }
-
         // CREATE / MOVE MARKER
+        function setPostingMarker(lat, lng) {
 
-        function setPostingMarker(position) {
+            const position = [
+                lat,
+                lng
+            ];
 
+
+            // Marker already exists
             if (postingMarker) {
 
-                postingMarker.setPosition(position);
+                postingMarker.setLatLng(position);
 
-            } else {
-
-                postingMarker = new google.maps.Marker({
-                    position: position,
-                    map: postingMap,
-                    title: 'Internship Location',
-                    draggable: true
-                });
-
-                // Marker dragged
-                postingMarker.addListener('dragend', function () {
-
-                    const pos = postingMarker.getPosition();
-
-                    document.getElementById('post-lat').value =
-                        pos.lat().toFixed(7);
-
-                    document.getElementById('post-lng').value =
-                        pos.lng().toFixed(7);
-
-                    document.getElementById('pin-label')
-                        .classList.remove('d-none');
-                });
             }
+
+            // Create marker
+            else {
+
+                postingMarker = L.marker(
+                    position,
+                    {
+                        draggable: true
+                    }
+                ).addTo(postingMap);
+
+
+                postingMarker.bindTooltip(
+                    'Internship Location',
+                    {
+                        permanent: false
+                    }
+                );
+
+                // MARKER DRAG
+                postingMarker.on(
+                    'dragend',
+                    function () {
+
+                        const position =
+                            postingMarker.getLatLng();
+
+
+                        saveCoordinates(
+                            position.lat,
+                            position.lng
+                        );
+
+                    }
+                );
+
+            }
+
+
+            // Show pinned message
+            document
+                .getElementById('pin-label')
+                .classList.remove('d-none');
+
         }
+
+
+        // SAVE LATITUDE / LONGITUDE
+        function saveCoordinates(lat, lng) {
+
+            document
+                .getElementById('post-lat')
+                .value = lat.toFixed(7);
+
+
+            document
+                .getElementById('post-lng')
+                .value = lng.toFixed(7);
+
+
+            document
+                .getElementById('pin-label')
+                .classList.remove('d-none');
+
+
+            console.log(
+                'Latitude:',
+                lat.toFixed(7)
+            );
+
+            console.log(
+                'Longitude:',
+                lng.toFixed(7)
+            );
+
+        }
+
+        // START MAP
+        document.addEventListener(
+            'DOMContentLoaded',
+            function () {
+
+                initPostingMap();
+
+            }
+        );
     </script>
 
-    <script
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDITrnTUmS0AwxqZCE8cfYI3d5kjtzg7RY&libraries=places&callback=initPostingMap"
-        async defer></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
     <script src="../JS/script.js"></script>
 
 </body>
