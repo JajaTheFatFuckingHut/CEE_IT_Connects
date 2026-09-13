@@ -74,9 +74,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     //adviser
     if (isset($_POST['create-adviser'])) {
-        $id = $_POST['id'] ?? null;
-        $source = $_POST['source'] ?? '';
-        $title = $_POST['title'] ?? '';
+        // $id = $_POST['id'] ?? null;
+        // $source = $_POST['source'] ?? '';
+        // $title = $_POST['title'] ?? '';
 
         $internship_id = null;
 
@@ -85,7 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
         $department = $_POST['department'];
         $role = $_POST['role'];
-        $title = $_POST['title'];
+        // $title = $_POST['title'];
 
         if ($role === 'HTE_adviser') {
             $internship_id = $_POST['internship_id'] ?? null;
