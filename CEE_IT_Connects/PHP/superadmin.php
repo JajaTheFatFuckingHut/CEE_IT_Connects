@@ -609,7 +609,7 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
             background: #f8fafc;
         }
 
-/* commented out */
+        /* commented out */
 
         /* .btn-update {
             margin-top: 18px;
@@ -1127,6 +1127,7 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
                         border-radius: 10px;
                         transition: background-color .15s ease;
                     }
+
                     .ojtc-activity-row:hover {
                         background: #f5f7ff;
                     }
@@ -1137,23 +1138,40 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
                         border-radius: 10px;
                         transition: background-color .15s ease;
                     }
+
                     .ojtc-hours-row:hover {
                         background: #f7f8fb;
                     }
 
                     /* ADDED*/
-                    .ojtc-badge-it { background:#fff1e0; color:#b85c00; }
-                    .ojtc-badge-ce { background:#e7effe; color:#1b4fce; }
-                    .ojtc-badge-ee { background:#fff8dc; color:#8a6d00; }
-                    .ojtc-badge-default { background:#f0f4ff; color:#272f54; }
+                    .ojtc-badge-it {
+                        background: #fff1e0;
+                        color: #b85c00;
+                    }
+
+                    .ojtc-badge-ce {
+                        background: #e7effe;
+                        color: #1b4fce;
+                    }
+
+                    .ojtc-badge-ee {
+                        background: #fff8dc;
+                        color: #8a6d00;
+                    }
+
+                    .ojtc-badge-default {
+                        background: #f0f4ff;
+                        color: #272f54;
+                    }
 
                     /* ADDED: stat card hover lift for the redesigned cards below */
                     .ojtc-stat-card {
                         transition: transform .15s ease, box-shadow .15s ease;
                     }
+
                     .ojtc-stat-card:hover {
                         transform: translateY(-2px);
-                        box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+                        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
                     }
 
                     /* ADDED: subtle yellow buttons by default, solid orange on hover */
@@ -1163,6 +1181,7 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
                         border: none !important;
                         transition: background-color .15s ease, color .15s ease;
                     }
+
                     .btn-update:hover {
                         background: #E4572E !important;
                         color: #fff !important;
@@ -1183,7 +1202,8 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
                                     <div class="flex-grow-1" style="min-width:0; overflow: hidden;">
                                         <p class="small mb-1 fw-semibold text-uppercase"
                                             style="letter-spacing:.05em; font-size:11px; color:#272f54;">Internships</p>
-                                        <h2 class="fw-bold mb-0" style="color:#272f54;"><?= (int) $totalInternships ?></h2>
+                                        <h2 class="fw-bold mb-0" style="color:#272f54;"><?= (int) $totalInternships ?>
+                                        </h2>
                                     </div>
                                 </div>
                             </div>
@@ -1204,7 +1224,7 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
                                             style="letter-spacing:.05em;font-size:11px;color:#7a5200;">Accounts
                                         </p>
                                         <h2 class="fw-bold mb-0" style="color:#3b2600;"><?= (int) $totalAccounts ?></h2>
-                                        
+
                                     </div>
                                 </div>
                             </div>
@@ -1338,19 +1358,19 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
                                     <div class="d-flex flex-column gap-2">
                                         <?php foreach ($programHoursList as $ph): ?>
                                             <?php
-                                                // ADDED: presentation-only color mapping for the hours badge.
-                                                // Does not change $ph['program'] or how it is stored/echoed —
-                                                // only picks which existing badge class to apply below.
-                                                $ojtcProgramName = strtoupper((string) $ph['program']);
-                                                if (strpos($ojtcProgramName, 'IT') !== false) {
-                                                    $ojtcBadgeClass = 'ojtc-badge-it';
-                                                } elseif (strpos($ojtcProgramName, 'CE') !== false) {
-                                                    $ojtcBadgeClass = 'ojtc-badge-ce';
-                                                } elseif (strpos($ojtcProgramName, 'EE') !== false) {
-                                                    $ojtcBadgeClass = 'ojtc-badge-ee';
-                                                } else {
-                                                    $ojtcBadgeClass = 'ojtc-badge-default';
-                                                }
+                                            // ADDED: presentation-only color mapping for the hours badge.
+                                            // Does not change $ph['program'] or how it is stored/echoed —
+                                            // only picks which existing badge class to apply below.
+                                            $ojtcProgramName = strtoupper((string) $ph['program']);
+                                            if (strpos($ojtcProgramName, 'IT') !== false) {
+                                                $ojtcBadgeClass = 'ojtc-badge-it';
+                                            } elseif (strpos($ojtcProgramName, 'CE') !== false) {
+                                                $ojtcBadgeClass = 'ojtc-badge-ce';
+                                            } elseif (strpos($ojtcProgramName, 'EE') !== false) {
+                                                $ojtcBadgeClass = 'ojtc-badge-ee';
+                                            } else {
+                                                $ojtcBadgeClass = 'ojtc-badge-default';
+                                            }
                                             ?>
                                             <!-- CHANGED: added ojtc-hours-row class for a subtle row hover. -->
                                             <div class="d-flex align-items-center justify-content-between ojtc-hours-row">
@@ -1566,7 +1586,8 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
                     <input type="text" name="name" placeholder="Full Name" required>
                     <input type="email" name="email" placeholder="Email Address" required>
                     <input type="password" name="password" placeholder="Password" required>
-                    <div style="color: #888; font-size: 10px;">Password must be at least 8 characters long, contains an uppercase and lowercase letter, a number, and a special character.</div>
+                    <div style="color: #888; font-size: 10px;">Password must be at least 8 characters long, contains an
+                        uppercase and lowercase letter, a number, and a special character.</div>
                     <select name="role" required>
                         <option value="internship_admin">Internship Admin</option>
                     </select>
@@ -1597,7 +1618,8 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
                     <input type="text" name="name" placeholder="Full Name" required>
                     <input type="email" name="email" placeholder="Email Address" required>
                     <input type="password" name="password" placeholder="Password" required>
-                    <div style="color: #888; font-size: 10px;">Password must be at least 8 characters long, contains an uppercase and lowercase letter, a number, and a special character.</div>
+                    <div style="color: #888; font-size: 10px;">Password must be at least 8 characters long, contains an
+                        uppercase and lowercase letter, a number, and a special character.</div>
                     <select name="role" id="adviserRole" required>
                         <option value="" disabled selected>Select Role</option>
                         <option value="HTE_adviser">HTE Adviser</option>
@@ -1716,7 +1738,7 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
                         <h5 class="fw-semibold mb-1" style="color:#272f54;">Import New CSV File</h5>
                         <p class="text-muted small mb-0">Replaces the existing CSV with the uploaded file.</p>
                     </div>
-                    <form action="auto-register-csv.php" method="POST" enctype="multipart/form-data">
+                    <form action="../auto-register-csv.php" method="POST" enctype="multipart/form-data">
                         <div class="d-flex gap-2 align-items-center">
                             <input type="file" name="students_csv" accept=".csv" required class="form-control"
                                 style="flex:1;font-size:13px;">
@@ -1751,7 +1773,7 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
                     /* ADDED: card wrapper polish to match the rest of the dashboard's card style */
                     #edit_csv .form-card {
                         border-radius: 16px;
-                        box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+                        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
                         padding: 24px;
                     }
 
@@ -1760,6 +1782,7 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
                         color: #272f54;
                         margin-bottom: 16px;
                     }
+
                     #edit_csv .ojtc-csv-filename {
                         background: #eef1ff;
                         color: #272f54;
@@ -1787,6 +1810,7 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
                     #edit_csv #csv-table tbody tr:hover {
                         background: #f8f9ff;
                     }
+
                     #edit_csv #csv-table td {
                         padding: 6px 8px;
                         vertical-align: middle;
@@ -1799,6 +1823,7 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
                         font-size: 13px;
                         padding: 8px 10px;
                     }
+
                     #edit_csv #csv-table .form-control:focus {
                         border-color: #272f54;
                         box-shadow: 0 0 0 3px rgba(39, 47, 84, 0.1);
@@ -1975,8 +2000,7 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
                                     <td><?= htmlspecialchars($st['email']) ?></td>
                                     <td>
                                         <?php if ($st['adviser_name']): ?>
-                                            <span 
-                                                style="color:#272f54;font-size:12px; font-weight:550;">
+                                            <span style="color:#272f54;font-size:12px; font-weight:550;">
                                                 <?= htmlspecialchars($st['adviser_name']) ?>
                                             </span>
                                         <?php else: ?>
@@ -2342,7 +2366,7 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
                             <?php endforeach; ?>
                         </div>
 
-                        
+
 
                         <div style="display:flex; justify-content:flex-end;">
                             <button type="submit" name="save_program_hours" class="btn-update">
