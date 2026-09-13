@@ -137,6 +137,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     <button onclick=\"window.location.href='internship-ui.php'\">
                         Return to Internship System
                     </button>
+                    <?php
+                    var_dump($is_valenzuela_lgu);
+                    var_dump($is_plv_ojt);
+                    ?>
                 </body>
                 </html>";
             exit();
