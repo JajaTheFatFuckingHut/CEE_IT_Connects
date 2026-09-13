@@ -17,5 +17,5 @@ if (ini_get("session.use_cookies")) {
 }
 
 session_destroy();
-header("Location: ../PHP/login-ui.php");
+header("Location: ../login-ui.php");
 exit();
