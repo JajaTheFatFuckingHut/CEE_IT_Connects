@@ -74,8 +74,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     //adviser
     if (isset($_POST['create-adviser'])) {
-        $id = $_POST['id'];
-        $source = $_POST['source'];
+        $id = $_POST['id'] ?? null;
+        $source = $_POST['source'] ?? '';
+        $title = $_POST['title'] ?? '';
+
+        if ($id === null || $source === '' || $title === '') {
+            die('Missing required form data.');
+        }
         $internship_id = null;
 
         $name = $_POST['name'];
