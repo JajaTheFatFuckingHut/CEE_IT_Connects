@@ -260,6 +260,7 @@ $now = new DateTime();
     </section>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 
     <script>
         let map;
@@ -602,9 +603,6 @@ $now = new DateTime();
             document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
         });
     </script>
-
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-
 </body>
 
 </html>
