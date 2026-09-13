@@ -1435,6 +1435,13 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                                 <label>Pin Location on Map</label>
                                 <p class="text-muted" style="font-size:13px;">Click on the map to pin the internship
                                     location.</p>
+                                <div class="input-group mb-2">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-search"></i>
+                                    </span>
+                                    <input type="text" id="map-search" class="form-control"
+                                        placeholder="Search internship location...">
+                                </div>
                                 <div id="posting-map"
                                     style="width:100%;height:350px;border-radius:10px;border:1px solid #dee2e6;"></div>
                                 <div class="row g-3 mt-2">
@@ -2557,31 +2564,114 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
         }
         // Map
         let postingMap, postingMarker;
+
         function initPostingMap() {
-            postingMap = new google.maps.Map(document.getElementById('posting-map'), {
-                zoom: 12,
-                center: { lat: 14.7011, lng: 120.9830 }
+
+            postingMap = new google.maps.Map(
+                document.getElementById('posting-map'),
+                {
+                    zoom: 12,
+                    center: { lat: 14.7011, lng: 120.9830 }
+                }
+            );
+
+            // SEARCH BOX
+            const searchInput = document.getElementById('map-search');
+
+            const autocomplete = new google.maps.places.Autocomplete(
+                searchInput,
+                {
+                    fields: ['geometry', 'name', 'formatted_address'],
+                    componentRestrictions: {
+                        country: 'ph'
+                    }
+                }
+            );
+
+            autocomplete.bindTo('bounds', postingMap);
+
+            autocomplete.addListener('place_changed', function () {
+
+                const place = autocomplete.getPlace();
+
+                if (!place.geometry || !place.geometry.location) {
+                    alert('Please select a location from the search suggestions.');
+                    return;
+                }
+
+                const location = place.geometry.location;
+
+                // Move map to searched location
+                postingMap.setCenter(location);
+                postingMap.setZoom(17);
+
+                // Move/create marker
+                setPostingMarker(location);
+
+                // Save coordinates
+                document.getElementById('post-lat').value =
+                    location.lat().toFixed(7);
+
+                document.getElementById('post-lng').value =
+                    location.lng().toFixed(7);
+
+                // Show pinned message
+                document.getElementById('pin-label')
+                    .classList.remove('d-none');
             });
+
+            // CLICK MAP
+
             postingMap.addListener('click', function (e) {
+
                 const lat = e.latLng.lat();
                 const lng = e.latLng.lng();
-                document.getElementById('post-lat').value = lat.toFixed(7);
-                document.getElementById('post-lng').value = lng.toFixed(7);
-                document.getElementById('pin-label').classList.remove('d-none');
-                if (postingMarker) {
-                    postingMarker.setPosition(e.latLng);
-                } else {
-                    postingMarker = new google.maps.Marker({
-                        position: e.latLng, map: postingMap,
-                        title: 'Internship Location', draggable: true
-                    });
-                    postingMarker.addListener('dragend', function () {
-                        const pos = postingMarker.getPosition();
-                        document.getElementById('post-lat').value = pos.lat().toFixed(7);
-                        document.getElementById('post-lng').value = pos.lng().toFixed(7);
-                    });
-                }
+
+                document.getElementById('post-lat').value =
+                    lat.toFixed(7);
+
+                document.getElementById('post-lng').value =
+                    lng.toFixed(7);
+
+                document.getElementById('pin-label')
+                    .classList.remove('d-none');
+
+                setPostingMarker(e.latLng);
             });
+        }
+
+        // CREATE / MOVE MARKER
+
+        function setPostingMarker(position) {
+
+            if (postingMarker) {
+
+                postingMarker.setPosition(position);
+
+            } else {
+
+                postingMarker = new google.maps.Marker({
+                    position: position,
+                    map: postingMap,
+                    title: 'Internship Location',
+                    draggable: true
+                });
+
+                // Marker dragged
+                postingMarker.addListener('dragend', function () {
+
+                    const pos = postingMarker.getPosition();
+
+                    document.getElementById('post-lat').value =
+                        pos.lat().toFixed(7);
+
+                    document.getElementById('post-lng').value =
+                        pos.lng().toFixed(7);
+
+                    document.getElementById('pin-label')
+                        .classList.remove('d-none');
+                });
+            }
         }
     </script>
 
