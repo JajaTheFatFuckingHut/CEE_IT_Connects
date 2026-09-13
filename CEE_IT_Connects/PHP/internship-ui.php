@@ -79,7 +79,7 @@ $mouStmt = $pdo->query("
 $mouUploads = $mouStmt->fetchAll(PDO::FETCH_ASSOC);
 
 $internshipStmt = $pdo->query("
-    SELECT id, company, title FROM internships ORDER BY company ASC, title ASC
+    SELECT id, company, title, location, program FROM internships ORDER BY company ASC, title ASC
 ");
 $internships = $internshipStmt->fetchAll(PDO::FETCH_ASSOC);
 

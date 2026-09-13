@@ -1170,7 +1170,7 @@ function timeAgo($datetime)
             <?= ($page == 'home') ? 'background:#ff6b2c;border-radius:8px;margin:4px 12px;' : '' ?>">
                 <i class="fa-solid fa-house me-2"></i> Home
             </a>
-            <a href="applied-internship-programs.php" style="display:block;padding:14px 24px;color:white;text-decoration:none;font-weight:600;
+            <a href="applied-Internship-programs.php" style="display:block;padding:14px 24px;color:white;text-decoration:none;font-weight:600;
             <?= ($page == 'opportunity') ? 'background:#ff6b2c;border-radius:8px;margin:4px 12px;' : '' ?>">
                 <i class="fa-solid fa-briefcase me-2"></i> Internships
             </a>

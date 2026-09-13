@@ -1024,7 +1024,7 @@ $internships = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <button class="btn-readmore" onclick="togglePanel(<?= $internship['id'] ?>, this)">
                                     <i class="fa fa-circle-info"></i> Read More
                                 </button>
-                                <form method="POST" action="applied-internship-programs-db.php" style="margin:0;">
+                                <form method="POST" action="applied-Internship-programs-db.php" style="margin:0;">
                                     <input type="hidden" name="internship_id" value="<?= $internship['id'] ?>">
                                     <!-- <button type="submit" class="btn-interested">
                                         <i class="fa fa-bookmark"></i> Interested
