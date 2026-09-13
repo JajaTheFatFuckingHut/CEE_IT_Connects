@@ -1,7 +1,7 @@
 <?php
 session_start();
 require 'db.php';
-
+require_once 'auth.php';
 
 // Second code's real queries
 $applicantsStmt = $pdo->query("
@@ -440,7 +440,7 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
             opacity: 0.9;
         }
 
-                    /* ADDED: stat card shell — rounded corners + hover lift, background set per-card
+        /* ADDED: stat card shell — rounded corners + hover lift, background set per-card
                        below via the card-tint-* classes (kept separate from ojtc-stat-card so any
                        stat card can reuse the shell and just swap its tint/icon color). */
         .ojtc-stat-card {
@@ -451,12 +451,13 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
             align-items: center;
             gap: 14px;
         }
+
         .ojtc-stat-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
         }
 
-                    /* ADDED: solid colored icon box (icon left of label/count), same pattern as the
+        /* ADDED: solid colored icon box (icon left of label/count), same pattern as the
                        System Admin dashboard's Internships/Accounts/Programs cards. */
         .ojtc-stat-icon {
             width: 44px;
@@ -470,46 +471,67 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
             color: #fff;
         }
 
-                    /* ADDED: one tint (card bg) + one solid accent (icon bg) per stat, matching the
+        /* ADDED: one tint (card bg) + one solid accent (icon bg) per stat, matching the
                        System Admin dashboard's navy/amber/red-orange palette. */
-        .card-tint-applications  { background: #FFF6E3; }
-        .icon-applications       { background: #FFB62F; }
+        .card-tint-applications {
+            background: #FFF6E3;
+        }
 
-        .card-tint-internships   { background: #EEF3FF; }
-        .icon-internships        { background: #272F54; }
+        .icon-applications {
+            background: #FFB62F;
+        }
 
-        .card-tint-announcements { background: #EAF3DE; }
-        .icon-announcements      { background: #3E8E58; }
+        .card-tint-internships {
+            background: #EEF3FF;
+        }
 
-        .card-tint-documents     { background: #FDEEE8; }
-        .icon-documents          { background: #E4572E; }
+        .icon-internships {
+            background: #272F54;
+        }
 
-                    /* ADDED: panel card hover-lift + rounded corners, reused by Application List,
+        .card-tint-announcements {
+            background: #EAF3DE;
+        }
+
+        .icon-announcements {
+            background: #3E8E58;
+        }
+
+        .card-tint-documents {
+            background: #FDEEE8;
+        }
+
+        .icon-documents {
+            background: #E4572E;
+        }
+
+        /* ADDED: panel card hover-lift + rounded corners, reused by Application List,
                        Announcements, Internship Postings, and Documents cards below. */
         .ojtc-panel-card {
             border-radius: 16px !important;
             transition: transform .15s ease, box-shadow .15s ease;
         }
+
         .ojtc-panel-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 24px rgba(0,0,0,0.08);
+            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
         }
 
-                    /* ADDED: subtle blue "tab" header background for the plain <table> headers —
+        /* ADDED: subtle blue "tab" header background for the plain <table> headers —
                        same class name/style as the System Admin dashboard table, for consistency. */
         .ojtc-th-tab th {
             background: rgba(39, 111, 255, 0.08) !important;
             color: #272f54 !important;
         }
 
-                    /* ADDED: row hover highlight — works for <tr> rows and the flex-row divs used in
+        /* ADDED: row hover highlight — works for <tr> rows and the flex-row divs used in
                        Announcements / Documents. */
         .ojtc-row-hover:hover {
             background: #f8f9ff;
             border-radius: 8px;
-                    }
+        }
 
-                    /* ADDED: same button style used on the System Admin dashboard — subtle yellow by
+        /* ADDED: same button style used on the System Admin dashboard — subtle yellow by
                        default, solid orange on hover. Reuse this class on any button added to this
                        tab or others (Add/Import/Save/etc.) for consistency. */
         .btn-update {
@@ -521,6 +543,7 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
             font-weight: 600 !important; */
             transition: background-color .15s ease, color .15s ease;
         }
+
         .btn-update:hover {
             background: #E4572E !important;
             color: #fff !important;
@@ -898,12 +921,13 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                         </div>
                         <div class="sysAdm-header-text">
                             <h2>Internship Administrator Overview</h2>
-                            <p>A centralized overview of status, pending tasks, and real-time administrative insights.</p>
+                            <p>A centralized overview of status, pending tasks, and real-time administrative insights.
+                            </p>
                         </div>
                     </div>
                 </div>
 
-            <!-- <div id="dashboard" class="section active sysAdm-section">
+                <!-- <div id="dashboard" class="section active sysAdm-section">
                 <div class="sysAdm-header--danger sysAdm-header--blue mb-4">
                     <div class="sysAdm-header-left">
                         <div class="sysAdm-header-icon">
@@ -917,7 +941,7 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                 </div> -->
 
 
-                
+
 
                 <!-- SUMMARY CARDS -->
                 <!-- CHANGED: replaced the custom .summary-container/.summary-card/.gold-icon flex
@@ -1070,7 +1094,7 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                                             ?>
                                             <!-- CHANGED: renamed to ojtc-row-hover (same rename, no behavior change). -->
                                             <div class="d-flex align-items-start gap-3 ojtc-row-hover" style="padding:6px;">
-                                                
+
                                                 <div style="flex:1;min-width:0;">
                                                     <p
                                                         style="font-weight:600;margin:0;color:#272f54;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
@@ -1234,7 +1258,8 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                         </div>
                         <div class="sysAdm-header-text">
                             <h2>Internship Postings</h2>
-                            <p>The administrative module for publishing, modifying, and monitoring active internship listings.</p>
+                            <p>The administrative module for publishing, modifying, and monitoring active internship
+                                listings.</p>
                         </div>
                     </div>
                 </div>
@@ -1243,7 +1268,8 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                      flex styles. Those classes only work if Bootstrap's CSS is actually loaded on
                      this page — since the row was stacking instead of aligning, it likely isn't, so
                      this no longer depends on that. -->
-                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
+                <div
+                    style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
                     <div style="display:flex; align-items:center; flex-wrap:wrap; gap:10px;">
                         <div class="search-box">
                             <input type="text" id="search-postings"
@@ -1268,7 +1294,8 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                             <option value="Information Technology, Civil Engineering">IT &amp; CE</option>
                             <option value="Information Technology, Electrical Engineering">IT &amp; EE</option>
                             <option value="Civil Engineering, Electrical Engineering">CE &amp; EE</option>
-                            <option value="Information Technology, Civil Engineering, Electrical Engineering">IT, CE &amp; EE</option>
+                            <option value="Information Technology, Civil Engineering, Electrical Engineering">IT, CE
+                                &amp; EE</option>
                         </select>
                     </div>
                     <!-- CHANGED: swapped "btn-button" for "btn-update" (already in your CSS) — same
@@ -1311,7 +1338,8 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                                     <td><?= !empty($p['location']) ? htmlspecialchars($p['location']) : '—' ?></td>
                                     <td>
                                         <!-- CHANGED  -->
-                                        <button class="btn-delete" title="Delete" tooltip="Delete" onclick="deleteRow(this)">
+                                        <button class="btn-delete" title="Delete" tooltip="Delete"
+                                            onclick="deleteRow(this)">
                                             <i class="bi bi-trash-fill"></i>
                                         </button>
                                     </td>
@@ -1336,12 +1364,12 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                             onsubmit="return confirm('Create this internship posting?');">
                             <input type="hidden" name="form_type" value="internship_posting">
                             <div class="form-grid">
-                                <div><label>Title</label><input type="text" name="title" placeholder="Job Title" style="width:100%;"
-                                        required></div>
-                                <div><label>Company</label><input type="text" name="company" placeholder="Company Name"style="width:100%;"
-                                        required></div>
-                                <div><label>Location</label><input type="text" name="location" placeholder="Location"style="width:100%;"
-                                        required></div>
+                                <div><label>Title</label><input type="text" name="title" placeholder="Job Title"
+                                        style="width:100%;" required></div>
+                                <div><label>Company</label><input type="text" name="company" placeholder="Company Name"
+                                        style="width:100%;" required></div>
+                                <div><label>Location</label><input type="text" name="location" placeholder="Location"
+                                        style="width:100%;" required></div>
                                 <div>
                                     <label>Program</label>
                                     <select name="program" required style="width:100%;">
@@ -1393,10 +1421,13 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                                 </div>
                                 <div style="grid-column:span 2;">
                                     <label>Description</label>
-                                    <textarea name="description" placeholder="Description" required style="width:100%;"></textarea>
+                                    <textarea name="description" placeholder="Description" required
+                                        style="width:100%;"></textarea>
                                 </div>
-                                <div><label>Opening Time</label><input type="time" name="openTime" style="width:100%;"></div>
-                                <div><label>Closing Time</label><input type="time" name="closeTime" style="width:100%;"></div>
+                                <div><label>Opening Time</label><input type="time" name="openTime" style="width:100%;">
+                                </div>
+                                <div><label>Closing Time</label><input type="time" name="closeTime" style="width:100%;">
+                                </div>
                             </div>
 
                             <!-- Map Pin -->
@@ -1481,6 +1512,7 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                     padding: 20px;
                     overflow-y: auto;
                 }
+
                 .ojtc-modal-card {
                     max-width: 800px;
                     width: 100%;
@@ -1499,7 +1531,8 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                         </div>
                         <div class="sysAdm-header-text">
                             <h2>Interns</h2>
-                            <p>A place to review student credentials and track candidate progress through the hiring pipeline.</p>
+                            <p>A place to review student credentials and track candidate progress through the hiring
+                                pipeline.</p>
                         </div>
                     </div>
                 </div>
@@ -1532,18 +1565,19 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                     </div>
                 </div> -->
 
-<!-- TEST -->
+                <!-- TEST -->
 
-                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
+                <div
+                    style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
                     <div style="display:flex; align-items:center; flex-wrap:wrap; gap:10px;">
                         <div class="search-box">
                             <input type="text" id="search-applicants"
                                 style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:220px;"
                                 placeholder="Search by company or title..." oninput="filterApplicants()">
-                          
+
                             <i class="bi bi-search" style="color:#272f54 !important;"></i>
                         </div>
-                        
+
                         <select class="filter-select"
                             style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:200px;"
                             id="app-phase-filter" onchange="filterApplicants()">
@@ -1638,21 +1672,23 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                         </div>
                         <div class="sysAdm-header-text">
                             <h2>Documents</h2>
-                            <p>A secure repository for managing, verifying, and storing mandatory internship documentation.</p>
+                            <p>A secure repository for managing, verifying, and storing mandatory internship
+                                documentation.</p>
                         </div>
                     </div>
                 </div>
 
-                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
+                <div
+                    style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
                     <div style="display:flex; align-items:center; flex-wrap:wrap; gap:10px;">
                         <div class="search-box">
                             <input type="text" id="search-documents"
                                 style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:220px;"
                                 placeholder="Search by student name..." oninput="filterDocs()">
-                          
+
                             <i class="bi bi-search" style="color:#272f54 !important;"></i>
                         </div>
-                        
+
                         <select class="filter-select"
                             style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:200px;"
                             id="doc-type-filter" onchange="filterDocs()">
@@ -1692,13 +1728,16 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                                     <td><span>Resume</span></td>
                                     <td><?= date("M d, Y", strtotime($doc['uploaded_at'])) ?></td>
                                     <td style="text-align:center;">
-                                        <a href="../uploads/resumes/<?= htmlspecialchars($doc['resume_path']) ?>" target="_blank"
-                                            target="_blank" class="btn-delete"tooltip="View MOU"title="View MOU"  style="text-decoration: none; background: #FFE7B3;
+                                        <a href="../uploads/resumes/<?= htmlspecialchars($doc['resume_path']) ?>"
+                                            target="_blank" target="_blank" class="btn-delete" tooltip="View MOU"
+                                            title="View MOU"
+                                            style="text-decoration: none; background: #FFE7B3;
                                             color: #7a5200; border:1px solid #7a5200; background-color: #FFE7B3; transition: background-color 0.2s ease;"
                                             onmouseover="this.style.backgroundColor='#dbbe83';"
-                                            onmouseout="this.style.backgroundColor='#FFE7B3';"><i class="bi bi-eye"></i> </a>
+                                            onmouseout="this.style.backgroundColor='#FFE7B3';"><i class="bi bi-eye"></i>
+                                        </a>
                                     </td>
-                                    
+
                                 </tr>
                             <?php endforeach; ?>
                             <?php foreach ($credentials as $doc): ?>
@@ -1711,11 +1750,14 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                                     <td><span>Credentials</span></td>
                                     <td><?= date("M d, Y", strtotime($doc['uploaded_at'])) ?></td>
                                     <td style="text-align:center;">
-                                        <a href="../uploads/credentials/<?= htmlspecialchars($doc['credential_path']) ?>" target="_blank"
-                                            target="_blank" class="btn-delete"tooltip="View MOU"title="View MOU"  style="text-decoration: none; background: #FFE7B3;
+                                        <a href="../uploads/credentials/<?= htmlspecialchars($doc['credential_path']) ?>"
+                                            target="_blank" target="_blank" class="btn-delete" tooltip="View MOU"
+                                            title="View MOU"
+                                            style="text-decoration: none; background: #FFE7B3;
                                             color: #7a5200; border:1px solid #7a5200; background-color: #FFE7B3; transition: background-color 0.2s ease;"
                                             onmouseover="this.style.backgroundColor='#dbbe83';"
-                                            onmouseout="this.style.backgroundColor='#FFE7B3';"><i class="bi bi-eye"></i> </a>
+                                            onmouseout="this.style.backgroundColor='#FFE7B3';"><i class="bi bi-eye"></i>
+                                        </a>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -1772,7 +1814,7 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
 
             <!-- ── DOCUMENT AVAILABILITY ── -->
             <div id="docu_availability" class="section sysAdm-section">
-                
+
                 <div class="sysAdm-header--danger sysAdm-header--blue mb-4">
                     <div class="sysAdm-header-left">
                         <div class="sysAdm-header-icon">
@@ -1831,76 +1873,78 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                         <button type="submit" class="submit-btn">Save Availability</button>
                     </form>
                 </div> -->
-<!-- editing to make the announce document availability popup instead na nakalabas -->
-                    <div id="document-availability-form-panel" class="ojtc-modal-backdrop" style="display:none;"
-                        onclick="if(event.target===this) hideDocAvailForm()">
-                        <div class="form-card ojtc-modal-card">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <h3 style="margin:0;">Announce Document Availability</h3>
+                <!-- editing to make the announce document availability popup instead na nakalabas -->
+                <div id="document-availability-form-panel" class="ojtc-modal-backdrop" style="display:none;"
+                    onclick="if(event.target===this) hideDocAvailForm()">
+                    <div class="form-card ojtc-modal-card">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h3 style="margin:0;">Announce Document Availability</h3>
+                            <button type="button" onclick="hideDocAvailForm()"
+                                style="background:none;border:none;font-size:20px;cursor:pointer;color:#888;">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        </div>
+                        <form method="POST" action="internship-db.php"
+                            onsubmit="return confirm('Post this document availability?');">
+                            <input type="hidden" name="form_type" value="document_availability">
+                            <div class="mb-3">
+                                <label>Internship</label>
+                                <select name="internship_id" required>
+                                    <option value="" disabled selected>Select Internship</option>
+                                    <?php foreach ($internships as $intn): ?>
+                                        <option value="<?= $intn['id'] ?>">
+                                            <?= htmlspecialchars($intn['company']) ?> —
+                                            <?= htmlspecialchars($intn['title']) ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div class="mb-3 d-flex gap-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="mou_available" id="mouCheck">
+                                    <label class="form-check-label" for="mouCheck">MOU</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox"
+                                        name="recommendation_letter_available" id="rlCheck">
+                                    <label class="form-check-label" for="rlCheck">Recommendation Letter</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="waiver_available"
+                                        id="waiverCheck">
+                                    <label class="form-check-label" for="waiverCheck">Waiver</label>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-end gap-2 mt-3">
                                 <button type="button" onclick="hideDocAvailForm()"
-                                    style="background:none;border:none;font-size:20px;cursor:pointer;color:#888;">
-                                    <i class="bi bi-x-lg"></i>
+                                    style="background:#888;color:white;border:none;padding:11px 24px;border-radius:8px;font-weight:600;cursor:pointer;">
+                                    Cancel
+                                </button>
+                                <button type="submit" class="btn-update" style="width:auto;padding:11px 24px;">
+                                    Post Document Availability
                                 </button>
                             </div>
-                            <form method="POST" action="internship-db.php"
-                                onsubmit="return confirm('Post this document availability?');">
-                                <input type="hidden" name="form_type" value="document_availability">
-                                <div class="mb-3">
-                                    <label>Internship</label>
-                                    <select name="internship_id" required>
-                                        <option value="" disabled selected>Select Internship</option>
-                                        <?php foreach ($internships as $intn): ?>
-                                            <option value="<?= $intn['id'] ?>">
-                                                <?= htmlspecialchars($intn['company']) ?> —
-                                                <?= htmlspecialchars($intn['title']) ?>
-                                            </option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                </div>
-                                <div class="mb-3 d-flex gap-4">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="mou_available" id="mouCheck">
-                                        <label class="form-check-label" for="mouCheck">MOU</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="recommendation_letter_available"
-                                            id="rlCheck">
-                                        <label class="form-check-label" for="rlCheck">Recommendation Letter</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="waiver_available"
-                                            id="waiverCheck">
-                                        <label class="form-check-label" for="waiverCheck">Waiver</label>
-                                    </div>
-                                </div>
-
-                                <div class="d-flex justify-content-end gap-2 mt-3">
-                                    <button type="button" onclick="hideDocAvailForm()"
-                                        style="background:#888;color:white;border:none;padding:11px 24px;border-radius:8px;font-weight:600;cursor:pointer;">
-                                        Cancel
-                                    </button>
-                                    <button type="submit" class="btn-update" style="width:auto;padding:11px 24px;">
-                                        Post Document Availability
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
+                        </form>
                     </div>
+                </div>
 
-                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
-                    <div style="display:flex; align-items:center; flex-wrap:wrap; gap:10px; justify-content:space-between; width:100%;">
+                <div
+                    style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
+                    <div
+                        style="display:flex; align-items:center; flex-wrap:wrap; gap:10px; justify-content:space-between; width:100%;">
                         <div class="search-box">
                             <input type="text" id="search-postings"
                                 style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:220px;"
                                 placeholder="Search by company..." oninput="filterPostings()">
-                          
+
                             <i class="bi bi-search" style="color:#272f54 !important;"></i>
                         </div>
                         <button class="btn-update" onclick="showDocAvailForm()">
-                        <i class="bi bi-plus-circle me-1"></i> Post Document Availability
+                            <i class="bi bi-plus-circle me-1"></i> Post Document Availability
                         </button>
                     </div>
-                    </div>
+                </div>
                 <div class="sysAdm-table-wrapper">
                     <table class="sysAdm-table" id="docuAvail-table">
                         <thead>
@@ -1940,18 +1984,19 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
 
             <!-- ── MANAGE ANNOUNCEMENTS ── -->
             <div id="manage_announcement" class="section sysAdm-section">
-                 <div class="sysAdm-header--danger sysAdm-header--blue mb-4">
+                <div class="sysAdm-header--danger sysAdm-header--blue mb-4">
                     <div class="sysAdm-header-left">
                         <div class="sysAdm-header-icon">
                             <i class="bi bi-bell-fill"></i>
                         </div>
                         <div class="sysAdm-header-text">
                             <h2>Manage Announcements</h2>
-                            <p>The content management utility for drafting, scheduling, and distributing official notifications.</p>
-                       </div>
+                            <p>The content management utility for drafting, scheduling, and distributing official
+                                notifications.</p>
+                        </div>
                     </div>
                 </div>
-                
+
                 <!-- <div class="table-controls">
                     <div class="filters">
                         <select class="filter-select" id="category-filter" onchange="filterAnnouncements()">
@@ -1968,15 +2013,16 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                     </div>
                 </div> -->
 
-                
 
-                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
+
+                <div
+                    style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
                     <div style="display:flex; align-items:center; flex-wrap:wrap; gap:10px;">
                         <div class="search-box">
                             <input type="text" id="search-announcements"
                                 style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:220px;"
                                 placeholder="Search announcements..." oninput="filterAnnouncements()">
-                          
+
                             <i class="bi bi-search" style="color:#272f54 !important;"></i>
                         </div>
                     </div>
@@ -2003,7 +2049,8 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                                 </div>
                                 <div class="mb-3">
                                     <label>Message</label>
-                                    <textarea name="message" placeholder="Message" style="width:100%;" required></textarea>
+                                    <textarea name="message" placeholder="Message" style="width:100%;"
+                                        required></textarea>
                                 </div>
                                 <div class="mb-3">
                                     <label>Category</label>
@@ -2029,7 +2076,7 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                     </div>
 
 
-                <!-- <div id="announcement-form-panel" class="ojtc-modal-backdrop" style="display:none;"
+                    <!-- <div id="announcement-form-panel" class="ojtc-modal-backdrop" style="display:none;"
                     onclick="if(event.target===this) hideAnnouncementForm()">
                     <div class="form-card ojtc-modal-card">
                         <div class="d-flex justify-content-between align-items-center mb-3">
@@ -2174,10 +2221,10 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                                         <td><?= date("M d, Y", strtotime($a['created_at'])) ?></td>
                                         <td class="text-center">
                                             <input type="hidden" name="announcement_id" value="<?= $a['id'] ?>">
-                                            <button type="submit" name="edit_announcement" class="btn-delete" 
-                                            style="color: #384887; border:1px solid #5766a68a; background-color: #dfe4f8; transition: background-color 0.2s ease;"
-                                            onmouseover="this.style.backgroundColor='#adbbe6';"
-                                            onmouseout="this.style.backgroundColor='#dfe4f8';">
+                                            <button type="submit" name="edit_announcement" class="btn-delete"
+                                                style="color: #384887; border:1px solid #5766a68a; background-color: #dfe4f8; transition: background-color 0.2s ease;"
+                                                onmouseover="this.style.backgroundColor='#adbbe6';"
+                                                onmouseout="this.style.backgroundColor='#dfe4f8';">
                                                 <i class="bi bi-floppy2"></i>
                                             </button>
                                             <button type="submit" name="delete_announcement" class="btn-delete">
@@ -2206,13 +2253,14 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                     </div>
                 </div>
 
-                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
+                <div
+                    style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
                     <div style="display:flex; align-items:center; flex-wrap:wrap; gap:10px;">
                         <div class="search-box">
                             <input type="text" id="search-mou"
                                 style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:220px;"
                                 placeholder="Search company..." oninput="filterMOU()">
-                          
+
                             <i class="bi bi-search" style="color:#272f54 !important;"></i>
                         </div>
                     </div>
@@ -2230,8 +2278,8 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                                     <i class="bi bi-x-lg"></i>
                                 </button>
                             </div>
-                            <form method="POST" action="internship-db.php" enctype="multipart/form-data" class="internship-form"
-                                onsubmit="return confirm('Post this MOU?');">
+                            <form method="POST" action="internship-db.php" enctype="multipart/form-data"
+                                class="internship-form" onsubmit="return confirm('Post this MOU?');">
                                 <input type="hidden" name="form_type" value="mou_upload">
                                 <div class="form-card">
                                     <h3>MOU File</h3>
@@ -2241,7 +2289,8 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                                             <option value="" disabled selected>Select Internship</option>
                                             <?php foreach ($internships as $p): ?>
                                                 <option value="<?= (int) $p['id'] ?>">
-                                                    <?= htmlspecialchars($p['company']) ?> — <?= htmlspecialchars($p['title']) ?>
+                                                    <?= htmlspecialchars($p['company']) ?> —
+                                                    <?= htmlspecialchars($p['title']) ?>
                                                 </option>
                                             <?php endforeach; ?>
                                         </select>
@@ -2264,9 +2313,9 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                             </form>
                         </div>
                     </div>
-                 </div>
+                </div>
 
-                
+
 
                 <!-- MOU TABLE -->
                 <div class="sysAdm-table-wrapper" style="margin-top:20px;">
@@ -2283,7 +2332,7 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                             <?php foreach ($mouUploads as $m): ?>
                                 <tr>
                                     <td style="padding:14px 15px;"><?= htmlspecialchars($m['company'] ?? '—') ?></td>
-                                    <td style="padding:14px 15px;"><?= htmlspecialchars($m['title'] ?? '—') ?></td>                                        
+                                    <td style="padding:14px 15px;"><?= htmlspecialchars($m['title'] ?? '—') ?></td>
                                     </td>
                                     <td style="padding:14px 15px;">
                                         <?= date("M d, Y", strtotime($m['updated_at'])) ?>
@@ -2294,10 +2343,12 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                                             <input type="hidden" name="form_type" value="mou_delete">
                                             <input type="hidden" name="mou_id" value="<?= (int) $m['id'] ?>">
                                             <a href="<?= htmlspecialchars($m['file_path']) ?>" target="_blank"
-                                            target="_blank" class="btn-delete"tooltip="View MOU"title="View MOU"  style="text-decoration: none; background: #FFE7B3;
+                                                target="_blank" class="btn-delete" tooltip="View MOU" title="View MOU"
+                                                style="text-decoration: none; background: #FFE7B3;
                                             color: #7a5200; border:1px solid #7a5200; background-color: #FFE7B3; transition: background-color 0.2s ease;"
-                                            onmouseover="this.style.backgroundColor='#dbbe83';"
-                                            onmouseout="this.style.backgroundColor='#FFE7B3';"><i class="bi bi-eye"></i> </a>
+                                                onmouseover="this.style.backgroundColor='#dbbe83';"
+                                                onmouseout="this.style.backgroundColor='#FFE7B3';"><i class="bi bi-eye"></i>
+                                            </a>
                                             <button type="submit" class="btn-delete" title="Delete" tooltip="Delete">
                                                 <i class="bi bi-trash"></i>
                                             </button>

@@ -2,6 +2,12 @@
 require 'db.php';
 require 'auth.php';
 
+$role = strtolower(trim($_SESSION['role'] ?? ''));
+
+if ($role !== 'superadmin') {
+    header("Location: index.php");
+    exit();
+}
 $statePath = __DIR__ . '/register_toggle.txt';
 $registerVisible = file_exists($statePath) ? trim(file_get_contents($statePath)) : 'show';
 
