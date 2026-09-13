@@ -16,6 +16,7 @@ $now = new DateTime();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home | CEE IT Connects</title>
 
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="../CSS/index-style.css">
@@ -39,16 +40,16 @@ $now = new DateTime();
         }
 
         .phone-dropdown {
-            display: none;          
-            position: absolute;     
+            display: none;
+            position: absolute;
             /* top: 100%;    */
             right: 10px;
             background: white;
             margin-top: 6px;
             border-radius: 10px;
-            box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
             padding: 10px 14px;
-            z-index: 20; 
+            z-index: 20;
             width: max-content;
         }
 
@@ -79,7 +80,7 @@ $now = new DateTime();
             background: rgba(0, 0, 0, 0.25);
             backdrop-filter: blur(3px);
             -webkit-backdrop-filter: blur(3px);
-            z-index: 15; 
+            z-index: 15;
         }
 
         .phone-backdrop.show {
@@ -251,49 +252,132 @@ $now = new DateTime();
         let markers = {};
 
         function initMap() {
-            map = new google.maps.Map(document.getElementById('map'), {
-                zoom: 10,
-                center: { lat: 14.70, lng: 120.98 }
-            });
 
-            // trigger resize in case map rendered in hidden/collapsed section
-            google.maps.event.trigger(map, 'resize');
+            // Create Leaflet map
+            map = L.map('map').setView(
+                [14.70, 120.98],
+                10
+            );
 
+            // OpenStreetMap tiles
+            L.tileLayer(
+                'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                {
+                    maxZoom: 19,
+                    attribution:
+                        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                }
+            ).addTo(map);
+
+
+            // PHP locations
             const locations = <?php echo json_encode($locations); ?>;
+
             const now = new Date();
 
+
             locations.forEach(loc => {
+
                 const lat = parseFloat(loc.latitude);
-                const lng = parseFloat(loc.longtitude); // matches DB typo
+                const lng = parseFloat(loc.longtitude);
 
-                if (isNaN(lat) || isNaN(lng)) return; // skip bad coordinates
+                // Skip invalid coordinates
+                if (isNaN(lat) || isNaN(lng)) return;
 
-                // Compute open/closed in JS the same way PHP does
+
+                // ================================
+                // OPEN / CLOSED STATUS
+                // ================================
+
                 const openTime = new Date();
                 const closeTime = new Date();
+
                 const [openH, openM] = loc.time_open.split(':');
                 const [closeH, closeM] = loc.time_close.split(':');
+
                 openTime.setHours(openH, openM, 0);
                 closeTime.setHours(closeH, closeM, 0);
 
-                const isOpen = now >= openTime && now <= closeTime;
-                const markerColor = isOpen ? 'green' : 'red';
+                const isOpen =
+                    now >= openTime &&
+                    now <= closeTime;
 
-                const marker = new google.maps.Marker({
-                    position: { lat, lng },
-                    map: map,
-                    title: loc.title,
-                    icon: `http://maps.google.com/mapfiles/ms/icons/${markerColor}-dot.png`
-                });
 
+                // ================================
+                // MARKER
+                // ================================
+
+                const marker = L.marker(
+                    [lat, lng],
+                    {
+                        title: loc.title
+                    }
+                ).addTo(map);
+
+
+                // Store marker using internship ID
                 markers[loc.id] = marker;
 
-                const info = new google.maps.InfoWindow({
-                    content: `<b>${loc.title}</b><br>${loc.company}<br>${loc.location}`
-                });
-                marker.addListener('click', () => info.open(map, marker));
+
+                // ================================
+                // INFO WINDOW
+                // ================================
+
+                const info = `
+            <div>
+                <b>${escapeHtml(loc.title)}</b><br>
+                ${escapeHtml(loc.company)}<br>
+                ${escapeHtml(loc.location)}
+            </div>
+        `;
+
+                marker.bindPopup(info);
+
+
+                // Optional:
+                // Open popup when marker is clicked automatically
+                // Leaflet does this through bindPopup()
             });
+
+
+            // ================================
+            // FIX MAP SIZE
+            // ================================
+
+            setTimeout(function () {
+
+                map.invalidateSize();
+
+            }, 300);
+
         }
+
+
+        // ================================
+        // HTML ESCAPE
+        // ================================
+
+        function escapeHtml(text) {
+
+            if (!text) return '';
+
+            return String(text)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+
+        }
+
+        document.addEventListener(
+            'DOMContentLoaded',
+            function () {
+
+                initMap();
+
+            }
+        );
 
         function filterListings() {
             const input = document.getElementById('searchInput').value.toLowerCase();
@@ -369,8 +453,8 @@ $now = new DateTime();
         });
     </script>
 
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDITrnTUmS0AwxqZCE8cfYI3d5kjtzg7RY&callback=initMap"
-        async defer></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+
 </body>
 
 </html>
