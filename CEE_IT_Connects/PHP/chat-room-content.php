@@ -840,7 +840,7 @@ $backLink = getDashboardByRole($_SESSION['role']);
             <?php endforeach; ?>
         </div>
 
-    <!-- <?php elseif ($tab === 'chats'): ?>
+        <!-- <?php elseif ($tab === 'chats'): ?>
 
         <div class="chat-container">
 
@@ -892,9 +892,10 @@ $backLink = getDashboardByRole($_SESSION['role']);
                 </div>
             </div>
 
-        </div>
+        </div> -->
 
-    <?php else: ?> -->
+
+    <?php else: ?>
 
         <?php if (
             $_SESSION['role'] === 'internship_adviser' || $_SESSION['role'] === 'hte_adviser'
