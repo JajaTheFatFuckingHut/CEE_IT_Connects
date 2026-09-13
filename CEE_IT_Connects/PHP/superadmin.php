@@ -1843,7 +1843,7 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
                 <br>
                 <div class="form-card">
                     <?php
-                    $sourceDir = __DIR__ . '../Sources/';
+                    $sourceDir = __DIR__ . '/Sources/';
                     $activeFile = file_exists($sourceDir . 'active_csv.txt')
                         ? trim(file_get_contents($sourceDir . 'active_csv.txt'))
                         : 'students.csv';

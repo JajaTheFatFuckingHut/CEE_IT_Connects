@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-$sourceDir = __DIR__ . '/../Sources/';
+$sourceDir = __DIR__ . '/Sources/';
 
 if (!isset($_FILES['students_csv']) || $_FILES['students_csv']['error'] !== UPLOAD_ERR_OK) {
     $_SESSION['error'] = "No file uploaded or upload error.";
