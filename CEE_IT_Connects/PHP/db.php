@@ -1,12 +1,17 @@
 <?php
-$host = "localhost";
-$dbname = "CEE_IT_CONNECTS";
-$user = "postgres";
-$pass = "12345";
+
+$databaseUrl = getenv('DATABASE_URL');
+
+if (!$databaseUrl) {
+    die("DATABASE_URL is not configured.");
+}
 
 try {
-    $pdo = new PDO("pgsql:host=$host;dbname=$dbname", $user, $pass);
+    $pdo = new PDO($databaseUrl);
+
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+
 } catch (PDOException $e) {
     die("Database connection failed: " . $e->getMessage());
 }
