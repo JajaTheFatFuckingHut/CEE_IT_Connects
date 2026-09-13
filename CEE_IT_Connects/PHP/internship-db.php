@@ -32,6 +32,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $deadline = $_POST['deadline'] ?? null;
         $openTime = $_POST['openTime'] ?? null;
         $closeTime = $_POST['closeTime'] ?? null;
+        $is_valenzuela_lgu = ($_POST['is_valenzuela_lgu'] ?? 'false') === 'true';
+        $is_plv_ojt = ($_POST['is_plv_ojt'] ?? 'false') === 'true';
 
         $admin_id = $_SESSION['user_id'];
         $available = 'true';
@@ -60,14 +62,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             ]);
 
             $required_hours = $hoursStmt->fetchColumn();
-            
+
             $stmt = $pdo->prepare(
                 "INSERT INTO internships (title, company, email, location, description, 
                 program, latitude, longtitude, phone_numbers, available, time_open, time_close, 
                 admin_id, is_plv_internal, is_valenzuela_lgu, required_hours) 
                 VALUES (:title, :company, :email, :location, :description, :program, :latitude, 
                 :longtitude, :phonenumber, :available, :openTime, :closeTime, :admin_id, 
-                False, False, :required_hours)"
+                :is_plv_ojt, :is_valenzuela_lgu, :required_hours)"
             );
 
             $stmt->execute([
@@ -84,7 +86,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 'openTime' => $openTime,
                 'closeTime' => $closeTime,
                 'admin_id' => $admin_id,
-                'required_hours' => $required_hours
+                'required_hours' => $required_hours,
+                'is_plv_ojt' => $is_plv_ojt,
+                'is_valenzuela_lgu' => $is_valenzuela_lgu
             ]);
 
             // This is for notifying students about the new internship posting

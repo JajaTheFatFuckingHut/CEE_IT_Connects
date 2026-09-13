@@ -1420,6 +1420,26 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                                         <option value="public-private">Public-Private Sector</option>
                                     </select>
                                 </div>
+                                <div>
+                                    <h4>
+                                        Is Valenzuela LGU
+                                    </h4>
+
+                                    Yes
+                                    <input value="true" type="radio" checked=true name="is_valenzuela_lgu">
+                                    No
+                                    <input value="false" type="radio" name="is_valenzuela_lgu"></label>
+                                </div>
+                                <div>
+                                    <h4>
+                                        Is PLV OJT
+                                    </h4>
+
+                                    Yes
+                                    <input value="true" type="radio" checked=true name="is_plv_ojt">
+                                    No
+                                    <input value="false" type="radio" name="is_plv_ojt"></label>
+                                </div>
                                 <div style="grid-column:span 2;">
                                     <label>Description</label>
                                     <textarea name="description" placeholder="Description" required
