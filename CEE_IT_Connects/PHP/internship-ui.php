@@ -2676,7 +2676,7 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
     </script>
 
     <script
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDITrnTUmS0AwxqZCE8cfYI3d5kjtzg7RY&callback=initPostingMap"
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDITrnTUmS0AwxqZCE8cfYI3d5kjtzg7RY&libraries=places&callback=initPostingMap"
         async defer></script>
     <script src="../JS/script.js"></script>
 
