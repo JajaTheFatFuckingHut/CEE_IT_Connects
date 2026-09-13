@@ -440,9 +440,7 @@ $now = new DateTime();
                     isOpen ? '#198754' : '#dc3545';
 
 
-                const popupContent = `
-            < div style = "min-width:180px;" >
-                
+                const popupContent = `                
                 <strong>
                     ${escapeHtml(loc.title)}
                 </strong>
