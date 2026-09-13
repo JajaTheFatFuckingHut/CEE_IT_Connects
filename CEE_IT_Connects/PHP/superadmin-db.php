@@ -78,9 +78,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $source = $_POST['source'] ?? '';
         $title = $_POST['title'] ?? '';
 
-        if ($id === null || $source === '' || $title === '') {
-            die('Missing required form data.');
-        }
         $internship_id = null;
 
         $name = $_POST['name'];
