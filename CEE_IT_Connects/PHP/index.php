@@ -250,7 +250,11 @@ $now = new DateTime();
     <script>
         let map;
         let markers = {};
+
+
+        // ========================================
         // CUSTOM LEAFLET MARKER ICONS
+        // ========================================
 
         const greenIcon = L.icon({
             iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
@@ -262,7 +266,6 @@ $now = new DateTime();
             shadowSize: [41, 41]
         });
 
-
         const redIcon = L.icon({
             iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
             shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
@@ -273,9 +276,31 @@ $now = new DateTime();
             shadowSize: [41, 41]
         });
 
+
+        // ========================================
         // INITIALIZE MAP
+        // ========================================
+
         function initMap() {
 
+            console.log("Initializing Leaflet map...");
+
+            // Check that Leaflet loaded
+            if (typeof L === 'undefined') {
+                console.error("Leaflet is NOT loaded.");
+                return;
+            }
+
+            // Check map container
+            const mapElement = document.getElementById('map');
+
+            if (!mapElement) {
+                console.error("Map element #map was not found.");
+                return;
+            }
+
+
+            // Create map
             map = L.map('map').setView(
                 [14.70, 120.98],
                 10
@@ -294,49 +319,65 @@ $now = new DateTime();
             ).addTo(map);
 
 
-            // Get internship locations from PHP
+            // ========================================
+            // GET PHP LOCATIONS
+            // ========================================
+
             const locations = <?php echo json_encode($locations); ?>;
+
+            console.log("Locations:", locations);
+
 
             const now = new Date();
 
 
+            // ========================================
             // CREATE MARKERS
-            locations.forEach(loc => {
+            // ========================================
+
+            locations.forEach(function (loc) {
 
                 const lat = parseFloat(loc.latitude);
                 const lng = parseFloat(loc.longtitude);
 
 
-                // Ignore invalid coordinates
+                // Skip invalid coordinates
                 if (isNaN(lat) || isNaN(lng)) {
+
+                    console.warn(
+                        "Invalid coordinates for:",
+                        loc.title,
+                        loc.latitude,
+                        loc.longtitude
+                    );
+
                     return;
                 }
 
 
+                // ========================================
                 // CALCULATE OPEN / CLOSED
+                // ========================================
+
                 const openTime = new Date();
                 const closeTime = new Date();
 
 
-                const [openH, openM] =
-                    loc.time_open.split(':');
-
-
-                const [closeH, closeM] =
-                    loc.time_close.split(':');
+                const openParts = loc.time_open.split(':');
+                const closeParts = loc.time_close.split(':');
 
 
                 openTime.setHours(
-                    parseInt(openH),
-                    parseInt(openM),
+                    parseInt(openParts[0]),
+                    parseInt(openParts[1]),
                     0,
                     0
                 );
 
 
                 closeTime.setHours(
-                    parseInt(closeH),
-                    parseInt(closeM),
+                    parseInt(closeParts[0]),
+                    parseInt(closeParts[1]),
                     0,
                     0
                 );
@@ -346,12 +387,19 @@ $now = new DateTime();
                     now >= openTime &&
                     now <= closeTime;
 
-                // SELECT ICON
+
+                // ========================================
+                // SELECT MARKER ICON
+                // ========================================
+
                 const markerIcon =
                     isOpen ? greenIcon : redIcon;
 
 
+                // ========================================
                 // CREATE MARKER
+                // ========================================
+
                 const marker = L.marker(
                     [lat, lng],
                     {
@@ -361,7 +409,7 @@ $now = new DateTime();
                 ).addTo(map);
 
 
-                // Save marker using internship ID
+                // Store marker
                 markers[loc.id] = marker;
 
 
@@ -373,28 +421,39 @@ $now = new DateTime();
                     isOpen ? 'OPEN' : 'CLOSED';
 
 
+                const statusColor =
+                    isOpen ? '#198754' : '#dc3545';
+
+
                 const popupContent = `
-            < div div style = "min-width:180px;" >
-                <strong>${escapeHtml(loc.title)}</strong>
+            < div style = "min-width:180px;" >
+                
+                <strong>
+                    ${escapeHtml(loc.title)}
+                </strong>
+
                 <br>
 
                 ${escapeHtml(loc.company)}
+
                 <br>
 
                 ${escapeHtml(loc.location)}
+
                 <br><br>
 
                 <span style="
                     display:inline-block;
                     padding:3px 8px;
                     border-radius:4px;
-                    background:${isOpen ? '#198754' : '#dc3545'};
+                    background:${statusColor};
                     color:white;
                     font-size:12px;
                     font-weight:bold;
                 ">
                     ${statusText}
                 </span>
+
             </>
         `;
 
@@ -406,7 +465,9 @@ $now = new DateTime();
             });
 
 
-            // FIX MAP SIZE
+            // ========================================
+            // FIX LEAFLET MAP SIZE
+            // ========================================
 
             setTimeout(function () {
 
@@ -414,12 +475,19 @@ $now = new DateTime();
 
             }, 300);
 
+
+            console.log("Leaflet map initialized successfully.");
+
         }
 
 
+        // ========================================
+        // ESCAPE HTML
+        // ========================================
+
         function escapeHtml(text) {
 
-            if (!text) {
+            if (text === null || text === undefined) {
                 return '';
             }
 
@@ -432,6 +500,11 @@ $now = new DateTime();
 
         }
 
+
+        // ========================================
+        // INITIALIZE AFTER PAGE LOAD
+        // ========================================
+
         document.addEventListener(
             'DOMContentLoaded',
             function () {
@@ -440,6 +513,7 @@ $now = new DateTime();
 
             }
         );
+
 
         function filterListings() {
             const input = document.getElementById('searchInput').value.toLowerCase();
