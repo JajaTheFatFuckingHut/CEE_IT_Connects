@@ -1421,19 +1421,14 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                                     </select>
                                 </div>
                                 <div>
-                                    <h4>
-                                        Is Valenzuela LGU
-                                    </h4>
+                                    <label>Contact Number</label>
 
                                     Yes
                                     <input value="true" type="radio" checked=true name="is_valenzuela_lgu">
                                     No
                                     <input value="false" type="radio" name="is_valenzuela_lgu"></label>
-                                </div>
-                                <div>
-                                    <h4>
-                                        Is PLV OJT
-                                    </h4>
+
+                                    <label>Contact Number</label>
 
                                     Yes
                                     <input value="true" type="radio" checked=true name="is_plv_ojt">

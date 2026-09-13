@@ -86,9 +86,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 'openTime' => $openTime,
                 'closeTime' => $closeTime,
                 'admin_id' => $admin_id,
-                'required_hours' => $required_hours,
                 'is_plv_ojt' => $is_plv_ojt,
-                'is_valenzuela_lgu' => $is_valenzuela_lgu
+                'is_valenzuela_lgu' => $is_valenzuela_lgu,
+                'required_hours' => $required_hours
             ]);
 
             // This is for notifying students about the new internship posting
