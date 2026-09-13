@@ -12,6 +12,9 @@ COPY PHP /var/www/html
 COPY CSS /var/www/html/CSS
 COPY Sources /var/www/html/Sources
 
+RUN chown -R www-data:www-data /var/www/html/Sources \
+    && chmod -R 775 /var/www/html/Sources
+
 RUN sed -i 's/AllowOverride None/AllowOverride All/g' /etc/apache2/apache2.conf
 
 EXPOSE 80
