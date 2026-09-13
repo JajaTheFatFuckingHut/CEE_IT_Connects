@@ -39,6 +39,20 @@ $now = new DateTime();
             position: relative;
         }
 
+        .main {
+            display: flex;
+            width: 100%;
+        }
+
+        .panel {
+            width: 40%;
+        }
+
+        #map {
+            width: 60%;
+            height: 600px;
+        }
+
         .phone-dropdown {
             display: none;
             position: absolute;
