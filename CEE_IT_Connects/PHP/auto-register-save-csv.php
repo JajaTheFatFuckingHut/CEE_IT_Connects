@@ -228,7 +228,7 @@ if (isset($_POST['edit_csv'])) {
             PASSWORD_DEFAULT
         );
 
-        $stmtActivity = $pdo->
+        $insertStmt = $pdo->
             prepare("INSERT INTO students (email, full_name, student_id, program, 
             year_level, section, contact_number, password_hash) 
         VALUES (:email, :full_name, :student_id, :program, :year_level, :section, :contact_number, 
