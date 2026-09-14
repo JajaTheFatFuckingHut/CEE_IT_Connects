@@ -11,10 +11,9 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-require '/var/www/phpmailer-master/src/Exception.php';
-require '/var/www/phpmailer-master/src/PHPMailer.php';
-require '/var/www/phpmailer-master/src/SMTP.php';
-
+require __DIR__ . '/PHPMailer-master/src/PHPMailer.php';
+require __DIR__ . '/PHPMailer-master/src/SMTP.php';
+require __DIR__ . '/PHPMailer-master/src/Exception.php';
 
 function sendStudentCredentials(
     string $email,
