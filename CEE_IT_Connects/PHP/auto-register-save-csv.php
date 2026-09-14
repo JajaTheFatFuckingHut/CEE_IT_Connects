@@ -30,19 +30,16 @@ function sendStudentCredentials(
         $mail->isSMTP();
         $mail->Host = 'smtp.gmail.com';
         $mail->SMTPAuth = true;
-        $mail->Username = getenv('jamesherold25@gmail.com');
-        $mail->Password = getenv('vyfc kawx ctvz cwqf');
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Username = 'jamesherold25@gmail.com';
+        $mail->Password = 'vyfc kawx ctvz cwqf';
+        $mail->SMTPSecure = 'tls';
         $mail->Port = 587;
 
         // Sender
-        $mail->setFrom(
-            getenv('jamesherold25@gmail.com'),
-            'CEE IT Connects'
-        );
+        $mail->setFrom('jamesherold25@gmail.com', 'CEE IT Connects');
 
-        // Recipient
-        $mail->addAddress($email, $full_name);
+        $mail->addAddress($email);
+
 
         // Email content
         $mail->isHTML(true);
