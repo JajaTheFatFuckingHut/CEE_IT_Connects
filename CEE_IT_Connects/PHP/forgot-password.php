@@ -40,8 +40,8 @@ if (isset($_POST['send_code'])) {
             $mail->isSMTP();
             $mail->Host = 'smtp.gmail.com';
             $mail->SMTPAuth = true;
-            $mail->Username = 'jamesherold25@gmail.com';
-            $mail->Password = 'vyfc kawx ctvz cwqf';
+            $mail->Username = getenv('jamesherold25@gmail.com');
+            $mail->Password = getenv('vyfc kawx ctvz cwqf');
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
             $mail->Port = 465;
 
