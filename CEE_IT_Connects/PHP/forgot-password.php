@@ -33,26 +33,32 @@ if (isset($_POST['send_code'])) {
             'email' => $email
         ]);
 
-        // email via Resend HTTP API
+        // email via Brevo API
         $payload = json_encode([
-            'from' => 'CEE IT Connects <onboarding@resend.dev>',
-            'to' => [$email],
+            'sender' => [
+                'name' => 'CEE IT Connects',
+                'email' => 'your-verified-sender@gmail.com', // must match the sender you verified in Brevo
+            ],
+            'to' => [
+                ['email' => $email],
+            ],
             'subject' => 'Password Reset Code',
-            'html' => "
+            'htmlContent' => "
                 <h3>Your verification code is:</h3>
                 <h1>$code</h1>
                 <p>This code expires in 10 minutes.</p>
             ",
         ]);
 
-        $ch = curl_init('https://api.resend.com/emails');
+        $ch = curl_init('https://api.brevo.com/v3/smtp/email');
         curl_setopt_array($ch, [
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_POST => true,
             CURLOPT_TIMEOUT => 15,
             CURLOPT_HTTPHEADER => [
-                'Authorization: Bearer ' . getenv('RESEND_API_KEY'),
+                'api-key: ' . getenv('BREVO_API_KEY'),
                 'Content-Type: application/json',
+                'accept: application/json',
             ],
             CURLOPT_POSTFIELDS => $payload,
         ]);
@@ -63,13 +69,13 @@ if (isset($_POST['send_code'])) {
         curl_close($ch);
 
         if ($curlError) {
-            error_log("Resend cURL error: " . $curlError);
+            error_log("Brevo cURL error: " . $curlError);
             $error = "Email failed: " . $curlError;
         } elseif ($httpCode >= 200 && $httpCode < 300) {
             header("Location: forgot-password.php?step=code&email=" . urlencode($email) . "&msg=Code sent!");
             exit;
         } else {
-            error_log("Resend API error ({$httpCode}): " . $response);
+            error_log("Brevo API error ({$httpCode}): " . $response);
             $error = "Email failed: " . $response;
         }
 
