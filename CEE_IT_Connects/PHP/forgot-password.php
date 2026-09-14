@@ -33,9 +33,9 @@ if (isset($_POST['send_code'])) {
             'email' => $email
         ]);
 
-        // email via Resend HTTP API (Render blocks outbound SMTP ports)
+        // email via Resend HTTP API
         $payload = json_encode([
-            'from' => 'CEE IT Connects <onboarding@resend.dev>', // swap to your verified domain later
+            'from' => 'CEE IT Connects <onboarding@resend.dev>',
             'to' => [$email],
             'subject' => 'Password Reset Code',
             'html' => "

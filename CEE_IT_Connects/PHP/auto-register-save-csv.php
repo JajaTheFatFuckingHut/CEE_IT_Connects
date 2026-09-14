@@ -25,40 +25,16 @@ function sendStudentCredentials(
     $mail = new PHPMailer(true);
 
     try {
-
-        $mail->isSMTP();
-        $mail->Host = 'smtp.gmail.com';
-        $mail->SMTPAuth = true;
-
-        $mail->Username = 'jamesherold25@gmail.com';
-        $mail->Password = 'vyfc kawx ctvz cwqf';
-
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port = 587;
-
-        // Prevent a failed SMTP connection from hanging forever
-        $mail->Timeout = 15;
-
-        $mail->setFrom(
-            'jamesherold25@gmail.com',
-            'CEE IT Connects'
-        );
-
-        $mail->addAddress(
-            $email,
-            $full_name
-        );
-
-        $mail->isHTML(true);
-
-        $mail->Subject = 'Your CEE IT Connects Account';
-
-        $mail->Body = "
-            <h2>Welcome to CEE IT Connects!</h2>
+        $payload = json_encode([
+            'from' => 'CEE IT Connects <onboarding@resend.dev>',
+            'to' => [$email],
+            'subject' => 'Your CEE IT Connects Account',
+            'html' => "
+                <h2>Welcome to CEE IT Connects!</h2>
 
             <p>Hello <strong>" .
-            htmlspecialchars($full_name) .
-            "</strong>,</p>
+                htmlspecialchars($full_name) .
+                "</strong>,</p>
 
             <p>Your student account has been successfully created.</p>
 
@@ -88,17 +64,36 @@ function sendStudentCredentials(
                 Regards,<br>
                 <strong>CEE IT Connects</strong>
             </p>
-        ";
+            ",
+        ]);
 
-        $mail->AltBody =
-            "Welcome to CEE IT Connects!\n\n" .
-            "Your student account has been created.\n\n" .
-            "Student ID: {$student_id}\n" .
-            "Email: {$email}\n" .
-            "Temporary Password: {$temporaryPassword}\n\n" .
-            "Please log in and change your password after your first login.";
+        $ch = curl_init('https://api.resend.com/emails');
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST => true,
+            CURLOPT_TIMEOUT => 15,
+            CURLOPT_HTTPHEADER => [
+                'Authorization: Bearer ' . getenv('RESEND_API_KEY'),
+                'Content-Type: application/json',
+            ],
+            CURLOPT_POSTFIELDS => $payload,
+        ]);
 
-        $mail->send();
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curlError = curl_error($ch);
+        curl_close($ch);
+
+        if ($curlError) {
+            error_log("Resend cURL error: " . $curlError);
+            $error = "Email failed: " . $curlError;
+        } elseif ($httpCode >= 200 && $httpCode < 300) {
+            header("Location: forgot-password.php?step=code&email=" . urlencode($email) . "&msg=Code sent!");
+            exit;
+        } else {
+            error_log("Resend API error ({$httpCode}): " . $response);
+            $error = "Email failed: " . $response;
+        }
 
         error_log("Credential email sent to: {$email}");
 
