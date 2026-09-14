@@ -48,7 +48,7 @@ $registerVisible = file_exists($statePath) ? trim(file_get_contents($statePath))
                 <div class="role-toggle">
                     <a href="login-ui.php?role=student"
                         class="btn-role <?= $role === 'student' ? 'active' : 'inactive' ?>">
-                        Stud
+                        Students
                     </a>
                     <a href="login-ui.php?role=adviser"
                         class="btn-role <?= $role === 'adviser' ? 'active' : 'inactive' ?>">
@@ -94,7 +94,7 @@ $registerVisible = file_exists($statePath) ? trim(file_get_contents($statePath))
 
     <!-- SCRIPTS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="../JS/login.js"></script>
+    <script src="/JS/login.js"></script>
 
 </body>
 
