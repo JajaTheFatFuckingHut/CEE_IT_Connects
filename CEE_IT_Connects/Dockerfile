@@ -13,7 +13,7 @@ COPY CSS /var/www/html/CSS
 COPY JS /var/www/html/JS
 COPY Sources /var/www/html/Sources
 COPY uploads/resumes /var/www/html/uploads/resumes
-COPY PHPMailer-master /var/www/phpmailer-master
+COPY PHPMailer-master /var/www/html/phpmailer-master
 
 RUN chown -R www-data:www-data /var/www/html/Sources \
     && chmod -R 775 /var/www/html/Sources
