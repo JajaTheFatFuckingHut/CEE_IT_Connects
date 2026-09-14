@@ -33,42 +33,44 @@ if (isset($_POST['send_code'])) {
             'email' => $email
         ]);
 
-        // email
-        $mail = new PHPMailer(true);
-
-        try {
-            $mail->isSMTP();
-            $mail->Host = 'smtp.gmail.com';
-            $mail->SMTPAuth = true;
-            $mail->Username = getenv('GMAIL_USERNAME');
-            $mail->Password = getenv('GMAIL_APP_PASSWORD');
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
-            $mail->Port = 465;
-
-            $mail->Timeout = 15;
-            $mail->setFrom(getenv('GMAIL_USERNAME'), 'CEE IT Connects');
-            $mail->addAddress($email);
-
-            $mail->isHTML(true);
-            $mail->Subject = 'Password Reset Code';
-            $mail->Body = "
+        // email via Resend HTTP API (Render blocks outbound SMTP ports)
+        $payload = json_encode([
+            'from' => 'CEE IT Connects <onboarding@resend.dev>', // swap to your verified domain later
+            'to' => [$email],
+            'subject' => 'Password Reset Code',
+            'html' => "
                 <h3>Your verification code is:</h3>
                 <h1>$code</h1>
                 <p>This code expires in 10 minutes.</p>
-            ";
+            ",
+        ]);
 
-            $mail->SMTPDebug = 2;
-            $mail->Debugoutput = function ($str, $level) {
-                error_log("PHPMailer: " . trim($str));
-            };
+        $ch = curl_init('https://api.resend.com/emails');
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST => true,
+            CURLOPT_TIMEOUT => 15,
+            CURLOPT_HTTPHEADER => [
+                'Authorization: Bearer ' . getenv('RESEND_API_KEY'),
+                'Content-Type: application/json',
+            ],
+            CURLOPT_POSTFIELDS => $payload,
+        ]);
 
-            $mail->send();
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curlError = curl_error($ch);
+        curl_close($ch);
 
+        if ($curlError) {
+            error_log("Resend cURL error: " . $curlError);
+            $error = "Email failed: " . $curlError;
+        } elseif ($httpCode >= 200 && $httpCode < 300) {
             header("Location: forgot-password.php?step=code&email=" . urlencode($email) . "&msg=Code sent!");
             exit;
-
-        } catch (Exception $e) {
-            $error = "Email failed: {$mail->ErrorInfo}";
+        } else {
+            error_log("Resend API error ({$httpCode}): " . $response);
+            $error = "Email failed: " . $response;
         }
 
     } else {
