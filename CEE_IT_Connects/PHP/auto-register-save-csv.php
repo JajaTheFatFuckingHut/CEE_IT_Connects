@@ -11,28 +11,347 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 $source = $_POST['source'] ?? '';
 
 // ── CASE 1: Superadmin editing the CSV file directly ──
+// ── CASE 1: Superadmin editing/importing the CSV file ──
 if (isset($_POST['edit_csv'])) {
+
     $headers = $_POST['headers'] ?? [];
     $rows = $_POST['csv'] ?? [];
 
-    $sourceDir = __DIR__ . '/../Sources/';
+    $sourceDir = __DIR__ . '/Sources/';
+
     $activeFile = file_exists($sourceDir . 'active_csv.txt')
         ? trim(file_get_contents($sourceDir . 'active_csv.txt'))
         : 'students.csv';
+
     $csvPath = $sourceDir . $activeFile;
 
-    $handle = fopen($csvPath, 'w');
-    fputcsv($handle, $headers);
-    foreach ($rows as $row) {
-        fputcsv($handle, $row);
+
+    // =========================================================
+    // SAVE CSV ONLY
+    // =========================================================
+
+    if (!isset($_POST['import_to_database'])) {
+
+        $handle = fopen($csvPath, 'w');
+
+        if ($handle === false) {
+            $_SESSION['error'] = "Unable to open CSV file: " . $csvPath;
+            header("Location: superadmin.php?section=student_register");
+            exit;
+        }
+
+        fputcsv($handle, $headers);
+
+        foreach ($rows as $row) {
+            fputcsv($handle, $row);
+        }
+
+        fclose($handle);
+
+        $_SESSION['success'] = "CSV saved successfully.";
+
+        header("Location: superadmin.php?section=student_register");
+        exit;
     }
-    fclose($handle);
 
-    $_SESSION['success'] = "CSV saved successfully.";
-    header("Location: superadmin.php?section=student_register");
-    exit;
+
+    // =========================================================
+    // ADD CSV DATA TO DATABASE
+    // =========================================================
+
+    if (isset($_POST['import_to_database'])) {
+
+        /*
+         * Find the column positions based on the CSV headers.
+         * This allows the CSV columns to remain flexible.
+         */
+
+        $normalizedHeaders = array_map(
+            fn($h) => strtolower(trim($h)),
+            $headers
+        );
+
+        $requiredColumns = [
+            'student_id',
+            'full_name',
+            'email',
+            'program',
+            'year_level',
+            'section',
+            'contact_number'
+        ];
+
+        $columnIndexes = [];
+
+        foreach ($requiredColumns as $column) {
+
+            $index = array_search($column, $normalizedHeaders);
+
+            if ($index === false) {
+
+                $_SESSION['error'] =
+                    "CSV is missing the required column: {$column}";
+
+                header("Location: superadmin.php?section=student_register");
+                exit;
+            }
+
+            $columnIndexes[$column] = $index;
+        }
+
+
+        // ---------------------------------------------------------
+        // PREPARE DATABASE STATEMENTS
+        // ---------------------------------------------------------
+
+        $checkEmailStmt = $pdo->prepare("
+            SELECT id
+            FROM students
+            WHERE email = ?
+            LIMIT 1
+        ");
+
+        $checkStudentIdStmt = $pdo->prepare("
+            SELECT id
+            FROM students
+            WHERE student_id = ?
+            LIMIT 1
+        ");
+
+        $insertStmt = $pdo->prepare("
+            INSERT INTO students
+            (
+                email,
+                full_name,
+                student_id,
+                program,
+                year_level,
+                section,
+                contact_number,
+                password_hash
+            )
+            VALUES
+            (
+                ?,
+                ?,
+                ?,
+                ?,
+                ?,
+                ?,
+                ?,
+                ?
+            )
+        ");
+
+
+        // ---------------------------------------------------------
+        // COUNTERS
+        // ---------------------------------------------------------
+
+        $added = 0;
+        $skipped = 0;
+        $errors = [];
+
+
+        // ---------------------------------------------------------
+        // PROCESS EACH CSV ROW
+        // ---------------------------------------------------------
+
+        foreach ($rows as $rowIndex => $row) {
+
+            $student_id = trim(
+                $row[$columnIndexes['student_id']] ?? ''
+            );
+
+            $full_name = trim(
+                $row[$columnIndexes['full_name']] ?? ''
+            );
+
+            $email = trim(
+                $row[$columnIndexes['email']] ?? ''
+            );
+
+            $program = trim(
+                $row[$columnIndexes['program']] ?? ''
+            );
+
+            $year_level = trim(
+                $row[$columnIndexes['year_level']] ?? ''
+            );
+
+            $section = trim(
+                $row[$columnIndexes['section']] ?? ''
+            );
+
+            $contact_number = trim(
+                $row[$columnIndexes['contact_number']] ?? ''
+            );
+
+
+            // -----------------------------------------------------
+            // SKIP COMPLETELY EMPTY ROW
+            // -----------------------------------------------------
+
+            if (
+                $student_id === '' &&
+                $full_name === '' &&
+                $email === '' &&
+                $program === '' &&
+                $year_level === '' &&
+                $section === '' &&
+                $contact_number === ''
+            ) {
+                continue;
+            }
+
+
+            // -----------------------------------------------------
+            // VALIDATE REQUIRED DATA
+            // -----------------------------------------------------
+
+            if ($student_id === '') {
+                $errors[] = "Row " . ($rowIndex + 1) . ": Student ID is empty.";
+                continue;
+            }
+
+            if ($full_name === '') {
+                $errors[] = "Row " . ($rowIndex + 1) . ": Full name is empty.";
+                continue;
+            }
+
+            if ($email === '') {
+                $errors[] = "Row " . ($rowIndex + 1) . ": Email is empty.";
+                continue;
+            }
+
+
+            // -----------------------------------------------------
+            // VALIDATE EMAIL
+            // -----------------------------------------------------
+
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+
+                $errors[] =
+                    "Row " . ($rowIndex + 1) .
+                    ": Invalid email ({$email}).";
+
+                continue;
+            }
+
+
+            // -----------------------------------------------------
+            // CHECK DUPLICATE EMAIL
+            // -----------------------------------------------------
+
+            $checkEmailStmt->execute([$email]);
+
+            if ($checkEmailStmt->fetch()) {
+
+                $skipped++;
+
+                $errors[] =
+                    "Row " . ($rowIndex + 1) .
+                    ": Email already exists ({$email}).";
+
+                continue;
+            }
+
+
+            // CHECK DUPLICATE STUDENT ID
+            $checkStudentIdStmt->execute([$student_id]);
+
+            if ($checkStudentIdStmt->fetch()) {
+
+                $skipped++;
+
+                $errors[] =
+                    "Row " . ($rowIndex + 1) .
+                    ": Student ID already exists ({$student_id}).";
+
+                continue;
+            }
+
+
+            // DEFAULT PASSWORD
+            $password_hash = password_hash(
+                $student_id,
+                PASSWORD_DEFAULT
+            );
+
+
+            // INSERT STUDENT
+            try {
+
+                $insertStmt->execute([
+                    $email,
+                    $full_name,
+                    $student_id,
+                    $program,
+                    $year_level !== '' ? (int) $year_level : null,
+                    $section,
+                    $contact_number,
+                    $password_hash
+                ]);
+
+                $added++;
+
+            } catch (PDOException $e) {
+
+                $errors[] =
+                    "Row " . ($rowIndex + 1) .
+                    ": Database error - " . $e->getMessage();
+            }
+        }
+
+
+        $handle = fopen($csvPath, 'w');
+
+        if ($handle !== false) {
+
+            fputcsv($handle, $headers);
+
+            foreach ($rows as $row) {
+                fputcsv($handle, $row);
+            }
+
+            fclose($handle);
+        }
+
+
+        // CREATE RESULT MESSAGE
+        if ($added > 0 && empty($errors)) {
+
+            $_SESSION['success'] =
+                "Successfully added {$added} student(s) to the database.";
+
+        } elseif ($added > 0) {
+
+            $_SESSION['warning'] =
+                "Added {$added} student(s). " .
+                ($skipped > 0
+                    ? "{$skipped} student(s) were skipped. "
+                    : "") .
+                implode(' ', $errors);
+
+        } elseif ($skipped > 0) {
+
+            $_SESSION['warning'] =
+                "No new students were added. " .
+                "{$skipped} student(s) were skipped. " .
+                implode(' ', $errors);
+
+        } else {
+
+            $_SESSION['error'] =
+                "No students were added. " .
+                implode(' ', $errors);
+        }
+
+
+        header("Location: superadmin.php?section=student_register");
+        exit;
+    }
 }
-
 // Ojt rooms
 if ($source === 'ojt-rooms') {
     $headers = $_POST['headers'] ?? [];

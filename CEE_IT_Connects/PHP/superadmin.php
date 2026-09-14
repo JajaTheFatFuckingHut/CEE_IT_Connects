@@ -1805,9 +1805,6 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
                         font-weight: 600;
                     }
 
-                    /* ADDED: table header now reads like column titles, not raw db field names —
-                       subtle blue background (same "tab" indicator style used on the dashboard table),
-                       spacing, and no more all-lowercase/underscore look. */
                     #edit_csv #csv-table thead th {
                         background: rgba(39, 111, 255, 0.08);
                         color: #272f54;
@@ -1937,10 +1934,25 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
                                 <button type="button" class="btn-update" onclick="addRow()">
                                     <i class="bi bi-plus-circle me-1"></i> Add Row
                                 </button>
+
                                 <div style="flex:1; text-align:right;">
-                                    <button type="submit" class="btn-update">Save CSV</button>
+
+                                    <!-- SAVE CSV -->
+                                    <button type="submit" class="btn-update">
+                                        <i class="bi bi-save me-1"></i> Save CSV
+                                    </button>
+
+                                    <!-- ADD CSV DATA TO DATABASE -->
+                                    <button type="submit" name="import_to_database" value="1" class="btn-update"
+                                        onclick="return confirm('Add all valid students from this CSV to the database?');">
+                                        <i class="bi bi-database-add me-1"></i> Add to Database
+                                    </button>
+
+                                    <!-- BACK -->
                                     <button type="button" class="btn-update"
-                                        onclick="showSection(event, 'student_register')">Back</button>
+                                        onclick="showSection(event, 'student_register')">
+                                        Back
+                                    </button>
                                 </div>
                             </div>
                         </form>
