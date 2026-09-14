@@ -23,55 +23,42 @@ function sendStudentCredentials(
 ): bool {
 
     $payload = json_encode([
-        'from' => 'CEE IT Connects <onboarding@resend.dev>',
-        'to' => [$email],
+        'sender' => [
+            'name' => 'CEE IT Connects',
+            'email' => 'your-verified-sender@gmail.com', // must match the sender you verified in Brevo
+        ],
+        'to' => [
+            ['email' => $email, 'name' => $full_name],
+        ],
         'subject' => 'Your CEE IT Connects Account',
-        'html' => "
+        'htmlContent' => "
             <h2>Welcome to CEE IT Connects!</h2>
 
-        <p>Hello <strong>" .
-            htmlspecialchars($full_name) .
-            "</strong>,</p>
+            <p>Hello <strong>" . htmlspecialchars($full_name) . "</strong>,</p>
 
-        <p>Your student account has been successfully created.</p>
+            <p>Your student account has been successfully created.</p>
 
-        <h3>Your Login Credentials</h3>
+            <h3>Your Login Credentials</h3>
 
-        <p>
-            <strong>Student ID:</strong>
-            " . htmlspecialchars($student_id) . "
-        </p>
+            <p><strong>Student ID:</strong> " . htmlspecialchars($student_id) . "</p>
+            <p><strong>Email:</strong> " . htmlspecialchars($email) . "</p>
+            <p><strong>Temporary Password:</strong> " . htmlspecialchars($temporaryPassword) . "</p>
 
-        <p>
-            <strong>Email:</strong>
-            " . htmlspecialchars($email) . "
-        </p>
+            <p>Please log in and change your password after your first successful login.</p>
 
-        <p>
-            <strong>Temporary Password:</strong>
-            " . htmlspecialchars($temporaryPassword) . "
-        </p>
-
-        <p>
-            Please log in and change your password after your
-            first successful login.
-        </p>
-
-        <p>
-            Regards,<br>
-            <strong>CEE IT Connects</strong>
-        </p>
+            <p>Regards,<br><strong>CEE IT Connects</strong></p>
         ",
     ]);
 
-    $ch = curl_init('https://api.resend.com/emails');
+    $ch = curl_init('https://api.brevo.com/v3/smtp/email');
     curl_setopt_array($ch, [
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_POST => true,
         CURLOPT_TIMEOUT => 15,
         CURLOPT_HTTPHEADER => [
-            'Authorization: Bearer ' . getenv('RESEND_API_KEY'),
+            'api-key: ' . getenv('BREVO_API_KEY'),
             'Content-Type: application/json',
+            'accept: application/json',
         ],
         CURLOPT_POSTFIELDS => $payload,
     ]);
@@ -82,7 +69,7 @@ function sendStudentCredentials(
     curl_close($ch);
 
     if ($curlError) {
-        error_log("Resend cURL error: " . $curlError);
+        error_log("Brevo cURL error: " . $curlError);
         return false;
     }
 
@@ -91,7 +78,7 @@ function sendStudentCredentials(
         return true;
     }
 
-    error_log("Resend API error ({$httpCode}) for {$email}: " . $response);
+    error_log("Brevo API error ({$httpCode}) for {$email}: " . $response);
     return false;
 }
 
@@ -393,10 +380,14 @@ if (isset($_POST['edit_csv'])) {
 
 
         // CREATE RESULT MESSAGE
+        if (!sendStudentCredentials($email, $full_name, $student_id, $temporaryPassword)) {
+            $error = "Student created, but the credential email failed to send.";
+        }
         if ($added > 0 && empty($errors)) {
 
             $_SESSION['success'] =
                 "Successfully added {$added} student(s) to the database.";
+
 
         } elseif ($added > 0) {
 
