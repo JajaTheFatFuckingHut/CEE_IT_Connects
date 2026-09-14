@@ -35,6 +35,9 @@ function sendStudentCredentials(
         $mail->SMTPSecure = 'tls';
         $mail->Port = 587;
 
+        $mail->Timeout = 15;
+        $mail->SMTPKeepAlive = false;
+
         // Sender
         $mail->setFrom('jamesherold25@gmail.com', 'CEE IT Connects');
 
@@ -93,6 +96,11 @@ function sendStudentCredentials(
             "Email: {$email}\n" .
             "Temporary Password: {$temporaryPassword}\n\n" .
             "Please log in and change your password after your first login.";
+
+        $mail->SMTPDebug = 2;
+        $mail->Debugoutput = function ($str, $level) {
+            error_log("SMTP: " . trim($str));
+        };
 
         $mail->send();
 
