@@ -57,6 +57,11 @@ if (isset($_POST['send_code'])) {
                 <p>This code expires in 10 minutes.</p>
             ";
 
+            $mail->SMTPDebug = 2;
+            $mail->Debugoutput = function ($str, $level) {
+                error_log("PHPMailer: " . trim($str));
+            };
+
             $mail->send();
 
             header("Location: forgot-password.php?step=code&email=" . urlencode($email) . "&msg=Code sent!");
