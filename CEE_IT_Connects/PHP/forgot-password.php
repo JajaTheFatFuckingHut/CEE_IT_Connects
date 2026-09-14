@@ -40,13 +40,13 @@ if (isset($_POST['send_code'])) {
             $mail->isSMTP();
             $mail->Host = 'smtp.gmail.com';
             $mail->SMTPAuth = true;
-            $mail->Username = getenv('jamesherold25@gmail.com');
-            $mail->Password = getenv('vyfc kawx ctvz cwqf');
+            $mail->Username = getenv('GMAIL_USERNAME');
+            $mail->Password = getenv('GMAIL_APP_PASSWORD');
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
             $mail->Port = 465;
 
             $mail->Timeout = 15;
-            $mail->setFrom(getenv('jamesherold25@gmail.com'), 'CEE IT Connects');
+            $mail->setFrom(getenv('GMAIL_USERNAME'), 'CEE IT Connects');
             $mail->addAddress($email);
 
             $mail->isHTML(true);
