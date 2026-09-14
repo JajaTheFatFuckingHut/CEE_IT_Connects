@@ -11,104 +11,92 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-require_once __DIR__ . '/PHPMailer-master/src/Exception.php';
-require_once __DIR__ . '/PHPMailer-master/src/PHPMailer.php';
-require_once __DIR__ . '/PHPMailer-master/src/SMTP.php';
-//For sending student credentials via email
+require '/var/www/phpmailer-master/src/Exception.php';
+require '/var/www/phpmailer-master/src/PHPMailer.php';
+require '/var/www/phpmailer-master/src/SMTP.php';
+
+
 function sendStudentCredentials(
-    $email,
-    $fullName,
-    $studentId,
-    $temporaryPassword
-) {
+    string $email,
+    string $full_name,
+    string $student_id,
+    string $temporaryPassword
+): bool {
+
     $mail = new PHPMailer(true);
 
     try {
+
+        // Gmail SMTP
         $mail->isSMTP();
-        $mail->Host = $_ENV['MAIL_HOST'] ?? getenv('MAIL_HOST');
+        $mail->Host = 'smtp.gmail.com';
         $mail->SMTPAuth = true;
-        $mail->Username = $_ENV['MAIL_USERNAME'] ?? getenv('MAIL_USERNAME');
-        $mail->Password = $_ENV['MAIL_PASSWORD'] ?? getenv('MAIL_PASSWORD');
+        $mail->Username = getenv('GMAIL_USERNAME');
+        $mail->Password = getenv('GMAIL_APP_PASSWORD');
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port = 587;
 
+        // Sender
         $mail->setFrom(
-            $_ENV['MAIL_USERNAME'] ?? getenv('MAIL_USERNAME'),
+            getenv('GMAIL_USERNAME'),
             'CEE IT Connects'
         );
 
-        $mail->addAddress($email, $fullName);
+        // Recipient
+        $mail->addAddress($email, $full_name);
 
+        // Email content
         $mail->isHTML(true);
-        $mail->Subject = 'CEE IT Connects Account Credentials';
+        $mail->Subject = 'Your CEE IT Connects Account';
 
         $mail->Body = "
-            <div style='font-family: Arial, sans-serif; line-height: 1.6;'>
-                <h2 style='color: #272f54;'>CEE IT Connects</h2>
+            <h2>Welcome to CEE IT Connects!</h2>
 
-                <p>Hello <strong>" . htmlspecialchars($fullName) . "</strong>,</p>
+            <p>Hello <strong>" .
+            htmlspecialchars($full_name) .
+            "</strong>,</p>
 
-                <p>
-                    Your CEE IT Connects student account has been
-                    successfully created.
-                </p>
+            <p>
+                Your student account has been successfully created.
+            </p>
 
-                <p><strong>Your login credentials:</strong></p>
+            <h3>Your Login Credentials</h3>
 
-                <table style='border-collapse: collapse;'>
-                    <tr>
-                        <td style='padding: 6px 12px 6px 0;'>
-                            <strong>Student ID:</strong>
-                        </td>
-                        <td>
-                            " . htmlspecialchars($studentId) . "
-                        </td>
-                    </tr>
+            <p>
+                <strong>Student ID:</strong>
+                " . htmlspecialchars($student_id) . "
+            </p>
 
-                    <tr>
-                        <td style='padding: 6px 12px 6px 0;'>
-                            <strong>Email:</strong>
-                        </td>
-                        <td>
-                            " . htmlspecialchars($email) . "
-                        </td>
-                    </tr>
+            <p>
+                <strong>Email:</strong>
+                " . htmlspecialchars($email) . "
+            </p>
 
-                    <tr>
-                        <td style='padding: 6px 12px 6px 0;'>
-                            <strong>Temporary Password:</strong>
-                        </td>
-                        <td>
-                            <code>" . htmlspecialchars($temporaryPassword) . "</code>
-                        </td>
-                    </tr>
-                </table>
+            <p>
+                <strong>Temporary Password:</strong>
+                " . htmlspecialchars($temporaryPassword) . "
+            </p>
 
-                <p>
-                    You may now use these credentials to log in to
-                    <strong>CEE IT Connects</strong>.
-                </p>
+            <p>
+                Please log in and change your password after your
+                first successful login.
+            </p>
 
-                <p>
-                    <strong>For security, please change your password
-                    after your first login.</strong>
-                </p>
+            <br>
 
-                <p>
-                    Thank you,<br>
-                    <strong>CEE IT Connects</strong>
-                </p>
-            </div>
+            <p>
+                Regards,<br>
+                <strong>CEE IT Connects</strong>
+            </p>
         ";
 
         $mail->AltBody =
-            "Hello {$fullName},\n\n" .
-            "Your CEE IT Connects student account has been created.\n\n" .
-            "Student ID: {$studentId}\n" .
+            "Welcome to CEE IT Connects!\n\n" .
+            "Your student account has been created.\n\n" .
+            "Student ID: {$student_id}\n" .
             "Email: {$email}\n" .
             "Temporary Password: {$temporaryPassword}\n\n" .
-            "Please change your password after your first login.\n\n" .
-            "CEE IT Connects";
+            "Please log in and change your password after your first login.";
 
         $mail->send();
 
@@ -117,7 +105,7 @@ function sendStudentCredentials(
     } catch (Exception $e) {
 
         error_log(
-            "Failed to send credentials to {$email}: " .
+            "Credential email failed for {$email}: " .
             $mail->ErrorInfo
         );
 
