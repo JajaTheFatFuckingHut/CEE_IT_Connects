@@ -42,9 +42,10 @@ if (isset($_POST['send_code'])) {
             $mail->SMTPAuth = true;
             $mail->Username = 'jamesherold25@gmail.com';
             $mail->Password = 'vyfc kawx ctvz cwqf';
-            $mail->SMTPSecure = 'tls';
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
             $mail->Port = 587;
 
+            $mail->Timeout = 15;
             $mail->setFrom('jamesherold25@gmail.com', 'CEE IT Connects');
             $mail->addAddress($email);
 
