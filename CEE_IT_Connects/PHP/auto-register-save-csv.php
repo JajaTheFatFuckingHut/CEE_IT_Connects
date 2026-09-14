@@ -22,92 +22,77 @@ function sendStudentCredentials(
     string $temporaryPassword
 ): bool {
 
-    $mail = new PHPMailer(true);
+    $payload = json_encode([
+        'from' => 'CEE IT Connects <onboarding@resend.dev>',
+        'to' => [$email],
+        'subject' => 'Your CEE IT Connects Account',
+        'html' => "
+            <h2>Welcome to CEE IT Connects!</h2>
 
-    try {
-        $payload = json_encode([
-            'from' => 'CEE IT Connects <onboarding@resend.dev>',
-            'to' => [$email],
-            'subject' => 'Your CEE IT Connects Account',
-            'html' => "
-                <h2>Welcome to CEE IT Connects!</h2>
+        <p>Hello <strong>" .
+            htmlspecialchars($full_name) .
+            "</strong>,</p>
 
-            <p>Hello <strong>" .
-                htmlspecialchars($full_name) .
-                "</strong>,</p>
+        <p>Your student account has been successfully created.</p>
 
-            <p>Your student account has been successfully created.</p>
+        <h3>Your Login Credentials</h3>
 
-            <h3>Your Login Credentials</h3>
+        <p>
+            <strong>Student ID:</strong>
+            " . htmlspecialchars($student_id) . "
+        </p>
 
-            <p>
-                <strong>Student ID:</strong>
-                " . htmlspecialchars($student_id) . "
-            </p>
+        <p>
+            <strong>Email:</strong>
+            " . htmlspecialchars($email) . "
+        </p>
 
-            <p>
-                <strong>Email:</strong>
-                " . htmlspecialchars($email) . "
-            </p>
+        <p>
+            <strong>Temporary Password:</strong>
+            " . htmlspecialchars($temporaryPassword) . "
+        </p>
 
-            <p>
-                <strong>Temporary Password:</strong>
-                " . htmlspecialchars($temporaryPassword) . "
-            </p>
+        <p>
+            Please log in and change your password after your
+            first successful login.
+        </p>
 
-            <p>
-                Please log in and change your password after your
-                first successful login.
-            </p>
+        <p>
+            Regards,<br>
+            <strong>CEE IT Connects</strong>
+        </p>
+        ",
+    ]);
 
-            <p>
-                Regards,<br>
-                <strong>CEE IT Connects</strong>
-            </p>
-            ",
-        ]);
+    $ch = curl_init('https://api.resend.com/emails');
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_POST => true,
+        CURLOPT_TIMEOUT => 15,
+        CURLOPT_HTTPHEADER => [
+            'Authorization: Bearer ' . getenv('RESEND_API_KEY'),
+            'Content-Type: application/json',
+        ],
+        CURLOPT_POSTFIELDS => $payload,
+    ]);
 
-        $ch = curl_init('https://api.resend.com/emails');
-        curl_setopt_array($ch, [
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_POST => true,
-            CURLOPT_TIMEOUT => 15,
-            CURLOPT_HTTPHEADER => [
-                'Authorization: Bearer ' . getenv('RESEND_API_KEY'),
-                'Content-Type: application/json',
-            ],
-            CURLOPT_POSTFIELDS => $payload,
-        ]);
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curlError = curl_error($ch);
+    curl_close($ch);
 
-        $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        $curlError = curl_error($ch);
-        curl_close($ch);
-
-        if ($curlError) {
-            error_log("Resend cURL error: " . $curlError);
-            $error = "Email failed: " . $curlError;
-        } elseif ($httpCode >= 200 && $httpCode < 300) {
-            header("Location: forgot-password.php?step=code&email=" . urlencode($email) . "&msg=Code sent!");
-            exit;
-        } else {
-            error_log("Resend API error ({$httpCode}): " . $response);
-            $error = "Email failed: " . $response;
-        }
-
-        error_log("Credential email sent to: {$email}");
-
-        return true;
-
-    } catch (Exception $e) {
-
-        error_log(
-            "Credential email failed for {$email}: " .
-            $mail->ErrorInfo
-        );
-
+    if ($curlError) {
+        error_log("Resend cURL error: " . $curlError);
         return false;
     }
+
+    if ($httpCode >= 200 && $httpCode < 300) {
+        error_log("Credential email sent to: {$email}");
+        return true;
+    }
+
+    error_log("Resend API error ({$httpCode}) for {$email}: " . $response);
+    return false;
 }
 
 $source = $_POST['source'] ?? '';
