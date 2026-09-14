@@ -8,10 +8,125 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+require_once __DIR__ . '/PHPMailer-master/src/Exception.php';
+require_once __DIR__ . '/PHPMailer-master/src/PHPMailer.php';
+require_once __DIR__ . '/PHPMailer-master/src/SMTP.php';
+//For sending student credentials via email
+function sendStudentCredentials(
+    $email,
+    $fullName,
+    $studentId,
+    $temporaryPassword
+) {
+    $mail = new PHPMailer(true);
+
+    try {
+        $mail->isSMTP();
+        $mail->Host = $_ENV['MAIL_HOST'] ?? getenv('MAIL_HOST');
+        $mail->SMTPAuth = true;
+        $mail->Username = $_ENV['MAIL_USERNAME'] ?? getenv('MAIL_USERNAME');
+        $mail->Password = $_ENV['MAIL_PASSWORD'] ?? getenv('MAIL_PASSWORD');
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port = 587;
+
+        $mail->setFrom(
+            $_ENV['MAIL_USERNAME'] ?? getenv('MAIL_USERNAME'),
+            'CEE IT Connects'
+        );
+
+        $mail->addAddress($email, $fullName);
+
+        $mail->isHTML(true);
+        $mail->Subject = 'CEE IT Connects Account Credentials';
+
+        $mail->Body = "
+            <div style='font-family: Arial, sans-serif; line-height: 1.6;'>
+                <h2 style='color: #272f54;'>CEE IT Connects</h2>
+
+                <p>Hello <strong>" . htmlspecialchars($fullName) . "</strong>,</p>
+
+                <p>
+                    Your CEE IT Connects student account has been
+                    successfully created.
+                </p>
+
+                <p><strong>Your login credentials:</strong></p>
+
+                <table style='border-collapse: collapse;'>
+                    <tr>
+                        <td style='padding: 6px 12px 6px 0;'>
+                            <strong>Student ID:</strong>
+                        </td>
+                        <td>
+                            " . htmlspecialchars($studentId) . "
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style='padding: 6px 12px 6px 0;'>
+                            <strong>Email:</strong>
+                        </td>
+                        <td>
+                            " . htmlspecialchars($email) . "
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style='padding: 6px 12px 6px 0;'>
+                            <strong>Temporary Password:</strong>
+                        </td>
+                        <td>
+                            <code>" . htmlspecialchars($temporaryPassword) . "</code>
+                        </td>
+                    </tr>
+                </table>
+
+                <p>
+                    You may now use these credentials to log in to
+                    <strong>CEE IT Connects</strong>.
+                </p>
+
+                <p>
+                    <strong>For security, please change your password
+                    after your first login.</strong>
+                </p>
+
+                <p>
+                    Thank you,<br>
+                    <strong>CEE IT Connects</strong>
+                </p>
+            </div>
+        ";
+
+        $mail->AltBody =
+            "Hello {$fullName},\n\n" .
+            "Your CEE IT Connects student account has been created.\n\n" .
+            "Student ID: {$studentId}\n" .
+            "Email: {$email}\n" .
+            "Temporary Password: {$temporaryPassword}\n\n" .
+            "Please change your password after your first login.\n\n" .
+            "CEE IT Connects";
+
+        $mail->send();
+
+        return true;
+
+    } catch (Exception $e) {
+
+        error_log(
+            "Failed to send credentials to {$email}: " .
+            $mail->ErrorInfo
+        );
+
+        return false;
+    }
+}
+
 $source = $_POST['source'] ?? '';
 
-// ── CASE 1: Superadmin editing the CSV file directly ──
-// ── CASE 1: Superadmin editing/importing the CSV file ──
 if (isset($_POST['edit_csv'])) {
 
     $headers = $_POST['headers'] ?? [];
@@ -26,10 +141,7 @@ if (isset($_POST['edit_csv'])) {
     $csvPath = $sourceDir . $activeFile;
 
 
-    // =========================================================
     // SAVE CSV ONLY
-    // =========================================================
-
     if (!isset($_POST['import_to_database'])) {
 
         $handle = fopen($csvPath, 'w');
@@ -54,18 +166,8 @@ if (isset($_POST['edit_csv'])) {
         exit;
     }
 
-
-    // =========================================================
-    // ADD CSV DATA TO DATABASE
-    // =========================================================
-
+    // Add to database
     if (isset($_POST['import_to_database'])) {
-
-        /*
-         * Find the column positions based on the CSV headers.
-         * This allows the CSV columns to remain flexible.
-         */
-
         $normalizedHeaders = array_map(
             fn($h) => strtolower(trim($h)),
             $headers
@@ -100,9 +202,7 @@ if (isset($_POST['edit_csv'])) {
         }
 
 
-        // ---------------------------------------------------------
         // PREPARE DATABASE STATEMENTS
-        // ---------------------------------------------------------
 
         $checkEmailStmt = $pdo->prepare("
             SELECT id
@@ -118,30 +218,53 @@ if (isset($_POST['edit_csv'])) {
             LIMIT 1
         ");
 
-        $insertStmt = $pdo->prepare("
-            INSERT INTO students
-            (
-                email,
-                full_name,
-                student_id,
-                program,
-                year_level,
-                section,
-                contact_number,
-                password_hash
-            )
-            VALUES
-            (
-                ?,
-                ?,
-                ?,
-                ?,
-                ?,
-                ?,
-                ?,
-                ?
-            )
-        ");
+        $characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
+        $randomString = substr(str_shuffle($characters), 0, 5);
+
+        $temporaryPassword = $randomString;
+
+        $password_hash = password_hash(
+            $temporaryPassword,
+            PASSWORD_DEFAULT
+        );
+
+        try {
+
+            $insertStmt->execute([
+                $email,
+                $full_name,
+                $student_id,
+                $program,
+                $year_level !== '' ? (int) $year_level : null,
+                $section,
+                $contact_number,
+                $password_hash
+            ]);
+
+            $added++;
+
+            // Send credentials after successful database insertion
+            $emailSent = sendStudentCredentials(
+                $email,
+                $full_name,
+                $student_id,
+                $temporaryPassword
+            );
+
+            if (!$emailSent) {
+                $errors[] =
+                    "Row " . ($rowIndex + 1) .
+                    ": Student was added, but the credential email could not be sent.";
+            }
+
+        } catch (PDOException $e) {
+
+            error_log($e->getMessage());
+
+            $errors[] =
+                "Row " . ($rowIndex + 1) .
+                ": Could not add this student.";
+        }
 
 
         // ---------------------------------------------------------

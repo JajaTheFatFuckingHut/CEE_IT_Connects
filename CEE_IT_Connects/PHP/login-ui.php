@@ -56,6 +56,14 @@ $registerVisible = file_exists($statePath) ? trim(file_get_contents($statePath))
                     </a>
                     <a href="login-ui.php?role=admin" class="btn-role <?= $role === 'admin' ? 'active' : 'inactive' ?>">
                         Admin
+                        <?php
+                        $characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
+                        $randomString = substr(str_shuffle($characters), 0, 5);
+
+                        $temporaryPassword = $randomString
+                            ?>
+                        <?= var_dump($temporaryPassword); ?>
+
                     </a>
                 </div>
 
@@ -82,7 +90,7 @@ $registerVisible = file_exists($statePath) ? trim(file_get_contents($statePath))
                 </form>
                 <?php if ($registerVisible === 'show'): ?>
                     <div class="register-text mt-3" style="text-align: center; margin-top: 20px; 
-                        font-size: 0.9rem; color: #333;">Click <a href="student-register.php"
+                    font-size: 0.9rem; color: #333;">Click <a href="student-register.php"
                             style="color: #e05834;">here</a>
                         to register</div>
                 <?php endif; ?>
