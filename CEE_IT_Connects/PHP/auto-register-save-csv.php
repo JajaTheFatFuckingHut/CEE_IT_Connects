@@ -26,26 +26,31 @@ function sendStudentCredentials(
 
     try {
 
-        // Gmail SMTP
         $mail->isSMTP();
         $mail->Host = 'smtp.gmail.com';
         $mail->SMTPAuth = true;
+
         $mail->Username = 'jamesherold25@gmail.com';
         $mail->Password = 'vyfc kawx ctvz cwqf';
-        $mail->SMTPSecure = 'tls';
+
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port = 587;
 
+        // Prevent a failed SMTP connection from hanging forever
         $mail->Timeout = 15;
-        $mail->SMTPKeepAlive = false;
 
-        // Sender
-        $mail->setFrom('jamesherold25@gmail.com', 'CEE IT Connects');
+        $mail->setFrom(
+            'jamesherold25@gmail.com',
+            'CEE IT Connects'
+        );
 
-        $mail->addAddress($email);
+        $mail->addAddress(
+            $email,
+            $full_name
+        );
 
-
-        // Email content
         $mail->isHTML(true);
+
         $mail->Subject = 'Your CEE IT Connects Account';
 
         $mail->Body = "
@@ -55,9 +60,7 @@ function sendStudentCredentials(
             htmlspecialchars($full_name) .
             "</strong>,</p>
 
-            <p>
-                Your student account has been successfully created.
-            </p>
+            <p>Your student account has been successfully created.</p>
 
             <h3>Your Login Credentials</h3>
 
@@ -81,8 +84,6 @@ function sendStudentCredentials(
                 first successful login.
             </p>
 
-            <br>
-
             <p>
                 Regards,<br>
                 <strong>CEE IT Connects</strong>
@@ -97,12 +98,9 @@ function sendStudentCredentials(
             "Temporary Password: {$temporaryPassword}\n\n" .
             "Please log in and change your password after your first login.";
 
-        $mail->SMTPDebug = 2;
-        $mail->Debugoutput = function ($str, $level) {
-            error_log("SMTP: " . trim($str));
-        };
-
         $mail->send();
+
+        error_log("Credential email sent to: {$email}");
 
         return true;
 
