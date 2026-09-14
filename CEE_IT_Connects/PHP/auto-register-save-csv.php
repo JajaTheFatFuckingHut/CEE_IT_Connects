@@ -231,46 +231,7 @@ if (isset($_POST['edit_csv'])) {
         $insertStmt = $pdo->
             prepare("INSERT INTO students (email, full_name, student_id, program, 
             year_level, section, contact_number, password_hash) 
-        VALUES (:email, :full_name, :student_id, :program, :year_level, :section, :contact_number, 
-        :password_hash)");
-
-        try {
-
-            $insertStmt->execute([
-                $email,
-                $full_name,
-                $student_id,
-                $program,
-                $year_level !== '' ? (int) $year_level : null,
-                $section,
-                $contact_number,
-                $password_hash
-            ]);
-
-            $added++;
-
-            // Send credentials after successful database insertion
-            $emailSent = sendStudentCredentials(
-                $email,
-                $full_name,
-                $student_id,
-                $temporaryPassword
-            );
-
-            if (!$emailSent) {
-                $errors[] =
-                    "Row " . ($rowIndex + 1) .
-                    ": Student was added, but the credential email could not be sent.";
-            }
-
-        } catch (PDOException $e) {
-
-            error_log($e->getMessage());
-
-            $errors[] =
-                "Row " . ($rowIndex + 1) .
-                ": Could not add this student.";
-        }
+        VALUES (?,?,?,?,?,?,?,?)");
 
 
         // COUNTERS
@@ -395,9 +356,14 @@ if (isset($_POST['edit_csv'])) {
             }
 
 
+            $characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
+            $randomString = substr(str_shuffle($characters), 0, 5);
+
+            $temporaryPassword = $randomString;
+
             // DEFAULT PASSWORD
             $password_hash = password_hash(
-                $student_id,
+                $temporaryPassword,
                 PASSWORD_DEFAULT
             );
 
@@ -417,6 +383,21 @@ if (isset($_POST['edit_csv'])) {
                 ]);
 
                 $added++;
+
+                $emailSent = sendStudentCredentials(
+                    $email,
+                    $full_name,
+                    $student_id,
+                    $temporaryPassword
+                );
+
+                if (!$emailSent) {
+
+                    $errors[] =
+                        "Row " . ($rowIndex + 1) .
+                        ": Student was added, but the credential email could not be sent.";
+                }
+
 
             } catch (PDOException $e) {
 
