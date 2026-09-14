@@ -37,7 +37,7 @@ if (isset($_POST['send_code'])) {
         $payload = json_encode([
             'sender' => [
                 'name' => 'CEE IT Connects',
-                'email' => 'your-verified-sender@gmail.com', // must match the sender you verified in Brevo
+                'email' => 'jamesherold25@gmail.com', // must match the sender you verified in Brevo
             ],
             'to' => [
                 ['email' => $email],

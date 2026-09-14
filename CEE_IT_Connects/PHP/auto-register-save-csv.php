@@ -25,7 +25,7 @@ function sendStudentCredentials(
     $payload = json_encode([
         'sender' => [
             'name' => 'CEE IT Connects',
-            'email' => 'your-verified-sender@gmail.com', // must match the sender you verified in Brevo
+            'email' => 'jamesherold25@gmail.com', // must match the sender you verified in Brevo
         ],
         'to' => [
             ['email' => $email, 'name' => $full_name],
