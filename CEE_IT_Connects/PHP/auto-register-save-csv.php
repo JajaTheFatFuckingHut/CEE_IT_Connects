@@ -25,7 +25,7 @@ function sendStudentCredentials(
     $payload = json_encode([
         'sender' => [
             'name' => 'CEE IT Connects',
-            'email' => 'jamesherold25@gmail.com', // must match the sender you verified in Brevo
+            'email' => 'jamesherold25@gmail.com',
         ],
         'to' => [
             ['email' => $email, 'name' => $full_name],
@@ -314,7 +314,7 @@ if (isset($_POST['edit_csv'])) {
 
 
             $characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
-            $randomString = substr(str_shuffle($characters), 0, 5);
+            $randomString = substr(str_shuffle($characters), 0, 10);
 
             $temporaryPassword = $randomString;
 
