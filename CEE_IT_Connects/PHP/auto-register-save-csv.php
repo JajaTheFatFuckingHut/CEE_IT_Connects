@@ -219,7 +219,7 @@ if (isset($_POST['edit_csv'])) {
         ");
 
         $characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
-        $randomString = substr(str_shuffle($characters), 0, 5);
+        $randomString = substr(str_shuffle($characters), 0, 10);
 
         $temporaryPassword = $randomString;
 
