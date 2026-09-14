@@ -55,7 +55,7 @@ $registerVisible = file_exists($statePath) ? trim(file_get_contents($statePath))
                         Adviser
                     </a>
                     <a href="login-ui.php?role=admin" class="btn-role <?= $role === 'admin' ? 'active' : 'inactive' ?>">
-                        Admin
+                        Admins
                     </a>
                 </div>
 
