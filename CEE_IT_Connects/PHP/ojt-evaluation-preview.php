@@ -10,7 +10,7 @@ if (!isset($_SESSION['user_id']) || ($_SESSION['role'] ?? '') !== 'student') {
     exit('Unauthorized');
 }
 
-require_once __DIR__ . '/../../vendor/autoload.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/ojt-pdf-common.php';
 use setasign\Fpdi\Tcpdf\Fpdi;
 
@@ -97,7 +97,7 @@ foreach (['most_valuable', 'least_valuable', 'concerns', 'suggestions'] as $key)
     $eval[$key] = trim($_POST[$key] ?? '');
 }
 
-$templatePdf = __DIR__ . '/../Sources/forms/CEIT-OJTF-011_Students_Evaluation_of_Internship.pdf';
+$templatePdf = __DIR__ . '/Sources/forms/CEIT-OJTF-011_Students_Evaluation_of_Internship.pdf';
 if (!file_exists($templatePdf)) {
     http_response_code(500);
     exit('Template PDF not found.');

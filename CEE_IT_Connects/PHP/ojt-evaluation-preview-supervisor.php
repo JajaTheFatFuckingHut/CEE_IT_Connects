@@ -81,7 +81,7 @@ $meta = [
     'eval_date' => trim($_POST['eval_date'] ?? date('Y-m-d')),
 ];
 
-$templatePdf = __DIR__ . '/../Sources/forms/CEIT-OJTF-010_Supervisors_Evaluation_of_Student_Intern.pdf';
+$templatePdf = __DIR__ . '/Sources/forms/CEIT-OJTF-010_Supervisors_Evaluation_of_Student_Intern.pdf';
 if (!file_exists($templatePdf)) {
     http_response_code(500);
     exit('Template PDF not found.');
