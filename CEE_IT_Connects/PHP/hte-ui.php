@@ -3,13 +3,13 @@ session_start();
 require 'auth.php';
 require 'db.php';
 
-require_once __DIR__ . '/../phpmailer-master/src/PHPMailer.php';
-require_once __DIR__ . '/../phpmailer-master/src/SMTP.php';
-require_once __DIR__ . '/../phpmailer-master/src/Exception.php';
+// require_once __DIR__ . '/phpmailer-master/src/PHPMailer.php';
+// require_once __DIR__ . '/phpmailer-master/src/SMTP.php';
+// require_once __DIR__ . '/phpmailer-master/src/Exception.php';
 
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\SMTP;
-use PHPMailer\PHPMailer\Exception;
+// use PHPMailer\PHPMailer\PHPMailer;
+// use PHPMailer\PHPMailer\SMTP;
+// use PHPMailer\PHPMailer\Exception;
 
 // echo realpath(__DIR__ . '/../Sources/forms/CEIT-OJTF-010_Supervisors_Evaluation_of_Student_Intern.pdf');
 // die();
@@ -411,38 +411,55 @@ foreach ($roomStatuses as $s) {
 
             if ($pdfPath && file_exists($pdfPath)) {
 
-
-
                 $htmlBody = "Dear <strong>{$sup['supervisor_name']}</strong>,<br><br>"
                     . "Student intern <strong>{$sup['student_name']}</strong> has completed their required OJT hours. "
                     . "Please fill out the attached evaluation form or <a href='{$evalUrl}'>click here</a> to complete it online.";
 
-                $mail = new PHPMailer(true);
-                try {
-                    $mail->isSMTP();
-                    $mail->Host = 'smtp.gmail.com';
-                    $mail->SMTPAuth = true;
-                    $mail->Username = 'jamesherold25@gmail.com';  // ← your Gmail
-                    $mail->Password = 'vyfc kawx ctvz cwqf';     // ← App Password
-                    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-                    $mail->Port = 587;
+                $payload = [
+                    'sender' => [
+                        'name' => 'PLV OJT System',
+                        'email' => 'jamesherold25@gmail.com'
+                    ],
+                    'to' => [
+                        [
+                            'email' => $sup['supervisor_email'],
+                            'name' => $sup['supervisor_name']
+                        ]
+                    ],
+                    'subject' => "Evaluation Request - {$sup['student_name']}",
+                    'htmlContent' => $htmlBody,
+                    'attachment' => [
+                        [
+                            'content' => base64_encode(file_get_contents($pdfPath)),
+                            'name' => 'CEIT-OJTF-010_Supervisors_Evaluation.pdf',
+                        ],
+                    ],
+                ];
 
-                    $mail->setFrom('jamesherold25@gmail.com', 'PLV OJT System');
-                    $mail->addAddress($sup['supervisor_email'], $sup['supervisor_name']);
-                    $mail->Subject = "Evaluation Request - {$sup['student_name']}";
-                    $mail->isHTML(true);
-                    $mail->Body = $htmlBody;
-                    $mail->addAttachment($pdfPath, 'CEIT-OJTF-010_Supervisors_Evaluation.pdf');
+                $ch = curl_init('https://api.brevo.com/v3/smtp/email');
+                curl_setopt_array($ch, [
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_POST => true,
+                    CURLOPT_POSTFIELDS => json_encode($payload),
+                    CURLOPT_HTTPHEADER => [
+                        'accept: application/json',
+                        'api-key:' . getenv('BREVO_API_KEY'),
+                        'content-type: application/json',
+                    ],
+                ]);
 
-                    $mail->send();
+                $response = curl_exec($ch);
+                $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                $curlError = curl_error($ch);
+                curl_close($ch);
 
+                if ($httpCode >= 200 && $httpCode < 300) {
                     $pdo->prepare("UPDATE student_supervisors SET eval_sent_at = NOW() WHERE student_id = ?")
                         ->execute([$s['id']]);
-
-                } catch (Exception $e) {
+                } else {
                     file_put_contents(
                         __DIR__ . '/mail_debug.log',
-                        date('Y-m-d H:i:s') . " | Auto-send error for student {$s['id']}: " . $mail->ErrorInfo . "\n",
+                        date('Y-m-d H:i:s') . " | Auto-send error for student {$s['id']}: HTTP $httpCode | $response | $curlError\n",
                         FILE_APPEND
                     );
                 }
@@ -557,7 +574,7 @@ foreach ($roomStatuses as $s) {
             background: #ff6b2c;
             color: #fff;
             width: calc(100% - 24px);
-        } 
+        }
 
         .sidebar-scroll {
             flex: 1;
@@ -643,8 +660,8 @@ foreach ($roomStatuses as $s) {
             text-decoration: none;
             display: block;
             margin: 4px;
-            padding:0;
-            width:auto;
+            padding: 0;
+            width: auto;
         }
 
         .room-link .room-item:hover {
@@ -1443,6 +1460,7 @@ foreach ($roomStatuses as $s) {
                 margin-left: 0;
                 margin-bottom: -10px;
             }
+
             .sidebar-user-info {
                 display: none;
             }
@@ -1473,7 +1491,7 @@ foreach ($roomStatuses as $s) {
                 height: 44px !important;
                 min-width: 44px !important;
                 min-height: 44px !important;
-                border-radius: 12px !important;   
+                border-radius: 12px !important;
                 font-weight: bold !important;
                 font-size: 1.1rem !important;
                 display: flex !important;
@@ -1644,7 +1662,8 @@ foreach ($roomStatuses as $s) {
             <?php endforeach; ?> -->
 
             <?php foreach ($rooms as $room): ?>
-                <a href="?room_id=<?= $room['id'] ?>" title="<?= htmlspecialchars($room['room_name']) ?>" class="room-link <?= $current_room_id == $room['id'] ? 'active-room-link' : '' ?>">
+                <a href="?room_id=<?= $room['id'] ?>" title="<?= htmlspecialchars($room['room_name']) ?>"
+                    class="room-link <?= $current_room_id == $room['id'] ? 'active-room-link' : '' ?>">
                     <div class="room-item <?= $current_room_id == $room['id'] ? 'active-room' : '' ?>">
                         <span class="room-initial"><?= strtoupper(substr(trim($room['room_name']), 0, 1)) ?></span>
                         <span class="room-name-text"><?= htmlspecialchars($room['room_name']) ?></span>
@@ -1674,7 +1693,7 @@ foreach ($roomStatuses as $s) {
         </div>
 
     </div>
-        <!-- end of sidebar -->
+    <!-- end of sidebar -->
 
     <!-- MAIN CONTENT -->
     <div class="main">
@@ -1705,17 +1724,17 @@ foreach ($roomStatuses as $s) {
                 </div>
             </div>
 
-            <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
-                    <!-- <div style="display:flex; align-items:center; flex-wrap:wrap; gap:10px;"> -->
-                    <div style="position:relative; flex:1; min-width:200px;">
-                        <i class="fa fa-search"
-                            style="position:absolute; color: #f97316; left:10px; top:50%; transform:translateY(-50%); font-size:13px;"></i>
-                        <input type="text" id="searchInput" placeholder="Search student..."
-                            oninput="filterTable()" style="width:25%; padding:8px 12px 8px 32px; border:1.5px solid #aeaeae; border-radius:22px;
+            <div
+                style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
+                <!-- <div style="display:flex; align-items:center; flex-wrap:wrap; gap:10px;"> -->
+                <div style="position:relative; flex:1; min-width:200px;">
+                    <i class="fa fa-search"
+                        style="position:absolute; color: #f97316; left:10px; top:50%; transform:translateY(-50%); font-size:13px;"></i>
+                    <input type="text" id="searchInput" placeholder="Search student..." oninput="filterTable()" style="width:25%; padding:8px 12px 8px 32px; border:1.5px solid #aeaeae; border-radius:22px;
                             font-size:13px; font-family:inherit; outline:none; transition:border-color .2s;"
-                            onfocus="this.style.borderColor='#f97316'" onblur="this.style.borderColor='#e5e7eb'">
-                    </div>
-                
+                        onfocus="this.style.borderColor='#f97316'" onblur="this.style.borderColor='#e5e7eb'">
+                </div>
+
                 <!-- <?php if ($isAdviser): ?>
                     <form method="POST" action="ojt-required-hours.php" style="display:flex; 
                     align-items:center; gap:8px;">
@@ -1732,7 +1751,7 @@ foreach ($roomStatuses as $s) {
                 <?php endif; ?> -->
             </div>
             <div class="sysAdm-table-wrapper">
-            <!-- <div style="background:white; border:1px solid #ddd; border-radius:8px; overflow:hidden; overflow-x:auto;"> -->
+                <!-- <div style="background:white; border:1px solid #ddd; border-radius:8px; overflow:hidden; overflow-x:auto;"> -->
                 <table class="sysAdm-table" id="ojt-status-table">
                     <thead>
                         <tr>
@@ -1888,12 +1907,12 @@ foreach ($roomStatuses as $s) {
 
             <div style="display:flex; gap:10px; margin-bottom:16px; align-items:center;">
                 <div style="position:relative; flex:1; min-width:200px;">
-                        <i class="fa fa-search"
-                            style="position:absolute; color: #f97316; left:10px; top:50%; transform:translateY(-50%); font-size:13px;"></i>
-                        <input type="text" id="reportsSearchInput" placeholder="Search student..."
-                            oninput="filterReportsTable()" style="width:100%; padding:8px 12px 8px 32px; border:1.5px solid #aeaeae; border-radius:22px;
+                    <i class="fa fa-search"
+                        style="position:absolute; color: #f97316; left:10px; top:50%; transform:translateY(-50%); font-size:13px;"></i>
+                    <input type="text" id="reportsSearchInput" placeholder="Search student..."
+                        oninput="filterReportsTable()" style="width:100%; padding:8px 12px 8px 32px; border:1.5px solid #aeaeae; border-radius:22px;
                             font-size:13px; font-family:inherit; outline:none; transition:border-color .2s;"
-                            onfocus="this.style.borderColor='#f97316'" onblur="this.style.borderColor='#e5e7eb'">
+                        onfocus="this.style.borderColor='#f97316'" onblur="this.style.borderColor='#e5e7eb'">
                 </div>
                 <select id="reportsRoomFilter" onchange="filterReportsTable()"
                     style="padding:7px 14px; border:1px solid #bbb; border-radius:24px; font-size:12px;">
@@ -1962,34 +1981,36 @@ foreach ($roomStatuses as $s) {
             </div>
         </div>
 
-        <div id="dtr_summary" class="section-panel section sysAdm-section <?= $section === 'dtr_summary' ? 'active' : '' ?>">
+        <div id="dtr_summary"
+            class="section-panel section sysAdm-section <?= $section === 'dtr_summary' ? 'active' : '' ?>">
             <!-- <div class="page-section">
                 <h2>Student DTR Summary</h2>
                 <p>Overview of rendered OJT hours per student</p>
             </div> -->
 
             <div class="sysAdm-header--danger sysAdm-header--blue mb-4">
-                    <div class="sysAdm-header-left">
-                        <div class="sysAdm-header-icon">
-                            <i class="bi bi-pencil-fill"></i>
-                        </div>
-                        <div class="sysAdm-header-text">
-                            <h2>Student DTR Summary</h2>
-                            <p>Overview of rendered OJT hours per student</p>
-                        </div>
+                <div class="sysAdm-header-left">
+                    <div class="sysAdm-header-icon">
+                        <i class="bi bi-pencil-fill"></i>
+                    </div>
+                    <div class="sysAdm-header-text">
+                        <h2>Student DTR Summary</h2>
+                        <p>Overview of rendered OJT hours per student</p>
                     </div>
                 </div>
+            </div>
 
-                <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
-                    <div style="position:relative; flex:1; min-width:200px;">
-                        <i class="fa fa-search"
-                            style="position:absolute; color: #f97316; left:10px; top:50%; transform:translateY(-50%); font-size:13px;"></i>
-                        <input type="text" id="searchDtr" placeholder="Search student or company..."
-                            oninput="filterDtr()" style="width:25%; padding:8px 12px 8px 32px; border:1.5px solid #aeaeae; border-radius:22px;
+            <div
+                style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
+                <div style="position:relative; flex:1; min-width:200px;">
+                    <i class="fa fa-search"
+                        style="position:absolute; color: #f97316; left:10px; top:50%; transform:translateY(-50%); font-size:13px;"></i>
+                    <input type="text" id="searchDtr" placeholder="Search student or company..." oninput="filterDtr()"
+                        style="width:25%; padding:8px 12px 8px 32px; border:1.5px solid #aeaeae; border-radius:22px;
                             font-size:13px; font-family:inherit; outline:none; transition:border-color .2s;"
-                            onfocus="this.style.borderColor='#f97316'" onblur="this.style.borderColor='#e5e7eb'">
-                    </div>
+                        onfocus="this.style.borderColor='#f97316'" onblur="this.style.borderColor='#e5e7eb'">
                 </div>
+            </div>
 
             <?php if (empty($adviserDtrRows)): ?>
                 <div class="text-center mt-5 py-5">
@@ -2001,56 +2022,59 @@ foreach ($roomStatuses as $s) {
                 </div>
             <?php else: ?>
                 <div class="sysAdm-table-wrapper">
-                <table class="sysAdm-table" id="dtr-summary-table">
-                    <thead>
-                        <tr>
-                            <th>Student</th>
-                            <th>Company</th>
-                            <th>Required Hours</th>
-                            <th>Completed</th>
-                            <th>Remaining</th>
-                            <th>Progress</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($adviserDtrRows as $row): ?>
+                    <table class="sysAdm-table" id="dtr-summary-table">
+                        <thead>
                             <tr>
-                                <td>
-                                    <div class="student-cell">
-                                        <span class="avatar" style="background:#ff6b2c;">
-                                            <?= strtoupper(substr(trim($row['full_name']), 0, 1)) ?>
-                                        </span>
-                                        <?= htmlspecialchars($row['full_name']) ?>
-                                    </div>
-                                </td>
-                                <td><?= htmlspecialchars($row['company']) ?></td>
-                                <td><?= number_format($row['required_hours'], 1) ?> hrs</td>
-                                <td><?= number_format($row['total_hours'], 1) ?> hrs</td>
-                                <td><?= number_format($row['remaining'], 1) ?> hrs</td>
-                                <td>
-                                    <div class="d-flex align-items-center gap-2">
-                                        <div class="progress-bar-bg">
-                                            <div class="progress-bar-fill" style="width:<?= $row['percent'] ?>%;"></div>
+                                <th>Student</th>
+                                <th>Company</th>
+                                <th>Required Hours</th>
+                                <th>Completed</th>
+                                <th>Remaining</th>
+                                <th>Progress</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($adviserDtrRows as $row): ?>
+                                <tr>
+                                    <td>
+                                        <div class="student-cell">
+                                            <span class="avatar" style="background:#ff6b2c;">
+                                                <?= strtoupper(substr(trim($row['full_name']), 0, 1)) ?>
+                                            </span>
+                                            <?= htmlspecialchars($row['full_name']) ?>
                                         </div>
-                                        <span style="font-size:12px; color:#888;"><?= $row['percent'] ?>%</span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <!-- <button class="btn-delete" onclick="viewStudentDtr(<?= $row['student_id'] ?>)">
+                                    </td>
+                                    <td><?= htmlspecialchars($row['company']) ?></td>
+                                    <td><?= number_format($row['required_hours'], 1) ?> hrs</td>
+                                    <td><?= number_format($row['total_hours'], 1) ?> hrs</td>
+                                    <td><?= number_format($row['remaining'], 1) ?> hrs</td>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="progress-bar-bg">
+                                                <div class="progress-bar-fill" style="width:<?= $row['percent'] ?>%;"></div>
+                                            </div>
+                                            <span style="font-size:12px; color:#888;"><?= $row['percent'] ?>%</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <!-- <button class="btn-delete" onclick="viewStudentDtr(<?= $row['student_id'] ?>)">
                                         <i class="bi bi-eye"></i>
                                     </button> -->
 
-                                    <button class="btn-update" onclick="viewStudentDtr(<?= $row['student_id'] ?>)" target="_blank"
-                                            target="_blank" class="btn-update" tooltip="View DTR" title="View DTR"  style="text-decoration: none; background: #FFE7B3;
+                                        <button class="btn-update" onclick="viewStudentDtr(<?= $row['student_id'] ?>)"
+                                            target="_blank" target="_blank" class="btn-update" tooltip="View DTR"
+                                            title="View DTR"
+                                            style="text-decoration: none; background: #FFE7B3;
                                             color: #7a5200; border:2px solid #7a5200; background-color: #FFE7B3; transition: background-color 0.2s ease;"
                                             onmouseover="this.style.backgroundColor='#dbbe83';"
-                                            onmouseout="this.style.backgroundColor='#FFE7B3';"><i class="bi bi-eye"></i> </button>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
+                                            onmouseout="this.style.backgroundColor='#FFE7B3';"><i class="bi bi-eye"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
                 </div>
             <?php endif; ?>
         </div>
