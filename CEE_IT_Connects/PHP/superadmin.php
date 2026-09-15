@@ -2495,12 +2495,16 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
 
         function filterRoles() {
             const search = document.getElementById('search-roles').value.toLowerCase();
-            const role = document.getElementById('filter-role-admin').value.toLowerCase();
-
+            const role = document.getElementById('filter-role-admin').value;
             document.querySelectorAll('#roles-tbody tr').forEach(row => {
-                const rowText = row.innerText.toLowerCase();
-                const matchesSearch = rowText.includes(search);
-                const matchesRole = roleValue === '' || row.dataset.role === roleValue;
+                const nameEmailText = row.querySelector('td:nth-child(1)').innerText.toLowerCase()
+                    + ' ' + row.querySelector('td:nth-child(2)').innerText.toLowerCase();
+
+                const roleSelect = row.querySelector('select[name="role[]"]');
+                const rowRole = roleSelect ? roleSelect.value : '';
+
+                const matchesSearch = nameEmailText.includes(search);
+                const matchesRole = role === '' || rowRole === role;
 
                 row.style.display = (matchesSearch && matchesRole) ? '' : 'none';
             });
