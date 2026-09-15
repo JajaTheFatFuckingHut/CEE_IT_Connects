@@ -2387,7 +2387,7 @@ foreach ($roomStatuses as $s) {
                                                 <label
                                                     style="cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;">
                                                     <input type="radio" name="<?= $name ?>" value="<?= $r ?>"
-                                                        style="accent-color:#065f46;width:16px;height:16px;">
+                                                        style="accent-color:#065f46;width:16px;height:16px;" required>
                                                     <span style="font-size:10px;color:#94a3b8;"><?= $r ?></span>
                                                 </label>
                                             <?php endfor; ?>
@@ -2418,8 +2418,8 @@ foreach ($roomStatuses as $s) {
                                         <?= htmlspecialchars($label) ?>
                                     </label>
                                     <textarea name="<?= $name ?>" rows="3" class="form-control"
-                                        style="font-size:13px;border-radius:8px;"
-                                        placeholder="Write your answer here…"></textarea>
+                                        style="font-size:13px;border-radius:8px;" placeholder="Write your answer here…"
+                                        required></textarea>
                                 </div>
                             <?php endforeach; ?>
                         </div>
@@ -2474,8 +2474,8 @@ foreach ($roomStatuses as $s) {
                                     Engineering and Information Technology?
                                 </label>
                                 <textarea name="suggestions" rows="3" class="form-control"
-                                    style="font-size:13px;border-radius:8px;"
-                                    placeholder="Write your suggestions here…"></textarea>
+                                    style="font-size:13px;border-radius:8px;" placeholder="Write your suggestions here…"
+                                    required></textarea>
                             </div>
 
                             <!-- B: Future supervision -->
@@ -2489,17 +2489,17 @@ foreach ($roomStatuses as $s) {
                                     <label class="d-flex align-items-center gap-2"
                                         style="cursor:pointer;font-size:13px;">
                                         <input type="radio" name="supervise_future" value="yes"
-                                            style="accent-color:#065f46;"> Yes
+                                            style="accent-color:#065f46;" required> Yes
                                     </label>
                                     <label class="d-flex align-items-center gap-2"
                                         style="cursor:pointer;font-size:13px;">
                                         <input type="radio" name="supervise_future" value="no"
-                                            style="accent-color:#065f46;"> No
+                                            style="accent-color:#065f46;" required> No
                                     </label>
                                 </div>
                                 <textarea name="supervise_future_reason" rows="2" class="form-control"
-                                    style="font-size:13px;border-radius:8px;"
-                                    placeholder="Please explain your answer…"></textarea>
+                                    style="font-size:13px;border-radius:8px;" placeholder="Please explain your answer…"
+                                    required></textarea>
                             </div>
 
                             <!-- C: Overall experience scale 0–10 -->
@@ -2537,20 +2537,20 @@ foreach ($roomStatuses as $s) {
                                     style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;">Title
                                     / Position</label>
                                 <input type="text" name="title_position" class="form-control form-control-sm mt-1"
-                                    placeholder="e.g. IT Manager">
+                                    placeholder="e.g. IT Manager" required>
                             </div>
                             <div>
                                 <label
                                     style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;">Contact
                                     Details</label>
                                 <input type="text" name="contact_details" class="form-control form-control-sm mt-1"
-                                    placeholder="Email / phone">
+                                    placeholder="Email / phone" required>
                             </div>
                             <div>
                                 <label
                                     style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;">Date</label>
                                 <input type="date" name="eval_date" class="form-control form-control-sm mt-1"
-                                    value="<?= date('Y-m-d') ?>">
+                                    value="<?= date('Y-m-d') ?>" required>
                             </div>
                         </div>
 
