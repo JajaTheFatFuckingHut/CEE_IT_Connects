@@ -2500,7 +2500,7 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
             document.querySelectorAll('#roles-tbody tr').forEach(row => {
                 const rowText = row.innerText.toLowerCase();
                 const matchesSearch = rowText.includes(search);
-                const matchesRole = role === '' || rowText.includes(role.replace('_', ' '));
+                const matchesRole = roleValue === '' || row.dataset.role === roleValue;
 
                 row.style.display = (matchesSearch && matchesRole) ? '' : 'none';
             });
