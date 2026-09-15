@@ -10,7 +10,7 @@ if (!isset($_SESSION['user_id']) || !in_array($role, ['internship_adviser', 'hte
     exit('Unauthorized');
 }
 
-require_once __DIR__ . '/../../vendor/autoload.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/ojt-pdf-common.php';
 use setasign\Fpdi\Tcpdf\Fpdi;
 
