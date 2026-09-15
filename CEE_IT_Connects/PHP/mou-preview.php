@@ -19,7 +19,7 @@ if (!$action) {
 
 // Handle approval early — it needs no internship id
 if ($action === 'approval') {
-    $approvalPdf = __DIR__ . '/../Sources/forms/approval.pdf';
+    $approvalPdf = __DIR__ . '/Sources/forms/approval.pdf';
     if (!file_exists($approvalPdf)) {
         http_response_code(500);
         exit('Approval PDF not found.');
@@ -108,7 +108,7 @@ $hte_lng = $internship['longtitude'] ?? null;
 $google_api_key = 'AIzaSyDITrnTUmS0AwxqZCE8cfYI3d5kjtzg7RY&callback=initMa';
 
 // Source Paths
-$pdfBase = __DIR__ . '/../Sources/forms/';
+$pdfBase = __DIR__ . '/Sources/forms/';
 $formFiles = [
     'hte_info' => $pdfBase . 'CEIT-OJTF-001_HTE_Information_Form.pdf',
     'addendum' => $pdfBase . 'CEIT-OJTF-009_Addendum_for_Student_Intern_Placement.pdf',

@@ -525,7 +525,7 @@ function timeAgo($datetime)
             echo 'index.php';
         }
         ?>">
-            <img src="../Sources/CEE IT Connects Logo.png" class="nav-logo">
+            <img src="/Sources/CEE IT Connects Logo.png" class="nav-logo">
             <span class="brand-text ms-1">CEE IT CONNECTS</span>
         </a>
 

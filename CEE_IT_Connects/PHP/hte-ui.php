@@ -407,7 +407,7 @@ foreach ($roomStatuses as $s) {
         if ($sup) {
             $baseUrl = rtrim((isset($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'], '/');
             $evalUrl = $baseUrl . '/supervisor-eval-form.php?token=' . urlencode($sup['eval_token']);
-            $pdfPath = realpath(__DIR__ . '/../Sources/forms/CEIT-OJTF-010_Supervisors_Evaluation_of_Student_Intern.pdf');
+            $pdfPath = realpath(__DIR__ . '/Sources/forms/CEIT-OJTF-010_Supervisors_Evaluation_of_Student_Intern.pdf');
 
             if ($pdfPath && file_exists($pdfPath)) {
 

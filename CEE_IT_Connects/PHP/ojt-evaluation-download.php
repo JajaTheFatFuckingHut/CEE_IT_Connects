@@ -102,10 +102,10 @@ $submittedAt = date('m/d/Y', strtotime($eval['submitted_at']));
 
 // ── Template path (swap based on mode) ───────────────────────────────────
 if ($isSupervisor) {
-    $templatePdf = __DIR__ . '/../Sources/forms/CEIT-OJTF-010_Supervisors_Evaluation_of_Student_Intern.pdf';
+    $templatePdf = __DIR__ . '/Sources/forms/CEIT-OJTF-010_Supervisors_Evaluation_of_Student_Intern.pdf';
     $filenamePrefix = 'CEIT-OJTF-010';
 } else {
-    $templatePdf = __DIR__ . '/../Sources/forms/CEIT-OJTF-011_Students_Evaluation_of_Internship.pdf';
+    $templatePdf = __DIR__ . '/Sources/forms/CEIT-OJTF-011_Students_Evaluation_of_Internship.pdf';
     $filenamePrefix = 'CEIT-OJTF-011';
 }
 

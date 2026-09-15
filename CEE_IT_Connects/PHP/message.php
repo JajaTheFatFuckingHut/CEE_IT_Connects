@@ -2742,7 +2742,7 @@ $requiredHours = $rhStmt->fetchColumn() ?: 486;
                         </div>
                     </div>
                 </div>
-                <a href="../Sources/weekly-report-template.docx" download class="btn btn-sm fw-semibold"
+                <a href="/Sources/weekly-report-template.docx" download class="btn btn-sm fw-semibold"
                     style="background:#272f54;color:#fff;border-radius:8px;">
                     <i class="fa-solid fa-download me-1"></i> Download
                 </a>
