@@ -2497,7 +2497,7 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
             const search = document.getElementById('search-roles').value.toLowerCase();
             const role = document.getElementById('filter-role-admin').value.toLowerCase();
 
-            document.querySelectorAll('#monitor-tbody tr').forEach(row => {
+            document.querySelectorAll('#roles-tbody tr').forEach(row => {
                 const rowText = row.innerText.toLowerCase();
                 const matchesSearch = rowText.includes(search);
                 const matchesRole = role === '' || rowText.includes(role.replace('_', ' '));
