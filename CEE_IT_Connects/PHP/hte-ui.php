@@ -2865,13 +2865,13 @@ foreach ($roomStatuses as $s) {
             });
         }
 
-        // function filterDtr() {
-        //     const search = document.getElementById('searchDtr')?.value.toLowerCase() ?? '';
-        //     document.querySelectorAll('#all-students-tbody tr').forEach(row => {
-        //         const name = row.querySelector('.student-cell span')?.textContent.toLowerCase() ?? '';
-        //         row.style.display = name.includes(search) ? '' : 'none';
-        //     });
-        // }
+        function filterDtr() {
+            const search = document.getElementById('searchDtr')?.value.toLowerCase() ?? '';
+            document.querySelectorAll('#all-students-tbody tr').forEach(row => {
+                const name = row.querySelector('.student-cell span')?.textContent.toLowerCase() ?? '';
+                row.style.display = name.includes(search) ? '' : 'none';
+            });
+        }
 
         function filterRoomChats() {
             const q = document.getElementById('roomChatSearch').value.toLowerCase().trim();
