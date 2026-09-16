@@ -147,32 +147,6 @@ $rooms = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 $studentId = $_POST['student_id'] ?? $_GET['student_id'] ?? null;
 
-if (!$studentId) {
-    die('Missing student ID.');
-}
-
-$stmt = $pdo->prepare("
-    SELECT 
-        s.id            AS student_id,
-        s.full_name     AS intern_name,
-        s.student_id,
-        s.program,
-        oa.internship_id,
-        i.company       AS company_name,
-        a.id            AS supervisor_id,
-        a.full_name     AS supervisor_name
-    FROM students s
-    JOIN ojt_applications oa ON s.id = oa.student_id
-    JOIN internships i ON oa.internship_id = i.id
-    LEFT JOIN advisers a 
-        ON a.internship_id = i.id
-       AND a.role = 'HTE_adviser'
-        AND a.department = s.program      
-        WHERE s.id = ?
-");
-$stmt->execute([$studentId]);
-$student = $stmt->fetch(PDO::FETCH_ASSOC);
-
 // Get the HTE adviser's internship_id
 $adviserStmt = $pdo->prepare("SELECT internship_id FROM advisers WHERE id = ?");
 $adviserStmt->execute([$adviser_id]);
@@ -1794,6 +1768,7 @@ foreach ($roomStatuses as $s) {
                                 $requiredHours = $s['required_hours'] ?: 486;
                                 $progressWidth = min(round(($s['total_hours'] / $requiredHours) * 100, 2), 100);
                                 $avatarColor = $avatarColors[crc32($s['full_name']) % count($avatarColors)];
+                                $studentId = $s['id'];
                                 ?>
                                 <tr>
                                     <td>
@@ -2266,7 +2241,6 @@ foreach ($roomStatuses as $s) {
     <div class="modal fade" id="supEvalModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
         <div class="modal-dialog modal-xl modal-dialog-scrollable">
             <div class="modal-content" style="border-radius:16px; overflow:hidden;">
-
                 <!-- Header -->
                 <div class="modal-header"
                     style="background:linear-gradient(135deg,#065f46,#047857); color:#fff; padding:20px 28px;">
@@ -2295,14 +2269,12 @@ foreach ($roomStatuses as $s) {
                                     style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;">Name
                                     of Intern</label>
                                 <input type="text" name="intern_name" class="form-control form-control-sm mt-1"
-                                    value="<?= htmlspecialchars($student['intern_name'] ?? '') ?>"
                                     placeholder="Full name of intern" required>
                             </div>
                             <div>
                                 <label style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;">
                                     Course / Student No.</label>
                                 <input type="text" name="student_no" class="form-control form-control-sm mt-1"
-                                    value="<?= htmlspecialchars($student['student_id'] ?? '') ?>"
                                     placeholder="e.g. BSIT / 2021-00001">
                             </div>
                             <div>
@@ -2310,7 +2282,6 @@ foreach ($roomStatuses as $s) {
                                     style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;">Name
                                     of Company</label>
                                 <input type="text" name="company_name" class="form-control form-control-sm mt-1"
-                                    value="<?= htmlspecialchars($student['company_name'] ?? '') ?>"
                                     placeholder="Company / organization name" required>
                             </div>
                             <div>
@@ -2318,7 +2289,6 @@ foreach ($roomStatuses as $s) {
                                     style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;">Site
                                     Internship Supervisor</label>
                                 <input type="text" name="supervisor_name" class="form-control form-control-sm mt-1"
-                                    value="<?= htmlspecialchars($student['supervisor_name'] ?? '') ?>"
                                     placeholder="Supervisor's full name" required>
                             </div>
                         </div>
@@ -2946,13 +2916,20 @@ foreach ($roomStatuses as $s) {
         }
 
         function openSupEvalModal(studentId) {
-            const modal = new bootstrap.Modal(document.getElementById('supEvalModal'), {
-                backdrop: 'static',
-                keyboard: false
-            });
-            // store student id so the submit handler can send it
-            document.getElementById('supEvalModal').dataset.studentId = studentId;
-            modal.show();
+            fetch('get-student-eval.php?student_id=' + studentId)
+                .then(res => res.json())
+                .then(data => {
+                    document.querySelector('[name="intern_name"]').value = data.intern_name || '';
+                    document.querySelector('[name="student_no"]').value = data.student_id || '';
+                    document.querySelector('[name="company_name"]').value = data.company_name || '';
+                    document.querySelector('[name="supervisor_name"]').value = data.supervisor_name || '';
+
+                    const modal = new bootstrap.Modal(document.getElementById('supEvalModal'), {
+                        backdrop: 'static',
+                        keyboard: false
+                    });
+                    modal.show();
+                });
         }
 
         document.addEventListener('DOMContentLoaded', function () {
