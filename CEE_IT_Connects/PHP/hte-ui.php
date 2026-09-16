@@ -1768,7 +1768,6 @@ foreach ($roomStatuses as $s) {
                                 $requiredHours = $s['required_hours'] ?: 486;
                                 $progressWidth = min(round(($s['total_hours'] / $requiredHours) * 100, 2), 100);
                                 $avatarColor = $avatarColors[crc32($s['full_name']) % count($avatarColors)];
-                                $studentId = $s['id'];
                                 ?>
                                 <tr>
                                     <td>

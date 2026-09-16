@@ -509,7 +509,29 @@ $rhStmt = $pdo->prepare("
 ");
 $rhStmt->execute([$_SESSION['user_id']]);
 $requiredHours = $rhStmt->fetchColumn() ?: 486;
+
+$stmt = $pdo->prepare("
+    SELECT 
+        s.id AS student_id,
+        s.student_id AS course_student_no
+        s.full_name AS intern_name,
+        s.student_id,
+        s.program,
+        oa.internship_id,
+        i.company AS company_name,
+        a.id AS supervisor_id,
+        a.full_name AS supervisor_name
+    FROM students s
+    JOIN ojt_applications oa ON s.id = oa.student_id
+    JOIN internships i ON oa.internship_id = i.id
+    LEFT JOIN advisers a ON a.internship_id = i.id AND a.role = 'HTE_adviser' AND a.department = s.program
+    WHERE s.id = ?
+");
+$stmt->execute([$student_id]);
+$student = $stmt->fetch(PDO::FETCH_ASSOC);
 ?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -2868,42 +2890,47 @@ $requiredHours = $rhStmt->fetchColumn() ?: 486;
 
                 <div class="modal-body" style="padding:28px 32px; background:#f8f9fb;">
                     <form id="ojtEvalForm">
-
-                        <!-- Student info strip -->
-                        <div style="background:#fff; border-radius:10px; padding:16px 20px; margin-bottom:20px;
-               border:1px solid #e2e8f0; display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-                            <div>
-                                <label
-                                    style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;">Name
-                                    of Intern</label>
-                                <div style="font-weight:600;color:#1e293b;">
-                                    <?= htmlspecialchars($_SESSION['full_name'] ?? 'Student') ?>
+                        <?php foreach ($student as $s): ?>
+                            <!-- Student info strip -->
+                            <div style="background:#fff; border-radius:10px; padding:16px 20px; margin-bottom:20px;
+                                     border:1px solid #e2e8f0; display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                                <div>
+                                    <label style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;"
+                                        name="intern_name">Name of Intern</label>
+                                    <div style="font-weight:600;color:#1e293b;">
+                                        <input type="text" name="intern_name" class="form-control form-control-sm mt-1"
+                                            placeholder="Name..."
+                                            value="<?= htmlspecialchars($student['intern_name'] ?? '') ?>">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label
+                                        style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;">Course
+                                        / Student No.</label>
+                                    <div style="font-weight:600;color:#1e293b;">
+                                        <input type="text" name="course_student_no"
+                                            class="form-control form-control-sm mt-1" placeholder="Course / Student No."
+                                            value="<?= htmlspecialchars($student['course_student_no'] ?? '') ?>">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label
+                                        style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;">Name
+                                        of Company</label>
+                                    <input type="text" name="company_name" class="form-control form-control-sm mt-1"
+                                        placeholder="Enter company name"
+                                        value="<?= htmlspecialchars($student['company_name'] ?? '') ?>">
+                                </div>
+                                <div>
+                                    <label
+                                        style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;">Site
+                                        Internship Supervisor</label>
+                                    <input type="text" name="supervisor_name" class="form-control form-control-sm mt-1"
+                                        placeholder="Enter supervisor name"
+                                        value="<?= htmlspecialchars($student['supervisor_name'] ?? '') ?>">
                                 </div>
                             </div>
-                            <div>
-                                <label
-                                    style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;">Course
-                                    / Student No.</label>
-                                <div style="font-weight:600;color:#1e293b;">
-                                    <?= htmlspecialchars($_SESSION['student_no'] ?? '—') ?>
-                                </div>
-                            </div>
-                            <div>
-                                <label
-                                    style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;">Name
-                                    of Company</label>
-                                <input type="text" name="company_name" class="form-control form-control-sm mt-1"
-                                    placeholder="Enter company name">
-                            </div>
-                            <div>
-                                <label
-                                    style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;">Site
-                                    Internship Supervisor</label>
-                                <input type="text" name="supervisor_name" class="form-control form-control-sm mt-1"
-                                    placeholder="Enter supervisor name">
-                            </div>
-                        </div>
-
+                        <?php endforeach; ?>
                         <!-- Rating legend -->
                         <div
                             style="background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:12px 18px;margin-bottom:20px;font-size:13px;">
