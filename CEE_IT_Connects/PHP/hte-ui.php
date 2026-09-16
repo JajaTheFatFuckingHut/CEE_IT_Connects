@@ -146,13 +146,26 @@ $stmt->execute([$_SESSION['user_id']]);
 $rooms = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 $stmt = $pdo->prepare("
-    SELECT s.id, s.full_name, si.internship_id, i.company
+    SELECT 
+        s.id            AS student_id,
+        s.full_name     AS intern_name,
+        s.student_no,
+        s.program,
+        si.internship_id,
+        i.company       AS company_name,
+        u.id            AS supervisor_id,
+        u.full_name     AS supervisor_name
     FROM students s
     JOIN student_internships si ON s.id = si.student_id
     JOIN internships i ON si.internship_id = i.id
+    LEFT JOIN users u 
+        ON u.internship_id = i.id
+       AND u.role = 'HTE_adviser'
+        AND u.department = s.program      
+        WHERE s.id = :student_id
 ");
-$stmt->execute();
-$students = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$stmt->execute(['student_id' => $studentId]);
+$student = $stmt->fetch(PDO::FETCH_ASSOC);
 
 // Get the HTE adviser's internship_id
 $adviserStmt = $pdo->prepare("SELECT internship_id FROM advisers WHERE id = ?");
@@ -2273,13 +2286,14 @@ foreach ($roomStatuses as $s) {
                                     style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;">Name
                                     of Intern</label>
                                 <input type="text" name="intern_name" class="form-control form-control-sm mt-1"
+                                    value="<?= htmlspecialchars($student['intern_name'] ?? '') ?>"
                                     placeholder="Full name of intern" required>
                             </div>
                             <div>
-                                <label
-                                    style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;">Course
-                                    / Student No.</label>
+                                <label style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;">
+                                    Course / Student No.</label>
                                 <input type="text" name="student_no" class="form-control form-control-sm mt-1"
+                                    value="<?= htmlspecialchars($student['student_no'] ?? '') ?>"
                                     placeholder="e.g. BSIT / 2021-00001">
                             </div>
                             <div>
@@ -2287,6 +2301,7 @@ foreach ($roomStatuses as $s) {
                                     style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;">Name
                                     of Company</label>
                                 <input type="text" name="company_name" class="form-control form-control-sm mt-1"
+                                    value="<?= htmlspecialchars($student['company_name'] ?? '') ?>"
                                     placeholder="Company / organization name" required>
                             </div>
                             <div>
@@ -2294,6 +2309,7 @@ foreach ($roomStatuses as $s) {
                                     style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;">Site
                                     Internship Supervisor</label>
                                 <input type="text" name="supervisor_name" class="form-control form-control-sm mt-1"
+                                    value="<?= htmlspecialchars($student['supervisor_name'] ?? '') ?>"
                                     placeholder="Supervisor's full name" required>
                             </div>
                         </div>
