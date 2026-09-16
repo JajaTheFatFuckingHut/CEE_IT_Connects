@@ -153,15 +153,15 @@ $stmt = $pdo->prepare("
         s.program,
         si.internship_id,
         i.company       AS company_name,
-        u.id            AS supervisor_id,
-        u.full_name     AS supervisor_name
+        a.id            AS supervisor_id,
+        a.full_name     AS supervisor_name
     FROM students s
     JOIN student_internships si ON s.id = si.student_id
     JOIN internships i ON si.internship_id = i.id
-    LEFT JOIN users u 
-        ON u.internship_id = i.id
-       AND u.role = 'HTE_adviser'
-        AND u.department = s.program      
+    LEFT JOIN advisers a 
+        ON a.internship_id = i.id
+       AND a.role = 'HTE_adviser'
+        AND a.department = s.program      
         WHERE s.id = :student_id
 ");
 $stmt->execute(['student_id' => $studentId]);
@@ -2596,7 +2596,7 @@ foreach ($roomStatuses as $s) {
                         <i class="fa-regular fa-eye me-1"></i> Preview PDF
                     </button>
                     <button type="button" class="btn btn-outline-secondary btn-sm" id="supEvalLaterBtn">
-                        Remind Me Later
+                        Later
                     </button>
                     <button type="button" class="btn btn-sm fw-semibold px-4" id="supEvalSubmitBtn"
                         style="background:#065f46;color:#fff;border-radius:8px;">
