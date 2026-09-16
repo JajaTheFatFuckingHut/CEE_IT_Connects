@@ -513,7 +513,7 @@ $requiredHours = $rhStmt->fetchColumn() ?: 486;
 $stmt = $pdo->prepare("
     SELECT 
         s.id AS student_id,
-        s.student_id AS course_student_no
+        s.student_id AS course_student_no,
         s.full_name AS intern_name,
         s.student_id,
         s.program,
@@ -3187,7 +3187,7 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
                         <i class="fa-regular fa-eye me-1"></i> Preview PDF
                     </button>
                     <button type="button" class="btn btn-outline-secondary btn-sm" id="evalLaterBtn">
-                        Remind Me Later
+                        Later
                     </button>
                     <button type="button" class="btn btn-sm fw-semibold px-4" id="evalSubmitBtn"
                         style="background:#29335C;color:#fff;border-radius:8px;">
