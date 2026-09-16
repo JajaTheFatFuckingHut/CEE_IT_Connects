@@ -2890,47 +2890,45 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
 
                 <div class="modal-body" style="padding:28px 32px; background:#f8f9fb;">
                     <form id="ojtEvalForm">
-                        <?php foreach ($student as $s): ?>
-                            <!-- Student info strip -->
-                            <div style="background:#fff; border-radius:10px; padding:16px 20px; margin-bottom:20px;
+                        <!-- Student info strip -->
+                        <div style="background:#fff; border-radius:10px; padding:16px 20px; margin-bottom:20px;
                                      border:1px solid #e2e8f0; display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-                                <div>
-                                    <label style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;"
-                                        name="intern_name">Name of Intern</label>
-                                    <div style="font-weight:600;color:#1e293b;">
-                                        <input type="text" name="intern_name" class="form-control form-control-sm mt-1"
-                                            placeholder="Name..."
-                                            value="<?= htmlspecialchars($student['intern_name'] ?? '') ?>">
-                                    </div>
-                                </div>
-                                <div>
-                                    <label
-                                        style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;">Course
-                                        / Student No.</label>
-                                    <div style="font-weight:600;color:#1e293b;">
-                                        <input type="text" name="course_student_no"
-                                            class="form-control form-control-sm mt-1" placeholder="Course / Student No."
-                                            value="<?= htmlspecialchars($student['course_student_no'] ?? '') ?>">
-                                    </div>
-                                </div>
-                                <div>
-                                    <label
-                                        style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;">Name
-                                        of Company</label>
-                                    <input type="text" name="company_name" class="form-control form-control-sm mt-1"
-                                        placeholder="Enter company name"
-                                        value="<?= htmlspecialchars($student['company_name'] ?? '') ?>">
-                                </div>
-                                <div>
-                                    <label
-                                        style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;">Site
-                                        Internship Supervisor</label>
-                                    <input type="text" name="supervisor_name" class="form-control form-control-sm mt-1"
-                                        placeholder="Enter supervisor name"
-                                        value="<?= htmlspecialchars($student['supervisor_name'] ?? '') ?>">
+                            <div>
+                                <label style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;"
+                                    name="intern_name">Name of Intern</label>
+                                <div style="font-weight:600;color:#1e293b;">
+                                    <input type="text" name="intern_name" class="form-control form-control-sm mt-1"
+                                        placeholder="Name..."
+                                        value="<?= htmlspecialchars($student['intern_name'] ?? '') ?>">
                                 </div>
                             </div>
-                        <?php endforeach; ?>
+                            <div>
+                                <label
+                                    style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;">Course
+                                    / Student No.</label>
+                                <div style="font-weight:600;color:#1e293b;">
+                                    <input type="text" name="course_student_no"
+                                        class="form-control form-control-sm mt-1" placeholder="Course / Student No."
+                                        value="<?= htmlspecialchars($student['course_student_no'] ?? '') ?>">
+                                </div>
+                            </div>
+                            <div>
+                                <label
+                                    style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;">Name
+                                    of Company</label>
+                                <input type="text" name="company_name" class="form-control form-control-sm mt-1"
+                                    placeholder="Enter company name"
+                                    value="<?= htmlspecialchars($student['company_name'] ?? '') ?>">
+                            </div>
+                            <div>
+                                <label
+                                    style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;">Site
+                                    Internship Supervisor</label>
+                                <input type="text" name="supervisor_name" class="form-control form-control-sm mt-1"
+                                    placeholder="Enter supervisor name"
+                                    value="<?= htmlspecialchars($student['supervisor_name'] ?? '') ?>">
+                            </div>
+                        </div>
                         <!-- Rating legend -->
                         <div
                             style="background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:12px 18px;margin-bottom:20px;font-size:13px;">
