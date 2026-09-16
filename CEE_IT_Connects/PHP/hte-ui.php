@@ -2030,7 +2030,7 @@ foreach ($roomStatuses as $s) {
                                 <th></th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="dtr-student">
                             <?php foreach ($adviserDtrRows as $row): ?>
                                 <tr>
                                     <td>
@@ -2867,7 +2867,7 @@ foreach ($roomStatuses as $s) {
 
         function filterDtr() {
             const search = document.getElementById('searchDtr')?.value.toLowerCase() ?? '';
-            document.querySelectorAll('#all-students-tbody tr').forEach(row => {
+            document.querySelectorAll('#dtr-student tr').forEach(row => {
                 const name = row.querySelector('.student-cell span')?.textContent.toLowerCase() ?? '';
                 row.style.display = name.includes(search) ? '' : 'none';
             });
