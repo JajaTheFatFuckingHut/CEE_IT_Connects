@@ -145,26 +145,32 @@ $stmt = $pdo->prepare("
 $stmt->execute([$_SESSION['user_id']]);
 $rooms = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+$studentId = $_POST['student_id'] ?? $_GET['student_id'] ?? null;
+
+if (!$studentId) {
+    die('Missing student ID.');
+}
+
 $stmt = $pdo->prepare("
     SELECT 
         s.id            AS student_id,
         s.full_name     AS intern_name,
         s.student_id,
         s.program,
-        si.internship_id,
+        oa.internship_id,
         i.company       AS company_name,
         a.id            AS supervisor_id,
         a.full_name     AS supervisor_name
     FROM students s
-    JOIN student_internships si ON s.id = si.student_id
-    JOIN internships i ON si.internship_id = i.id
+    JOIN ojt_applications oa ON s.id = oa.student_id
+    JOIN internships i ON oa.internship_id = i.id
     LEFT JOIN advisers a 
         ON a.internship_id = i.id
        AND a.role = 'HTE_adviser'
         AND a.department = s.program      
-        WHERE s.id = :student_id
+        WHERE s.id = ?
 ");
-$stmt->execute(['student_id' => $studentId]);
+$stmt->execute([$studentId]);
 $student = $stmt->fetch(PDO::FETCH_ASSOC);
 
 // Get the HTE adviser's internship_id
@@ -1723,7 +1729,6 @@ foreach ($roomStatuses as $s) {
 
         <!-- STATUS SECTION -->
 
-        <!-- THIS BLOCK BELOW IS FOR TESTING OF UI REVISION FOR OJT STATUS -->
         <div id="status" class="section-panel section sysAdm-section">
             <div class="sysAdm-header--danger sysAdm-header--blue mb-4">
                 <div class="sysAdm-header-left">
@@ -1833,25 +1838,26 @@ foreach ($roomStatuses as $s) {
                                             $hasSup = !empty($sup);
                                             ?>
                                             <button type="button" onclick="openAssignSupModal(
-                <?= $s['id'] ?>,
-                '<?= htmlspecialchars(addslashes($s['full_name'])) ?>',
-                '<?= htmlspecialchars(addslashes($sup['supervisor_name'] ?? '')) ?>',
-                '<?= htmlspecialchars(addslashes($sup['supervisor_email'] ?? '')) ?>',
-                '<?= htmlspecialchars(addslashes($sup['department_note'] ?? '')) ?>'
-            )" style="display:inline-flex;align-items:center;gap:5px;padding:5px 10px;
-                   background:<?= $hasSup ? '#d1fae5' : '#fef3c7' ?>;
-                   color:<?= $hasSup ? '#065f46' : '#92400e' ?>;
-                   border-radius:6px;font-size:11px;font-weight:600;
-                   border:1px solid <?= $hasSup ? '#6ee7b7' : '#fde68a' ?>;
-                   cursor:pointer;white-space:nowrap;">
+                                                    <?= $s['id'] ?>,
+                                                    '<?= htmlspecialchars(addslashes($s['full_name'])) ?>',
+                                                    '<?= htmlspecialchars(addslashes($sup['supervisor_name'] ?? '')) ?>',
+                                                    '<?= htmlspecialchars(addslashes($sup['supervisor_email'] ?? '')) ?>',
+                                                    '<?= htmlspecialchars(addslashes($sup['department_note'] ?? '')) ?>'
+                                                )" style="display:inline-flex;align-items:center;gap:5px;padding:5px 10px;
+                                                    background:<?= $hasSup ? '#d1fae5' : '#fef3c7' ?>;
+                                                    color:<?= $hasSup ? '#065f46' : '#92400e' ?>;
+                                                    border-radius:6px;font-size:11px;font-weight:600;
+                                                    border:1px solid <?= $hasSup ? '#6ee7b7' : '#fde68a' ?>;
+                                                    cursor:pointer;white-space:nowrap;">
                                                 <i class="fa <?= $hasSup ? 'fa-user-check' : 'fa-user-plus' ?>"></i>
                                                 <?= $hasSup ? 'Supervisor Set' : 'Assign Supervisor' ?>
                                             </button>
 
                                             <?php if ($hasSup): ?>
-                                                <span style="font-size:10px;color:#6b7280;padding:2px 6px;background:#f9fafb;
-                         border:1px solid #e5e7eb;border-radius:4px;white-space:nowrap;
-                         overflow:hidden;text-overflow:ellipsis;max-width:160px;display:inline-block;"
+                                                <span
+                                                    style="font-size:10px;color:#6b7280;padding:2px 6px;background:#f9fafb;
+                                                            border:1px solid #e5e7eb;border-radius:4px;white-space:nowrap;
+                                                            overflow:hidden;text-overflow:ellipsis;max-width:160px;display:inline-block;"
                                                     title="<?= htmlspecialchars($sup['supervisor_email']) ?>">
                                                     <?= htmlspecialchars($sup['supervisor_email']) ?>
                                                 </span>
@@ -1866,8 +1872,8 @@ foreach ($roomStatuses as $s) {
                                             <?php if ($hasSupEval): ?>
                                                 <a href="ojt-evaluation-download.php?student_id=<?= $s['id'] ?>" target="_blank"
                                                     style="display:inline-flex;align-items:center;gap:5px;padding:5px 10px;
-                      background:#dbeafe;color:#1e40af;border-radius:6px;font-size:11px;
-                      font-weight:600;border:1px solid #93c5fd;cursor:pointer;text-decoration:none;">
+                                                            background:#dbeafe;color:#1e40af;border-radius:6px;font-size:11px;
+                                                            font-weight:600;border:1px solid #93c5fd;cursor:pointer;text-decoration:none;">
                                                     <i class="fa fa-file-pdf"></i> Supervisor Eval
                                                 </a>
 
@@ -1875,15 +1881,17 @@ foreach ($roomStatuses as $s) {
                                                 <div style="display:flex;gap:4px;flex-wrap:wrap;">
                                                     <button type="button"
                                                         onclick="sendEvalEmail(<?= $s['id'] ?>, '<?= htmlspecialchars(addslashes($sup['supervisor_name'])) ?>', '<?= htmlspecialchars(addslashes($sup['supervisor_email'])) ?>')"
-                                                        id="send-email-btn-<?= $s['id'] ?>" style="display:inline-flex;align-items:center;gap:5px;padding:5px 10px;
-                           background:#ede9fe;color:#5b21b6;border-radius:6px;font-size:11px;
-                           font-weight:600;border:1px solid #c4b5fd;cursor:pointer;white-space:nowrap;">
+                                                        id="send-email-btn-<?= $s['id'] ?>"
+                                                        style="display:inline-flex;align-items:center;gap:5px;padding:5px 10px;
+                                                            background:#ede9fe;color:#5b21b6;border-radius:6px;font-size:11px;
+                                                            font-weight:600;border:1px solid #c4b5fd;cursor:pointer;white-space:nowrap;">
                                                         <i class="fa fa-envelope"></i>
                                                         <?= $sup['eval_sent_at'] ? 'Resend Email' : 'Send Eval Email' ?>
                                                     </button>
-                                                    <button type="button" onclick="openSupEvalModal(<?= $s['id'] ?>)" style="display:inline-flex;align-items:center;gap:5px;padding:5px 10px;
-                           background:#dbeafe;color:#1e40af;border-radius:6px;font-size:11px;
-                           font-weight:600;border:1px solid #93c5fd;cursor:pointer;white-space:nowrap;">
+                                                    <button type="button" onclick="openSupEvalModal(<?= $s['id'] ?>)"
+                                                        style="display:inline-flex;align-items:center;gap:5px;padding:5px 10px;
+                                                                background:#dbeafe;color:#1e40af;border-radius:6px;font-size:11px;
+                                                                font-weight:600;border:1px solid #93c5fd;cursor:pointer;white-space:nowrap;">
                                                         <i class="fa fa-file-pen"></i> Fill Manually
                                                     </button>
                                                 </div>
@@ -1895,9 +1903,10 @@ foreach ($roomStatuses as $s) {
                                                 <?php endif; ?>
 
                                             <?php else: ?>
-                                                <span style="display:inline-flex;align-items:center;gap:5px;padding:5px 10px;
-                         background:#f3f4f6;color:#9ca3af;border-radius:6px;font-size:11px;
-                         font-weight:600;white-space:nowrap;border:1px solid #e5e7eb;"
+                                                <span
+                                                    style="display:inline-flex;align-items:center;gap:5px;padding:5px 10px;
+                                                            background:#f3f4f6;color:#9ca3af;border-radius:6px;font-size:11px;
+                                                            font-weight:600;white-space:nowrap;border:1px solid #e5e7eb;"
                                                     title="Assign a supervisor first">
                                                     <i class="fa fa-file-pen"></i> Supervisor Eval
                                                 </span>
