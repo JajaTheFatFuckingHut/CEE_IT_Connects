@@ -149,7 +149,7 @@ $stmt = $pdo->prepare("
     SELECT 
         s.id            AS student_id,
         s.full_name     AS intern_name,
-        s.student_no,
+        s.student_id,
         s.program,
         si.internship_id,
         i.company       AS company_name,
@@ -2293,7 +2293,7 @@ foreach ($roomStatuses as $s) {
                                 <label style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;">
                                     Course / Student No.</label>
                                 <input type="text" name="student_no" class="form-control form-control-sm mt-1"
-                                    value="<?= htmlspecialchars($student['student_no'] ?? '') ?>"
+                                    value="<?= htmlspecialchars($student['student_id'] ?? '') ?>"
                                     placeholder="e.g. BSIT / 2021-00001">
                             </div>
                             <div>
