@@ -102,8 +102,7 @@ $applicants = $applicantsStmt->fetchAll(PDO::FETCH_ASSOC);
 
 $documentsStmt = $pdo->query("
     SELECT sp.id, sp.file_path, sp.step_key, sp.updated_at AS uploaded_at,
-           s.full_name, s.program, s.student_id AS student_number,
-           CASE WHEN sp.step_key = 'resume' THEN 'resume' ELSE 'credential' END AS doc_type
+           s.full_name, s.program, s.student_id AS student_number
     FROM student_progress sp
     JOIN students s ON s.id = sp.student_id
     WHERE sp.file_path IS NOT NULL
@@ -1766,13 +1765,14 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                         </thead>
                         <tbody>
                             <?php foreach ($documents as $doc): ?>
-                                <tr data-type="<?= htmlspecialchars($doc['doc_type']) ?>"
+                                <tr data-type="<?= htmlspecialchars($doc['step_key']) ?>"
                                     data-name="<?= strtolower(htmlspecialchars($doc['full_name'])) ?>"
                                     data-program="<?= strtolower(htmlspecialchars($doc['program'])) ?>">
                                     <td><?= htmlspecialchars($doc['full_name']) ?></td>
                                     <td><?= htmlspecialchars($doc['student_number']) ?></td>
                                     <td><?= htmlspecialchars($doc['program']) ?></td>
-                                    <td><span><?= $doc['doc_type'] === 'resume' ? 'Resume' : 'Credentials' ?></span></td>
+                                    <td><span><?= htmlspecialchars(ucwords(str_replace('_', ' ', $doc['step_key']))) ?></span>
+                                    </td>
                                     <td><?= date("M d, Y", strtotime($doc['uploaded_at'])) ?></td>
                                     <td style="text-align:center;">
                                         <a href="../<?= htmlspecialchars($doc['file_path']) ?>" target="_blank"
