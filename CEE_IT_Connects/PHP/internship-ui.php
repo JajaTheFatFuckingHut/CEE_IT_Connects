@@ -11,27 +11,92 @@ $applicantsStmt = $pdo->query("
         s.program,
         i.title AS internship_title,
         i.company,
+        oa.status AS application_status,
+
+        -- Binary phase: Internship Confirmed / In Progress / No Progress
         CASE
-            WHEN sp_ojt.is_done = TRUE THEN 'Internship Confirmed'
-            WHEN sp_docs.is_done = TRUE THEN 'Documents Submitted'
-            WHEN sp_app.is_done = TRUE THEN 'Application Submitted'
-            WHEN sd.student_id IS NOT NULL THEN 'Resume Uploaded'
+            WHEN sp_company_profile.is_done IS TRUE
+             AND sp_resume.is_done IS TRUE
+             AND sp_addendum.is_done IS TRUE
+             AND sp_medical_cert.is_done IS TRUE
+             AND sp_internship_plan.is_done IS TRUE
+             AND sp_vicinity_map.is_done IS TRUE
+             AND sp_oath.is_done IS TRUE
+             AND (i.is_plv_internal IS TRUE OR i.is_valenzuela_lgu IS TRUE OR sp_reco_letter.is_done IS TRUE)
+             AND (i.is_plv_internal IS TRUE OR sp_waiver.is_done IS TRUE)
+                THEN 'Internship Confirmed'
+            WHEN sp_company_profile.is_done IS TRUE
+              OR sp_resume.is_done IS TRUE
+              OR sp_addendum.is_done IS TRUE
+              OR sp_medical_cert.is_done IS TRUE
+              OR sp_internship_plan.is_done IS TRUE
+              OR sp_vicinity_map.is_done IS TRUE
+              OR sp_oath.is_done IS TRUE
+              OR sp_reco_letter.is_done IS TRUE
+              OR sp_waiver.is_done IS TRUE
+                THEN 'In Progress'
             ELSE 'No Progress'
         END AS current_phase,
-        CASE 
-            WHEN sd.student_id IS NOT NULL AND sc.student_id IS NOT NULL THEN 'Complete'
+
+        -- Requirements complete/incomplete (accounts for conditional docs)
+        CASE
+            WHEN sp_company_profile.is_done IS TRUE
+             AND sp_resume.is_done IS TRUE
+             AND sp_addendum.is_done IS TRUE
+             AND sp_medical_cert.is_done IS TRUE
+             AND sp_internship_plan.is_done IS TRUE
+             AND sp_vicinity_map.is_done IS TRUE
+             AND sp_oath.is_done IS TRUE
+             AND (i.is_plv_internal IS TRUE OR i.is_valenzuela_lgu IS TRUE OR sp_reco_letter.is_done IS TRUE)
+             AND (i.is_plv_internal IS TRUE OR sp_waiver.is_done IS TRUE)
+                THEN 'Complete'
             ELSE 'Incomplete'
         END AS requirements,
-        ib.created_at
-    FROM internship_bookmarks ib
-    JOIN students s ON s.id = ib.student_id
-    JOIN internships i ON i.id = ib.internship_id
-    LEFT JOIN student_documents sd ON sd.student_id = s.id
-    LEFT JOIN (SELECT DISTINCT student_id FROM student_credentials) sc ON sc.student_id = s.id
-    LEFT JOIN student_progress sp_app ON sp_app.student_id = s.id AND sp_app.step_key = 'application'
-    LEFT JOIN student_progress sp_docs ON sp_docs.student_id = s.id AND sp_docs.step_key = 'documents'
-    LEFT JOIN student_progress sp_ojt ON sp_ojt.student_id = s.id AND sp_ojt.step_key = 'ojt_accepted'
-    ORDER BY ib.created_at DESC
+
+        oa.submitted_at
+
+    FROM ojt_applications oa
+    JOIN students s ON s.id = oa.student_id
+    JOIN internships i ON i.id = oa.internship_id
+
+    LEFT JOIN student_progress sp_company_profile 
+        ON sp_company_profile.student_id = s.id 
+       AND sp_company_profile.internship_id = oa.internship_id 
+       AND sp_company_profile.step_key = 'company_profile'
+    LEFT JOIN student_progress sp_resume 
+        ON sp_resume.student_id = s.id 
+       AND sp_resume.internship_id = oa.internship_id 
+       AND sp_resume.step_key = 'resume'
+    LEFT JOIN student_progress sp_addendum 
+        ON sp_addendum.student_id = s.id 
+       AND sp_addendum.internship_id = oa.internship_id 
+       AND sp_addendum.step_key = 'addendum'
+    LEFT JOIN student_progress sp_medical_cert 
+        ON sp_medical_cert.student_id = s.id 
+       AND sp_medical_cert.internship_id = oa.internship_id 
+       AND sp_medical_cert.step_key = 'medical_cert'
+    LEFT JOIN student_progress sp_internship_plan 
+        ON sp_internship_plan.student_id = s.id 
+       AND sp_internship_plan.internship_id = oa.internship_id 
+       AND sp_internship_plan.step_key = 'internship_plan'
+    LEFT JOIN student_progress sp_vicinity_map 
+        ON sp_vicinity_map.student_id = s.id 
+       AND sp_vicinity_map.internship_id = oa.internship_id 
+       AND sp_vicinity_map.step_key = 'vicinity_map'
+    LEFT JOIN student_progress sp_oath 
+        ON sp_oath.student_id = s.id 
+       AND sp_oath.internship_id = oa.internship_id 
+       AND sp_oath.step_key = 'oath'
+    LEFT JOIN student_progress sp_reco_letter 
+        ON sp_reco_letter.student_id = s.id 
+       AND sp_reco_letter.internship_id = oa.internship_id 
+       AND sp_reco_letter.step_key = 'reco_letter'
+    LEFT JOIN student_progress sp_waiver 
+        ON sp_waiver.student_id = s.id 
+       AND sp_waiver.internship_id = oa.internship_id 
+       AND sp_waiver.step_key = 'waiver'
+
+    ORDER BY oa.submitted_at DESC
 ");
 $applicants = $applicantsStmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -1292,11 +1357,11 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                             <option value="Information Technology">IT</option>
                             <option value="Civil Engineering">CE</option>
                             <option value="Electrical Engineering">EE</option>
-                            <option value="Information Technology, Civil Engineering">IT &amp; CE</option>
-                            <option value="Information Technology, Electrical Engineering">IT &amp; EE</option>
+                            <!-- <option value="Information Technology, Civil Engineering">IT &amp; CE</option> -->
+                            <!-- <option value="Information Technology, Electrical Engineering">IT &amp; EE</option>
                             <option value="Civil Engineering, Electrical Engineering">CE &amp; EE</option>
                             <option value="Information Technology, Civil Engineering, Electrical Engineering">IT, CE
-                                &amp; EE</option>
+                                &amp; EE</option> -->
                         </select>
                     </div>
                     <!-- CHANGED: swapped "btn-button" for "btn-update" (already in your CSS) — same
@@ -1565,144 +1630,86 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
             </style>
 
             <!-- ── APPLICANTS ── -->
-            <div id="interns" class="section sysAdm-section">
-                <div class="sysAdm-header--danger sysAdm-header--blue sysAdm-header mb-4">
-                    <div class="sysAdm-header-left">
-                        <div class="sysAdm-header-icon">
-                            <i class="bi bi-people-fill"></i>
-                        </div>
-                        <div class="sysAdm-header-text">
-                            <h2>Interns</h2>
-                            <p>A place to review student credentials and track candidate progress through the hiring
-                                pipeline.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- <div class="table-controls">
-                    <div class="filters">
-                        <select class="filter-select" id="app-phase-filter" onchange="filterApplicants()">
-                            <option value="all">Status</option>
-                            <option value="Internship Confirmed">Internship Confirmed</option>
-                            <option value="Documents Submitted">Documents Submitted</option>
-                            <option value="Application Submitted">Application Submitted</option>
-                            <option value="Resume Uploaded">Resume Uploaded</option>
-                            <option value="No Progress">No Progress</option>
-                        </select>
-                        <select class="filter-select" id="app-req-filter" onchange="filterApplicants()">
-                            <option value="all">Requirements</option>
-                            <option value="Complete">Complete</option>
-                            <option value="Incomplete">Incomplete</option>
-                        </select>
-                        <select class="filter-select" id="app-program-filter" onchange="filterApplicants()">
-                            <option value="all">Programs</option>
-                            <option value="Information Technology">Information Technology</option>
-                            <option value="Civil Engineering">Civil Engineering</option>
-                            <option value="Electrical Engineering">Electrical Engineering</option>
-                        </select>
-                    </div>
+            <div
+                style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
+                <div style="display:flex; align-items:center; flex-wrap:wrap; gap:10px;">
                     <div class="search-box">
-                        <input type="text" id="search-applicants" oninput="filterApplicants()" placeholder="Search">
-                        <i class="bi bi-search"></i>
-                    </div>
-                </div> -->
-
-                <!-- TEST -->
-
-                <div
-                    style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
-                    <div style="display:flex; align-items:center; flex-wrap:wrap; gap:10px;">
-                        <div class="search-box">
-                            <input type="text" id="search-applicants"
-                                style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:220px;"
-                                placeholder="Search by company or title..." oninput="filterApplicants()">
-
-                            <i class="bi bi-search" style="color:#272f54 !important;"></i>
-                        </div>
-
-                        <select class="filter-select"
-                            style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:200px;"
-                            id="app-phase-filter" onchange="filterApplicants()">
-                            <option value="all">Status</option>
-                            <option value="Internship Confirmed">Internship Confirmed</option>
-                            <option value="Documents Submitted">Documents Submitted</option>
-                            <option value="Application Submitted">Application Submitted</option>
-                            <option value="Resume Uploaded">Resume Uploaded</option>
-                            <option value="No Progress">No Progress</option>
-                        </select>
-                        <select class="filter-select"
-                            style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:200px;"
-                            id="app-phase-filter" onchange="filterApplicants()">
-                            <option value="all">Requirements</option>
-                            <option value="Complete">Complete</option>
-                            <option value="Incomplete">Incomplete</option>
-                        </select>
-                        <select class="filter-select"
-                            style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:200px;"
-                            id="app-phase-filter" onchange="filterApplicants()">
-                            <option value="all">Programs</option>
-                            <option value="Information Technology">Information Technology</option>
-                            <option value="Civil Engineering">Civil Engineering</option>
-                            <option value="Electrical Engineering">Electrical Engineering</option>
-                        </select>
+                        <input type="text" id="search-applicants"
+                            style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:220px;"
+                            placeholder="Search by company or title..." oninput="filterApplicants()">
+                        <i class="bi bi-search" style="color:#272f54 !important;"></i>
                     </div>
 
+                    <select class="filter-select"
+                        style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:200px;"
+                        id="app-req-filter" onchange="filterApplicants()">
+                        <option value="all">Requirements</option>
+                        <option value="Complete">Complete</option>
+                        <option value="Incomplete">Incomplete</option>
+                    </select>
+
+                    <select class="filter-select"
+                        style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:200px;"
+                        id="app-program-filter" onchange="filterApplicants()">
+                        <option value="all">Programs</option>
+                        <option value="Information Technology">Information Technology</option>
+                        <option value="Civil Engineering">Civil Engineering</option>
+                        <option value="Electrical Engineering">Electrical Engineering</option>
+                    </select>
                 </div>
+            </div>
 
-                <div class="sysAdm-table-wrapper">
-                    <table class="sysAdm-table" id="applicants-table">
-                        <thead>
+            <div class="sysAdm-table-wrapper">
+                <table class="sysAdm-table" id="applicants-table">
+                    <thead>
+                        <tr>
+                            <th>Student Name</th>
+                            <th>Program</th>
+                            <th>Internship</th>
+                            <th>Company</th>
+                            <th>Phase</th>
+                            <th>Requirements</th>
+                        </tr>
+                    </thead>
+                    <tbody id="applicants-tbody">
+                        <?php if (empty($applicants)): ?>
                             <tr>
-                                <th>Student Name</th>
-                                <th>Program</th>
-                                <th>Internship</th>
-                                <th>Company</th>
-                                <th>Phase</th>
-                                <th>Requirements</th>
+                                <td colspan="6" class="text-center text-muted">No applicants yet.</td>
                             </tr>
-                        </thead>
-                        <tbody id="applicants-tbody">
-                            <?php if (empty($applicants)): ?>
-                                <tr>
-                                    <td colspan="6" class="text-center text-muted">No applicants yet.</td>
+                        <?php else: ?>
+                            <?php foreach ($applicants as $a):
+                                $phaseColors = [
+                                    'Internship Confirmed' => ['bg' => '#d1fae5', 'color' => '#065f46'],
+                                    'In Progress' => ['bg' => '#fef9c3', 'color' => '#854d0e'],
+                                    'No Progress' => ['bg' => '#f3f4f6', 'color' => '#6b7280'],
+                                ];
+                                $pc = $phaseColors[$a['current_phase']] ?? ['bg' => '#f3f4f6', 'color' => '#6b7280'];
+                                ?>
+                                <tr data-name="<?= strtolower(htmlspecialchars($a['full_name'])) ?>"
+                                    data-program="<?= htmlspecialchars($a['program']) ?>"
+                                    data-phase="<?= htmlspecialchars($a['current_phase']) ?>"
+                                    data-req="<?= htmlspecialchars($a['requirements']) ?>">
+                                    <td><?= htmlspecialchars($a['full_name']) ?></td>
+                                    <td><?= htmlspecialchars($a['program']) ?></td>
+                                    <td><?= htmlspecialchars($a['internship_title']) ?></td>
+                                    <td><?= htmlspecialchars($a['company']) ?></td>
+                                    <td>
+                                        <span
+                                            style="background:<?= $pc['bg'] ?>;color:<?= $pc['color'] ?>;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:600;">
+                                            <?= htmlspecialchars($a['current_phase']) ?>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span
+                                            style="color:<?= $a['requirements'] === 'Complete' ? '#16a34a' : '#dc2626' ?>;font-weight:600;font-size:13px;">
+                                            <?= htmlspecialchars($a['requirements']) ?>
+                                        </span>
+                                    </td>
                                 </tr>
-                            <?php else: ?>
-                                <?php foreach ($applicants as $a):
-                                    $phaseColors = [
-                                        'Internship Confirmed' => ['bg' => '#d1fae5', 'color' => '#065f46'],
-                                        'Documents Submitted' => ['bg' => '#dbeafe', 'color' => '#1e40af'],
-                                        'Application Submitted' => ['bg' => '#fef9c3', 'color' => '#854d0e'],
-                                        'Resume Uploaded' => ['bg' => '#fce7f3', 'color' => '#9d174d'],
-                                        'No Progress' => ['bg' => '#f3f4f6', 'color' => '#6b7280'],
-                                    ];
-                                    $pc = $phaseColors[$a['current_phase']] ?? ['bg' => '#f3f4f6', 'color' => '#6b7280'];
-                                    ?>
-                                    <tr data-name="<?= strtolower(htmlspecialchars($a['full_name'])) ?>"
-                                        data-program="<?= htmlspecialchars($a['program']) ?>"
-                                        data-phase="<?= htmlspecialchars($a['current_phase']) ?>"
-                                        data-req="<?= htmlspecialchars($a['requirements']) ?>">
-                                        <td><?= htmlspecialchars($a['full_name']) ?></td>
-                                        <td><?= htmlspecialchars($a['program']) ?></td>
-                                        <td><?= htmlspecialchars($a['internship_title']) ?></td>
-                                        <td><?= htmlspecialchars($a['company']) ?></td>
-                                        <td>
-                                            <span
-                                                style="background:<?= $pc['bg'] ?>;color:<?= $pc['color'] ?>;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:600;">
-                                                <?= htmlspecialchars($a['current_phase']) ?>
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <span
-                                                style="color:<?= $a['requirements'] === 'Complete' ? '#16a34a' : '#dc2626' ?>;font-weight:600;font-size:13px;">
-                                                <?= htmlspecialchars($a['requirements']) ?>
-                                            </span>
-                                        </td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            <?php endif; ?>
-                        </tbody>
-                    </table>
-                </div>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
             </div>
 
             <!-- ── DOCUMENTS ── -->
@@ -2534,7 +2541,6 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
         // Applicants filter
         function filterApplicants() {
             const search = document.getElementById('search-applicants').value.toLowerCase();
-            const phase = document.getElementById('app-phase-filter').value;
             const req = document.getElementById('app-req-filter').value;
             const program = document.getElementById('app-program-filter').value;
             document.querySelectorAll('#applicants-tbody tr').forEach(row => {

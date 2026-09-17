@@ -104,6 +104,7 @@ function stepDate(array $p, string $k): string
 $checklist = [
     'internship' => false,
     // 'hte_form' => false,
+    'resume' => false,
     'addendum' => false,
     'reco_letter' => false,
     'waiver' => false,
