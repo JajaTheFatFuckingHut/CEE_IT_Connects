@@ -2545,10 +2545,9 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
             const program = document.getElementById('app-program-filter').value;
             document.querySelectorAll('#applicants-tbody tr').forEach(row => {
                 const nameMatch = row.dataset.name?.includes(search) ?? true;
-                const phaseMatch = phase === 'all' || row.dataset.phase === phase;
                 const reqMatch = req === 'all' || row.dataset.req === req;
                 const programMatch = program === 'all' || row.dataset.program === program;
-                row.style.display = (nameMatch && phaseMatch && reqMatch && programMatch) ? '' : 'none';
+                row.style.display = (nameMatch && reqMatch && programMatch) ? '' : 'none';
             });
         }
 
