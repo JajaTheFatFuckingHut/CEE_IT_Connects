@@ -1630,86 +1630,88 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
             </style>
 
             <!-- ── APPLICANTS ── -->
-            <div
-                style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
-                <div style="display:flex; align-items:center; flex-wrap:wrap; gap:10px;">
-                    <div class="search-box">
-                        <input type="text" id="search-applicants"
-                            style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:220px;"
-                            placeholder="Search by company or title..." oninput="filterApplicants()">
-                        <i class="bi bi-search" style="color:#272f54 !important;"></i>
+            <div id="interns" class="section sysAdm-section">
+                <div
+                    style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
+                    <div style="display:flex; align-items:center; flex-wrap:wrap; gap:10px;">
+                        <div class="search-box">
+                            <input type="text" id="search-applicants"
+                                style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:220px;"
+                                placeholder="Search by company or title..." oninput="filterApplicants()">
+                            <i class="bi bi-search" style="color:#272f54 !important;"></i>
+                        </div>
+
+                        <select class="filter-select"
+                            style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:200px;"
+                            id="app-req-filter" onchange="filterApplicants()">
+                            <option value="all">Requirements</option>
+                            <option value="Complete">Complete</option>
+                            <option value="Incomplete">Incomplete</option>
+                        </select>
+
+                        <select class="filter-select"
+                            style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:200px;"
+                            id="app-program-filter" onchange="filterApplicants()">
+                            <option value="all">Programs</option>
+                            <option value="information technology">Information Technology</option>
+                            <option value="civil engineering">Civil Engineering</option>
+                            <option value="electrical engineering">Electrical Engineering</option>
+                        </select>
                     </div>
-
-                    <select class="filter-select"
-                        style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:200px;"
-                        id="app-req-filter" onchange="filterApplicants()">
-                        <option value="all">Requirements</option>
-                        <option value="Complete">Complete</option>
-                        <option value="Incomplete">Incomplete</option>
-                    </select>
-
-                    <select class="filter-select"
-                        style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:200px;"
-                        id="app-program-filter" onchange="filterApplicants()">
-                        <option value="all">Programs</option>
-                        <option value="Information Technology">Information Technology</option>
-                        <option value="Civil Engineering">Civil Engineering</option>
-                        <option value="Electrical Engineering">Electrical Engineering</option>
-                    </select>
                 </div>
-            </div>
 
-            <div class="sysAdm-table-wrapper">
-                <table class="sysAdm-table" id="applicants-table">
-                    <thead>
-                        <tr>
-                            <th>Student Name</th>
-                            <th>Program</th>
-                            <th>Internship</th>
-                            <th>Company</th>
-                            <th>Phase</th>
-                            <th>Requirements</th>
-                        </tr>
-                    </thead>
-                    <tbody id="applicants-tbody">
-                        <?php if (empty($applicants)): ?>
+                <div class="sysAdm-table-wrapper">
+                    <table class="sysAdm-table" id="applicants-table">
+                        <thead>
                             <tr>
-                                <td colspan="6" class="text-center text-muted">No applicants yet.</td>
+                                <th>Student Name</th>
+                                <th>Program</th>
+                                <th>Internship</th>
+                                <th>Company</th>
+                                <th>Phase</th>
+                                <th>Requirements</th>
                             </tr>
-                        <?php else: ?>
-                            <?php foreach ($applicants as $a):
-                                $phaseColors = [
-                                    'Internship Confirmed' => ['bg' => '#d1fae5', 'color' => '#065f46'],
-                                    'In Progress' => ['bg' => '#fef9c3', 'color' => '#854d0e'],
-                                    'No Progress' => ['bg' => '#f3f4f6', 'color' => '#6b7280'],
-                                ];
-                                $pc = $phaseColors[$a['current_phase']] ?? ['bg' => '#f3f4f6', 'color' => '#6b7280'];
-                                ?>
-                                <tr data-name="<?= strtolower(htmlspecialchars($a['full_name'])) ?>"
-                                    data-program="<?= htmlspecialchars($a['program']) ?>"
-                                    data-phase="<?= htmlspecialchars($a['current_phase']) ?>"
-                                    data-req="<?= htmlspecialchars($a['requirements']) ?>">
-                                    <td><?= htmlspecialchars($a['full_name']) ?></td>
-                                    <td><?= htmlspecialchars($a['program']) ?></td>
-                                    <td><?= htmlspecialchars($a['internship_title']) ?></td>
-                                    <td><?= htmlspecialchars($a['company']) ?></td>
-                                    <td>
-                                        <span
-                                            style="background:<?= $pc['bg'] ?>;color:<?= $pc['color'] ?>;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:600;">
-                                            <?= htmlspecialchars($a['current_phase']) ?>
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span
-                                            style="color:<?= $a['requirements'] === 'Complete' ? '#16a34a' : '#dc2626' ?>;font-weight:600;font-size:13px;">
-                                            <?= htmlspecialchars($a['requirements']) ?>
-                                        </span>
-                                    </td>
+                        </thead>
+                        <tbody id="applicants-tbody">
+                            <?php if (empty($applicants)): ?>
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted">No applicants yet.</td>
                                 </tr>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
+                            <?php else: ?>
+                                <?php foreach ($applicants as $a):
+                                    $phaseColors = [
+                                        'Internship Confirmed' => ['bg' => '#d1fae5', 'color' => '#065f46'],
+                                        'In Progress' => ['bg' => '#fef9c3', 'color' => '#854d0e'],
+                                        'No Progress' => ['bg' => '#f3f4f6', 'color' => '#6b7280'],
+                                    ];
+                                    $pc = $phaseColors[$a['current_phase']] ?? ['bg' => '#f3f4f6', 'color' => '#6b7280'];
+                                    ?>
+                                    <tr data-name="<?= strtolower(htmlspecialchars($a['full_name'])) ?>"
+                                        data-program="<?= htmlspecialchars($a['program']) ?>"
+                                        data-phase="<?= htmlspecialchars($a['current_phase']) ?>"
+                                        data-req="<?= htmlspecialchars($a['requirements']) ?>">
+                                        <td><?= htmlspecialchars($a['full_name']) ?></td>
+                                        <td><?= htmlspecialchars($a['program']) ?></td>
+                                        <td><?= htmlspecialchars($a['internship_title']) ?></td>
+                                        <td><?= htmlspecialchars($a['company']) ?></td>
+                                        <td>
+                                            <span
+                                                style="background:<?= $pc['bg'] ?>;color:<?= $pc['color'] ?>;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:600;">
+                                                <?= htmlspecialchars($a['current_phase']) ?>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span
+                                                style="color:<?= $a['requirements'] === 'Complete' ? '#16a34a' : '#dc2626' ?>;font-weight:600;font-size:13px;">
+                                                <?= htmlspecialchars($a['requirements']) ?>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <!-- ── DOCUMENTS ── -->
