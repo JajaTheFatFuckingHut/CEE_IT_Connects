@@ -100,21 +100,16 @@ $applicantsStmt = $pdo->query("
 ");
 $applicants = $applicantsStmt->fetchAll(PDO::FETCH_ASSOC);
 
-$resumeStmt = $pdo->query("
-    SELECT sd.id, sd.resume_path, sd.uploaded_at, s.full_name, s.program, s.student_id AS student_number
-    FROM student_documents sd
-    JOIN students s ON s.id = sd.student_id
-    ORDER BY sd.uploaded_at DESC
+$documentsStmt = $pdo->query("
+    SELECT sp.id, sp.file_path, sp.step_key, sp.updated_at AS uploaded_at,
+           s.full_name, s.program, s.student_id AS student_number,
+           CASE WHEN sp.step_key = 'resume' THEN 'resume' ELSE 'credential' END AS doc_type
+    FROM student_progress sp
+    JOIN students s ON s.id = sp.student_id
+    WHERE sp.file_path IS NOT NULL
+    ORDER BY sp.updated_at DESC
 ");
-$resumes = $resumeStmt->fetchAll(PDO::FETCH_ASSOC);
-
-$credentialStmt = $pdo->query("
-    SELECT sc.id, sc.credential_path, sc.uploaded_at, s.full_name, s.program, s.student_id AS student_number
-    FROM student_credentials sc
-    JOIN students s ON s.id = sc.student_id
-    ORDER BY sc.uploaded_at DESC
-");
-$credentials = $credentialStmt->fetchAll(PDO::FETCH_ASSOC);
+$documents = $documentsStmt->fetchAll(PDO::FETCH_ASSOC);
 
 $stmtinterest = $pdo->prepare("
     SELECT oa.id AS interest_id, oa.student_id, oa.submitted_at,
@@ -1770,42 +1765,20 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($resumes as $doc): ?>
-                                <tr data-type="resume" data-name="<?= strtolower(htmlspecialchars($doc['full_name'])) ?>"
-                                    data-program="<?= strtolower(htmlspecialchars($doc['program'])) ?>">
-                                    <td><?= htmlspecialchars($doc['full_name']) ?></td>
-                                    <td><?= htmlspecialchars($doc['student_number']) ?></td>
-                                    <td><?= htmlspecialchars($doc['program']) ?></td>
-                                    <td><span>Resume</span></td>
-                                    <td><?= date("M d, Y", strtotime($doc['uploaded_at'])) ?></td>
-                                    <td style="text-align:center;">
-                                        <a href="../uploads/resumes/<?= htmlspecialchars($doc['resume_path']) ?>"
-                                            target="_blank" target="_blank" class="btn-delete" tooltip="View MOU"
-                                            title="View MOU"
-                                            style="text-decoration: none; background: #FFE7B3;
-                                            color: #7a5200; border:1px solid #7a5200; background-color: #FFE7B3; transition: background-color 0.2s ease;"
-                                            onmouseover="this.style.backgroundColor='#dbbe83';"
-                                            onmouseout="this.style.backgroundColor='#FFE7B3';"><i class="bi bi-eye"></i>
-                                        </a>
-                                    </td>
-
-                                </tr>
-                            <?php endforeach; ?>
-                            <?php foreach ($credentials as $doc): ?>
-                                <tr data-type="credential"
+                            <?php foreach ($documents as $doc): ?>
+                                <tr data-type="<?= htmlspecialchars($doc['doc_type']) ?>"
                                     data-name="<?= strtolower(htmlspecialchars($doc['full_name'])) ?>"
                                     data-program="<?= strtolower(htmlspecialchars($doc['program'])) ?>">
                                     <td><?= htmlspecialchars($doc['full_name']) ?></td>
                                     <td><?= htmlspecialchars($doc['student_number']) ?></td>
                                     <td><?= htmlspecialchars($doc['program']) ?></td>
-                                    <td><span>Credentials</span></td>
+                                    <td><span><?= $doc['doc_type'] === 'resume' ? 'Resume' : 'Credentials' ?></span></td>
                                     <td><?= date("M d, Y", strtotime($doc['uploaded_at'])) ?></td>
                                     <td style="text-align:center;">
-                                        <a href="../uploads/credentials/<?= htmlspecialchars($doc['credential_path']) ?>"
-                                            target="_blank" target="_blank" class="btn-delete" tooltip="View MOU"
-                                            title="View MOU"
+                                        <a href="../<?= htmlspecialchars($doc['file_path']) ?>" target="_blank"
+                                            class="btn-delete" tooltip="View MOU" title="View MOU"
                                             style="text-decoration: none; background: #FFE7B3;
-                                            color: #7a5200; border:1px solid #7a5200; background-color: #FFE7B3; transition: background-color 0.2s ease;"
+                            color: #7a5200; border:1px solid #7a5200; background-color: #FFE7B3; transition: background-color 0.2s ease;"
                                             onmouseover="this.style.backgroundColor='#dbbe83';"
                                             onmouseout="this.style.backgroundColor='#FFE7B3';"><i class="bi bi-eye"></i>
                                         </a>
