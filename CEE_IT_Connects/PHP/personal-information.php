@@ -496,8 +496,6 @@ $initials = strtoupper(
                             <label class="form-label">Year & Section</label>
                             <div class="d-flex align-items-center gap-1">
                                 <input name="year_level" class="form-control" style="max-width:70px;" value="4" readonly>
-                                4
-                                </input>
 
                                 <!-- <select name="year_level" class="form-control" style="max-width:70px;">
                                     <?php for ($y = 1; $y <= 4; $y++): ?>
