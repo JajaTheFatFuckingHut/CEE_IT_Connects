@@ -12,7 +12,7 @@ if (!$student_id) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: message.php?section=application&room_id=' . urlencode($current_room_id));
+    header('Location: message.php?section=application&room_id=' . urlencode($current_room_id ?? ''));
     exit;
 }
 
@@ -24,7 +24,7 @@ if ($action === 'apply_internship') {
 
     if (!$internship_id) {
         $_SESSION['error'] = 'Please select an internship.';
-        header('Location: message.php?section=application&room_id=' . urlencode($current_room_id));
+        header('Location: message.php?section=application&room_id=' . urlencode($current_room_id ?? ''));
         exit;
     }
 
@@ -40,7 +40,7 @@ if ($action === 'apply_internship') {
 
     if ($check->fetch()) {
         $_SESSION['error'] = 'You already have an internship application.';
-        header('Location: message.php?section=application&room_id=' . urlencode($current_room_id));
+        header('Location: message.php?section=application&room_id=' . urlencode($current_room_id ?? '' ?? ''));
         exit;
     }
 
@@ -58,7 +58,7 @@ if ($action === 'apply_internship') {
 
     if (!$internship) {
         $_SESSION['error'] = 'Internship not found.';
-        header('Location: message.php?section=application&room_id=' . urlencode($current_room_id));
+        header('Location: message.php?section=application&room_id=' . urlencode($current_room_id ?? '' ?? ''));
         exit;
     }
 
@@ -106,7 +106,7 @@ if ($action === 'apply_internship') {
     if (!in_array($step_key, $allowed_steps, true)) {
 
         $_SESSION['error'] = 'Invalid step.';
-        header('Location: message.php?section=application&room_id=' . urlencode($current_room_id));
+        header('Location: message.php?section=application&room_id=' . urlencode($current_room_id ?? ''));
         exit;
     }
 
@@ -121,7 +121,7 @@ if ($action === 'apply_internship') {
     if (!$internship_id || !$verify->fetch()) {
 
         $_SESSION['error'] = 'Invalid or mismatched internship.';
-        header('Location: message.php?section=application&room_id=' . urlencode($current_room_id));
+        header('Location: message.php?section=application&room_id=' . urlencode($current_room_id ?? ''));
         exit;
     }
 
@@ -135,7 +135,7 @@ if ($action === 'apply_internship') {
         ) {
 
             $_SESSION['error'] = 'Please attach proof before marking as done.';
-            header('Location: message.php?section=application&room_id=' . urlencode($current_room_id));
+            header('Location: message.php?section=application&room_id=' . urlencode($current_room_id ?? ''));
             exit;
         }
 
@@ -144,7 +144,7 @@ if ($action === 'apply_internship') {
         if ($file['error'] !== UPLOAD_ERR_OK) {
 
             $_SESSION['error'] = 'Upload error. Please try again.';
-            header('Location: message.php?section=application&room_id=' . urlencode($current_room_id));
+            header('Location: message.php?section=application&room_id=' . urlencode($current_room_id ?? ''));
             exit;
         }
 
@@ -153,7 +153,7 @@ if ($action === 'apply_internship') {
         if ($file['size'] > $max_size) {
 
             $_SESSION['error'] = 'File must be under 5MB.';
-            header('Location: message.php?section=application&room_id=' . urlencode($current_room_id));
+            header('Location: message.php?section=application&room_id=' . urlencode($current_room_id ?? ''));
             exit;
         }
 
@@ -169,7 +169,7 @@ if ($action === 'apply_internship') {
         if (!isset($allowed_types[$mime_type])) {
 
             $_SESSION['error'] = 'Only JPG, PNG, or PDF files are allowed.';
-            header('Location: message.php?section=application&room_id=' . urlencode($current_room_id));
+            header('Location: message.php?section=application&room_id=' . urlencode($current_room_id ?? ''));
             exit;
         }
 
@@ -182,7 +182,7 @@ if ($action === 'apply_internship') {
             if (!mkdir($upload_dir, 0775, true)) {
 
                 $_SESSION['error'] = 'Unable to create upload directory.';
-                header('Location: message.php?section=application&room_id=' . urlencode($current_room_id));
+                header('Location: message.php?section=application&room_id=' . urlencode($current_room_id ?? ''));
                 exit;
             }
         }
@@ -201,7 +201,7 @@ if ($action === 'apply_internship') {
         if (!move_uploaded_file($file['tmp_name'], $destination)) {
 
             $_SESSION['error'] = 'File upload failed. Please try again.';
-            header('Location: message.php?section=application&room_id=' . urlencode($current_room_id));
+            header('Location: message.php?section=application&room_id=' . urlencode($current_room_id ?? ''));
             exit;
         }
 
@@ -411,7 +411,7 @@ elseif ($action === 'cancel_application') {
     if (!$application_id) {
 
         $_SESSION['error'] = 'Invalid application.';
-        header('Location: message.php?section=application&room_id=' . urlencode($current_room_id));
+        header('Location: message.php?section=application&room_id=' . urlencode($current_room_id ?? ''));
         exit;
     }
 
@@ -433,7 +433,7 @@ elseif ($action === 'cancel_application') {
     if ($application_internship_id === false) {
 
         $_SESSION['error'] = 'Application not found.';
-        header('Location: message.php?section=application&room_id=' . urlencode($current_room_id));
+        header('Location: message.php?section=application&room_id=' . urlencode($current_room_id ?? ''));
         exit;
     }
 
@@ -481,7 +481,7 @@ elseif ($action === 'cancel_application') {
     $_SESSION['success'] =
         'Application cancelled and progress reset.';
 
-    header('Location: message.php?section=application&room_id=' . urlencode($current_room_id));
+    header('Location: message.php?section=application&room_id=' . urlencode($current_room_id ?? ''));
     exit;
 } elseif ($action === 'delete-weekly-report') {
 
@@ -489,7 +489,7 @@ elseif ($action === 'cancel_application') {
 
     if (!$report_id) {
         $_SESSION['error'] = 'Invalid report.';
-        header('Location: message.php?section=progress_report&room_id=' . urlencode($current_room_id));
+        header('Location: message.php?section=progress_report&room_id=' . urlencode($current_room_id ?? ''));
         exit;
     }
 
@@ -505,7 +505,7 @@ elseif ($action === 'cancel_application') {
 
     if (!$report) {
         $_SESSION['error'] = 'Report not found.';
-        header('Location: message.php?section=progress_report&room_id=' . urlencode($current_room_id));
+        header('Location: message.php?section=progress_report&room_id=' . urlencode($current_room_id ?? ''));
         exit;
     }
 
@@ -521,7 +521,7 @@ elseif ($action === 'cancel_application') {
 
     $_SESSION['success'] = 'Weekly report deleted.';
 
-    header('Location: message.php?section=progress_report&room_id=' . urlencode($current_room_id));
+    header('Location: message.php?section=progress_report&room_id=' . urlencode($current_room_id ?? ''));
     exit;
 
 } else {
@@ -529,5 +529,5 @@ elseif ($action === 'cancel_application') {
     $_SESSION['error'] = 'Unknown action.';
 }
 
-header('Location: message.php?section=application&room_id=' . urlencode($current_room_id ?? ''));
+header('Location: message.php?section=application&room_id=' . urlencode($current_room_id ?? '' ?? ''));
 exit;
