@@ -27,7 +27,8 @@ $adviserInternshipId = $adviserStmt->fetchColumn();
 
 // Confirm this adviser actually oversees this student before exposing any DTR data
 $accessStmt = $pdo->prepare("
-    SELECT s.id, s.full_name, i.company, i.required_hours
+    SELECT s.id, s.full_name, i.company, i.required_hours,
+           i.ojt_time_in, i.ojt_time_out
     FROM students s
     JOIN ojt_applications oa ON oa.student_id = s.id
     JOIN internships i ON i.id = oa.internship_id
@@ -96,15 +97,7 @@ echo json_encode([
     'weeks' => $ojtWeeks,
 ]);
 
-$accessStmt = $pdo->prepare("
-    SELECT s.id, s.full_name, i.company, i.required_hours,
-           i.ojt_time_in, i.ojt_time_out
-    FROM students s
-    JOIN ojt_applications oa ON oa.student_id = s.id
-    JOIN internships i ON i.id = oa.internship_id
-    WHERE s.id = ? AND oa.internship_id = ?
-    LIMIT 1
-");
+
 
 echo json_encode([
     'success' => true,
