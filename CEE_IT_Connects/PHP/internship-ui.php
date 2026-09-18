@@ -1255,7 +1255,7 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                                     foreach ($documents as $r) {
                                         $allDocs[] = [
                                             'name' => $r['full_name'],
-                                            'type' => 'Resume',
+                                            'type' => htmlspecialchars($r['step_key']),
                                             'date' => $r['uploaded_at'],
                                             'bg' => '#EAF3DE',
                                             'color' => '#27500A'
