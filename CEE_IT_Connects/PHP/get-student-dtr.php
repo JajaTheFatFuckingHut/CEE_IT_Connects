@@ -105,14 +105,16 @@ $accessStmt = $pdo->prepare("
     WHERE s.id = ? AND oa.internship_id = ?
     LIMIT 1
 ");
+
 echo json_encode([
     'success' => true,
     'student' => [
         'full_name' => $student['full_name'],
         'company' => $student['company'],
         'required_hours' => (float) $student['required_hours'],
-        'ojt_time_in' => $student['ojt_time_in'],   // e.g. "08:00:00"
-        'ojt_time_out' => $student['ojt_time_out'],  // e.g. "17:00:00"
+        'ojt_time_in' => $student['ojt_time_in'],
+        'ojt_time_out' => $student['ojt_time_out'],
     ],
     'weeks' => $ojtWeeks,
 ]);
+exit;
