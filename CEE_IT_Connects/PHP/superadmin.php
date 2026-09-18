@@ -1884,6 +1884,20 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
                             return ucwords(strtolower($label));
                         }
                     }
+                    if (!function_exists('ojtc_get_dropdown_options')) {
+                        function ojtc_get_dropdown_options($columnName)
+                        {
+                            $options = [
+                                'program' => [
+                                    'information technology',
+                                    'civil engineering',
+                                    'electrical engineering'
+                                ],
+                                'year_level' => ['1', '2', '3', '4'],
+                            ];
+                            return $options[$columnName] ?? null;
+                        }
+                    }
                     ?>
                     <?php if (empty($csvRows)): ?>
                         <p class="text-muted">No CSV file found. Please upload one first.</p>
@@ -1915,9 +1929,29 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
                                                 continue; ?>
                                             <tr>
                                                 <?php foreach ($row as $colIndex => $cell): ?>
+                                                    <?php
+                                                    $colName = strtolower(trim($csvRows[0][$colIndex] ?? ''));
+                                                    $options = ojtc_get_dropdown_options($colName);
+                                                    ?>
                                                     <td>
-                                                        <input type="text" name="csv[<?= $rowIndex ?>][<?= $colIndex ?>]"
-                                                            value="<?= htmlspecialchars($cell) ?>" class="form-control">
+                                                        <?php if ($options): ?>
+                                                            <select name="csv[<?= $rowIndex ?>][<?= $colIndex ?>]" class="form-control">
+                                                                <?php foreach ($options as $opt): ?>
+                                                                    <option value="<?= htmlspecialchars($opt) ?>"
+                                                                        <?= (strtolower(trim($cell)) === strtolower($opt)) ? 'selected' : '' ?>>
+                                                                        <?= htmlspecialchars(ucwords($opt)) ?>
+                                                                    </option>
+                                                                <?php endforeach; ?>
+                                                                <?php if (!in_array(strtolower(trim($cell)), array_map('strtolower', $options))): ?>
+                                                                    <option value="<?= htmlspecialchars($cell) ?>" selected>
+                                                                        <?= htmlspecialchars($cell) ?> (current)
+                                                                    </option>
+                                                                <?php endif; ?>
+                                                            </select>
+                                                        <?php else: ?>
+                                                            <input type="text" name="csv[<?= $rowIndex ?>][<?= $colIndex ?>]"
+                                                                value="<?= htmlspecialchars($cell) ?>" class="form-control">
+                                                        <?php endif; ?>
                                                     </td>
                                                 <?php endforeach; ?>
                                             </tr>
