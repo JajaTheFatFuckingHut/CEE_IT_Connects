@@ -1252,7 +1252,7 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                                 <div class="d-flex flex-column gap-3">
                                     <?php
                                     $allDocs = [];
-                                    foreach ($resumes as $r) {
+                                    foreach ($documents as $r) {
                                         $allDocs[] = [
                                             'name' => $r['full_name'],
                                             'type' => 'Resume',
@@ -1261,15 +1261,15 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                                             'color' => '#27500A'
                                         ];
                                     }
-                                    foreach ($credentials as $c) {
-                                        $allDocs[] = [
-                                            'name' => $c['full_name'],
-                                            'type' => 'Credential',
-                                            'date' => $c['uploaded_at'],
-                                            'bg' => '#E6F1FB',
-                                            'color' => '#0C447C'
-                                        ];
-                                    }
+                                    // foreach ($credentials as $c) {
+                                    //     $allDocs[] = [
+                                    //         'name' => $c['full_name'],
+                                    //         'type' => 'Credential',
+                                    //         'date' => $c['uploaded_at'],
+                                    //         'bg' => '#E6F1FB',
+                                    //         'color' => '#0C447C'
+                                    //     ];
+                                    // }
                                     usort($allDocs, fn($a, $b) => strtotime($b['date']) - strtotime($a['date']));
                                     $recentDocs = array_slice($allDocs, 0, 3);
                                     ?>
