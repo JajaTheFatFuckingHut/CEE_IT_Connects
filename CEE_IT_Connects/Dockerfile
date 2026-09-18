@@ -28,6 +28,11 @@ COPY uploads/checklist /var/www/html/uploads/checklist
 RUN chown -R www-data:www-data /var/www/html/Sources \
     && chmod -R 775 /var/www/html/Sources
 
+# Make upload directories writable by Apache/PHP
+RUN mkdir -p /var/www/html/uploads/checklist \
+    && chown -R www-data:www-data /var/www/html/uploads \
+    && chmod -R 775 /var/www/html/uploads
+
 RUN sed -i 's/AllowOverride None/AllowOverride All/g' /etc/apache2/apache2.conf
 
 EXPOSE 80
