@@ -95,3 +95,24 @@ echo json_encode([
     ],
     'weeks' => $ojtWeeks,
 ]);
+
+$accessStmt = $pdo->prepare("
+    SELECT s.id, s.full_name, i.company, i.required_hours,
+           i.ojt_time_in, i.ojt_time_out
+    FROM students s
+    JOIN ojt_applications oa ON oa.student_id = s.id
+    JOIN internships i ON i.id = oa.internship_id
+    WHERE s.id = ? AND oa.internship_id = ?
+    LIMIT 1
+");
+echo json_encode([
+    'success' => true,
+    'student' => [
+        'full_name' => $student['full_name'],
+        'company' => $student['company'],
+        'required_hours' => (float) $student['required_hours'],
+        'ojt_time_in' => $student['ojt_time_in'],   // e.g. "08:00:00"
+        'ojt_time_out' => $student['ojt_time_out'],  // e.g. "17:00:00"
+    ],
+    'weeks' => $ojtWeeks,
+]);

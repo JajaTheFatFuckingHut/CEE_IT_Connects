@@ -2755,7 +2755,7 @@ foreach ($roomStatuses as $s) {
                 }
 
                 body.innerHTML =
-                    data.weeks.map(week => renderDtrWeekReadOnly(week)).join('');
+                    data.weeks.map(week => renderDtrWeekReadOnly(week, data.student)).join('');
 
             } catch (err) {
                 console.error('DTR ERROR:', err);
@@ -3135,6 +3135,106 @@ foreach ($roomStatuses as $s) {
                 showSection(section, null);
             }
         });
+
+        function toMinutes(t) {
+            if (!t) return null;
+            const [h, m] = t.split(':').map(Number);
+            return h * 60 + m;
+        }
+
+        function getDtrStatus(row, schedule) {
+            const schedIn = toMinutes(schedule.ojt_time_in);
+            const schedOut = toMinutes(schedule.ojt_time_out);
+
+            const firstIn = toMinutes(row.m_in || row.a_in);
+            const lastOut = toMinutes(row.a_out || row.m_out);
+
+            // No entry at all
+            if (!row.date && firstIn === null && lastOut === null) {
+                return { label: '—', color: '#6b7280', bg: 'transparent' };
+            }
+            // Clocked in but never clocked out (or vice versa)
+            if (firstIn === null || lastOut === null) {
+                return { label: 'Incomplete', color: '#92400e', bg: '#fef3c7' };
+            }
+            // No schedule set on the internship
+            if (schedIn === null || schedOut === null) {
+                return { label: 'Present', color: '#065f46', bg: '#d1fae5' };
+            }
+
+            const late = firstIn > schedIn;
+            const undertime = lastOut < schedOut;
+
+            if (late && undertime) return { label: 'Late + Undertime', color: '#991b1b', bg: '#fee2e2' };
+            if (late) return { label: 'Late', color: '#991b1b', bg: '#fee2e2' };
+            if (undertime) return { label: 'Undertime', color: '#9a3412', bg: '#ffedd5' };
+            return { label: 'On time', color: '#065f46', bg: '#d1fae5' };
+        }
+
+        function renderDtrWeekReadOnly(week, schedule) {
+            const rows = week.rows.length > 0 ? week.rows : Array.from({ length: 6 }, (_, i) => ({
+                row_index: i, date: '', m_in: '', m_out: '', a_in: '', a_out: ''
+            }));
+
+            const rowsHtml = rows.map(row => {
+                const mHrs = calcHrs(row.m_in, row.m_out);
+                const aHrs = calcHrs(row.a_in, row.a_out);
+                const daily = (mHrs + aHrs).toFixed(2);
+                const dayName = row.date
+                    ? new Date(row.date + 'T00:00:00').toLocaleDateString(undefined, { weekday: 'short' })
+                    : '—';
+                const st = getDtrStatus(row, schedule);
+
+                return `
+        <tr>
+            <td>${row.date || '—'}</td>
+            <td style="text-align:center">${dayName}</td>
+            <td class="td-morning">${row.m_in || '—'}</td>
+            <td class="td-morning">${row.m_out || '—'}</td>
+            <td class="td-morning">${mHrs ? mHrs.toFixed(2) : '—'}</td>
+            <td class="td-afternoon">${row.a_in || '—'}</td>
+            <td class="td-afternoon">${row.a_out || '—'}</td>
+            <td class="td-afternoon">${aHrs ? aHrs.toFixed(2) : '—'}</td>
+            <td>${daily}</td>
+            <td>
+                <span class="ojt-status-badge"
+                      style="color:${st.color}; background:${st.bg}; padding:2px 8px; border-radius:999px; font-size:.8rem; white-space:nowrap;">
+                    ${st.label}
+                </span>
+            </td>
+        </tr>`;
+            }).join('');
+
+            return `
+    <div class="ojt-week-block mb-3">
+        <div class="ojt-week-header">
+            <strong>${week.week_label}</strong>
+        </div>
+        <div class="ojt-table-scroll">
+            <table class="ojt-table">
+                <thead>
+                    <tr>
+                        <th rowspan="2" class="ojt-group">Date</th>
+                        <th rowspan="2" class="ojt-group">Day</th>
+                        <th colspan="3" style="background:#FFB62F;">Morning</th>
+                        <th colspan="3" style="background:#FF673A;">Afternoon</th>
+                        <th rowspan="2" class="ojt-group">Daily<br>Hours</th>
+                        <th rowspan="2" class="ojt-group">Status</th>
+                    </tr>
+                    <tr>
+                        <th style="background:#f9c565;">In</th>
+                        <th style="background:#f9c565;">Out</th>
+                        <th style="background:#f9c565;">Hrs</th>
+                        <th style="background:#f49679;">In</th>
+                        <th style="background:#f49679;">Out</th>
+                        <th style="background:#f49679;">Hrs</th>
+                    </tr>
+                </thead>
+                <tbody>${rowsHtml}</tbody>
+            </table>
+        </div>
+    </div>`;
+        }
     </script>
 </body>
 
