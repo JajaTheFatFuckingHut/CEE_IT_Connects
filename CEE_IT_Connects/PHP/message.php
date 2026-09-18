@@ -496,6 +496,31 @@ function loadOjtWeeks($pdo, $userId, $userType)
     return array_values($weeks);
 }
 
+$ojtTimeIn = null;
+$ojtTimeOut = null;
+
+$studentId = $_SESSION['student_id'] ?? ($_GET['student_id'] ?? null);
+
+$ojtTimeIn = null;
+$ojtTimeOut = null;
+
+if ($student_id) {
+    $stmt = $pdo->prepare("
+        SELECT i.ojt_time_in, i.ojt_time_out
+        FROM ojt_application oa
+        JOIN internships i ON i.id = oa.internship_id
+        WHERE oa.student_id = ?
+        LIMIT 1
+    ");
+    $stmt->execute([$student_id]);
+    $internship = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($internship) {
+        $ojtTimeIn = $internship['ojt_time_in'];
+        $ojtTimeOut = $internship['ojt_time_out'];
+    }
+}
+
 $ojtWeeks = loadOjtWeeks($pdo, $_SESSION['user_id'], $current_user_type);
 $colors = ['#d63ba5', '#1abc9c', '#3498db', '#9b59b6'];
 $color = $colors[array_rand($colors)];
@@ -2572,6 +2597,7 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
                                             <th class="th-afternoon" colspan="3"
                                                 style="background:#FF673A; border:1px solid #e5e7eb;">Afternoon</th>
                                             <th rowspan="2" class="ojt-group">Daily<br>Hours</th>
+                                            <th rowspan="2" class="ojt-group">Status</th>
                                         </tr>
                                         <tr class="ojt-sub">
                                             <th class="sub-morning" style="background:#f9c565; border:1px solid #e5e7eb;">In
@@ -2631,6 +2657,10 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
                                                 <td style="min-width:62px">
                                                     <span class="ojt-daily-val" data-display="daily"
                                                         id="ojt-daily-<?= $week['week_index'] ?>-<?= $ri ?>">—</span>
+                                                </td>
+                                                <td style="min-width:110px">
+                                                    <span class="ojt-status-badge" data-display="status"
+                                                        id="ojt-status-<?= $week['week_index'] ?>-<?= $ri ?>">—</span>
                                                 </td>
                                             </tr>
                                         <?php endforeach; ?>
@@ -3599,6 +3629,7 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
             ojtUnsavedChanges[`${weekId}-${rowIndex}-${field}`] = el.value;
             ojtShowSaveBar();
             ojtRecalcAll();
+            ojtComputeStatus(weekId, rowIndex);
         }
 
         function ojtShowSaveBar() {
@@ -3908,6 +3939,73 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
                 }
             <?php endif; ?>
         })();
+
+
+
+        const OJT_EXPECTED_TIME_IN = "<?= htmlspecialchars($ojtTimeIn ?? '') ?>";
+        const OJT_EXPECTED_TIME_OUT = "<?= htmlspecialchars($ojtTimeOut ?? '') ?>";
+        function timeToMinutes(t) {
+            if (!t) return null;
+            const [h, m] = t.split(':').map(Number);
+            return (h * 60) + m;
+        }
+
+        function ojtComputeStatus(weekIndex, rowIndex) {
+            const row = document.querySelector(
+                `#ojt-week-block-${weekIndex} tr[data-row-index="${rowIndex}"]`
+            );
+            if (!row) return;
+
+            const mIn = row.querySelector('[data-field="mIn"]')?.value;
+            const aOut = row.querySelector('[data-field="aOut"]')?.value;
+
+            const statusEl = document.getElementById(`ojt-status-${weekIndex}-${rowIndex}`);
+            if (!statusEl) return;
+
+            const expectedIn = timeToMinutes(OJT_EXPECTED_TIME_IN);
+            const expectedOut = timeToMinutes(OJT_EXPECTED_TIME_OUT);
+            const actualIn = timeToMinutes(mIn);
+            const actualOut = timeToMinutes(aOut);
+
+            // Not enough data yet (student hasn't timed in/out this day)
+            if (actualIn === null || actualOut === null || expectedIn === null || expectedOut === null) {
+                statusEl.textContent = '—';
+                statusEl.style.color = '';
+                statusEl.style.fontWeight = '';
+                return;
+            }
+
+            const GRACE_MINUTES = 15; // adjust tolerance as needed
+
+            const lateBy = actualIn - expectedIn;     // + = arrived late
+            const leftEarlyBy = expectedOut - actualOut;    // + = left before schedule
+            const overtimeBy = actualOut - expectedOut;    // + = stayed beyond schedule
+
+            if (lateBy > GRACE_MINUTES || leftEarlyBy > GRACE_MINUTES) {
+                statusEl.textContent = lateBy > GRACE_MINUTES ? 'Late' : 'Undertime';
+                statusEl.style.color = '#dc3545'; // red
+                statusEl.style.fontWeight = '600';
+            } else if (overtimeBy > GRACE_MINUTES) {
+                statusEl.textContent = 'Overtime';
+                statusEl.style.color = '#0d6efd'; // blue
+                statusEl.style.fontWeight = '600';
+            } else {
+                statusEl.textContent = 'On Time';
+                statusEl.style.color = '#198754'; // green
+                statusEl.style.fontWeight = '600';
+            }
+        }
+
+        // Run once on load for all existing filled-in rows
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.ojt-week-block').forEach(block => {
+                const weekIndex = block.dataset.weekId;
+                block.querySelectorAll('tr[data-row-index]').forEach(row => {
+                    const rowIndex = row.dataset.rowIndex;
+                    ojtComputeStatus(weekIndex, rowIndex);
+                });
+            });
+        });
     </script>
 </body>
 

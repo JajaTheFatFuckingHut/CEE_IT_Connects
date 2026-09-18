@@ -1939,7 +1939,7 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
                                                                 <?php foreach ($options as $opt): ?>
                                                                     <option value="<?= htmlspecialchars($opt) ?>"
                                                                         <?= (strtolower(trim($cell)) === strtolower($opt)) ? 'selected' : '' ?>>
-                                                                        <?= htmlspecialchars(ucwords($opt)) ?>
+                                                                        <?= htmlspecialchars($opt) ?>
                                                                     </option>
                                                                 <?php endforeach; ?>
                                                                 <?php if (!in_array(strtolower(trim($cell)), array_map('strtolower', $options))): ?>
