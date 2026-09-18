@@ -89,18 +89,7 @@ foreach ($weeks as $w) {
 
 echo json_encode([
     'success' => true,
-    'student' => [
-        'full_name' => $student['full_name'],
-        'company' => $student['company'],
-        'required_hours' => (float) $student['required_hours'],
-    ],
-    'weeks' => $ojtWeeks,
-]);
-
-
-
-echo json_encode([
-    'success' => true,
+    'debug_version' => 'v2',   // temporary marker
     'student' => [
         'full_name' => $student['full_name'],
         'company' => $student['company'],
