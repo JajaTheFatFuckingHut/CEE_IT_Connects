@@ -72,6 +72,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['upload_docs'])) {
 
         if (empty(trim($_POST['section'] ?? '')))
             $errors[] = "Section is required.";
+        if (empty(trim($_POST['year_level'] ?? '')))
+            $errors[] = "Year level is required.";
+
+        if (empty(trim($_POST['section'] ?? '')))
+            $errors[] = "Section is required.";
     }
 
     // Adviser Conf
@@ -153,87 +158,75 @@ $upload_success = '';
 $upload_errors = [];
 
 // Handle credential deletion
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_credential']) && $userType === 'student') {
-    $cred_id = (int) $_POST['delete_credential'];
-    $s = $pdo->prepare("SELECT credential_path FROM student_credentials WHERE id = ? AND student_id = ?");
-    $s->execute([$cred_id, $user_id]);
-    $row = $s->fetch(PDO::FETCH_ASSOC);
-    if ($row) {
-        $filePath = '../uploads/credentials/' . $row['credential_path'];
-        if (file_exists($filePath))
-            unlink($filePath);
-        $pdo->prepare("DELETE FROM student_credentials WHERE id = ? AND student_id = ?")
-            ->execute([$cred_id, $user_id]);
-    }
-    header("Location: " . $_SERVER['PHP_SELF'] . "?success=1&tab=docs");
-    exit;
-}
+// if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_credential']) && $userType === 'student') {
+//     $cred_id = (int) $_POST['delete_credential'];
+//     $s = $pdo->prepare("SELECT credential_path FROM student_credentials WHERE id = ? AND student_id = ?");
+//     $s->execute([$cred_id, $user_id]);
+//     $row = $s->fetch(PDO::FETCH_ASSOC);
+//     if ($row) {
+//         $filePath = '../uploads/credentials/' . $row['credential_path'];
+//         if (file_exists($filePath))
+//             unlink($filePath);
+//         $pdo->prepare("DELETE FROM student_credentials WHERE id = ? AND student_id = ?")
+//             ->execute([$cred_id, $user_id]);
+//     }
+//     header("Location: " . $_SERVER['PHP_SELF'] . "?success=1&tab=docs");
+//     exit;
+// }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_docs']) && $userType === 'student') {
-    $uploadDir_resume = '../uploads/resumes/';
-    $uploadDir_credential = '../uploads/credentials/';
+// if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_docs']) && $userType === 'student') {
+//     $uploadDir_resume = '../uploads/resumes/';
+//     $uploadDir_credential = '../uploads/credentials/';
 
-    // Resume upload (single, overwrite)
-    if (!empty($_FILES['resume']['name'])) {
-        $resumeExt = strtolower(pathinfo($_FILES['resume']['name'], PATHINFO_EXTENSION));
-        if ($resumeExt !== 'pdf') {
-            $upload_errors[] = "Resume must be a PDF file.";
-        } elseif ($_FILES['resume']['size'] > 5 * 1024 * 1024) {
-            $upload_errors[] = "Resume must be under 5MB.";
-        } else {
-            $resumeName = 'resume_' . $user_id . '_' . time() . '.pdf';
-            move_uploaded_file($_FILES['resume']['tmp_name'], $uploadDir_resume . $resumeName);
-            $pdo->prepare("INSERT INTO student_documents (student_id, resume_path, uploaded_at)
-                           VALUES (?, ?, NOW())
-                           ON CONFLICT (student_id)
-                           DO UPDATE SET resume_path = EXCLUDED.resume_path, uploaded_at = NOW()")
-                ->execute([$user_id, 'uploads/resumes' . $resumeName]);
-        }
-    }
+//     // Resume upload (single, overwrite)
+//     if (!empty($_FILES['resume']['name'])) {
+//         $resumeExt = strtolower(pathinfo($_FILES['resume']['name'], PATHINFO_EXTENSION));
+//         if ($resumeExt !== 'pdf') {
+//             $upload_errors[] = "Resume must be a PDF file.";
+//         } elseif ($_FILES['resume']['size'] > 5 * 1024 * 1024) {
+//             $upload_errors[] = "Resume must be under 5MB.";
+//         } else {
+//             $resumeName = 'resume_' . $user_id . '_' . time() . '.pdf';
+//             move_uploaded_file($_FILES['resume']['tmp_name'], $uploadDir_resume . $resumeName);
+//             $pdo->prepare("INSERT INTO student_documents (student_id, resume_path, uploaded_at)
+//                            VALUES (?, ?, NOW())
+//                            ON CONFLICT (student_id)
+//                            DO UPDATE SET resume_path = EXCLUDED.resume_path, uploaded_at = NOW()")
+//                 ->execute([$user_id, 'uploads/resumes' . $resumeName]);
+//         }
+//     }
 
-    // Credential upload (multiple allowed)
-    if (!empty($_FILES['credentials']['name'][0])) {
-        $files = $_FILES['credentials'];
-        $count = count($files['name']);
-        for ($i = 0; $i < $count; $i++) {
-            if (empty($files['name'][$i]))
-                continue;
-            $credExt = strtolower(pathinfo($files['name'][$i], PATHINFO_EXTENSION));
-            if (!in_array($credExt, ['jpg', 'jpeg', 'png'])) {
-                $upload_errors[] = "'{$files['name'][$i]}' must be a JPG or PNG image.";
-            } elseif ($files['size'][$i] > 5 * 1024 * 1024) {
-                $upload_errors[] = "'{$files['name'][$i]}' must be under 5MB.";
-            } else {
-                $credName = 'credential_' . $user_id . '_' . time() . '_' . $i . '.' . $credExt;
-                move_uploaded_file($files['tmp_name'][$i], $uploadDir_credential . $credName);
-                $pdo->prepare("INSERT INTO student_credentials (student_id, credential_path, uploaded_at)
-                               VALUES (?, ?, NOW())")
-                    ->execute([$user_id, $credName]);
-            }
-        }
-    }
+// Credential upload (multiple allowed)
+// if (!empty($_FILES['credentials']['name'][0])) {
+//     $files = $_FILES['credentials'];
+//     $count = count($files['name']);
+//     for ($i = 0; $i < $count; $i++) {
+//         if (empty($files['name'][$i]))
+//             continue;
+//         $credExt = strtolower(pathinfo($files['name'][$i], PATHINFO_EXTENSION));
+//         if (!in_array($credExt, ['jpg', 'jpeg', 'png'])) {
+//             $upload_errors[] = "'{$files['name'][$i]}' must be a JPG or PNG image.";
+//         } elseif ($files['size'][$i] > 5 * 1024 * 1024) {
+//             $upload_errors[] = "'{$files['name'][$i]}' must be under 5MB.";
+//         } else {
+//             $credName = 'credential_' . $user_id . '_' . time() . '_' . $i . '.' . $credExt;
+//             move_uploaded_file($files['tmp_name'][$i], $uploadDir_credential . $credName);
+//             $pdo->prepare("INSERT INTO student_credentials (student_id, credential_path, uploaded_at)
+//                            VALUES (?, ?, NOW())")
+//                 ->execute([$user_id, $credName]);
+//         }
+//     }
+// }
 
-    if (empty($upload_errors)) {
-        header("Location: " . $_SERVER['PHP_SELF'] . "?success=1&tab=docs");
-        exit;
-    }
-}
+//     if (empty($upload_errors)) {
+//         header("Location: " . $_SERVER['PHP_SELF'] . "?success=1&tab=docs");
+//         exit;
+//     }
+// }
 
 $user = getUser($pdo, $userType, $user_id);
 
 
-// Fetch 
-$docs = [];
-$credentials = [];
-if ($userType === 'student') {
-    $s = $pdo->prepare("SELECT * FROM student_documents WHERE student_id = ?");
-    $s->execute([$user_id]);
-    $docs = $s->fetch(PDO::FETCH_ASSOC) ?: [];
-
-    $s2 = $pdo->prepare("SELECT * FROM student_credentials WHERE student_id = ? ORDER BY uploaded_at DESC");
-    $s2->execute([$user_id]);
-    $credentials = $s2->fetchAll(PDO::FETCH_ASSOC);
-}
 
 // Convenience variables used in the form
 $val_full_name = $user['full_name'] ?? '';          // students, advisers
@@ -488,21 +481,6 @@ $initials = strtoupper(
                                 value="<?= htmlspecialchars($val_contact_number) ?>">
                         </div>
 
-                        <!-- <div class="col-md-4">
-                            <label class="form-label">Year Level</label>
-                            <select name="year_level" class="form-select">
-                                
-                                <?php /* ?>
-                      <?php for ($y = 1; $y <= 5; $y++): ?>
-                          <option value="<?= $y ?>" <?= $val_year_level === $y ? 'selected' : '' ?>>
-                              Year <?= $y ?>
-                          </option>
-                      <?php endfor; ?>
-                      <?php */ ?>
-
-                            </select>
-                        </div> -->
-
                         <div class="col-md-8">
                             <label class="form-label">Program</label>
                             <select name="program" class="form-control">
@@ -515,9 +493,21 @@ $initials = strtoupper(
                         </div>
 
                         <div class="col-md-4">
-                            <label class="form-label">Section</label>
-                            <input type="text" name="section" class="form-control"
-                                value="<?= htmlspecialchars($val_year_level . '-' . $val_section) ?>">
+                            <label class="form-label">Year & Section</label>
+                            <div class="d-flex align-items-center gap-1">
+                                <select name="year_level" class="form-select" style="max-width:70px;">
+                                    <?php for ($y = 1; $y <= 5; $y++): ?>
+                                        <option value="<?= $y ?>" <?= $val_year_level === $y ? 'selected' : '' ?>>
+                                            <?= $y ?>
+                                        </option>
+                                    <?php endfor; ?>
+                                </select>
+
+                                <span class="fw-bold">-</span>
+
+                                <input type="text" name="section" class="form-control" style="max-width:70px;"
+                                    value="<?= htmlspecialchars($val_section) ?>" placeholder="Sec">
+                            </div>
                         </div>
 
                         <div class="col-md-4">
