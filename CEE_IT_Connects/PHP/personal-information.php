@@ -242,7 +242,7 @@ $val_email = $user['email'] ?? '';
 $val_student_id = $user['student_id'] ?? '';          // students
 $val_contact_number = $user['contact_number'] ?? '';          // students
 $val_program = $user['program'] ?? '';          // students
-$val_year_level = (int) ($user['year_level'] ?? 1);       // students
+$val_year_level = (int) ($user['year_level'] ?? '');       // students
 $val_section = $user['section'] ?? '';          // students
 $val_title = $user['title'] ?? '';          // advisers, admins
 $val_role = $user['role'] ?? $roleRaw;    // advisers, admins
@@ -369,7 +369,7 @@ $initials = strtoupper(
             border: none !important;
             transition: background-color .15s ease, color .15s ease;
         }
-        
+
         .btn-update:hover {
             background: #E4572E !important;
             color: #fff !important;
@@ -420,7 +420,8 @@ $initials = strtoupper(
     <div class="container mt-4 mb-5">
 
         <div class="d-flex align-items-center gap-2 mb-4">
-            <a href="#" onclick="history.back(); return false;" class="text-dark"><i class="fa fa-arrow-left" style="margin-left: 5px;"></i></a>
+            <a href="#" onclick="history.back(); return false;" class="text-dark"><i class="fa fa-arrow-left"
+                    style="margin-left: 5px;"></i></a>
             <a href="#" onclick="history.back(); return false;" class="text-dark" style="text-decoration:none;">
                 <h5 class="page-title mb-0">Back to Home</h5>
             </a>
@@ -492,12 +493,12 @@ $initials = strtoupper(
                             <select name="year_level" class="form-select">
                                 
                                 <?php /* ?>
-                           <?php for ($y = 1; $y <= 5; $y++): ?>
-                               <option value="<?= $y ?>" <?= $val_year_level === $y ? 'selected' : '' ?>>
-                                   Year <?= $y ?>
-                               </option>
-                           <?php endfor; ?>
-                           <?php */ ?>
+                      <?php for ($y = 1; $y <= 5; $y++): ?>
+                          <option value="<?= $y ?>" <?= $val_year_level === $y ? 'selected' : '' ?>>
+                              Year <?= $y ?>
+                          </option>
+                      <?php endfor; ?>
+                      <?php */ ?>
 
                             </select>
                         </div> -->
