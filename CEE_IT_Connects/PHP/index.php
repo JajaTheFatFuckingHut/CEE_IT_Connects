@@ -1,4 +1,11 @@
 <?php
+session_set_cookie_params([
+    'lifetime' => 0,
+    'path' => '/',
+    'secure' => true,
+    'httponly' => true,
+    'samesite' => 'Lax',
+]);
 require 'db.php';
 require 'auth.php';
 $stmt = $pdo->query("SELECT * FROM internships");
@@ -7,6 +14,52 @@ $locations = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $page = 'home';
 date_default_timezone_set('Asia/Manila');
 $now = new DateTime();
+if (empty($_SESSION['user_id']) || empty($_SESSION['role'])) {
+    header('Location: login.php');
+    exit;
+}
+
+$userId = $_SESSION['user_id'];
+$role = strtolower(trim($_SESSION['role']));
+
+// ADVISER
+if ($role === 'hte_adviser') {
+    $stmt = $pdo->prepare("SELECT id FROM advisers WHERE id = :id");
+    $stmt->execute(['id' => $userId]);
+    if ($stmt->fetch()) {
+        header('Location: hte-ui.php');
+        exit;
+    }
+} elseif ($role === 'internship_adviser') {
+    $stmt = $pdo->prepare("SELECT id FROM advisers WHERE id = :id");
+    $stmt->execute(['id' => $userId]);
+    if ($stmt->fetch()) {
+        header('Location: ojt-rooms.php');
+        exit;
+    }
+}
+
+// ADMIN
+elseif ($role === 'superadmin') {
+    $stmt = $pdo->prepare("SELECT id FROM admins WHERE id = :id");
+    $stmt->execute(['id' => $userId]);
+    if ($stmt->fetch()) {
+        header('Location: superadmin.php');
+        exit;
+    }
+} elseif ($role === 'internship_admin') {
+    $stmt = $pdo->prepare("SELECT id FROM admins WHERE id = :id");
+    $stmt->execute(['id' => $userId]);
+    if ($stmt->fetch()) {
+        header('Location: internship-ui.php');
+        exit;
+    }
+}
+
+session_unset();
+session_destroy();
+header('Location: login.php');
+exit;
 ?>
 <!DOCTYPE html>
 <html lang="en">
