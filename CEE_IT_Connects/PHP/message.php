@@ -507,7 +507,7 @@ $ojtTimeOut = null;
 if ($student_id) {
     $stmt = $pdo->prepare("
         SELECT i.ojt_time_in, i.ojt_time_out
-        FROM ojt_application oa
+        FROM ojt_applications oa
         JOIN internships i ON i.id = oa.internship_id
         WHERE oa.student_id = ?
         LIMIT 1
