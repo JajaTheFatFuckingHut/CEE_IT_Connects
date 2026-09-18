@@ -455,7 +455,7 @@ $page = 'messages';
             background: #ff6b2c;
             color: #fff;
             width: calc(100% - 24px);
-        } 
+        }
 
         .sidebar-scroll {
             flex: 1;
@@ -561,8 +561,8 @@ $page = 'messages';
             text-decoration: none;
             display: block;
             margin: 4px;
-            padding:0;
-            width:auto;
+            padding: 0;
+            width: auto;
         }
 
         .room-link .room-item:hover {
@@ -1443,7 +1443,7 @@ $page = 'messages';
             .rooms-list hr {
                 display: none !important;
             }
-            
+
             .sidebar-user {
                 flex-direction: column;
                 justify-content: center;
@@ -1453,6 +1453,7 @@ $page = 'messages';
                 margin-left: 0;
                 margin-bottom: -10px;
             }
+
             .sidebar-user-info {
                 display: none;
             }
@@ -1644,7 +1645,7 @@ $page = 'messages';
                 </a>
             <?php endforeach; ?>
         </div>
-        
+
         <hr style="border-top: 2px solid rgba(255,255,255,0.59); margin: 16px auto; width: calc(100% - 32px);">
 
         <div style="display:flex; flex-direction:column; width:100%;">
@@ -1654,7 +1655,8 @@ $page = 'messages';
             </a>
 
             <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=ojt_applications"
-                class="<?= $section === 'ojt_applications' ? 'active' : '' ?>" tooltip="Requirements" title="Requirements">
+                class="<?= $section === 'ojt_applications' ? 'active' : '' ?>" tooltip="Requirements"
+                title="Requirements">
                 <i class="bi bi-file-earmark-fill me-2"></i> <span class="sidebar-text">Requirements</span>
                 <?php
                 $pendingStmt = $pdo->prepare("
@@ -1672,7 +1674,8 @@ $page = 'messages';
             </a>
 
             <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=weekly_reports"
-                class="<?= $section === 'weekly_reports' ? 'active' : '' ?>" tooltip="Weekly Reports" title="Weekly Reports">
+                class="<?= $section === 'weekly_reports' ? 'active' : '' ?>" tooltip="Weekly Reports"
+                title="Weekly Reports">
                 <i class="fa-solid fa-file-lines me-2"></i> <span class="sidebar-text">Weekly Reports</span>
             </a>
 
@@ -1680,15 +1683,15 @@ $page = 'messages';
                 class="<?= $section === 'chats' ? 'active' : '' ?>" title="Chats">
                 <i class="fa-solid fa-comments me-2"></i> <span class="sidebar-text">Chats</span>
             </a>
-                <hr style="border-top: 2px solid rgba(255,255,255,0.59); margin: 16px auto; width: calc(100% - 32px);">
+            <hr style="border-top: 2px solid rgba(255,255,255,0.59); margin: 16px auto; width: calc(100% - 32px);">
 
             <?php if ($isAdviser): ?>
-                <button class="sidebar-action-btn" data-bs-toggle="modal" data-bs-target="#csvUploadModal" title="Import Students">
+                <!-- <button class="sidebar-action-btn" data-bs-toggle="modal" data-bs-target="#csvUploadModal" title="Import Students">
                     <i class="fa fa-file-csv me-2"></i> <span class="sidebar-text">Import Students</span>
-                </button>
+                </button> -->
             <?php endif; ?>
             <hr>
-            
+
         </div>
         <div class="sidebar-user">
             <div class="sidebar-user-avatar"><?= strtoupper(substr($userFullName, 0, 1)) ?></div>
@@ -1726,8 +1729,7 @@ $page = 'messages';
                     <div style="position:relative; flex:1; min-width:200px;">
                         <i class="fa fa-search"
                             style="position:absolute; color: #f97316; left:10px; top:50%; transform:translateY(-50%); font-size:13px;"></i>
-                        <input type="text" id="searchInput" placeholder="Search student..."
-                            oninput="filterTable()" style="width:50%; padding:8px 12px 8px 32px; border:1.5px solid #aeaeae; border-radius:22px;
+                        <input type="text" id="searchInput" placeholder="Search student..." oninput="filterTable()" style="width:50%; padding:8px 12px 8px 32px; border:1.5px solid #aeaeae; border-radius:22px;
                             font-size:13px; font-family:inherit; outline:none; transition:border-color .2s;"
                             onfocus="this.style.borderColor='#f97316'" onblur="this.style.borderColor='#e5e7eb'">
                     </div>
@@ -1741,7 +1743,7 @@ $page = 'messages';
 
                 </div>
 
-        
+
                 <div style="background:white; border:1px solid #ddd; border-radius:8px; overflow:hidden;">
                     <div class="sysAdm-table-wrapper">
                         <table class="sysAdm-table" id="ojt-status-table">
@@ -1851,7 +1853,7 @@ $page = 'messages';
                 'ojt_started' => 'OJT Started',
             ];
             ?>
-            
+
             <!-- REQUIREMENTS -->
             <div id="status" class="section-panel section sysAdm-section">
                 <div class="sysAdm-header--danger sysAdm-header--blue mb-4">
@@ -1874,9 +1876,10 @@ $page = 'messages';
                             font-size:13px; font-family:inherit; outline:none; transition:border-color .2s;"
                             onfocus="this.style.borderColor='#f97316'" onblur="this.style.borderColor='#e5e7eb'">
                     </div>
-                    <select id="progress-filter" onchange="filterApps()" style="padding:8px 12px; border:1.5px solid #e5e7eb; border-radius:8px; font-size:13px;
-                        font-family:inherit; outline:none; background:white; cursor:pointer; transition:border-color .2s;"
-                        onfocus="this.style.borderColor='#f97316'" onblur="this.style.borderColor='#e5e7eb'">
+                    <select id="progress-filter" onchange="filterApps()"
+                        style="padding:8px 12px; border:1.5px solid #e5e7eb; border-radius:8px; font-size:13px;
+                        font-family:inherit; outline:none; background:white; cursor:pointer; transition:border-color .2s;" onfocus="this.style.borderColor='#f97316'"
+                        onblur="this.style.borderColor='#e5e7eb'">
                         <option value="all">All Progress</option>
                         <option value="0">Not Started (0%)</option>
                         <option value="1">In Progress (1-49%)</option>
@@ -2060,17 +2063,17 @@ $page = 'messages';
             </div> -->
         <?php elseif ($section === 'weekly_reports'): ?>
             <div id="status" class="section-panel section sysAdm-section">
-            <div class="sysAdm-header--danger sysAdm-header--blue mb-4">
-                <div class="sysAdm-header-left">
-                    <div class="sysAdm-header-icon">
-                        <i class="bi bi-file-earmark-text-fill"></i>
-                    </div>
-                    <div class="sysAdm-header-text">
-                        <h2>Weekly Progress Reports</h2>
-                        <p>View weekly reports submitted by students in this room.</p>
+                <div class="sysAdm-header--danger sysAdm-header--blue mb-4">
+                    <div class="sysAdm-header-left">
+                        <div class="sysAdm-header-icon">
+                            <i class="bi bi-file-earmark-text-fill"></i>
+                        </div>
+                        <div class="sysAdm-header-text">
+                            <h2>Weekly Progress Reports</h2>
+                            <p>View weekly reports submitted by students in this room.</p>
+                        </div>
                     </div>
                 </div>
-            </div>
                 <?php
                 $reportsStmt = $pdo->prepare("
                     SELECT wr.id, wr.week_number, wr.wr_filepath, wr.created_at,
@@ -2331,9 +2334,11 @@ $page = 'messages';
         <div class="modal-dialog modal-xl modal-dialog-scrollable">
             <div class="modal-content" style="border-radius:16px; overflow:hidden;">
 
-                <div class="modal-header" style="background:linear-gradient(135deg,#1e3a5f,#2563eb); color:#fff; padding:20px 28px; border:none;">
+                <div class="modal-header"
+                    style="background:linear-gradient(135deg,#1e3a5f,#2563eb); color:#fff; padding:20px 28px; border:none;">
                     <div>
-                        <div style="font-size:11px; letter-spacing:.12em; opacity:.7; text-transform:uppercase; margin-bottom:4px;">
+                        <div
+                            style="font-size:11px; letter-spacing:.12em; opacity:.7; text-transform:uppercase; margin-bottom:4px;">
                             Bulk Enrollment
                         </div>
                         <h5 class="modal-title fw-bold mb-0" style="font-size:1.2rem;">
@@ -2346,9 +2351,11 @@ $page = 'messages';
                 <div class="modal-body" style="padding:28px 32px; background:#f8f9fb;">
 
                     <div id="csv-step-1">
-                        <div style="background:#fff; border-radius:10px; padding:18px 22px; margin-bottom:16px; border:1px solid #e2e8f0;">
+                        <div
+                            style="background:#fff; border-radius:10px; padding:18px 22px; margin-bottom:16px; border:1px solid #e2e8f0;">
                             <p style="font-size:13px; color:#64748b; margin-bottom:14px;">
-                                Upload a <code>.csv</code> file with a single column: <strong style="color:#1e3a5f;">student_id</strong>.
+                                Upload a <code>.csv</code> file with a single column: <strong
+                                    style="color:#1e3a5f;">student_id</strong>.
                                 Students matching those IDs will be added to your room.
                             </p>
                             <a href="download-csv-temp.php?type=student_room" name="add_student_room_temp"
@@ -2358,12 +2365,14 @@ $page = 'messages';
                         </div>
 
                         <div style="background:#fff; border-radius:10px; padding:18px 22px; border:1px solid #e2e8f0;">
-                            <label style="font-size:11px; color:#64748b; font-weight:700; text-transform:uppercase; letter-spacing:.05em; display:block; margin-bottom:8px;">
+                            <label
+                                style="font-size:11px; color:#64748b; font-weight:700; text-transform:uppercase; letter-spacing:.05em; display:block; margin-bottom:8px;">
                                 Choose file
                             </label>
                             <input type="file" id="csvFileInput" accept=".csv,.tsv,.txt" class="form-control"
                                 onchange="previewCSV(this)">
-                            <div id="csv-error" class="alert alert-danger d-none mt-3" style="border-radius:8px; font-size:13px;"></div>
+                            <div id="csv-error" class="alert alert-danger d-none mt-3"
+                                style="border-radius:8px; font-size:13px;"></div>
                         </div>
                     </div>
 
