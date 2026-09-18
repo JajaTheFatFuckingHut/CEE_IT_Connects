@@ -2725,7 +2725,8 @@ foreach ($roomStatuses as $s) {
                 console.log('Student ID:', studentId);
 
                 const res = await fetch(
-                    `get-student-dtr.php?student_id=${encodeURIComponent(studentId)}`
+                    `/get-student-dtr.php?student_id=${encodeURIComponent(studentId)}`,
+                    { credentials: 'same-origin' }
                 );
 
                 console.log('HTTP Status:', res.status);
