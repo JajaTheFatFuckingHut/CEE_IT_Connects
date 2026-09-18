@@ -15,10 +15,6 @@ $page = 'home';
 date_default_timezone_set('Asia/Manila');
 $now = new DateTime();
 
-if (empty($_SESSION['user_id']) || empty($_SESSION['role'])) {
-    header('Location: index.php');
-    exit;
-}
 
 $userId = $_SESSION['user_id'];
 $role = strtolower(trim($_SESSION['role']));
