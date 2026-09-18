@@ -495,12 +495,17 @@ $initials = strtoupper(
                         <div class="col-md-4">
                             <label class="form-label">Year & Section</label>
                             <div class="d-flex align-items-center gap-1">
-                                <input type=text name="year_level" class="form-select" style="max-width:70px;" readonly>
-                                <option value="4" <?= $val_year_level === $y ? 'selected' : '' ?>>
-                                    4
-                                </option>
+                                <input name="year_level" class="form-control" style="max-width:70px;" value="4" readonly>
+                                4
                                 </input>
 
+                                <!-- <select name="year_level" class="form-control" style="max-width:70px;">
+                                    <?php for ($y = 1; $y <= 4; $y++): ?>
+                                        <option value="4" <?= $val_year_level === $y ? 'selected' : '' ?>>
+                                            4
+                                        </option>
+                                    <?php endfor; ?>
+                                </select> -->
                                 <span class="fw-bold">-</span>
 
                                 <input type="text" name="section" class="form-control" style="max-width:70px;"
