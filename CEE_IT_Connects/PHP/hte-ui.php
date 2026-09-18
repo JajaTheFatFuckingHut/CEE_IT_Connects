@@ -660,7 +660,6 @@ foreach ($roomStatuses as $s) {
         .room-link .room-item:hover {
             cursor: pointer;
             color: #FFB62F;
-            padding: 0px !important;
         }
 
         .active-room {
