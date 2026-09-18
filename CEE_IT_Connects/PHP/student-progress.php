@@ -529,5 +529,5 @@ elseif ($action === 'cancel_application') {
     $_SESSION['error'] = 'Unknown action.';
 }
 
-header('Location: message.php?section=application&room_id=' . urlencode($current_room_id));
+header('Location: message.php?section=application&room_id=' . urlencode($current_room_id ?? ''));
 exit;

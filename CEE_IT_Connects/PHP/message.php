@@ -6,6 +6,7 @@ require 'auth.php';
 $student_id = $_SESSION['user_id'];
 $page = $page ?? "";
 $isAdviser = isset($_SESSION['role']) && $_SESSION['role'] === 'internship_adviser';
+
 $current_room_id = $_GET['room_id'] ?? null;
 if ($current_room_id !== null && $current_room_id !== '' && ctype_digit((string) $current_room_id)) {
     $current_room_id = (int) $current_room_id;
@@ -2929,6 +2930,7 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
                                     value="<?= htmlspecialchars($student['supervisor_name'] ?? '') ?>">
                             </div>
                         </div>
+                        <?= var_dump($current_room_id) ?>
                         <!-- Rating legend -->
                         <div
                             style="background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:12px 18px;margin-bottom:20px;font-size:13px;">
