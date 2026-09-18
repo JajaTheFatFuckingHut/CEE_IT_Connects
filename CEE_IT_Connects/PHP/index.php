@@ -15,7 +15,7 @@ $page = 'home';
 date_default_timezone_set('Asia/Manila');
 $now = new DateTime();
 if (empty($_SESSION['user_id']) || empty($_SESSION['role'])) {
-    header('Location: login.php');
+    header('Location: index.php');
     exit;
 }
 
@@ -58,7 +58,7 @@ elseif ($role === 'superadmin') {
 
 session_unset();
 session_destroy();
-header('Location: login.php');
+header('Location: index.php');
 exit;
 ?>
 <!DOCTYPE html>
