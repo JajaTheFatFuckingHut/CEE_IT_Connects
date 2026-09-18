@@ -1516,6 +1516,15 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                                 </div>
                                 <div><label>Closing Time</label><input type="time" name="closeTime" style="width:100%;">
                                 </div>
+
+                                <div class="mt-3">
+                                    <div><label>OJT Schedule Time</label><input type="time" name="ojt_time_in"
+                                            style="width:100%;">
+                                    </div>
+                                    <div><label>OJT Schedule Time</label><input type="time" name="ojt_time_out"
+                                            style="width:100%;">
+                                    </div>
+                                </div>
                             </div>
 
                             <!-- Map Pin -->
