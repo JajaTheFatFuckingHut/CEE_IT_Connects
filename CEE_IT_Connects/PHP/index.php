@@ -14,6 +14,7 @@ $locations = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $page = 'home';
 date_default_timezone_set('Asia/Manila');
 $now = new DateTime();
+
 if (empty($_SESSION['user_id']) || empty($_SESSION['role'])) {
     header('Location: index.php');
     exit;
@@ -21,7 +22,7 @@ if (empty($_SESSION['user_id']) || empty($_SESSION['role'])) {
 
 $userId = $_SESSION['user_id'];
 $role = strtolower(trim($_SESSION['role']));
-if ($role === 'students') {
+if ($role === 'student') {
     $stmt = $pdo->prepare("SELECT id FROM students WHERE id = :id");
     $stmt->execute(['id' => $userId]);
     if ($stmt->fetch()) {
