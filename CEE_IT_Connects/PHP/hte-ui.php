@@ -3128,6 +3128,13 @@ foreach ($roomStatuses as $s) {
                 });
             }
         });
+        document.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            const section = params.get('section');
+            if (section) {
+                showSection(section, null);
+            }
+        });
     </script>
 </body>
 

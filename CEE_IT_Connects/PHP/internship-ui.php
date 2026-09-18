@@ -1512,13 +1512,14 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                                     <textarea name="description" placeholder="Description" required
                                         style="width:100%;"></textarea>
                                 </div>
-                                <div><label>Opening Time</label><input type="time" name="openTime" style="width:100%;"
-                                        required>
+                                <div class="row g-3 mt-2">
+                                    <div class="col-md-6"><label>Opening Time</label><input type="time" name="openTime"
+                                            style="width:100%;" required>
+                                    </div>
+                                    <div class="col-md-6"><label>Closing Time</label><input type="time" name="closeTime"
+                                            style="width:100%;" required>
+                                    </div>
                                 </div>
-                                <div><label>Closing Time</label><input type="time" name="closeTime" style="width:100%;"
-                                        required>
-                                </div>
-
                                 <div class="row g-3 mt-2">
                                     <div class="col-md-6"><label>OJT Schedule Time</label><input type="time"
                                             name="ojt_time_in" style="width:100%;" required>
