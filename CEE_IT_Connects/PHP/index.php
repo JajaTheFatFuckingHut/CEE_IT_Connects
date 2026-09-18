@@ -21,9 +21,16 @@ if (empty($_SESSION['user_id']) || empty($_SESSION['role'])) {
 
 $userId = $_SESSION['user_id'];
 $role = strtolower(trim($_SESSION['role']));
-
+if ($role === 'students') {
+    $stmt = $pdo->prepare("SELECT id FROM students WHERE id = :id");
+    $stmt->execute(['id' => $userId]);
+    if ($stmt->fetch()) {
+        header('Location: index.php');
+        exit;
+    }
+}
 // ADVISER
-if ($role === 'hte_adviser') {
+elseif ($role === 'hte_adviser') {
     $stmt = $pdo->prepare("SELECT id FROM advisers WHERE id = :id");
     $stmt->execute(['id' => $userId]);
     if ($stmt->fetch()) {
