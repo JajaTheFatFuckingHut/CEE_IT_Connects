@@ -107,7 +107,7 @@ $now = new DateTime();
 
         #map {
             width: 60%;
-            height: 600px;
+            height: 650px;
         }
 
         .phone-dropdown {
@@ -483,11 +483,6 @@ $now = new DateTime();
 
                 // Store marker
                 markers[loc.id] = marker;
-
-
-                // ========================================
-                // POPUP
-                // ========================================
 
                 const statusText =
                     isOpen ? 'OPEN' : 'CLOSED';
