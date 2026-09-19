@@ -107,7 +107,7 @@ $now = new DateTime();
 
         #map {
             width: 60%;
-            height: 540px;
+            height: 542px;
         }
 
         .phone-dropdown {
@@ -183,7 +183,7 @@ $now = new DateTime();
                                 partner institutions.
                             </p>
                         </div>
-                        <a href="applied-internship-programs.php" class="btn-find animate-on-scroll animate-scale"
+                        <a href="applied-Internship-programs.php" class="btn-find animate-on-scroll animate-scale"
                             style="color:white; background-color: #ff673a;">
                             Browse for Internships
                         </a>
