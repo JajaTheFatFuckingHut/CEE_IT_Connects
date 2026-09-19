@@ -1090,9 +1090,9 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
                 <i class="bi bi-person-lines-fill me-2"></i>
                 <span class="nav-label">Assign Adviser</span>
             </a>
-            <a href="#" onclick="showSection(event, 'supervisor_requests')" data-tooltip="Supervisor Requests">
+            <!-- <a href="#" onclick="showSection(event, 'supervisor_requests')" data-tooltip="Supervisor Requests">
                 <i class="bi bi-person-badge me-2"></i>
-                <span class="nav-label">Supervisor Requests</span>
+                <span class="nav-label">Supervisor Requests</span> -->
             </a>
             <a href="#" onclick="showSection(event, 'ojt_hours')" data-tooltip="OJT Hours">
                 <i class="bi bi-clock-history me-2"></i>
