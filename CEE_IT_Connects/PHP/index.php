@@ -107,7 +107,7 @@ $now = new DateTime();
 
         #map {
             width: 60%;
-            height: 650px;
+            height: 550px;
         }
 
         .phone-dropdown {
