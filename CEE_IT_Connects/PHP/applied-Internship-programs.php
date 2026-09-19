@@ -1120,8 +1120,19 @@ $internships = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                         </div>
                                     <?php endif; ?>
 
+                                    <?php if (!empty($internship['ojt_time_in'])): ?>
+                                        <div class="detail-row">
+                                            <span class="detail-label">OJT Time In:</span>
+                                            <span class="detail-val"><?= htmlspecialchars($internship['ojt_time_in']) ?></span>
+                                        </div>
+                                    <?php endif; ?>
+                                    <?php if (!empty($internship['ojt_time_out'])): ?>
+                                        <div class="detail-row">
+                                            <span class="detail-label">OJT Time Out:</span>
+                                            <span class="detail-val"><?= htmlspecialchars($internship['ojt_time_out']) ?></span>
+                                        </div>
+                                    <?php endif; ?>
                                 </div>
-
                                 <hr>
                                 <!-- <p class="details-section-title">Application Documents</p>
 
@@ -1150,8 +1161,8 @@ $internships = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <div class="file-btns">
                                         <a href="mou-preview.php?id=<?= $internship['id'] ?>&student_id=<?= $_SESSION['user_id'] ?>&action=waiver"
                                             class="btn-preview" target="_blank">Preview</a>
-                                        <a href="download-mou.php?id=<?= $internship['id'] ?>&action=waiver"
-                                            class="btn-dl">Download PDF</a>
+                                    <a href="download-mou.php?id=<?= $internship['id'] ?>&action=waiver"
+                                        class="btn-dl">Download PDF</a>
                                     </div>
                                 </div> -->
 
