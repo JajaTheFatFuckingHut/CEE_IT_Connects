@@ -22,6 +22,8 @@ COPY CSS /var/www/html/CSS
 COPY JS /var/www/html/JS
 COPY Sources /var/www/html/Sources
 COPY uploads/resumes /var/www/html/uploads/resumes
+COPY uploads/weekly_reports /var/www/html/uploads/weekly_reports
+
 COPY PHPMailer-master /var/www/html/PHPMailer-master
 
 RUN chown -R www-data:www-data /var/www/html/Sources \
