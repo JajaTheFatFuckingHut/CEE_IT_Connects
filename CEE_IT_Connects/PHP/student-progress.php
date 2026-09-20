@@ -100,7 +100,8 @@ if ($action === 'apply_internship') {
         'internship_plan',
         'vicinity_map',
         'oath',
-        'resume'
+        'resume',
+        'mou'
     ];
 
     if (!in_array($step_key, $allowed_steps, true)) {
