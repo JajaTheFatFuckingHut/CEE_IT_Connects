@@ -570,6 +570,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ]);
             $pdo->commit();
             $_SESSION['success'] = "Section counts saved for {$sy}.";
+
+            for ($y = 1; $y <= 4; $y++) {
+                $c = max(0, min(50, (int) ($counts[$y] ?? 0)));
+                $ok = $up->execute([':sy' => $sy, ':y' => $y, ':c' => $c]);
+                if (!$ok) {
+                    die('INSERT FAILED: ' . print_r($up->errorInfo(), true));
+                }
+            }
         } catch (Exception $e) {
             if ($pdo->inTransaction())
                 $pdo->rollBack();
