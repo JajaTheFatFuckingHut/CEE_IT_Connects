@@ -126,7 +126,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['success'] = "Room created. {$added} student(s) moved into {$roomName}.";
         } catch (Exception $e) {
             $pdo->rollBack();
-            $_SESSION['error'] = "Could not assign the section.";
+            $_SESSION['error'] = "Could not assign the section." . $e->getMessage();
         }
 
         header("Location: superadmin.php");
