@@ -300,10 +300,10 @@ unset($row);
 // die();
 
 $chattableStmt = $pdo->prepare("
-    SELECT 
-        s.id          AS user_id,
+    SELECT DISTINCT
+        s.id      AS user_id,
         s.full_name,
-        'student'     AS user_type
+        'student' AS user_type
     FROM students s
     JOIN ojt_applications oa ON oa.student_id = s.id
     JOIN advisers a ON a.internship_id = oa.internship_id
@@ -311,19 +311,18 @@ $chattableStmt = $pdo->prepare("
 
     UNION
 
-    -- OJT advisers (internship_adviser) assigned to those students via rooms
-    SELECT
-        adv.id        AS user_id,
+    -- OJT advisers whose section rooms contain this company's applicants
+    SELECT DISTINCT
+        adv.id    AS user_id,
         adv.full_name,
-        'adviser'     AS user_type
+        'adviser' AS user_type
     FROM advisers adv
-    JOIN rooms r ON r.adviser_id = adv.id
+    JOIN rooms r ON r.adviser_id = adv.id AND r.is_archived = FALSE
     JOIN room_members rm ON rm.room_id = r.id AND rm.user_type = 'student'
-    JOIN students s ON s.id = rm.user_id
-    JOIN ojt_applications oa ON oa.student_id = s.id
+    JOIN ojt_applications oa ON oa.student_id = rm.user_id
     JOIN advisers hte ON hte.internship_id = oa.internship_id
     WHERE hte.id = ? AND hte.role = 'HTE_adviser'
-    AND adv.role = 'internship_adviser'
+      AND adv.role = 'internship_adviser'
 
     ORDER BY full_name
 ");
@@ -333,20 +332,39 @@ $chattableUsers = $chattableStmt->fetchAll(PDO::FETCH_ASSOC);
 // ── Fetch existing chat conversations for this adviser ────────────────────────
 $adviserChatStmt = $pdo->prepare("
     SELECT
-        CASE WHEN sender_id = :uid THEN receiver_id ELSE sender_id END AS chat_user_id,
-        CASE WHEN sender_id = :uid THEN receiver_type ELSE sender_type END AS chat_user_type,
-        MAX(created_at) AS last_message_at,
-        (SELECT message FROM messages m2
-         WHERE (m2.sender_id = :uid AND m2.receiver_id = CASE WHEN sender_id = :uid THEN receiver_id ELSE sender_id END)
-            OR (m2.receiver_id = :uid AND m2.sender_id = CASE WHEN sender_id = :uid THEN receiver_id ELSE sender_id END)
-         ORDER BY m2.created_at DESC LIMIT 1) AS last_message
-    FROM messages
-    WHERE (sender_id = :uid AND sender_type = 'adviser')
-       OR (receiver_id = :uid AND receiver_type = 'adviser')
-    GROUP BY chat_user_id, chat_user_type
-    ORDER BY last_message_at DESC
+        c.chat_user_id,
+        c.chat_user_type,
+        c.last_message_at,
+        (SELECT m2.message
+         FROM messages m2
+         WHERE (m2.sender_id = :u4 AND m2.sender_type = 'adviser'
+                AND m2.receiver_id = c.chat_user_id AND m2.receiver_type = c.chat_user_type)
+            OR (m2.receiver_id = :u5 AND m2.receiver_type = 'adviser'
+                AND m2.sender_id = c.chat_user_id AND m2.sender_type = c.chat_user_type)
+         ORDER BY m2.created_at DESC
+         LIMIT 1) AS last_message
+    FROM (
+        SELECT
+            CASE WHEN sender_id = :u1 AND sender_type = 'adviser'
+                 THEN receiver_id ELSE sender_id END AS chat_user_id,
+            CASE WHEN sender_id = :u2 AND sender_type = 'adviser'
+                 THEN receiver_type ELSE sender_type END AS chat_user_type,
+            MAX(created_at) AS last_message_at
+        FROM messages
+        WHERE (sender_id = :u3 AND sender_type = 'adviser')
+           OR (receiver_id = :u6 AND receiver_type = 'adviser')
+        GROUP BY 1, 2
+    ) c
+    ORDER BY c.last_message_at DESC
 ");
-$adviserChatStmt->execute(['uid' => $adviser_id]);
+$adviserChatStmt->execute([
+    ':u1' => $adviser_id,
+    ':u2' => $adviser_id,
+    ':u3' => $adviser_id,
+    ':u4' => $adviser_id,
+    ':u5' => $adviser_id,
+    ':u6' => $adviser_id,
+]);
 $adviserChats = $adviserChatStmt->fetchAll(PDO::FETCH_ASSOC);
 
 // ── Fetch messages if a chat is open ─────────────────────────────────────────
