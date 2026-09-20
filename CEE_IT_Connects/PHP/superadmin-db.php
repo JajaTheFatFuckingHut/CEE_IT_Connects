@@ -1,7 +1,4 @@
 <?php
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    die('<pre>POST RECEIVED:' . "\n" . print_r($_POST, true) . '</pre>');
-}
 session_start();
 require 'db.php';
 
@@ -543,44 +540,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header("Location: superadmin.php?section=ojt_hours");
         exit;
     }
-}
-if (isset($_POST['save_section_settings'])) {
-    error_log('POST KEYS: ' . implode(',', array_keys($_POST)));
-    $sy = $_POST['school_year'] ?? '';
-    if (!preg_match('/^\d{4}-\d{4}$/', $sy)) {
-        $_SESSION['error'] = "Invalid school year.";
-        header("Location: superadmin.php");
-        exit;
-    }
-    $counts = $_POST['section_count'] ?? [];
+    if (isset($_POST['save_section_settings'])) {
+        error_log('POST KEYS: ' . implode(',', array_keys($_POST)));
+        $sy = $_POST['school_year'] ?? '';
+        if (!preg_match('/^\d{4}-\d{4}$/', $sy)) {
+            $_SESSION['error'] = "Invalid school year.";
+            header("Location: superadmin.php");
+            exit;
+        }
+        $counts = $_POST['section_count'] ?? [];
 
-    try {
-        $pdo->beginTransaction();
-        $up = $pdo->prepare("
+        try {
+            $pdo->beginTransaction();
+            $up = $pdo->prepare("
             INSERT INTO section_settings (school_year, year_level, section_count)
             VALUES (:sy, :y, :c)
             ON CONFLICT (school_year, year_level) DO UPDATE SET section_count = EXCLUDED.section_count
         ");
-        for ($y = 1; $y <= 4; $y++) {
-            $c = max(0, min(50, (int) ($counts[$y] ?? 0)));
-            $up->execute([':sy' => $sy, ':y' => $y, ':c' => $c]);
-        }
-        $pdo->prepare("
+            for ($y = 1; $y <= 4; $y++) {
+                $c = max(0, min(50, (int) ($counts[$y] ?? 0)));
+                $up->execute([':sy' => $sy, ':y' => $y, ':c' => $c]);
+            }
+            $pdo->prepare("
             INSERT INTO audits (user_id, roles, activity, activity_date)
             VALUES (:user_id, :roles, :activity, NOW())
         ")->execute([
-                    ':user_id' => $_SESSION['user_id'],
-                    ':roles' => 'superadmin',
-                    ':activity' => "Updated section counts for school year {$sy}"
-                ]);
-        $pdo->commit();
-        $_SESSION['success'] = "Section counts saved for {$sy}.";
-    } catch (Exception $e) {
-        if ($pdo->inTransaction())
-            $pdo->rollBack();
-        $_SESSION['error'] = "Could not save section counts: " . $e->getMessage();
+                        ':user_id' => $_SESSION['user_id'],
+                        ':roles' => 'superadmin',
+                        ':activity' => "Updated section counts for school year {$sy}"
+                    ]);
+            $pdo->commit();
+            $_SESSION['success'] = "Section counts saved for {$sy}.";
+        } catch (Exception $e) {
+            if ($pdo->inTransaction())
+                $pdo->rollBack();
+            $_SESSION['error'] = "Could not save section counts: " . $e->getMessage();
+        }
+        header("Location: superadmin.php?sy=" . urlencode($sy));
+        exit;
     }
-    header("Location: superadmin.php?sy=" . urlencode($sy));
-    exit;
 }
+
 ?>
