@@ -90,6 +90,9 @@ if ($action === 'apply_internship') {
 
     $step_key = trim($_POST['step_key'] ?? '');
     $internship_id = (int) ($_POST['internship_id'] ?? 0);
+    $file_path = null;
+    $file_stream = null;
+    $mime_type = null;
 
     $allowed_steps = [
         'medical_cert',
@@ -149,10 +152,8 @@ if ($action === 'apply_internship') {
             exit;
         }
 
-        $max_size = 5 * 1024 * 1024; // 5 MB
-
+        $max_size = 5 * 1024 * 1024;
         if ($file['size'] > $max_size) {
-
             $_SESSION['error'] = 'File must be under 5MB.';
             header('Location: message.php?section=application&room_id=' . urlencode($current_room_id ?? ''));
             exit;
@@ -161,23 +162,20 @@ if ($action === 'apply_internship') {
         $finfo = new finfo(FILEINFO_MIME_TYPE);
         $mime_type = $finfo->file($file['tmp_name']);
 
-        $allowed_types = [
-            'image/jpeg' => 'jpg',
-            'image/png' => 'png',
-            'application/pdf' => 'pdf'
-        ];
-
+        $allowed_types = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'application/pdf' => 'pdf'];
         if (!isset($allowed_types[$mime_type])) {
-
             $_SESSION['error'] = 'Only JPG, PNG, or PDF files are allowed.';
             header('Location: message.php?section=application&room_id=' . urlencode($current_room_id ?? ''));
             exit;
         }
 
-        $extension = $allowed_types[$mime_type];
+        // new: read the file into memory instead of moving it to disk
+        $file_stream = fopen($file['tmp_name'], 'rb');
+        $file_path = 'view-proof.php?sid=' . (int) $student_id
+            . '&iid=' . (int) $internship_id
+            . '&step=' . urlencode($step_key);
 
     } else {
-
         $file_path = null;
         $file_stream = null;
         $mime_type = null;
