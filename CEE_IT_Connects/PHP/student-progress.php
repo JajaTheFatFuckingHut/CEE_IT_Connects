@@ -176,80 +176,40 @@ if ($action === 'apply_internship') {
 
         $extension = $allowed_types[$mime_type];
 
-        $upload_dir = __DIR__ . '/uploads/checklist/';
-
-        if (!is_dir($upload_dir)) {
-
-            if (!mkdir($upload_dir, 0775, true)) {
-
-                $_SESSION['error'] = 'Unable to create upload directory.';
-                header('Location: message.php?section=application&room_id=' . urlencode($current_room_id ?? ''));
-                exit;
-            }
-        }
-
-        $filename =
-            $student_id .
-            '_' .
-            $step_key .
-            '_' .
-            bin2hex(random_bytes(8)) .
-            '.' .
-            $extension;
-
-        $destination = $upload_dir . $filename;
-
-        if (!move_uploaded_file($file['tmp_name'], $destination)) {
-
-            $_SESSION['error'] = 'File upload failed. Please try again.';
-            header('Location: message.php?section=application&room_id=' . urlencode($current_room_id ?? ''));
-            exit;
-        }
-
-        $file_path = 'uploads/checklist/' . $filename;
-
     } else {
 
         $file_path = null;
+        $file_stream = null;
+        $mime_type = null;
     }
 
     // save the student's progress
     try {
 
         $upsert = $pdo->prepare("
-            INSERT INTO student_progress
-                (
-                    student_id,
-                    internship_id,
-                    step_key,
-                    is_done,
-                    updated_at,
-                    file_path
-                )
-            VALUES
-                (
-                    :student_id,
-                    :internship_id,
-                    :step_key,
-                    TRUE,
-                    NOW(),
-                    :file_path
-                )
-
-            ON CONFLICT (student_id, internship_id, step_key)
-
-            DO UPDATE SET
-                is_done = TRUE,
-                updated_at = NOW(),
-                file_path = EXCLUDED.file_path
-        ");
-
-        $upsert->execute([
-            ':student_id' => $student_id,
-            ':internship_id' => $internship_id,
-            ':step_key' => $step_key,
-            ':file_path' => $file_path
-        ]);
+    INSERT INTO student_progress
+        (student_id, internship_id, step_key, is_done, updated_at, file_path, file_data, file_mime)
+    VALUES
+        (:student_id, :internship_id, :step_key, TRUE, NOW(), :file_path, :file_data, :file_mime)
+    ON CONFLICT (student_id, internship_id, step_key)
+    DO UPDATE SET
+        is_done = TRUE,
+        updated_at = NOW(),
+        file_path = EXCLUDED.file_path,
+        file_data = EXCLUDED.file_data,
+        file_mime = EXCLUDED.file_mime
+");
+        $upsert->bindValue(':student_id', $student_id);
+        $upsert->bindValue(':internship_id', $internship_id);
+        $upsert->bindValue(':step_key', $step_key);
+        $upsert->bindValue(':file_path', $file_path);
+        $upsert->bindValue(':file_mime', $mime_type);
+        if ($file_stream) {
+            $upsert->bindParam(':file_data', $file_stream, PDO::PARAM_LOB);
+        } else {
+            $upsert->bindValue(':file_data', null, PDO::PARAM_NULL);
+        }
+        $upsert->execute();
 
         $_SESSION['success'] = 'Step marked as complete.';
 
