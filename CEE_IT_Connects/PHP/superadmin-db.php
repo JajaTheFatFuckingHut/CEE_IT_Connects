@@ -1,7 +1,6 @@
 <?php
 session_start();
 require 'db.php';
-die('DB FILE LOADED');
 // only superadmin
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'superadmin') {
     $_SESSION['error'] = "Invalid role. Please log in using a system admin account.";
