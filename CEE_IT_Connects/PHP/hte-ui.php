@@ -121,43 +121,43 @@ $myRoomsStmt->execute([
 ]);
 $myRooms = $myRoomsStmt->fetchAll(PDO::FETCH_ASSOC);
 
-$isAdviser = isset($_SESSION['role']) && $_SESSION['role'] === 'hte_adviser';
-if ($isAdviser) {
+// $isAdviser = isset($_SESSION['role']) && $_SESSION['role'] === 'hte_adviser';
+// if ($isAdviser) {
 
-    $checkRoomStmt = $pdo->prepare("
-        SELECT id FROM rooms WHERE adviser_id = ? LIMIT 1
-    ");
-    $checkRoomStmt->execute([$adviser_id]);
-    $advisersRoomId = $checkRoomStmt->fetchColumn();
+//     $checkRoomStmt = $pdo->prepare("
+//         SELECT id FROM rooms WHERE adviser_id = ? LIMIT 1
+//     ");
+//     $checkRoomStmt->execute([$adviser_id]);
+//     $advisersRoomId = $checkRoomStmt->fetchColumn();
 
-    if (!$advisersRoomId) {
+//     if (!$advisersRoomId) {
 
-        // Get the adviser's name to build a default room name
-        $advNameStmt = $pdo->prepare("SELECT full_name FROM advisers WHERE id = ?");
-        $advNameStmt->execute([$adviser_id]);
-        $advName = $advNameStmt->fetchColumn() ?: 'Adviser';
+//         // Get the adviser's name to build a default room name
+//         $advNameStmt = $pdo->prepare("SELECT full_name FROM advisers WHERE id = ?");
+//         $advNameStmt->execute([$adviser_id]);
+//         $advName = $advNameStmt->fetchColumn() ?: 'Adviser';
 
-        $roomName = $advName . "'s Room";
+//         $roomName = $advName . "'s Room";
 
-        $insertRoom = $pdo->prepare("
-            INSERT INTO rooms (room_name, adviser_id, is_archived)
-            VALUES (?, ?, FALSE)
-            RETURNING id
-        ");
-        $insertRoom->execute([$roomName, $adviser_id]);
-        $advisersRoomId = $insertRoom->fetchColumn();
+//         $insertRoom = $pdo->prepare("
+//             INSERT INTO rooms (room_name, adviser_id, is_archived)
+//             VALUES (?, ?, FALSE)
+//             RETURNING id
+//         ");
+//         $insertRoom->execute([$roomName, $adviser_id]);
+//         $advisersRoomId = $insertRoom->fetchColumn();
 
-        // Make the adviser a member of their own room so it shows up
-        // in the sidebar's room list query (rm.user_id = adviser_id)
-        $pdo->prepare("
-            INSERT INTO room_members (room_id, user_id, user_type)
-            VALUES (?, ?, 'adviser')
-        ")->execute([$advisersRoomId, $adviser_id]);
-    }
-    if (!$current_room_id) {
-        $current_room_id = $advisersRoomId;
-    }
-}
+//         // Make the adviser a member of their own room so it shows up
+//         // in the sidebar's room list query (rm.user_id = adviser_id)
+//         $pdo->prepare("
+//             INSERT INTO room_members (room_id, user_id, user_type)
+//             VALUES (?, ?, 'adviser')
+//         ")->execute([$advisersRoomId, $adviser_id]);
+//     }
+//     if (!$current_room_id) {
+//         $current_room_id = $advisersRoomId;
+//     }
+// }
 
 $stmt = $pdo->prepare("
     SELECT DISTINCT r.*, a.full_name, a.title, a.role
