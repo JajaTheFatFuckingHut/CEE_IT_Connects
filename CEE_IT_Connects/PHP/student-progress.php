@@ -113,7 +113,7 @@ if ($action === 'apply_internship') {
 
     // Verify this internship_id actually belongs to the student's application
     $verify = $pdo->prepare("
-        SELECT id FROM ojt_hours
+        SELECT id FROM ojt_applications
         WHERE student_id = ? AND internship_id = ?
         LIMIT 1
     ");
@@ -480,7 +480,7 @@ elseif ($action === 'cancel_application') {
             ]);
 
     $pdo->prepare("
-        DELETE FROM ojt_applications
+        DELETE FROM ojt_hours
         WHERE user_id  = ? AND user_type = 'student'
     ")->execute([
                 $student_id
