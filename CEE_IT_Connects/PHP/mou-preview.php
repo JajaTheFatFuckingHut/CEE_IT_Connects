@@ -250,6 +250,7 @@ switch ($action) {
         $pdf->Cell(160, 5, $companyName, 0, 0, 'L');
         $pdf->SetXY(60, 55);
         $pdf->Cell(160, 5, $companyAddr, 0, 0, 'L');
+
         $pdf->SetFont('Helvetica', '', 11);
         $pdf->SetXY(86, 269);
         $pdf->Cell(80, 5, $studentName, 0, 0, 'L');
@@ -261,6 +262,15 @@ switch ($action) {
                 unlink($mapFile);
             }
         }
+
+        $rf = new ReflectionFunction('osmStaticMap');
+        $pdf->SetFont('Helvetica', '', 6);
+        $pdf->SetTextColor(255, 0, 0);
+        $pdf->SetXY(10, 8);
+        $pdf->Cell(190, 4, basename(__FILE__) . ' | fn in ' . $rf->getFileName()
+            . ' | md5 ' . substr(md5_file($rf->getFileName()), 0, 8)
+            . " | plv=$plv_lat,$plv_lng hte=$hte_lat,$hte_lng", 0, 0, 'L');
+        $pdf->SetTextColor(0, 0, 0);
         break;
 
     case 'oath':

@@ -212,6 +212,15 @@ switch ($action) {
             }
         }
 
+        $rf = new ReflectionFunction('osmStaticMap');
+        $pdf->SetFont('Helvetica', '', 6);
+        $pdf->SetTextColor(255, 0, 0);
+        $pdf->SetXY(10, 8);
+        $pdf->Cell(190, 4, basename(__FILE__) . ' | fn in ' . $rf->getFileName()
+            . ' | md5 ' . substr(md5_file($rf->getFileName()), 0, 8)
+            . " | plv=$plv_lat,$plv_lng hte=$hte_lat,$hte_lng", 0, 0, 'L');
+        $pdf->SetTextColor(0, 0, 0);
+
         $filename = 'CEIT-OJTF-003_OJT_Vicinity_Map_' . $studentName . '.pdf';
         break;
     // ── CEIT-OJTF-007: Oath of Undertaking ───────────────────────────────────
