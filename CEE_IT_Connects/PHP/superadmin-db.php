@@ -1,4 +1,7 @@
 <?php
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    die('<pre>POST RECEIVED:' . "\n" . print_r($_POST, true) . '</pre>');
+}
 session_start();
 require 'db.php';
 

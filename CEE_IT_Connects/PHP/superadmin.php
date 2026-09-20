@@ -1,6 +1,6 @@
 <?php
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    error_log('POST KEYS: ' . implode(',', array_keys($_POST)));
+    die('<pre>POST RECEIVED:' . "\n" . print_r($_POST, true) . '</pre>');
 }
 require 'db.php';
 require 'auth.php';
