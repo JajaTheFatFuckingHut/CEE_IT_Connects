@@ -56,6 +56,21 @@ $sql .= " ORDER BY id DESC";
 $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
 $internships = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+$mapPoints = [];
+foreach ($internships as $loc) {
+    $lat = $loc['latitude'] ?? null;
+    $lng = $loc['longtitude'] ?? ($loc['longitude'] ?? null);
+    if (!is_numeric($lat) || !is_numeric($lng))
+        continue;
+    $mapPoints[] = [
+        'id' => (int) $loc['id'],
+        'company' => $loc['company'] ?? '',
+        'address' => $loc['location'] ?? '',
+        'lat' => (float) $lat,
+        'lng' => (float) $lng,
+    ];
+}
 ?>
 
 <?php $page = 'opportunity'; ?>
@@ -1354,7 +1369,40 @@ $internships = $stmt->fetchAll(PDO::FETCH_ASSOC);
         });
 
         let map;
-        let markers = {};
+        const markersById = {};
+        const internships = <?= json_encode($mapPoints, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
+
+        function esc(s) {
+            const d = document.createElement('div');
+            d.textContent = s ?? '';
+            return d.innerHTML;
+        }
+
+        function addInternshipMarkers() {
+            const bounds = [];
+
+            internships.forEach(item => {
+                if (isNaN(item.lat) || isNaN(item.lng)) return;
+                // reject swapped or impossible values
+                if (item.lat < -90 || item.lat > 90 || item.lng < -180 || item.lng > 180) return;
+
+                const marker = L.marker([item.lat, item.lng], { icon: greenIcon })
+                    .addTo(map)
+                    .bindPopup(
+                        `<strong>${esc(item.company)}</strong><br>${esc(item.address)}`
+                    );
+
+                markersById[item.id] = marker;
+                bounds.push([item.lat, item.lng]);
+            });
+
+            // zoom to fit all markers (or a single one)
+            if (bounds.length === 1) {
+                map.setView(bounds[0], 15);
+            } else if (bounds.length > 1) {
+                map.fitBounds(bounds, { padding: [40, 40] });
+            }
+        }
 
 
         // ========================================
@@ -1363,16 +1411,6 @@ $internships = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         const greenIcon = L.icon({
             iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
-            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
-
-            iconSize: [25, 41],
-            iconAnchor: [12, 41],
-            popupAnchor: [1, -34],
-            shadowSize: [41, 41]
-        });
-
-        const redIcon = L.icon({
-            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
             shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
 
             iconSize: [25, 41],
@@ -1422,6 +1460,10 @@ $internships = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 }
             ).addTo(map);
+
+            addInternshipMarkers();
+        }
+        window.addEventListener('load', initMap);
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
