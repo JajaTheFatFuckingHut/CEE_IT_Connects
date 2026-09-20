@@ -185,6 +185,12 @@ $adviserStmt = $pdo->prepare("SELECT internship_id FROM advisers WHERE id = ?");
 $adviserStmt->execute([$adviser_id]);
 $adviserInternshipId = $adviserStmt->fetchColumn();
 
+
+die('<pre>' . print_r([
+    'session_user_id' => $_SESSION['user_id'] ?? null,
+    'role' => $_SESSION['role'] ?? null,
+    'internship_id' => $adviserInternshipId,
+], true) . '</pre>');
 $stmt = $pdo->prepare("
     SELECT
         s.id,
@@ -1815,7 +1821,7 @@ foreach ($roomStatuses as $s) {
                         <?php if (empty($roomStatuses)): ?>
                             <tr>
                                 <td colspan="5" class="text-center text-muted py-4">
-                                    No students in this room yet.
+                                    No students have applied to your company yet.
                                 </td>
                             </tr>
                         <?php else: ?>
