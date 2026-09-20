@@ -64,63 +64,42 @@ if (!isset($allowed_types[$mime_type])) {
     header('Location: message.php?section=progress_report&room_id=' . urlencode($current_room_id));
     exit;
 }
-
-$extension = $allowed_types[$mime_type];
-
-$upload_dir = __DIR__ . '/uploads/weekly_reports/';
-
-if (!is_dir($upload_dir)) {
-    if (!mkdir($upload_dir, 0775, true)) {
-        $_SESSION['error'] = 'Unable to create upload directory.';
-        header('Location: message.php?section=progress_report&room_id=' . urlencode($current_room_id));
-        exit;
-    }
-}
-
-$filename =
-    $student_id .
-    '_week' .
-    $week_number .
-    '_' .
-    bin2hex(random_bytes(8)) .
-    '.' .
-    $extension;
-
-$destination = $upload_dir . $filename;
-
-if (!move_uploaded_file($file['tmp_name'], $destination)) {
-    $_SESSION['error'] = 'File upload failed. Please try again.';
+$file_stream = fopen($file['tmp_name'], 'rb');
+if (!$file_stream) {
+    $_SESSION['error'] = 'Could not read the uploaded file.';
     header('Location: message.php?section=progress_report&room_id=' . urlencode($current_room_id));
     exit;
 }
 
-$wr_filepath = 'uploads/weekly_reports/' . $filename;
-
 try {
-
     $insert = $pdo->prepare("
         INSERT INTO weekly_reports
-            (student_id, week_number, wr_filepath, created_at)
+            (student_id, week_number, wr_filepath, file_data, file_mime, created_at)
         VALUES
-            (?, ?, ?, CURRENT_DATE)
+            (:sid, :week, '', :data, :mime, CURRENT_DATE)
+        RETURNING id
     ");
+    $insert->bindValue(':sid', $student_id, PDO::PARAM_INT);
+    $insert->bindValue(':week', $week_number, PDO::PARAM_INT);
+    $insert->bindParam(':data', $file_stream, PDO::PARAM_LOB);
+    $insert->bindValue(':mime', $mime_type);
+    $insert->execute();
 
-    $insert->execute([
-        $student_id,
-        $week_number,
-        $wr_filepath
-    ]);
+    $newId = (int) $insert->fetchColumn();
+
+    // the path your View links already use
+    $pdo->prepare("UPDATE weekly_reports SET wr_filepath = ? WHERE id = ?")
+        ->execute(['view-report.php?id=' . $newId, $newId]);
 
     $_SESSION['success'] = 'Weekly report submitted successfully.';
 
 } catch (PDOException $e) {
-
-    if (file_exists($destination)) {
-        unlink($destination);
-    }
-
+    error_log('weekly report save failed: ' . $e->getMessage());
     $_SESSION['error'] = 'Unable to save your report. Please try again.';
 }
+
+if (is_resource($file_stream))
+    fclose($file_stream);
 
 header('Location: message.php?section=progress_report&room_id=' . urlencode($current_room_id));
 exit;

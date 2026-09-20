@@ -2181,9 +2181,10 @@ $page = 'messages';
                                         <td><?= $count ?> report<?= $count > 1 ? 's' : '' ?></td>
                                         <td><?= $latest ?></td>
                                         <td>
-                                            <button type="button" onclick="openReports(<?= (int) $sid ?>)" style="display:inline-flex; align-items:center; gap:5px; padding:5px 10px;
-                               background:#dbeafe; color:#1e40af; border-radius:6px; font-size:11px;
-                               font-weight:600; border:1px solid #93c5fd; cursor:pointer; white-space:nowrap;">
+                                            <button type="button" onclick="openReports(<?= (int) $sid ?>)"
+                                                style="display:inline-flex; align-items:center; gap:5px; padding:5px 10px;
+                                                background:#dbeafe; color:#1e40af; border-radius:6px; font-size:11px;
+                                                font-weight:600; border:1px solid #93c5fd; cursor:pointer; white-space:nowrap;">
                                                 <i class="fa fa-eye"></i> View
                                             </button>
                                         </td>
