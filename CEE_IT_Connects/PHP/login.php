@@ -46,7 +46,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if (!$user) {
+        if (!$user && $user['is_archived'] = TRUE) {
+
+            echo "<script>alert('Account has been deleted! Please contact you supervisor.'); window.history.back();</script>";
+            exit;
+        } elseif (!$user) {
             echo "<script>alert('Admin not found!'); window.history.back();</script>";
             exit;
         }
@@ -85,15 +89,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if (!$user) {
+        if (!$user && $user['is_archived'] = TRUE) {
+
+            echo "<script>alert('Account has been deleted! Please contact you supervisor.'); window.history.back();</script>";
+            exit;
+        } elseif (!$user) {
             echo "<script>alert('Adviser not found!'); window.history.back();</script>";
             exit;
         }
 
-        if ($user['is_archived'] = TRUE) {
-            echo "<script>alert('Account has been deleted! Please contact you supervisor.'); window.history.back();</script>";
-            exit;
-        }
         if (password_verify($password, $user['password_hash'])) {
 
             $_SESSION['user_id'] = $user['id'];
