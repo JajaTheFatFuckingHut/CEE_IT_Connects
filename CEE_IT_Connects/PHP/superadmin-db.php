@@ -465,10 +465,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Insert into the shared advisers table as an HTE supervisor role
             // Change 'hte_supervisor' below to match your actual adviser_role enum value
             $insertStmt = $pdo->prepare("
-    INSERT INTO advisers
-        (full_name, email, password_hash, role, internship_id, created_at)
-    VALUES (?, ?, ?, 'HTE_adviser', ?, NOW())
-");
+                INSERT INTO advisers
+                    (full_name, email, password_hash, role, internship_id, created_at)
+                VALUES (?, ?, ?, 'HTE_adviser', ?, NOW())
+            ");
             $insertStmt->execute([
                 $sub['full_name'],
                 $sub['email'],
@@ -616,6 +616,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['error'] = "Could not add school year: " . $e->getMessage();
             header("Location: superadmin.php");
         }
+        exit;
+    }
+
+    if (isset($_POST['restore'])) {
+
+        $tables = ['students' => 'students', 'admins' => 'admins', 'advisers' => 'advisers'];
+        $table = $tables[$_POST['source'] ?? ''] ?? null;
+        $userId = (int) ($_POST['user_id'] ?? 0);
+
+        if (!$table || !$userId) {
+            $_SESSION['error'] = "Invalid user.";
+            header("Location: superadmin.php");
+            exit;
+        }
+
+        try {
+            $pdo->prepare("UPDATE {$table} SET is_archived = FALSE WHERE id = :id")
+                ->execute([':id' => $userId]);
+
+            $pdo->prepare("
+            INSERT INTO audits (user_id, roles, activity, activity_date)
+            VALUES (:admin, :roles, :activity, NOW())
+        ")->execute([
+                        ':admin' => $_SESSION['user_id'],
+                        ':roles' => 'superadmin',
+                        ':activity' => "Restored {$table} user ID {$userId}",
+                    ]);
+
+            $_SESSION['success'] = "User restored.";
+        } catch (Exception $e) {
+            $_SESSION['error'] = "Could not restore user: " . $e->getMessage();
+        }
+
+        header("Location: superadmin.php#archived");
         exit;
     }
 }
