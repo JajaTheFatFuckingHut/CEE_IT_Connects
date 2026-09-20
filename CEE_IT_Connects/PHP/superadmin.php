@@ -2112,8 +2112,8 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
                                         </form>
                                     </td>
                                     <td>
-                                        <button type="submit" name="assign_section" class="btn-update"
-                                            style="padding:8px 14px;">
+                                        <button type="submit" form="assign-form-<?= $adv['id'] ?>" name="assign_section"
+                                            class="btn-update" style="padding:8px 14px;">
                                             <i class="bi bi-person-check me-1"></i> Assign
                                         </button>
                                     </td>
