@@ -269,10 +269,9 @@ $now = new DateTime();
                             </p>
                             <p><?= htmlspecialchars($loc['address'] ?? $loc['location']) ?></p>
                             <div class="icons">
-                                <span class="phone-wrap">
-                                    <div id="phoneBackdrop" class="phone-backdrop"></div>
-                                    <div id="phoneDropdown" class="phone-dropdown"></div>
-                                </span>
+                                <i class="fas fa-phone"
+                                    onclick="toggleNumbers(event, this, '<?= htmlspecialchars($loc['phone_numbers'], ENT_QUOTES) ?>')">
+                                </i>
                                 <i class="fas fa-location-arrow"
                                     onclick="getDirections(<?= $loc['latitude'] ?>, <?= $loc['longtitude'] ?>)">
                                 </i>
@@ -319,6 +318,8 @@ $now = new DateTime();
         </div>
     </section>
 
+    <div id="phoneBackdrop" class="phone-backdrop"></div>
+    <div id="phoneDropdown" class="phone-dropdown"></div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 
