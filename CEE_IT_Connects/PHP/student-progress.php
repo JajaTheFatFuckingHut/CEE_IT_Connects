@@ -113,7 +113,7 @@ if ($action === 'apply_internship') {
 
     // Verify this internship_id actually belongs to the student's application
     $verify = $pdo->prepare("
-        SELECT id FROM ojt_applications
+        SELECT id FROM ojt_hours
         WHERE student_id = ? AND internship_id = ?
         LIMIT 1
     ");
