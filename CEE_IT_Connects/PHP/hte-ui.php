@@ -221,10 +221,11 @@ $roomStatusesStmt = $pdo->prepare("
     SELECT
         s.id,
         s.full_name,
-        i.company,
+        oa.company_name AS company,
+        oa.status AS application_status,
         i.required_hours,
-        COALESCE(
-            SUM(
+        COALESCE((
+            SELECT SUM(
                 CASE WHEN oh.m_in IS NOT NULL AND oh.m_out IS NOT NULL
                     THEN EXTRACT(EPOCH FROM (oh.m_out - oh.m_in)) / 3600
                     ELSE 0
@@ -234,15 +235,15 @@ $roomStatusesStmt = $pdo->prepare("
                     THEN EXTRACT(EPOCH FROM (oh.a_out - oh.a_in)) / 3600
                     ELSE 0
                 END
-            ), 0
-        ) AS total_hours
-    FROM students s
-    JOIN ojt_applications oa ON oa.student_id = s.id
-    JOIN internships i ON i.id = oa.internship_id
-    JOIN room_members rm ON rm.user_id = s.id AND rm.user_type = 'student'
-    LEFT JOIN ojt_hours oh ON oh.user_id = s.id AND oh.user_type = 'student'
+            )
+            FROM ojt_hours oh
+            WHERE oh.user_id = s.id AND oh.user_type = 'student'
+        ), 0) AS total_hours
+    FROM ojt_applications oa
+    JOIN students s ON s.id = oa.student_id
+    LEFT JOIN internships i ON i.id = oa.internship_id
     WHERE oa.internship_id = ?
-    GROUP BY s.id, s.full_name, i.company, i.required_hours
+    ORDER BY s.full_name
 ");
 $roomStatusesStmt->execute([$adviserInternshipId]);
 $roomStatuses = $roomStatusesStmt->fetchAll(PDO::FETCH_ASSOC);
