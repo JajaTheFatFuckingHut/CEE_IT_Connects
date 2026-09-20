@@ -83,6 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ':name' => $roomName,
                 ':section' => (string) $section,
                 ':year' => $year,
+                ':sy' => $sy,
                 ':adviser' => $adviser_id
             ]);
             $new_room_id = (int) $roomStmt->fetchColumn();
@@ -585,6 +586,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['error'] = "Could not save section counts: " . $e->getMessage();
         }
         header("Location: superadmin.php?sy=" . urlencode($sy));
+        exit;
+    }
+    if (isset($_POST['add_school_year'])) {
+        try {
+            // latest existing school year, e.g. 2026-2027
+            $latest = $pdo->query("SELECT MAX(school_year) FROM school_years")->fetchColumn();
+
+            if ($latest) {
+                $start = (int) substr($latest, 0, 4) + 1;
+            } else {
+                $m = (int) date('n');
+                $y = (int) date('Y');
+                $start = $m >= 6 ? $y : $y - 1;
+            }
+            $newSY = $start . '-' . ($start + 1);
+
+            $pdo->prepare("INSERT INTO school_years (school_year) VALUES (?) ON CONFLICT DO NOTHING")
+                ->execute([$newSY]);
+
+            $pdo->prepare("
+            INSERT INTO audits (user_id, roles, activity, activity_date)
+            VALUES (:user_id, :roles, :activity, NOW())
+        ")->execute([
+                        ':user_id' => $_SESSION['user_id'],
+                        ':roles' => 'superadmin',
+                        ':activity' => "Added school year {$newSY}"
+                    ]);
+
+            $_SESSION['success'] = "School year {$newSY} added.";
+            header("Location: superadmin.php?sy=" . urlencode($newSY) . "#section_settings");
+        } catch (Exception $e) {
+            $_SESSION['error'] = "Could not add school year: " . $e->getMessage();
+            header("Location: superadmin.php");
+        }
         exit;
     }
 }

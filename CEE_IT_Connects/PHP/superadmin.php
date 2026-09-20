@@ -157,9 +157,17 @@ $m = (int) date('n');
 $y = (int) date('Y');
 $currentSY = $m >= 6 ? "{$y}-" . ($y + 1) : ($y - 1) . "-{$y}";
 
-// selected school year (?sy=2026-2027), falls back to current
+// make sure the current school year exists in the list
+$pdo->prepare("INSERT INTO school_years (school_year) VALUES (?) ON CONFLICT DO NOTHING")
+    ->execute([$currentSY]);
+
+// all school years, oldest first
+$schoolYearOptions = $pdo->query("SELECT school_year FROM school_years ORDER BY school_year")
+    ->fetchAll(PDO::FETCH_COLUMN);
+
+// selected school year (?sy=...), falls back to current if unknown
 $schoolYear = $_GET['sy'] ?? $currentSY;
-if (!preg_match('/^\d{4}-\d{4}$/', $schoolYear))
+if (!in_array($schoolYear, $schoolYearOptions, true))
     $schoolYear = $currentSY;
 
 // school year choices: previous, current, next
@@ -1984,14 +1992,22 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
 
             <div id="section_settings" class="section sysAdm-section">
                 <!-- school year picker -->
-                <form method="GET" class="mb-2 d-flex align-items-center gap-2">
+                <form method="GET" id="syForm" class="mb-2 d-flex align-items-center gap-2">
                     <label style="font-size:13px; color:#272f54;" class="fw-semibold">School year</label>
-                    <select name="sy" onchange="this.form.submit()"
+                    <select name="sy" onchange="handleSyChange(this)"
                         style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px;">
                         <?php foreach ($schoolYearOptions as $opt): ?>
-                            <option value="<?= $opt ?>" <?= $opt === $schoolYear ? 'selected' : '' ?>><?= $opt ?></option>
+                            <option value="<?= htmlspecialchars($opt) ?>" <?= $opt === $schoolYear ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($opt) ?>
+                            </option>
                         <?php endforeach; ?>
+                        <option value="__add__">+ Add new school year</option>
                     </select>
+                </form>
+
+                <!-- Handle the adding of sy -->
+                <form method="POST" action="superadmin-db.php" id="addSyForm" style="display:none;">
+                    <input type="hidden" name="add_school_year" value="1">
                 </form>
 
                 <form method="POST" class="mb-3 p-3" action="superadmin-db.php"
@@ -2760,6 +2776,19 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
                 if (link) link.classList.add('active');
             }
         });
+
+        function handleSyChange(sel) {
+            if (sel.value === '__add__') {
+                if (confirm('Add the next school year?')) {
+                    document.getElementById('addSyForm').submit();
+                } else {
+                    // put the dropdown back on the current selection
+                    sel.value = <?= json_encode($schoolYear) ?>;
+                }
+            } else {
+                document.getElementById('syForm').submit();
+            }
+        }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
