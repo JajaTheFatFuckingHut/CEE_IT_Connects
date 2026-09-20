@@ -572,8 +572,9 @@ if (isset($_POST['save_section_settings'])) {
         $pdo->commit();
         $_SESSION['success'] = "Section counts saved for {$sy}.";
     } catch (Exception $e) {
-        $pdo->rollBack();
-        $_SESSION['error'] = "Could not save section counts.";
+        if ($pdo->inTransaction())
+            $pdo->rollBack();
+        $_SESSION['error'] = "Could not save section counts: " . $e->getMessage();
     }
     header("Location: superadmin.php?sy=" . urlencode($sy));
     exit;

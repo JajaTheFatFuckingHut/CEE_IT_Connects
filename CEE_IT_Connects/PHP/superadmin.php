@@ -1083,6 +1083,7 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
             <a href="#" onclick="showSection(event, 'section_settings')" data-tooltip="Settings">
                 <i class="bi bi-gear me-2"></i>
                 <span class="nav-label">Section</span>
+            </a>
         </div>
 
         <div class="main-content">
