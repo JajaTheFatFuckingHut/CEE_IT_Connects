@@ -74,7 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $pdo->beginTransaction();
             $step = '1 create room';
             // 1. create the new room
-            $roomName = "{$adviserName}'s Room (Year {$year}-{$section})";
+            $roomName = "Year {$year}-{$section} Room";
             $roomStmt = $pdo->prepare("
             INSERT INTO rooms (room_name, section, year_level, school_year, adviser_id, is_archived, created_at)
             VALUES (:name, :section, :year, :sy, :adviser, FALSE, NOW())

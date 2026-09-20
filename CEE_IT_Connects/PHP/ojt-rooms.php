@@ -94,6 +94,24 @@ if (!isset($_GET['room_id'])) {
     exit;
 }
 
+$myRoomsStmt = $pdo->prepare("
+    SELECT DISTINCT r.id, r.room_name, r.school_year, r.year_level, r.section
+    FROM rooms r
+    LEFT JOIN room_members rm ON r.id = rm.room_id
+    WHERE r.is_archived = FALSE
+      AND (
+            (rm.user_id = :uid AND rm.user_type = :utype)
+         OR (:utype2 = 'adviser' AND r.adviser_id = :uid2)
+      )
+    ORDER BY r.school_year DESC NULLS LAST, r.year_level, r.section, r.room_name
+");
+$myRoomsStmt->execute([
+    ':uid' => $user_id,
+    ':utype' => $user_type,
+    ':utype2' => $user_type,
+    ':uid2' => $user_id,
+]);
+$myRooms = $myRoomsStmt->fetchAll(PDO::FETCH_ASSOC);
 // function generateRoomCode($length = 9)
 // {
 //     $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -133,13 +151,12 @@ if (!isset($_GET['room_id'])) {
         $adviser = $advStmt->fetch(PDO::FETCH_ASSOC);
 
         $room_name = ($adviser['full_name'] ?? 'Adviser') . "'s Room";
-        $room_code = generateUniqueRoomCode($pdo);
 
         $createStmt = $pdo->prepare("
-            INSERT INTO rooms (room_name, room_code, adviser_id, is_archived)
-            VALUES (?, ?, ?, FALSE)
+            INSERT INTO rooms (room_name, adviser_id, is_archived)
+            VALUES (?, ?, FALSE)
         ");
-        $createStmt->execute([$room_name, $room_code, $adviser_id]);
+        $createStmt->execute([$room_name, $adviser_id]);
         $room_id = $pdo->lastInsertId();
 
         $memberStmt = $pdo->prepare("
@@ -328,25 +345,6 @@ if ($chatSection_id && $section === 'chats') {
     ]);
     $chatMessages = $msgStmt->fetchAll(PDO::FETCH_ASSOC);
 }
-
-$myRoomsStmt = $pdo->prepare("
-    SELECT DISTINCT r.id, r.room_name, r.school_year, r.year_level, r.section
-    FROM rooms r
-    LEFT JOIN room_members rm ON r.id = rm.room_id
-    WHERE r.is_archived = FALSE
-      AND (
-            (rm.user_id = :uid AND rm.user_type = :utype)
-         OR (:utype2 = 'adviser' AND r.adviser_id = :uid2)
-      )
-    ORDER BY r.school_year DESC NULLS LAST, r.year_level, r.section, r.room_name
-");
-$myRoomsStmt->execute([
-    ':uid' => $user_id,
-    ':utype' => $user_type,
-    ':utype2' => $user_type,
-    ':uid2' => $user_id,
-]);
-$myRooms = $myRoomsStmt->fetchAll(PDO::FETCH_ASSOC);
 
 // helper — get name for a chat list entry
 function getRoomChatName($pdo, $id, $type)
