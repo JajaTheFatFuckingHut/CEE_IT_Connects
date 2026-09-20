@@ -330,13 +330,22 @@ if ($chatSection_id && $section === 'chats') {
 }
 
 $myRoomsStmt = $pdo->prepare("
-    SELECT r.id, r.room_name
+    SELECT DISTINCT r.id, r.room_name, r.school_year, r.year_level, r.section
     FROM rooms r
-    JOIN room_members rm ON r.id = rm.room_id
-    WHERE rm.user_id = ? AND rm.user_type = ? AND r.is_archived = FALSE
-    ORDER BY r.room_name
+    LEFT JOIN room_members rm ON r.id = rm.room_id
+    WHERE r.is_archived = FALSE
+      AND (
+            (rm.user_id = :uid AND rm.user_type = :utype)
+         OR (:utype2 = 'adviser' AND r.adviser_id = :uid2)
+      )
+    ORDER BY r.school_year DESC NULLS LAST, r.year_level, r.section, r.room_name
 ");
-$myRoomsStmt->execute([$user_id, $user_type]);
+$myRoomsStmt->execute([
+    ':uid' => $user_id,
+    ':utype' => $user_type,
+    ':utype2' => $user_type,
+    ':uid2' => $user_id,
+]);
 $myRooms = $myRoomsStmt->fetchAll(PDO::FETCH_ASSOC);
 
 // helper — get name for a chat list entry
