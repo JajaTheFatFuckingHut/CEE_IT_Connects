@@ -3,8 +3,11 @@ FROM php:8.2-apache
 RUN a2enmod rewrite
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends libpq-dev unzip git \
-    && docker-php-ext-install pdo pdo_pgsql \
+    && apt-get install -y --no-install-recommends \
+    libpq-dev unzip git \
+    libpng-dev libjpeg-dev \
+    && docker-php-ext-configure gd --with-jpeg \
+    && docker-php-ext-install pdo pdo_pgsql gd \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Composer

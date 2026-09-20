@@ -181,9 +181,6 @@ $plv_lng = 120.9830;
 
 $hte_lat = $internship['latitude'] ?? null;
 $hte_lng = $internship['longtitude'] ?? null;
-
-$google_api_key = 'YOUR_GOOGLE_MAPS_API_KEY';
-
 // Source paths
 $pdfBase = __DIR__ . '/Sources/forms/';
 $formFiles = [
