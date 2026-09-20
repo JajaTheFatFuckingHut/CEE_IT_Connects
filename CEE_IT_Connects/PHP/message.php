@@ -2924,7 +2924,7 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
                                             <input type="hidden" name="report_id" value="<?= (int) $r['id'] ?>">
                                             <button type="submit" class="btn btn-sm"
                                                 style="background:#fef2f2;color:#dc2626;border-radius:6px;">
-                                                <i class="fa-solid fa-trash " me-1></i>Delete
+                                                <i class="fa-solid fa-trash me-1"></i>Delete
                                             </button>
                                         </form>
                                     </td>
