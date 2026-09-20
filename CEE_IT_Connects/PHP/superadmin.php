@@ -1098,7 +1098,7 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
                 <i class="bi bi-clock-history me-2"></i>
                 <span class="nav-label">OJT Hours</span>
             </a>
-            <a href="#" onclick="showSection(event, 'settings')" data-tooltip="Settings">
+            <a href="#" onclick="showSection(event, 'section_settings')" data-tooltip="Settings">
                 <i class="bi bi-gear me-2"></i>
                 <span class="nav-label">Section</span>
         </div>
