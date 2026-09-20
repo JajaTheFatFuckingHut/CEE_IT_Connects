@@ -2093,19 +2093,26 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
                 <i class="fa-solid fa-clock m-1"></i> <span class="sidebar-text">Hours</span>
             </a>
         <?php else: ?>
-            <a href="#" onclick="return false;" title="Complete at least one application step to unlock"
-                style="opacity:0.4; cursor:not-allowed; pointer-events:none;">
+            <a href="#" onclick="return false;" title="Upload at Mou, Recomendation Letter and Waiver
+            documents to unlock" style="opacity:0.4; cursor:not-allowed; pointer-events:none;">
                 <i class="fa-solid fa-clock m-1"></i>
                 <span class="sidebar-text">Hours <i class="fa-solid fa-lock" style="font-size:10px;"></i></span>
             </a>
         <?php endif; ?>
 
-        <a href="?section=progress_report<?php if ($current_room_id)
-            echo "&room_id=$current_room_id"; ?>"
-            class="sidebar-link <?= $current_section === 'progress_report' ? 'active' : '' ?>">
-            <i class="fa-solid fa-file m-1"></i> <span class="sidebar-text">Progress Report</span>
-        </a>
-
+        <?php if ($hasActiveProgress): ?>
+            <a href="?section=progress_report<?php if ($current_room_id)
+                echo "&room_id=$current_room_id"; ?>"
+                class="sidebar-link <?= $current_section === 'progress_report' ? 'active' : '' ?>">
+                <i class="fa-solid fa-file m-1"></i> <span class="sidebar-text">Progress Report</span>
+            </a>
+            </a>
+        <?php else: ?>
+            <a href="#" onclick="return false;" title="Upload at Mou, Recomendation Letter and Waiver
+            documents to unlock" style="opacity:0.4; cursor:not-allowed; pointer-events:none;">
+                <i class="fa-solid fa-file m-1"></i> <span class="sidebar-text">Progress Report</span>
+            </a>
+        <?php endif; ?>
         <div class="rooms-list">
             <hr><br>
             <h6>ROOMS</h6>
