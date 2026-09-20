@@ -202,20 +202,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     ORDER BY full_name
 ")->fetchAll(PDO::FETCH_ASSOC);
 
-    // sections already handled, grouped by adviser
-    $assignedSections = [];
-    $takenKeys = [];
-    $rows = $pdo->query("
-    SELECT adviser_id, LOWER(department) AS program, year_level, section
-    FROM rooms
-    WHERE adviser_id IS NOT NULL AND is_archived = FALSE
-      AND section IS NOT NULL AND section <> ''
-    ORDER BY program, year_level, section
-")->fetchAll(PDO::FETCH_ASSOC);
-    foreach ($rows as $r) {
-        $assignedSections[$r['adviser_id']][] = ucwords($r['program']) . ' ' . $r['year_level'] . '-' . $r['section'];
-        $takenKeys[] = "{$r['program']}|{$r['year_level']}|{$r['section']}";
-    }
     //admin 
     if (isset($_POST['create-admin'])) {
 
