@@ -2097,7 +2097,7 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
                                         <?php endif; ?>
                                     </td>
                                     <td>
-                                        <form method="POST" id="assign-form-<?= $adv['id'] ?>">
+                                        <form method="POST" action="superadmin-db.php" id="assign-form-<?= $adv['id'] ?>">
                                             <input type="hidden" name="school_year"
                                                 value="<?= htmlspecialchars($schoolYear) ?>">
                                             <input type="hidden" name="adviser_id" value="<?= $adv['id'] ?>">
@@ -2112,8 +2112,8 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
                                         </form>
                                     </td>
                                     <td>
-                                        <button type="submit" form="assign-form-<?= $adv['id'] ?>" name="assign_section"
-                                            class="btn-update" style="padding:8px;">
+                                        <button type="submit" name="assign_section" class="btn-update"
+                                            style="padding:8px 14px;">
                                             <i class="bi bi-person-check me-1"></i> Assign
                                         </button>
                                     </td>
