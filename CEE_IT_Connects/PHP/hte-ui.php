@@ -186,11 +186,11 @@ $adviserStmt->execute([$adviser_id]);
 $adviserInternshipId = $adviserStmt->fetchColumn();
 
 
-die('<pre>' . print_r([
-    'session_user_id' => $_SESSION['user_id'] ?? null,
-    'role' => $_SESSION['role'] ?? null,
-    'internship_id' => $adviserInternshipId,
-], true) . '</pre>');
+// die('<pre>' . print_r([
+//     'session_user_id' => $_SESSION['user_id'] ?? null,
+//     'role' => $_SESSION['role'] ?? null,
+//     'internship_id' => $adviserInternshipId,
+// ], true) . '</pre>');
 $stmt = $pdo->prepare("
     SELECT
         s.id,
