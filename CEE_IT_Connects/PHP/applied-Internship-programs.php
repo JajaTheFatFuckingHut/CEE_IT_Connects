@@ -1391,7 +1391,7 @@ foreach ($internships as $loc) {
         });
 
         let map;
-        const markersById = {};
+        let activeMarker = null;
         const internships = <?= json_encode($mapPoints, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
 
         function esc(s) {
@@ -1400,30 +1400,19 @@ foreach ($internships as $loc) {
             return d.innerHTML;
         }
 
-        function addInternshipMarkers() {
-            const bounds = [];
+        function showInternship(id) {
+            const item = internships.find(i => Number(i.id) === Number(id));
+            if (!item) return;
 
-            internships.forEach(item => {
-                if (isNaN(item.lat) || isNaN(item.lng)) return;
-                // reject swapped or impossible values
-                if (item.lat < -90 || item.lat > 90 || item.lng < -180 || item.lng > 180) return;
+            // remove the previously shown marker
+            if (activeMarker) map.removeLayer(activeMarker);
 
-                const marker = L.marker([item.lat, item.lng], { icon: greenIcon })
-                    .addTo(map)
-                    .bindPopup(
-                        `<strong>${esc(item.company)}</strong><br>${esc(item.address)}`
-                    );
+            activeMarker = L.marker([item.lat, item.lng], { icon: greenIcon })
+                .addTo(map)
+                .bindPopup(`<strong>${esc(item.company)}</strong><br>${esc(item.address)}`)
+                .openPopup();
 
-                markersById[item.id] = marker;
-                bounds.push([item.lat, item.lng]);
-            });
-
-            // zoom to fit all markers (or a single one)
-            if (bounds.length === 1) {
-                map.setView(bounds[0], 15);
-            } else if (bounds.length > 1) {
-                map.fitBounds(bounds, { padding: [40, 40] });
-            }
+            map.setView([item.lat, item.lng], 16);
         }
 
 
@@ -1486,6 +1475,7 @@ foreach ($internships as $loc) {
             addInternshipMarkers();
         }
         window.addEventListener('load', initMap);
+        setTimeout(() => map.invalidateSize(), 200);
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
