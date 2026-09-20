@@ -115,11 +115,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             // 3. add every student of that year level + section to the new room
             $ins = $pdo->prepare("
-            INSERT INTO room_members (room_id, user_id, user_type)
-            SELECT :room, s.id, 'student'
-            FROM students s
-            WHERE CAST(s.year_level AS TEXT) = :year AND CAST(s.section AS TEXT) = :section
-        ");
+                INSERT INTO room_members (room_id, user_id, user_type)
+                SELECT CAST(:room AS INTEGER), s.id, 'student'
+                FROM students s
+                WHERE CAST(s.year_level AS TEXT) = :year AND CAST(s.section AS TEXT) = :section
+            ");
             $ins->execute([':room' => $new_room_id, ':year' => (string) $year, ':section' => (string) $section]);
             $added = $ins->rowCount();
             $step = '4 audit log';
