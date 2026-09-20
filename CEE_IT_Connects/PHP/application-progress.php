@@ -109,6 +109,7 @@ $checklist = [
     'addendum' => false,
     'reco_letter' => false,
     'waiver' => false,
+    'company_profile' => false,
     'internship_plan' => false,
     'vicinity_map' => false,
     'oath' => false,

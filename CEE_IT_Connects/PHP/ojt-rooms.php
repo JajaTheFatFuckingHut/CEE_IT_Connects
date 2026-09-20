@@ -1854,7 +1854,8 @@ $page = 'messages';
 
             <?php
             $stepLabels = [
-                'hte_form' => 'HTE Form',
+                'mou' => 'MOU',
+                'company_profile' => 'Company Profile',
                 'addendum' => 'Addendum',
                 'reco_letter' => 'Reco Letter',
                 'waiver' => 'Waiver',
@@ -1987,18 +1988,30 @@ $page = 'messages';
                                         $file_path = $entry['file_path'] ?? null;
                                         ?>
 
-                                        <?php if ($done && $file_path): ?>
-                                            <!-- Clickable — downloads the uploaded proof -->
-                                            <a href="<?= htmlspecialchars($file_path) ?>" target="_blank" download
-                                                title="Download proof for <?= htmlspecialchars($label) ?>" class="checklist-pill done"
-                                                style="text-decoration:none; cursor:pointer; display:inline-flex; align-items:center; gap:4px;">
+                                        <?php if ($done && $file_path):
+                                            $url = htmlspecialchars($file_path);
+                                            $safeLabel = htmlspecialchars($label);
+                                            // download link: view-proof.php streams inline, so add a flag for it (see note below)
+                                            $dlUrl = strpos($file_path, 'view-proof.php') !== false
+                                                ? $url . '&download=1'
+                                                : $url;
+                                            ?>
+                                            <span class="checklist-pill done" style="display:inline-flex; align-items:center; gap:6px;">
                                                 <i class="fa fa-circle-check" style="font-size:10px;"></i>
                                                 <?= $label ?>
-                                                <i class="fa fa-download" style="font-size:9px; opacity:.7; margin-left:2px;"></i>
-                                            </a>
+
+                                                <a href="<?= $url ?>" target="_blank" rel="noopener" title="Preview <?= $safeLabel ?>"
+                                                    style="color:inherit; text-decoration:none; opacity:.8;">
+                                                    <i class="fa fa-eye" style="font-size:10px;"></i>
+                                                </a>
+
+                                                <a href="<?= $dlUrl ?>" download title="Download <?= $safeLabel ?>"
+                                                    style="color:inherit; text-decoration:none; opacity:.8;">
+                                                    <i class="fa fa-download" style="font-size:10px;"></i>
+                                                </a>
+                                            </span>
 
                                         <?php elseif ($done): ?>
-                                            <!-- Done but no file (legacy rows before upload was required) -->
                                             <span class="checklist-pill done" title="Marked done — no file attached"
                                                 style="display:inline-flex; align-items:center; gap:4px;">
                                                 <i class="fa fa-circle-check" style="font-size:10px;"></i>
@@ -2006,7 +2019,6 @@ $page = 'messages';
                                             </span>
 
                                         <?php else: ?>
-                                            <!-- Not done -->
                                             <span class="checklist-pill pending" style="display:inline-flex; align-items:center; gap:4px;">
                                                 <i class="fa fa-circle" style="font-size:10px;"></i>
                                                 <?= $label ?>
