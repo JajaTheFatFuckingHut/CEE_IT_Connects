@@ -17,6 +17,7 @@ function formatSection(?string $key): string
 }
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // for assigning a section to an adviser
+
     if (isset($_POST['assign_section'])) {
         $sy = $_POST['school_year'] ?? '';
         if (!preg_match('/^\d{4}-\d{4}$/', $sy)) {
@@ -48,8 +49,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         // section must be within the base amount for that year level
-        $cfg = $pdo->prepare("SELECT section_count FROM section_settings WHERE year_level = ?");
-        $cfg->execute([$year]);
+        $cfg = $pdo->prepare("SELECT section_count FROM section_settings WHERE school_year = ? AND year_level = ?");
+        $cfg->execute([$sy, $year]);
         $max = (int) $cfg->fetchColumn();
         if ($section < 1 || $section > $max) {
             $_SESSION['error'] = "That section is outside the configured range for year {$year}.";

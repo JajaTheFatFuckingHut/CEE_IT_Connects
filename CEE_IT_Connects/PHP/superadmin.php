@@ -149,8 +149,7 @@ $adviserList = $pdo->query("
     ORDER BY full_name
 ")->fetchAll(PDO::FETCH_ASSOC);
 
-$cfg = $pdo->prepare("SELECT section_count FROM section_settings WHERE school_year = ? AND year_level = ?");
-$cfg->execute([$sy, $year]);
+
 // current school year (school year starts in June)
 $m = (int) date('n');
 $y = (int) date('Y');
