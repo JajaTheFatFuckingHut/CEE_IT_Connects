@@ -98,7 +98,7 @@ if (!isset($_GET['room_id'])) {
         $joinStmt->execute([$room['id'], $user_id, $user_type]);
     }
 
-    header("Location: ojt-rooms.php?room_id=" . $room['id']);
+    header("Location: hte-ui.php?room_id=" . $room['id']);
     exit;
 }
 

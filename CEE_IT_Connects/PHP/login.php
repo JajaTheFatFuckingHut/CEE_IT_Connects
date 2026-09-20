@@ -91,7 +91,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $normalizedRole = strtolower(trim($user['role']));
 
             $dashboards = [
-                'hte_adviser' => 'hte-ui.php',
+                'hte_adviser' => '../hte-ui.php',
                 'internship_adviser' => '../ojt-rooms.php',
             ];
 
