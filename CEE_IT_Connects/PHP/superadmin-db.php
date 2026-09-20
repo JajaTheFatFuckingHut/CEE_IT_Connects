@@ -18,6 +18,13 @@ function formatSection(?string $key): string
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // for assigning a section to an adviser
     if (isset($_POST['assign_section'])) {
+        $sy = $_POST['school_year'] ?? '';
+        if (!preg_match('/^\d{4}-\d{4}$/', $sy)) {
+            $_SESSION['error'] = "Invalid school year.";
+            header("Location: superadmin.php");
+            exit;
+        }
+
         $adviser_id = (int) ($_POST['adviser_id'] ?? 0);
         $parts = array_map('trim', explode('|', $_POST['section'] ?? ''));
 
@@ -67,8 +74,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // 1. create the new room
             $roomName = "{$adviserName}'s Room (Year {$year}-{$section})";
             $roomStmt = $pdo->prepare("
-            INSERT INTO rooms (room_name, section, year_level, adviser_id, is_archived, created_at)
-            VALUES (:name, :section, :year, :adviser, FALSE, NOW())
+            INSERT INTO rooms (room_name, section, year_level, school_year, adviser_id, is_archived, created_at)
+            VALUES (:name, :section, :year, :sy, :adviser, FALSE, NOW())
             RETURNING id
         ");
             $roomStmt->execute([
@@ -533,38 +540,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 }
-if (isset($_POST['save_section_counts'])) {
+if (isset($_POST['save_section_settings'])) {
+    $sy = $_POST['school_year'] ?? '';
+    if (!preg_match('/^\d{4}-\d{4}$/', $sy)) {
+        $_SESSION['error'] = "Invalid school year.";
+        header("Location: superadmin.php");
+        exit;
+    }
     $counts = $_POST['section_count'] ?? [];
 
     try {
         $pdo->beginTransaction();
         $up = $pdo->prepare("
-            INSERT INTO section_settings (year_level, section_count)
-            VALUES (:y, :c)
-            ON CONFLICT (year_level) DO UPDATE SET section_count = EXCLUDED.section_count
+            INSERT INTO section_settings (school_year, year_level, section_count)
+            VALUES (:sy, :y, :c)
+            ON CONFLICT (school_year, year_level) DO UPDATE SET section_count = EXCLUDED.section_count
         ");
-        foreach ($counts as $y => $c) {
-            $y = (int) $y;
-            $c = max(0, min(50, (int) $c));   // clamp to 0-50
-            if ($y > 0)
-                $up->execute([':y' => $y, ':c' => $c]);
+        for ($y = 1; $y <= 4; $y++) {
+            $c = max(0, min(50, (int) ($counts[$y] ?? 0)));
+            $up->execute([':sy' => $sy, ':y' => $y, ':c' => $c]);
         }
-
         $pdo->prepare("
             INSERT INTO audits (user_id, roles, activity, activity_date)
             VALUES (:user_id, :roles, :activity, NOW())
         ")->execute([
                     ':user_id' => $_SESSION['user_id'],
                     ':roles' => 'superadmin',
-                    ':activity' => "Updated section counts per year level"
+                    ':activity' => "Updated section counts for school year {$sy}"
                 ]);
         $pdo->commit();
-        $_SESSION['success'] = "Section counts saved.";
+        $_SESSION['success'] = "Section counts saved for {$sy}.";
     } catch (Exception $e) {
         $pdo->rollBack();
         $_SESSION['error'] = "Could not save section counts.";
     }
-    header("Location: superadmin.php");
+    header("Location: superadmin.php?sy=" . urlencode($sy));
     exit;
 }
 ?>

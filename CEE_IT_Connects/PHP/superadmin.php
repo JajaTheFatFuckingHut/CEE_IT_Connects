@@ -142,11 +142,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_role'])) {
     header("Location: superadmin.php?section=roles");
     exit;
 }
-
-$sectionSettings = $pdo->query("
-    SELECT year_level, section_count FROM section_settings ORDER BY year_level
-")->fetchAll(PDO::FETCH_ASSOC);
-
 $adviserList = $pdo->query("
     SELECT id, full_name, email
     FROM advisers
@@ -154,96 +149,59 @@ $adviserList = $pdo->query("
     ORDER BY full_name
 ")->fetchAll(PDO::FETCH_ASSOC);
 
-$assignedSections = [];
-$takenKeys = [];
-$rows = $pdo->query("
+$cfg = $pdo->prepare("SELECT section_count FROM section_settings WHERE school_year = ? AND year_level = ?");
+$cfg->execute([$sy, $year]);
+// current school year (school year starts in June)
+$m = (int) date('n');
+$y = (int) date('Y');
+$currentSY = $m >= 6 ? "{$y}-" . ($y + 1) : ($y - 1) . "-{$y}";
+
+// selected school year (?sy=2026-2027), falls back to current
+$schoolYear = $_GET['sy'] ?? $currentSY;
+if (!preg_match('/^\d{4}-\d{4}$/', $schoolYear))
+    $schoolYear = $currentSY;
+
+// school year choices: previous, current, next
+$startY = (int) substr($currentSY, 0, 4);
+$schoolYearOptions = [];
+for ($i = -1; $i <= 1; $i++) {
+    $schoolYearOptions[] = ($startY + $i) . '-' . ($startY + $i + 1);
+}
+
+// saved counts for the selected school year, keyed by year level
+$stmt = $pdo->prepare("SELECT year_level, section_count FROM section_settings WHERE school_year = ?");
+$stmt->execute([$schoolYear]);
+$sectionCounts = [];
+foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
+    $sectionCounts[(int) $r['year_level']] = (int) $r['section_count'];
+}
+
+// sections already taken in this school year
+$stmt = $pdo->prepare("
     SELECT adviser_id, year_level, section
     FROM rooms
     WHERE adviser_id IS NOT NULL AND is_archived = FALSE
-      AND section IS NOT NULL AND section <> '' AND year_level IS NOT NULL
+      AND school_year = ? AND section IS NOT NULL AND section <> '' AND year_level IS NOT NULL
     ORDER BY year_level, section
-")->fetchAll(PDO::FETCH_ASSOC);
-foreach ($rows as $r) {
+");
+$stmt->execute([$schoolYear]);
+$assignedSections = [];
+$takenKeys = [];
+foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
     $assignedSections[$r['adviser_id']][] = "Year {$r['year_level']}-{$r['section']}";
     $takenKeys[] = "{$r['year_level']}|{$r['section']}";
 }
 
+// open sections = 1..N per year level, minus taken ones
 $openSections = [];
-foreach ($sectionSettings as $cfg) {
-    for ($n = 1; $n <= (int) $cfg['section_count']; $n++) {
-        if (!in_array("{$cfg['year_level']}|{$n}", $takenKeys, true)) {
-            $openSections[] = ['year_level' => $cfg['year_level'], 'section' => $n];
+foreach ($sectionCounts as $yl => $count) {
+    for ($n = 1; $n <= $count; $n++) {
+        if (!in_array("{$yl}|{$n}", $takenKeys, true)) {
+            $openSections[] = ['year_level' => $yl, 'section' => $n];
         }
     }
 }
-// Assign adviser POST handler
-// if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['assign_adviser'])) {
-//     $student_id = (int) $_POST['student_id'];
-//     $adviser_id = (int) $_POST['adviser_id'];
-//     $current_room_id = (int) ($_POST['current_room_id'] ?? 0);
 
-//     if (!$student_id || !$adviser_id) {
-//         $_SESSION['error'] = "Please select a valid adviser.";
-//         header("Location: superadmin.php");
-//         exit;
-//     }
-
-//     // Get the adviser's room
-//     $roomStmt = $pdo->prepare("
-//         SELECT id FROM rooms 
-//         WHERE adviser_id = ? AND is_archived = FALSE 
-//         LIMIT 1
-//     ");
-//     $roomStmt->execute([$adviser_id]);
-//     $adviserRoom = $roomStmt->fetch(PDO::FETCH_ASSOC);
-
-//     if (!$adviserRoom) {
-//         $_SESSION['error'] = "This adviser has no active room yet.";
-//         header("Location: superadmin.php");
-//         exit;
-//     }
-
-//     $new_room_id = $adviserRoom['id'];
-
-//     // Remove student from current room if they're already in one
-//     if ($current_room_id && $current_room_id !== $new_room_id) {
-//         $removeStmt = $pdo->prepare("
-//             DELETE FROM room_members 
-//             WHERE room_id = ? AND user_id = ? AND user_type = 'student'
-//         ");
-//         $removeStmt->execute([$current_room_id, $student_id]);
-//     }
-
-//     // Check if already in the new room
-//     $checkStmt = $pdo->prepare("
-//         SELECT id FROM room_members 
-//         WHERE room_id = ? AND user_id = ? AND user_type = 'student'
-//     ");
-//     $checkStmt->execute([$new_room_id, $student_id]);
-
-//     if (!$checkStmt->fetch()) {
-//         $insertStmt = $pdo->prepare("
-//             INSERT INTO room_members (room_id, user_id, user_type)
-//             VALUES (?, ?, 'student')
-//         ");
-//         $insertStmt->execute([$new_room_id, $student_id]);
-//     }
-
-//     // Audit log
-//     $stmtActivity = $pdo->prepare("
-//         INSERT INTO audits (user_id, roles, activity, activity_date) 
-//         VALUES (:user_id, :roles, :activity, NOW())
-//     ");
-//     $stmtActivity->execute([
-//         ':user_id' => $_SESSION['user_id'],
-//         ':roles' => 'superadmin',
-//         ':activity' => "Assigned student ID {$student_id} to adviser ID {$adviser_id}"
-//     ]);
-
-//     $_SESSION['success'] = "Student successfully assigned to adviser's room.";
-//     header("Location: superadmin.php");
-//     exit;
-// }
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_assign_csv'])) {
     $headers = array_map('strtolower', array_map('trim', $_POST['headers'] ?? []));
     $rows = $_POST['csv'] ?? [];
@@ -2023,20 +1981,33 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
             </div>
 
             <div id="section_settings" class="section sysAdm-section">
+                <!-- school year picker -->
+                <form method="GET" class="mb-2 d-flex align-items-center gap-2">
+                    <label style="font-size:13px; color:#272f54;" class="fw-semibold">School year</label>
+                    <select name="sy" onchange="this.form.submit()"
+                        style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px;">
+                        <?php foreach ($schoolYearOptions as $opt): ?>
+                            <option value="<?= $opt ?>" <?= $opt === $schoolYear ? 'selected' : '' ?>><?= $opt ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </form>
+
                 <form method="POST" class="mb-3 p-3"
                     style="background:#f7f8fc; border-radius:12px; border:1px solid #e3e6f3;">
+                    <input type="hidden" name="school_year" value="<?= htmlspecialchars($schoolYear) ?>">
                     <div class="fw-semibold mb-2" style="font-size:13px; color:#272f54;">
                         <i class="bi bi-sliders me-1"></i> Sections per year level
+                        (<?= htmlspecialchars($schoolYear) ?>)
                     </div>
                     <div class="d-flex flex-wrap align-items-end gap-3">
-                        <?php foreach ($sectionSettings as $cfg): ?>
+                        <?php for ($yl = 1; $yl <= 4; $yl++): ?>
                             <div>
-                                <label style="font-size:12px; color:#666;">Year <?= (int) $cfg['year_level'] ?></label>
-                                <input type="number" min="0" max="50" name="section_count[<?= (int) $cfg['year_level'] ?>]"
-                                    value="<?= (int) $cfg['section_count'] ?>"
+                                <label style="font-size:12px; color:#666;">Year <?= $yl ?></label>
+                                <input type="number" min="0" max="50" name="section_count[<?= $yl ?>]"
+                                    value="<?= $sectionCounts[$yl] ?? 0 ?>"
                                     style="display:block; width:90px; padding:8px 10px; border-radius:10px; border:1px solid #ddd; font-size:13px;">
                             </div>
-                        <?php endforeach; ?>
+                        <?php endfor; ?>
                         <button type="submit" name="save_section_settings" class="btn-update" style="padding:8px 14px;">
                             <i class="bi bi-save me-1"></i> Save
                         </button>
@@ -2124,6 +2095,8 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
                                     </td>
                                     <td>
                                         <form method="POST" id="assign-form-<?= $adv['id'] ?>">
+                                            <input type="hidden" name="school_year"
+                                                value="<?= htmlspecialchars($schoolYear) ?>">
                                             <input type="hidden" name="adviser_id" value="<?= $adv['id'] ?>">
                                             <select name="section" class="assign-select" required>
                                                 <option value="">— Select Section —</option>
