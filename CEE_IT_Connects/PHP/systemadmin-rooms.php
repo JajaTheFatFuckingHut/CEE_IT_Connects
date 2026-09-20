@@ -23,11 +23,11 @@ if (!isset($roleMap[$role])) {
 $user_type = $roleMap[$role]['user_type'];
 $table = $roleMap[$role]['table'];
 
-$departmentRoomIds = [
-    'information technology' => 24,
-    'electrical engineering' => 25,
-    'civil engineering' => 26,
-];
+// $departmentRoomIds = [
+//     'information technology' => 24,
+//     'electrical engineering' => 25,
+//     'civil engineering' => 26,
+// ];
 
 if (!isset($_GET['room_id'])) {
     // Get the department
@@ -39,7 +39,13 @@ if (!isset($_GET['room_id'])) {
         die('No department assigned to this account.');
     }
 
-    $roomId = $departmentRoomIds[$user['department']] ?? null;
+    $deptStmt = $pdo->prepare("
+    SELECT id FROM rooms
+    WHERE LOWER(department) = LOWER(?) AND adviser_id IS NULL AND is_archived = FALSE
+    LIMIT 1
+");
+    $deptStmt->execute([$user['department']]);
+    $roomId = $deptStmt->fetchColumn() ?: null;
 
     if (!$roomId) {
         die('No room mapped for department: ' . htmlspecialchars($user['department']));
@@ -313,13 +319,22 @@ if ($chatSection_id && $section === 'chats') {
 }
 
 $myRoomsStmt = $pdo->prepare("
-    SELECT r.id, r.room_name
+    SELECT DISTINCT r.id, r.room_name, r.school_year, r.year_level, r.section
     FROM rooms r
-    JOIN room_members rm ON r.id = rm.room_id
-    WHERE rm.user_id = ? AND rm.user_type = ? AND r.is_archived = FALSE
-    ORDER BY r.room_name
+    LEFT JOIN room_members rm ON r.id = rm.room_id
+    WHERE r.is_archived = FALSE
+      AND (
+            (rm.user_id = :uid AND rm.user_type = :utype)
+         OR (:utype2 = 'adviser' AND r.adviser_id = :uid2)
+      )
+    ORDER BY r.school_year DESC NULLS LAST, r.year_level, r.section, r.room_name
 ");
-$myRoomsStmt->execute([$user_id, $user_type]);
+$myRoomsStmt->execute([
+    ':uid' => $user_id,
+    ':utype' => $user_type,
+    ':utype2' => $user_type,
+    ':uid2' => $user_id,
+]);
 $myRooms = $myRoomsStmt->fetchAll(PDO::FETCH_ASSOC);
 
 // helper — get name for a chat list entry
@@ -1291,426 +1306,6 @@ $page = 'messages';
 
         <?php if ($section === ''): ?>
             <?php include 'chat-room-content.php'; ?>
-
-        <?php elseif ($section === 'status'): ?>
-            <div>
-                <h4 class="fw-bold mb-1">OJT Status</h4>
-                <p class="text-muted mb-3" style="font-size:.85rem;">Monitor student progress on their OJT program</p>
-
-                <!-- Adviser: Set Required Hours -->
-                <div style="display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap;
-            align-items:center; justify-content:space-between;">
-
-                    <div class="search-box">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                        <input type="text" id="searchInput" placeholder="Search student" oninput="filterTable()">
-                    </div>
-
-                    <div style="display:flex; align-items:center; gap:8px; padding:8px 14px;
-                background:#eff6ff; border:1px solid #bfdbfe; border-radius:10px;
-                font-size:13px; color:#1e40af;">
-                        <i class="fa-solid fa-circle-info"></i>
-                        Required OJT hours are set per program by the System Administrator.
-                    </div>
-
-                </div>
-
-
-                <div style="background:white; border:1px solid #ddd; border-radius:8px; overflow:hidden;">
-                    <div class="ojt-table-wrapper">
-                        <table class="ojt-status-table">
-                            <thead style="background:#f8f9fa;">
-                                <tr>
-                                    <th>STUDENT</th>
-                                    <th>COMPANY</th>
-                                    <th>HOURS</th>
-                                    <th>PROGRESS</th>
-                                    <th>ACTIONS</th>
-                                </tr>
-                            </thead>
-                            <tbody id="all-students-tbody">
-                                <?php if (empty($statuses)): ?>
-                                    <tr>
-                                        <td colspan="5" class="text-center text-muted py-4">
-                                            No students in this room yet.
-                                        </td>
-                                    </tr>
-                                <?php else: ?>
-                                    <?php foreach ($statuses as $s):
-                                        // required_hours now comes from the student's matched internship
-                                        $requiredHours = !empty($s['required_hours']) ? (int) $s['required_hours'] : 486;
-                                        $progressWidth = min(round(($s['total_hours'] / $requiredHours) * 100, 2), 100);
-                                        $avatarColors = ['#ff2c8f', '#2c6fff', '#1abc9c', '#9b59b6', '#e67e22'];
-                                        $avatarColor = $avatarColors[crc32($s['full_name']) % count($avatarColors)];
-                                        ?>
-                                        <tr>
-                                            <td>
-                                                <div class="student-cell">
-                                                    <div class="avatar" style="background:<?= $avatarColor ?>;">
-                                                        <strong><?= strtoupper(substr($s['full_name'], 0, 1)) ?></strong>
-                                                    </div>
-                                                    <span><?= htmlspecialchars($s['full_name']) ?></span>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <?php if (empty($s['company'])): ?>
-                                                    <span style="font-size:12px; font-weight:500;">
-                                                        No company
-                                                    </span>
-                                                <?php else: ?>
-                                                    <?= htmlspecialchars($s['company']) ?>
-                                                <?php endif; ?>
-                                            </td>
-                                            <td>
-                                                <strong><?= $s['total_hours'] ?></strong>
-                                                <span style="color:#aaa; font-size:12px;">/ <?= $requiredHours ?> hrs</span>
-                                            </td>
-                                            <td>
-                                                <div style="display:flex; align-items:center; gap:8px;">
-                                                    <div class="progress-bar-bg">
-                                                        <div class="progress-bar-fill" style="width:<?= $progressWidth ?>%"></div>
-                                                    </div>
-                                                    <span><?= $progressWidth ?>%</span>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <?php
-                                                $supEvalStmt = $pdo->prepare("SELECT id FROM ojt_evaluations_supervisor WHERE student_id = ?");
-                                                $supEvalStmt->execute([$s['id']]);
-                                                $hasSupEval = (bool) $supEvalStmt->fetchColumn();
-                                                ?>
-                                                <?php if ($hasSupEval): ?>
-                                                    <a href="ojt-evaluation-download.php?student_id=<?= $s['id'] ?>" target="_blank"
-                                                        style="display:inline-flex; align-items:center; gap:5px; padding:5px 10px;
-                              background: #ffe5d9; color: #ff6b2c; border-radius:6px; font-size:11px;
-                              font-weight:600; border:1px solid #ff6b2c; text-decoration:none; white-space:nowrap;">
-                                                        <i class="fa fa-file-pdf"></i> Supervisor Eval
-                                                    </a>
-                                                <?php else: ?>
-                                                    <span style="display:inline-flex; align-items:center; gap:5px; padding:5px 10px;
-                                 background: #f3f4f6; color: #9ca3af; border-radius:6px; font-size:11px;
-                                 font-weight:600; white-space:nowrap; border:1px solid #e5e7eb;">
-                                                        <i class="fa fa-file-pdf"></i> Supervisor Eval
-                                                    </span>
-                                                <?php endif; ?>
-                                            </td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                <?php endif; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-        <?php elseif ($section === 'remarks'): ?>
-            <div>
-                <h4 class="fw-bold mb-1">Requirements & Remarks</h4>
-                <p class="text-muted mb-3" style="font-size:.85rem;">Track student requirement submissions.</p>
-                <!-- your existing remarks/requirements content here -->
-            </div>
-
-        <?php elseif ($section === 'ojt_applications'): ?>
-
-            <?php
-            $stepLabels = [
-                'hte_form' => 'HTE Form',
-                'addendum' => 'Addendum',
-                'reco_letter' => 'Reco Letter',
-                'waiver' => 'Waiver',
-                'medical_cert' => 'Medical Cert',
-                'internship_plan' => 'Internship Plan',
-                'vicinity_map' => 'Vicinity Map',
-                'oath' => 'Oath',
-                'ojt_started' => 'OJT Started',
-            ];
-            ?>
-            <div>
-                <h4 class="fw-bold mb-1">Requirements</h4>
-                <p class="text-muted mb-3">Track students' pre-deployment requirements submission progress.</p>
-
-                <div style="display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap; align-items:center;">
-                    <div style="position:relative; flex:1; min-width:200px;">
-                        <i class="fa fa-search"
-                            style="position:absolute; left:10px; top:50%; transform:translateY(-50%); color:#aaa; font-size:13px;"></i>
-                        <input type="text" id="search-input" placeholder="Search by name, student no., or company..."
-                            oninput="filterApps()" style="width:100%; padding:8px 12px 8px 32px; border:1.5px solid #e5e7eb; border-radius:8px;
-                font-size:13px; font-family:inherit; outline:none; transition:border-color .2s;"
-                            onfocus="this.style.borderColor='#f97316'" onblur="this.style.borderColor='#e5e7eb'">
-                    </div>
-                    <select id="progress-filter" onchange="filterApps()" style="padding:8px 12px; border:1.5px solid #e5e7eb; border-radius:8px; font-size:13px;
-            font-family:inherit; outline:none; background:white; cursor:pointer; transition:border-color .2s;"
-                        onfocus="this.style.borderColor='#f97316'" onblur="this.style.borderColor='#e5e7eb'">
-                        <option value="all">All Progress</option>
-                        <option value="0">Not Started (0%)</option>
-                        <option value="1">In Progress (1-49%)</option>
-                        <option value="50">Halfway (50-74%)</option>
-                        <option value="75">Almost Done (75-99%)</option>
-                        <option value="100">Complete (100%)</option>
-                    </select>
-                </div>
-
-                <?php if (empty($ojtApplications)): ?>
-                    <div class="text-center text-muted py-5">
-                        <i class="fa fa-inbox fa-2x mb-2 d-block"></i>
-                        No OJT applications yet.
-                    </div>
-                <?php else: ?>
-
-                    <!-- Application Cards -->
-                    <div style="display:flex; flex-direction:column; gap:12px;" id="apps-list">
-                        <?php foreach ($ojtApplications as $app):
-                            $avatarColors = ['#ff2c8f', '#2c6fff', '#1abc9c', '#9b59b6', '#e67e22'];
-                            $avatarColor = $avatarColors[crc32($app['full_name']) % count($avatarColors)];
-                            $checklist = json_decode($app['checklist'] ?? '{}', true) ?: [];
-                            $doneCount = count(array_filter($checklist, fn($v) => !empty($v['done'])));
-                            $totalCount = count($stepLabels);
-                            $progressPct = $totalCount > 0 ? round(($doneCount / $totalCount) * 100) : 0;
-                            ?>
-                            <div class="app-card" data-name="<?= strtolower(htmlspecialchars($app['full_name'])) ?>"
-                                data-student="<?= strtolower(htmlspecialchars($app['student_no'])) ?>"
-                                data-company="<?= strtolower(htmlspecialchars($app['company_name'] ?? '')) ?>"
-                                data-progress="<?= $progressPct ?>" style="background:white; border:1px solid #eee; border-radius:12px; padding:18px 20px;
-                            box-shadow:0 1px 4px rgba(0,0,0,0.04); transition:box-shadow .2s;">
-
-                                <!-- Top row: avatar + student info + company + date + status badge -->
-                                <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
-
-                                    <!-- Avatar + Name -->
-                                    <div style="display:flex; align-items:center; gap:10px; flex:1; min-width:200px;">
-                                        <div style="width:42px;height:42px;border-radius:50%;background:<?= $avatarColor ?>;
-                        color:white;display:flex;align-items:center;justify-content:center;
-                        font-weight:700;font-size:16px;flex-shrink:0;">
-                                            <?= strtoupper(substr($app['full_name'], 0, 1)) ?>
-                                        </div>
-                                        <div>
-                                            <div style="font-weight:600;font-size:14px;display:flex;align-items:center;gap:8px;">
-                                                <?= htmlspecialchars($app['full_name']) ?>
-                                                <span
-                                                    style=" background: <?= $progressPct === 100 ? '#d1fae5' : ($progressPct >= 50 ? '#dbeafe' : '#fef3c7') ?>;
-                                                color: <?= $progressPct === 100 ? '#065f46' : ($progressPct >= 50 ? '#1e40af' : '#92400e') ?>;
-                                                border: 1px solid <?= $progressPct === 100 ? '#6ee7b7' : ($progressPct >= 50 ? '#93c5fd' : '#fde68a') ?>;
-                                                font-size:11px; font-weight:600; padding:2px 8px;border-radius:99px; white-space:nowrap;">
-                                                    <?= $progressPct ?>%
-                                                </span>
-                                            </div>
-                                            <div style="font-size:12px;color:#888;">
-                                                <?= htmlspecialchars($app['student_no']) ?> &middot;
-                                                <?= htmlspecialchars($app['program']) ?>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Company -->
-                                    <div style="flex:1; min-width:150px;">
-                                        <div style="font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:.5px;">Company
-                                        </div>
-                                        <div style="font-size:13px;font-weight:500;">
-                                            <?= htmlspecialchars($app['company_name'] ?? '—') ?>
-                                        </div>
-                                        <?php if (!empty($app['location'])): ?>
-                                            <div style="font-size:11px;color:#888;">
-                                                <i class="fa fa-location-dot me-1"></i>
-                                                <?= htmlspecialchars($app['location']) ?>
-                                            </div>
-                                        <?php endif; ?>
-                                    </div>
-
-                                    <!-- Submitted date -->
-                                    <div style="min-width:100px;">
-                                        <div style="font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:.5px;">
-                                            Last Submitted</div>
-                                        <div style="font-size:13px;">
-                                            <?= date('M d, Y', strtotime($app['submitted_at'])) ?>
-                                        </div>
-                                    </div>
-
-                                    <!-- Status badge -->
-                                </div>
-
-                                <!-- Checklist Pills -->
-                                <div class="checklist-grid">
-                                    <?php foreach ($stepLabels as $key => $label):
-                                        $entry = $checklist[$key] ?? null;
-                                        $done = !empty($entry['done']);
-                                        $file_path = $entry['file_path'] ?? null;
-                                        ?>
-
-                                        <?php if ($done && $file_path): ?>
-                                            <!-- Clickable — downloads the uploaded proof -->
-                                            <a href="<?= htmlspecialchars($file_path) ?>" target="_blank" download
-                                                title="Download proof for <?= htmlspecialchars($label) ?>" class="checklist-pill done"
-                                                style="text-decoration:none; cursor:pointer; display:inline-flex; align-items:center; gap:4px;">
-                                                <i class="fa fa-circle-check" style="font-size:10px;"></i>
-                                                <?= $label ?>
-                                                <i class="fa fa-download" style="font-size:9px; opacity:.7; margin-left:2px;"></i>
-                                            </a>
-
-                                        <?php elseif ($done): ?>
-                                            <!-- Done but no file (legacy rows before upload was required) -->
-                                            <span class="checklist-pill done" title="Marked done — no file attached"
-                                                style="display:inline-flex; align-items:center; gap:4px;">
-                                                <i class="fa fa-circle-check" style="font-size:10px;"></i>
-                                                <?= $label ?>
-                                            </span>
-
-                                        <?php else: ?>
-                                            <!-- Not done -->
-                                            <span class="checklist-pill pending" style="display:inline-flex; align-items:center; gap:4px;">
-                                                <i class="fa fa-circle" style="font-size:10px;"></i>
-                                                <?= $label ?>
-                                            </span>
-
-                                        <?php endif; ?>
-
-                                    <?php endforeach; ?>
-                                </div>
-
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
-
-                <?php endif; ?>
-            </div>
-
-            <!-- start of weekly reports logic -->
-            <!-- SUBMITTED REPORTS LIST -->
-            <!-- <h6 class="fw-bold mb-2" style="font-size:14px;">Your Submitted Reports</h6>
-            <div class="card  shadow-sm rounded-3" style="overflow:hidden; border:1px solid #e5e7eb;">
-                <table class="w-100" style="font-size:13px; border-collapse:collapse;">
-                    <thead style="background:#f8f9fa;">
-                        <tr>
-                            <th class="p-3 text-start">Week</th>
-                            <th class="p-3 text-start">Submitted</th>
-                            <th class="p-3 text-start">File</th>
-                            <th class="p-3 text-start">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php
-                        $reportsStmt = $pdo->prepare("
-                        SELECT id, week_number, wr_filepath, created_at
-                        FROM weekly_reports
-                        WHERE student_id = ?
-                        ORDER BY week_number DESC
-                    ");
-                        $reportsStmt->execute([$student_id]);
-                        $reports = $reportsStmt->fetchAll(PDO::FETCH_ASSOC);
-                        ?>
-                        <?php if (empty($reports)): ?>
-                            <tr>
-                                <td colspan="4" class="text-center text-muted p-4">No reports submitted yet.</td>
-                            </tr>
-                        <?php else: ?>
-                            <?php foreach ($reports as $r): ?>
-                                <tr style="border-top:1px solid #f0f0f0;">
-                                    <td class="p-3">Week <?= (int) $r['week_number'] ?></td>
-                                    <td class="p-3"><?= date('M d, Y', strtotime($r['created_at'])) ?></td>
-                                    <td class="p-3">
-                                        <i class="fa-solid fa-file-lines me-1" style="color:#888;"></i>
-                                        <?= htmlspecialchars(basename($r['wr_filepath'])) ?>
-                                    </td>
-                                    <td class="p-3">
-                                        <a href="<?= htmlspecialchars($r['wr_filepath']) ?>" target="_blank" class="btn btn-sm"
-                                            style="background:#eef2ff;color:#272f54;border-radius:6px;">
-                                            <i class="fa-solid fa-eye me-1"></i> Preview
-                                        </a>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
-            </div> -->
-        <?php elseif ($section === 'weekly_reports'): ?>
-            <div>
-                <h4 class="fw-bold mb-1">Weekly Progress Reports</h4>
-                <p class="text-muted mb-3" style="font-size:.85rem;">
-                    View weekly reports submitted by students in this room.
-                </p>
-                <?php
-                $reportsStmt = $pdo->prepare("
-                    SELECT wr.id, wr.week_number, wr.wr_filepath, wr.created_at,
-                        s.full_name AS student_name, rm.*
-                    FROM weekly_reports wr
-                    JOIN students s ON wr.student_id = s.id
-                    JOIN room_members rm ON rm.user_id = s.id AND rm.user_type = 'student'
-                    JOIN rooms r ON r.id = rm.room_id
-                    WHERE r.adviser_id = ?
-                    AND r.is_archived = FALSE
-                    ORDER BY wr.week_number DESC
-        ");
-                $reportsStmt->execute([$adviser_id]);
-                $reports = $reportsStmt->fetchAll(PDO::FETCH_ASSOC);
-                ?>
-                <div
-                    style="display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap; align-items:center; justify-content:space-between;">
-                    <div class="search-box">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                        <input type="text" id="reportsSearchInput" placeholder="Search student"
-                            oninput="filterReportsTable()">
-                    </div>
-
-
-                </div>
-
-                <div class="ojt-table-wrapper">
-                    <table class="ojt-status-table">
-                        <thead style="background:#f8f9fa;">
-                            <tr>
-                                <th>Student</th>
-                                <th>Week #</th>
-                                <th>Submitted</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="reports-tbody">
-                            <?php if (empty($reports)): ?>
-                                <tr>
-                                    <td colspan="5" class="text-center text-muted py-4">
-                                        No weekly reports submitted yet.
-                                    </td>
-                                </tr>
-                            <?php else: ?>
-                                <?php foreach ($reports as $r):
-                                    $avatarColors = ['#ff2c8f', '#2c6fff', '#1abc9c', '#9b59b6', '#e67e22'];
-                                    $avatarColor = $avatarColors[crc32($r['student_name']) % count($avatarColors)];
-                                    ?>
-                                    <tr>
-                                        <td>
-                                            <div class="student-cell">
-                                                <div class="avatar" style="background:<?= $avatarColor ?>;">
-                                                    <strong><?= strtoupper(substr($r['student_name'], 0, 1)) ?></strong>
-                                                </div>
-                                                <span><?= htmlspecialchars($r['student_name']) ?></span>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <p>Week
-                                                <?= $r['week_number'] ?>
-                                            </p>
-                                        </td>
-                                        <td><?= date('M d, Y', strtotime($r['created_at'])) ?></td>
-                                        <td>
-                                            <a href="<?= htmlspecialchars($r['wr_filepath']) ?>" target="_blank" class="btn btn-sm"
-                                                style="display:inline-flex; align-items:center; gap:5px; padding:5px 10px;
-                                                    background:#dbeafe; color:#1e40af; border-radius:6px; font-size:11px;
-                                                    font-weight:600; border:1px solid #93c5fd; text-decoration:none; white-space:nowrap;">
-                                                <i class="fa fa-eye"></i> View
-                                            </a>
-                                        </td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            <?php endif; ?>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-
-        <?php elseif ($section === 'remarks'): ?>
-
-            <!-- end of weekly reports logic -->
 
         <?php elseif ($section === 'chats'): ?>
             <?php

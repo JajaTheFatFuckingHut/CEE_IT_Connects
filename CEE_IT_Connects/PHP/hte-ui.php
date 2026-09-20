@@ -31,11 +31,11 @@ if (!isset($roleMap[$role])) {
 $user_type = $roleMap[$role]['user_type'];
 $table = $roleMap[$role]['table'];
 
-$departmentRoomIds = [
-    'information technology' => 24,
-    'electrical engineering' => 25,
-    'civil engineering' => 26,
-];
+// $departmentRoomIds = [
+//     'information technology' => 24,
+//     'electrical engineering' => 25,
+//     'civil engineering' => 26,
+// ];
 
 // added para sa sidebar thingy sa baba
 $userInfoStmt = $pdo->prepare("SELECT full_name FROM {$table} WHERE id = ?");
