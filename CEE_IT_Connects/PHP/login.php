@@ -16,12 +16,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if (!$user) {
-            echo "<script>alert('Student not found!'); window.history.back();</script>";
-            exit;
-        }
-        if ($user['is_archived'] = TRUE) {
+        if (!$user && $user['is_archived'] = TRUE) {
+
             echo "<script>alert('Account has been deleted! Please contact you supervisor.'); window.history.back();</script>";
+            exit;
+        } elseif (!$user) {
+            echo "<script>alert('Student not found!'); window.history.back();</script>";
             exit;
         }
         if ($user && password_verify($password, $user['password_hash'])) {
