@@ -835,6 +835,7 @@ foreach ($internships as $loc) {
 
         .main {
             display: flex;
+            justify-content: center;
             width: 100%;
         }
     </style>
@@ -1479,6 +1480,7 @@ foreach ($internships as $loc) {
             ).addTo(map);
 
             addInternshipMarkers();
+            setTimeout(() => map.invalidateSize(), 200);
         }
         window.addEventListener('load', initMap);
     </script>
