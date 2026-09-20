@@ -117,10 +117,9 @@ $now = new DateTime();
 
         .phone-dropdown {
             display: none;
-            position: absolute;
-            left: 0;
-            bottom: calc(100% + 8px);
-            z-index: 9999;
+            position: fixed;
+            /* positioned by JS, relative to the viewport */
+            z-index: 10000;
             min-width: 140px;
             background: #fff;
             border-radius: 12px;
@@ -144,7 +143,6 @@ $now = new DateTime();
             background: #f2f2f2;
         }
 
-        /* dims/blurs everything behind the popup while it's open */
         .phone-backdrop {
             display: none;
             position: fixed;
@@ -152,7 +150,11 @@ $now = new DateTime();
             background: rgba(0, 0, 0, 0.25);
             backdrop-filter: blur(3px);
             -webkit-backdrop-filter: blur(3px);
-            z-index: 15;
+            z-index: 9999;
+        }
+
+        .phone-backdrop.show {
+            display: block;
         }
 
         .phone-backdrop.show {
@@ -267,12 +269,9 @@ $now = new DateTime();
                             </p>
                             <p><?= htmlspecialchars($loc['address'] ?? $loc['location']) ?></p>
                             <div class="icons">
-                                <!-- toggleNumbers now passes numbers as argument (from first code) -->
                                 <span class="phone-wrap">
-                                    <i class="fas fa-phone"
-                                        onclick="toggleNumbers(this, '<?= htmlspecialchars($loc['phone_numbers'], ENT_QUOTES) ?>')">
-                                    </i>
-                                    <div class="phone-dropdown"></div>
+                                    <div id="phoneBackdrop" class="phone-backdrop"></div>
+                                    <div id="phoneDropdown" class="phone-dropdown"></div>
                                 </span>
                                 <i class="fas fa-location-arrow"
                                     onclick="getDirections(<?= $loc['latitude'] ?>, <?= $loc['longtitude'] ?>)">
@@ -593,40 +592,57 @@ $now = new DateTime();
             });
         }
 
-        function toggleNumbers(iconEl, numbersStr) {
-            const listing = iconEl.closest('.listing');
-            const dropdown = listing.querySelector('.phone-dropdown');
+        const phoneDropdown = document.getElementById('phoneDropdown');
+        const phoneBackdrop = document.getElementById('phoneBackdrop');
+        let phoneAnchor = null;
 
-            document.querySelectorAll('.phone-dropdown.show').forEach(d => {
-                if (d !== dropdown) d.classList.remove('show');
-            });
+        function closePhoneDropdown() {
+            phoneDropdown.classList.remove('show');
+            phoneBackdrop.classList.remove('show');
+            phoneAnchor = null;
+        }
 
-            // toggle this one
-            const isOpen = dropdown.classList.contains('show');
-            dropdown.classList.toggle('show', !isOpen);
-
-            if (!isOpen) {
-                const numbers = numbersStr.split(/[,;/]/).map(n => n.trim()).filter(Boolean);
-                dropdown.innerHTML = numbers
-                    .map(num => `<a href="tel:${num}">${num}</a>`)
-                    .join('');
-            }
-
+        function toggleNumbers(event, iconEl, numbersStr) {
             event.stopPropagation();
-        }
 
-        document.addEventListener('click', function (e) {
-            if (!e.target.closest('.phone-dropdown') && !e.target.classList.contains('fa-phone')) {
-                document.querySelectorAll('.phone-dropdown.show').forEach(d => d.classList.remove('show'));
+            // clicking the same icon again closes it
+            if (phoneAnchor === iconEl) {
+                closePhoneDropdown();
+                return;
             }
-        });
 
-        function closeDropdown() {
-            document.querySelectorAll('.phone-dropdown').forEach(dropdown => {
-                dropdown.style.display = 'none';
-                dropdown.innerHTML = '';
-            });
+            const numbers = numbersStr
+                .split(/\s*[,;]\s*|\s+\/\s+/)
+                .map(n => n.trim())
+                .filter(Boolean);
+
+            phoneDropdown.replaceChildren(...numbers.map(num => {
+                const a = document.createElement('a');
+                a.href = 'tel:' + num.replace(/[^\d+]/g, '');
+                a.textContent = num;
+                return a;
+            }));
+
+            // show first so it can be measured, then position
+            phoneDropdown.classList.add('show');
+            phoneBackdrop.classList.add('show');
+            phoneAnchor = iconEl;
+
+            const r = iconEl.getBoundingClientRect();
+            const d = phoneDropdown.getBoundingClientRect();
+
+            let top = r.top - d.height - 8;                 // prefer above the icon
+            if (top < 8) top = r.bottom + 8;                // flip below if no room
+            const left = Math.max(8, Math.min(r.left, window.innerWidth - d.width - 8));
+
+            phoneDropdown.style.top = top + 'px';
+            phoneDropdown.style.left = left + 'px';
         }
+
+        // close on outside click, scroll (including the panel's), or resize
+        document.addEventListener('click', closePhoneDropdown);
+        window.addEventListener('scroll', closePhoneDropdown, true);
+        window.addEventListener('resize', closePhoneDropdown);
 
         function copyNumber(number) {
             navigator.clipboard.writeText(number);
