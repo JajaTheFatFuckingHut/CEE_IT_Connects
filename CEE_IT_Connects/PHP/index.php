@@ -122,7 +122,7 @@ $now = new DateTime();
 
         .phone-dropdown {
             display: none;
-            position: static;
+            position: absolute;
             margin-top: 8px;
             width: max-content;
             max-width: 100%;
@@ -611,12 +611,34 @@ $now = new DateTime();
             phoneAnchor = null;
         }
 
+        function copyText(text) {
+            // modern way (needs https or localhost)
+            if (navigator.clipboard && window.isSecureContext) {
+                return navigator.clipboard.writeText(text);
+            }
+            // fallback for plain http
+            return new Promise((resolve, reject) => {
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                ta.style.position = 'fixed';
+                ta.style.opacity = '0';
+                document.body.appendChild(ta);
+                ta.select();
+                try {
+                    document.execCommand('copy') ? resolve() : reject();
+                } catch (e) {
+                    reject(e);
+                } finally {
+                    ta.remove();
+                }
+            });
+        }
+
         function toggleNumbers(event, iconEl, numbersStr) {
             event.stopPropagation();
 
             const dropdown = iconEl.closest('.listing').querySelector('.phone-dropdown');
 
-            // close any other open dropdowns
             document.querySelectorAll('.phone-dropdown.show').forEach(d => {
                 if (d !== dropdown) d.classList.remove('show');
             });
@@ -631,8 +653,26 @@ $now = new DateTime();
 
             dropdown.replaceChildren(...numbers.map(num => {
                 const a = document.createElement('a');
-                a.href = 'tel:' + num.replace(/[^\d+]/g, '');
+                a.href = '#';
                 a.textContent = num;
+                a.title = 'Click to copy';
+
+                a.addEventListener('click', e => {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    copyText(num).then(() => {
+                        a.textContent = 'Copied!';
+                    }).catch(() => {
+                        a.textContent = 'Copy failed';
+                    }).finally(() => {
+                        setTimeout(() => {
+                            a.textContent = num;
+                            dropdown.classList.remove('show');
+                        }, 800);
+                    });
+                });
+
                 return a;
             }));
         }
