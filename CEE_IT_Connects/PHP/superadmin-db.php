@@ -216,18 +216,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $assignedSections[$r['adviser_id']][] = ucwords($r['program']) . ' ' . $r['year_level'] . '-' . $r['section'];
         $takenKeys[] = "{$r['program']}|{$r['year_level']}|{$r['section']}";
     }
-
-    // sections that no adviser has yet
-    $allSections = $pdo->query("
-    SELECT DISTINCT LOWER(program) AS program, year_level, section
-    FROM students
-    WHERE program IS NOT NULL AND year_level IS NOT NULL AND section IS NOT NULL
-    ORDER BY program, year_level, section
-")->fetchAll(PDO::FETCH_ASSOC);
-
-    $openSections = array_values(array_filter($allSections, function ($s) use ($takenKeys) {
-        return !in_array("{$s['program']}|{$s['year_level']}|{$s['section']}", $takenKeys, true);
-    }));
     //admin 
     if (isset($_POST['create-admin'])) {
 
