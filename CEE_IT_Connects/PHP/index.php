@@ -115,8 +115,14 @@ $now = new DateTime();
             display: inline-block;
         }
 
+        .icons-wrap {
+            display: block;
+            width: 100%;
+        }
+
         .phone-dropdown {
             display: none;
+            position: static;
             margin-top: 8px;
             width: max-content;
             max-width: 100%;
@@ -268,15 +274,17 @@ $now = new DateTime();
                                 <?= htmlspecialchars($loc['location']) ?>
                             </p>
                             <p><?= htmlspecialchars($loc['address'] ?? $loc['location']) ?></p>
-                            <div class="icons">
-                                <i class="fas fa-phone"
-                                    onclick="toggleNumbers(event, this, '<?= htmlspecialchars($loc['phone_numbers'], ENT_QUOTES) ?>')">
-                                </i>
-                                <i class="fas fa-location-arrow"
-                                    onclick="getDirections(<?= $loc['latitude'] ?>, <?= $loc['longtitude'] ?>)">
-                                </i>
+                            <div class="icons-wrap">
+                                <div class="icons">
+                                    <i class="fas fa-phone"
+                                        onclick="toggleNumbers(event, this, '<?= htmlspecialchars($loc['phone_numbers'], ENT_QUOTES) ?>')">
+                                    </i>
+                                    <i class="fas fa-location-arrow"
+                                        onclick="getDirections(<?= $loc['latitude'] ?>, <?= $loc['longtitude'] ?>)">
+                                    </i>
+                                </div>
+                                <div class="phone-dropdown"></div>
                             </div>
-                            <div class="phone-dropdown"></div>
 
                         </div>
                     <?php endforeach; ?>
