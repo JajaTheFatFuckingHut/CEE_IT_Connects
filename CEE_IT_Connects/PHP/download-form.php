@@ -104,7 +104,7 @@ function getProgramCode(string $program): string
 $department = getDepartment($studentProg);
 $programCode = getProgramCode($studentProg);
 
-$plv_lat = 14.7011;
+$plv_lat = 14.698835;
 $plv_lng = 120.9830;
 
 $hte_lat = $internship['latitude'] ?? null;
