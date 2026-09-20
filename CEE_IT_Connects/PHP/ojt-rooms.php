@@ -2101,7 +2101,7 @@ $page = 'messages';
                 <?php
                 $reportsStmt = $pdo->prepare("
                     SELECT wr.id, wr.student_id, wr.week_number, wr.wr_filepath, wr.created_at,
-                        s.full_name AS student_name
+                    s.full_name AS student_name
                     FROM weekly_reports wr
                     JOIN students s ON s.id = wr.student_id
                     WHERE EXISTS (
@@ -2117,12 +2117,15 @@ $page = 'messages';
 
                 // one entry per student, holding all of their reports
                 $byStudent = [];
+                $byStudent = [];
                 foreach ($reportsStmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
                     $sid = (int) $r['student_id'];
                     $byStudent[$sid]['name'] = $r['student_name'];
+
                     $byStudent[$sid]['reports'][] = [
                         'week' => (int) $r['week_number'],
                         'file' => $r['wr_filepath'],
+                        'mime' => $r['file_mime'] ?? '',
                         'date' => date('M d, Y', strtotime($r['created_at'])),
                     ];
                 }
@@ -2194,16 +2197,43 @@ $page = 'messages';
                         </tbody>
                     </table>
                 </div>
-                <div id="reportsModal" onclick="if(event.target===this) closeReports()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:2000;
-                                align-items:center; justify-content:center; padding:16px;">
-                    <div style="background:#fff; border-radius:14px; width:100%; max-width:520px; max-height:80vh;
-                                        overflow:auto; padding:20px;">
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <div id="reportsModal" onclick="if(event.target===this) closeReports()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:2000;
+           align-items:center; justify-content:center; padding:16px;">
+                    <div style="background:#fff; border-radius:14px; width:100%; max-width:1000px; height:85vh;
+                display:flex; flex-direction:column; overflow:hidden;">
+
+                        <div style="display:flex; justify-content:space-between; align-items:center;
+                    padding:14px 18px; border-bottom:1px solid #e5e7eb;">
                             <h5 id="reportsModalTitle" style="margin:0; color:#272f54;"></h5>
                             <button type="button" onclick="closeReports()"
-                                style="border:none; background:none; font-size:22px; cursor:pointer;">&times;</button>
+                                style="border:none; background:none; font-size:24px; cursor:pointer;">&times;</button>
                         </div>
-                        <div id="reportsModalBody"></div>
+
+                        <div style="display:flex; flex:1; min-height:0; flex-wrap:wrap;">
+                            <!-- week list -->
+                            <div id="reportsList" style="width:230px; max-width:100%; overflow:auto; padding:12px;
+                                         border-right:1px solid #e5e7eb; background:#f8f9fa;"></div>
+
+                            <!-- preview -->
+                            <div style="flex:1; min-width:280px; display:flex; flex-direction:column;">
+                                <div style="display:flex; justify-content:space-between; align-items:center;
+                            padding:8px 14px; border-bottom:1px solid #e5e7eb; gap:8px;">
+                                    <strong id="reportsCurrent" style="font-size:14px;"></strong>
+                                    <span>
+                                        <a id="reportsOpen" href="#" target="_blank" rel="noopener"
+                                            class="btn btn-sm btn-outline-primary"><i
+                                                class="fa fa-up-right-from-square"></i> Open</a>
+                                        <a id="reportsDl" href="#" class="btn btn-sm btn-outline-secondary">
+                                            <i class="fa fa-download"></i> Download</a>
+                                    </span>
+                                </div>
+                                <iframe id="reportsFrame" style="flex:1; border:0; width:100%;"></iframe>
+                                <div id="reportsNoPreview" style="display:none; flex:1; align-items:center;
+                     justify-content:center; text-align:center; color:#6b7280; padding:20px;">
+                                    This file type can't be previewed in the browser.<br>Use Download to open it.
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -2695,6 +2725,7 @@ $page = 'messages';
         }
 
         const studentReports = <?= json_encode($byStudent, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
+        let currentReports = [];
 
         function escH(s) {
             const d = document.createElement('div');
@@ -2706,30 +2737,55 @@ $page = 'messages';
             const st = studentReports[sid];
             if (!st) return;
 
+            currentReports = st.reports;
             document.getElementById('reportsModalTitle').textContent = st.name + ' — Weekly Reports';
 
-            document.getElementById('reportsModalBody').innerHTML = st.reports.map(r => `
-        <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;
-                    padding:10px 12px; border:1px solid #e5e7eb; border-radius:10px; margin-bottom:8px;">
-            <div>
-                <strong>Week ${r.week}</strong><br>
-                <small class="text-muted">Submitted ${escH(r.date)}</small>
-            </div>
-            <div style="display:flex; gap:6px;">
-                <a href="${escH(r.file)}" target="_blank" rel="noopener" class="btn btn-sm btn-outline-primary">
-                    <i class="fa fa-eye"></i> View
-                </a>
-                <a href="${escH(r.file)}" download class="btn btn-sm btn-outline-secondary">
-                    <i class="fa fa-download"></i>
-                </a>
-            </div>
-        </div>`).join('');
+            document.getElementById('reportsList').innerHTML = currentReports.map((r, i) => `
+        <button type="button" data-i="${i}" onclick="selectReport(${i})"
+            style="display:block; width:100%; text-align:left; padding:10px 12px; margin-bottom:6px;
+                   border:1px solid #e5e7eb; border-radius:10px; background:#fff; cursor:pointer;">
+            <strong>Week ${r.week}</strong><br>
+            <small style="color:#6b7280;">${escH(r.date)}</small>
+        </button>`).join('');
 
             document.getElementById('reportsModal').style.display = 'flex';
+            selectReport(currentReports.length - 1);   // open the latest week first
+        }
+
+        function selectReport(i) {
+            const r = currentReports[i];
+            if (!r) return;
+
+            document.querySelectorAll('#reportsList button').forEach(b => {
+                const on = Number(b.dataset.i) === i;
+                b.style.background = on ? '#dbeafe' : '#fff';
+                b.style.borderColor = on ? '#93c5fd' : '#e5e7eb';
+            });
+
+            const isDb = r.file.includes('view-report.php');
+            const dl = isDb ? r.file + '&download=1' : r.file;
+            const previewable = r.mime ? r.mime === 'application/pdf' : /\.pdf($|\?)/i.test(r.file) || isDb;
+
+            document.getElementById('reportsCurrent').textContent = 'Week ' + r.week;
+            document.getElementById('reportsOpen').href = r.file;
+            document.getElementById('reportsDl').href = dl;
+
+            const frame = document.getElementById('reportsFrame');
+            const none = document.getElementById('reportsNoPreview');
+            if (previewable) {
+                frame.style.display = 'block';
+                none.style.display = 'none';
+                frame.src = r.file;
+            } else {
+                frame.style.display = 'none';
+                frame.src = 'about:blank';
+                none.style.display = 'flex';
+            }
         }
 
         function closeReports() {
             document.getElementById('reportsModal').style.display = 'none';
+            document.getElementById('reportsFrame').src = 'about:blank';
         }
     </script>
 </body>
