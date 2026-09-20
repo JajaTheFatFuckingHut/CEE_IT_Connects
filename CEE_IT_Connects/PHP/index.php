@@ -110,37 +110,38 @@ $now = new DateTime();
             height: 542px;
         }
 
+        .phone-wrap {
+            position: relative;
+            display: inline-block;
+        }
+
         .phone-dropdown {
             display: none;
             position: absolute;
-            /* top: 100%;    */
-            right: 10px;
-            background: white;
-            margin-top: 6px;
-            border-radius: 10px;
-            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
-            padding: 10px 14px;
-            z-index: 20;
-            width: max-content;
+            left: 0;
+            bottom: calc(100% + 8px);
+            z-index: 100;
+            min-width: 140px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+            padding: 4px 0;
         }
 
         .phone-dropdown.show {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
+            display: block;
         }
 
         .phone-dropdown a {
-            font-size: 13px;
-            color: #272f54;
+            display: block;
+            padding: 8px 14px;
+            white-space: nowrap;
             text-decoration: none;
-            padding: 4px 6px;
-            border-radius: 6px;
-            transition: background 0.15s ease;
+            color: #222;
         }
 
         .phone-dropdown a:hover {
-            background: #f1f5f9;
+            background: #f2f2f2;
         }
 
         /* dims/blurs everything behind the popup while it's open */
@@ -267,14 +268,17 @@ $now = new DateTime();
                             <p><?= htmlspecialchars($loc['address'] ?? $loc['location']) ?></p>
                             <div class="icons">
                                 <!-- toggleNumbers now passes numbers as argument (from first code) -->
-                                <i class="fas fa-phone"
-                                    onclick="toggleNumbers(this, '<?= htmlspecialchars($loc['phone_numbers'], ENT_QUOTES) ?>')">
-                                </i>
+                                <span class="phone-wrap">
+                                    <i class="fas fa-phone"
+                                        onclick="toggleNumbers(this, '<?= htmlspecialchars($loc['phone_numbers'], ENT_QUOTES) ?>')">
+                                    </i>
+                                    <div class="phone-dropdown"></div>
+                                </span>
                                 <i class="fas fa-location-arrow"
                                     onclick="getDirections(<?= $loc['latitude'] ?>, <?= $loc['longtitude'] ?>)">
                                 </i>
                             </div>
-                            <div class="phone-dropdown"></div>
+
                         </div>
                     <?php endforeach; ?>
 
