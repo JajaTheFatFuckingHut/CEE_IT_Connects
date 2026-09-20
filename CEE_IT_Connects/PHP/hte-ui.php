@@ -22,6 +22,7 @@ $roleMap = [
     'internship_adviser' => ['user_type' => 'adviser', 'table' => 'advisers'],
     'superadmin' => ['user_type' => 'admin', 'table' => 'admins'],
 ];
+$user_id = $adviser_id;
 
 if (!isset($roleMap[$role])) {
     die('Unauthorized: no room mapping for role "' . htmlspecialchars((string) $role) . '"');
@@ -58,7 +59,13 @@ if (!isset($_GET['room_id'])) {
         die('No department assigned to this account.');
     }
 
-    $roomId = $departmentRoomIds[$user['department']] ?? null;
+    $deptStmt = $pdo->prepare("
+    SELECT id FROM rooms
+    WHERE LOWER(department) = LOWER(?) AND adviser_id IS NULL AND is_archived = FALSE
+    LIMIT 1
+");
+    $deptStmt->execute([$user['department']]);
+    $roomId = $deptStmt->fetchColumn() ?: null;
 
     if (!$roomId) {
         die('No room mapped for department: ' . htmlspecialchars($user['department']));
@@ -77,7 +84,6 @@ if (!isset($_GET['room_id'])) {
         die('Room not found or archived for department: ' . htmlspecialchars($user['department']));
     }
 
-    // Ensure membership
     $checkStmt = $pdo->prepare("
         SELECT 1 FROM room_members
         WHERE room_id = ? AND user_id = ? AND user_type = ?
@@ -92,9 +98,28 @@ if (!isset($_GET['room_id'])) {
         $joinStmt->execute([$room['id'], $user_id, $user_type]);
     }
 
-    header("Location: hte-ui.php?room_id=" . $room['id']);
+    header("Location: ojt-rooms.php?room_id=" . $room['id']);
     exit;
 }
+
+$myRoomsStmt = $pdo->prepare("
+    SELECT DISTINCT r.id, r.room_name, r.school_year, r.year_level, r.section
+    FROM rooms r
+    LEFT JOIN room_members rm ON r.id = rm.room_id
+    WHERE r.is_archived = FALSE
+      AND (
+            (rm.user_id = :uid AND rm.user_type = :utype)
+         OR (:utype2 = 'adviser' AND r.adviser_id = :uid2)
+      )
+    ORDER BY r.school_year DESC NULLS LAST, r.year_level, r.section, r.room_name
+");
+$myRoomsStmt->execute([
+    ':uid' => $user_id,
+    ':utype' => $user_type,
+    ':utype2' => $user_type,
+    ':uid2' => $user_id,
+]);
+$myRooms = $myRoomsStmt->fetchAll(PDO::FETCH_ASSOC);
 
 $isAdviser = isset($_SESSION['role']) && $_SESSION['role'] === 'hte_adviser';
 if ($isAdviser) {
@@ -135,14 +160,22 @@ if ($isAdviser) {
 }
 
 $stmt = $pdo->prepare("
-    SELECT r.*, a.full_name, a.title, a.role
+    SELECT DISTINCT r.*, a.full_name, a.title, a.role
     FROM rooms r
     LEFT JOIN advisers a ON r.adviser_id = a.id
-    JOIN room_members rm ON r.id = rm.room_id
-    WHERE rm.user_id = ? and rm.user_type = 'adviser'
+    LEFT JOIN room_members rm ON r.id = rm.room_id
+    WHERE (
+            (rm.user_id = :uid AND rm.user_type = :utype)
+         OR (:utype2 = 'adviser' AND r.adviser_id = :uid2)
+    )
     " . (!$isAdviser ? "AND r.is_archived = FALSE" : "") . "
 ");
-$stmt->execute([$_SESSION['user_id']]);
+$stmt->execute([
+    ':uid' => $user_id,
+    ':utype' => $user_type,
+    ':utype2' => $user_type,
+    ':uid2' => $user_id,
+]);
 $rooms = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 $studentId = $_POST['student_id'] ?? $_GET['student_id'] ?? null;
