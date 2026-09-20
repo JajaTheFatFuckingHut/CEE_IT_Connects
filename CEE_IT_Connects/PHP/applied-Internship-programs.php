@@ -827,9 +827,9 @@ foreach ($internships as $loc) {
             }
         }
 
-        #map {
-            width: 60%;
-            height: 542px;
+        .internship-map {
+            width: 100%;
+            height: 400px;
         }
 
         .main {
@@ -1165,11 +1165,22 @@ foreach ($internships as $loc) {
 
                                 </div>
                                 <hr>
+                                <?php
+                                $lat = $internship['latitude'] ?? null;
+                                $lng = $internship['longtitude'] ?? ($internship['longitude'] ?? null);
+                                $hasCoords = is_numeric($lat) && is_numeric($lng);
+                                ?>
                                 <section class="map-section">
                                     <div class="map-section-wrapper">
-                                        <div class="main">
-                                            <div id="map"></div>
-                                        </div>
+                                        <?php if ($hasCoords): ?>
+                                            <div class="internship-map" id="map-<?= (int) $internship['id'] ?>"
+                                                data-lat="<?= (float) $lat ?>" data-lng="<?= (float) $lng ?>"
+                                                data-company="<?= htmlspecialchars($internship['company'] ?? '') ?>"
+                                                data-address="<?= htmlspecialchars($internship['address'] ?? $internship['location'] ?? '') ?>">
+                                            </div>
+                                        <?php else: ?>
+                                            <p class="text-muted">No map location available for this company.</p>
+                                        <?php endif; ?>
                                     </div>
                                 </section>
                                 <!-- <p class="details-section-title">Application Documents</p>
@@ -1295,6 +1306,9 @@ foreach ($internships as $loc) {
             document.querySelectorAll('.details-panel.open').forEach(p => p.classList.remove('open'));
             document.querySelectorAll('.btn-readmore.active').forEach(b => b.classList.remove('active'));
 
+            const panel = document.getElementById('details-' + id);
+            panel.classList.toggle('open');
+            if (panel.classList.contains('open')) { initDetailMap(id) };
             if (!isOpen) {
                 panel.classList.add('open');
                 btn.classList.add('active');
@@ -1391,7 +1405,6 @@ foreach ($internships as $loc) {
         });
 
         let map;
-        let activeMarker = null;
         const internships = <?= json_encode($mapPoints, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
 
         function esc(s) {
@@ -1400,82 +1413,47 @@ foreach ($internships as $loc) {
             return d.innerHTML;
         }
 
-        function showInternship(id) {
-            const item = internships.find(i => Number(i.id) === Number(id));
-            if (!item) return;
+        const detailMaps = {};
 
-            // remove the previously shown marker
-            if (activeMarker) map.removeLayer(activeMarker);
+        function initDetailMap(id) {
+            const el = document.getElementById('map-' + id);
+            if (!el || typeof L === 'undefined') return;
 
-            activeMarker = L.marker([item.lat, item.lng], { icon: greenIcon })
-                .addTo(map)
-                .bindPopup(`<strong>${esc(item.company)}</strong><br>${esc(item.address)}`)
+            // already created: just fix its size
+            if (detailMaps[id]) {
+                detailMaps[id].invalidateSize();
+                return;
+            }
+
+            const lat = parseFloat(el.dataset.lat);
+            const lng = parseFloat(el.dataset.lng);
+            if (isNaN(lat) || isNaN(lng)) return;
+
+            const icon = L.icon({
+                iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+                shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+                iconSize: [25, 41],
+                iconAnchor: [12, 41],
+                popupAnchor: [1, -34],
+                shadowSize: [41, 41]
+            });
+
+            const m = L.map(el).setView([lat, lng], 16);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(m);
+
+            L.marker([lat, lng], { icon })
+                .addTo(m)
+                .bindPopup(`<strong>${esc(el.dataset.company)}</strong><br>${esc(el.dataset.address)}`)
                 .openPopup();
 
-            map.setView([item.lat, item.lng], 16);
+            detailMaps[id] = m;
+            setTimeout(() => m.invalidateSize(), 100);
         }
 
-
-        // ========================================
-        // CUSTOM LEAFLET MARKER ICONS
-        // ========================================
-
-        const greenIcon = L.icon({
-            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
-            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
-
-            iconSize: [25, 41],
-            iconAnchor: [12, 41],
-            popupAnchor: [1, -34],
-            shadowSize: [41, 41]
-        });
-
-
-        // ========================================
-        // INITIALIZE MAP
-        // ========================================
-
-        function initMap() {
-
-            console.log("Initializing Leaflet map...");
-
-            // Check that Leaflet loaded
-            if (typeof L === 'undefined') {
-                console.error("Leaflet is NOT loaded.");
-                return;
-            }
-
-            // Check map container
-            const mapElement = document.getElementById('map');
-
-            if (!mapElement) {
-                console.error("Map element #map was not found.");
-                return;
-            }
-
-
-            // Create map
-            map = L.map('map').setView(
-                [14.70, 120.98],
-                10
-            );
-
-
-            // OpenStreetMap tiles
-            L.tileLayer(
-                'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                {
-                    maxZoom: 19,
-
-                    attribution:
-                        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                }
-            ).addTo(map);
-
-            addInternshipMarkers();
-        }
-        window.addEventListener('load', initMap);
-        setTimeout(() => map.invalidateSize(), 200);
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
