@@ -122,7 +122,7 @@ $now = new DateTime();
 
         .phone-dropdown {
             display: none;
-            position: absolute;
+            position: static;
             margin-top: 8px;
             width: max-content;
             max-width: 100%;

@@ -2035,70 +2035,62 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
                     <table class="sysAdm-table">
                         <thead>
                             <tr>
-                                <th>Student</th>
+                                <th>Adviser</th>
                                 <th>Email</th>
-                                <th>Current Adviser</th>
-                                <th>Current Room</th>
+                                <th>Assigned Section(s)</th>
                                 <th>Assign To</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
                         <tbody id="assign-tbody">
-                            <?php foreach ($studentList as $st): ?>
-                                <tr data-adviser="<?= htmlspecialchars(strtolower($st['adviser_name'] ?? '')) ?>"
-                                    data-name="<?= htmlspecialchars(strtolower($st['full_name'])) ?>">
+                            <?php foreach ($adviserList as $adv):
+                                $mine = $assignedSections[$adv['id']] ?? []; ?>
+                                <tr data-name="<?= htmlspecialchars(strtolower($adv['full_name'])) ?>"
+                                    data-has="<?= $mine ? 'has' : 'none' ?>">
                                     <td>
                                         <div class="d-flex align-items-center gap-2">
                                             <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold flex-shrink-0"
                                                 style="width:34px;height:34px;background:#eef1ff;color:#272f54;font-size:12px;">
-                                                <?= strtoupper(substr($st['full_name'], 0, 1)) ?>
+                                                <?= strtoupper(substr($adv['full_name'], 0, 1)) ?>
                                             </div>
-                                            <?= htmlspecialchars($st['full_name']) ?>
+                                            <?= htmlspecialchars($adv['full_name']) ?>
                                         </div>
                                     </td>
-                                    <td><?= htmlspecialchars($st['email']) ?></td>
+                                    <td><?= htmlspecialchars($adv['email']) ?></td>
                                     <td>
-                                        <?php if ($st['adviser_name']): ?>
-                                            <span style="color:#272f54;font-size:12px; font-weight:550;">
-                                                <?= htmlspecialchars($st['adviser_name']) ?>
-                                            </span>
+                                        <?php if ($mine): ?>
+                                            <?php foreach ($mine as $label): ?>
+                                                <span class="badge rounded-pill px-3 me-1"
+                                                    style="background:#eaf3de;color:#27500a;font-size:12px;font-weight:500;">
+                                                    <?= htmlspecialchars($label) ?>
+                                                </span>
+                                            <?php endforeach; ?>
                                         <?php else: ?>
                                             <span class="badge rounded-pill px-3"
                                                 style="background:#f8d7da;color:#721c24;font-size:12px;">
-                                                Unassigned
+                                                No section yet
                                             </span>
                                         <?php endif; ?>
                                     </td>
-                                    <td><?= $st['room_name'] ? htmlspecialchars($st['room_name']) : '—' ?></td>
                                     <td>
-                                        <form method="POST" id="assign-form-<?= $st['id'] ?>">
-                                            <input type="hidden" name="student_id" value="<?= $st['id'] ?>">
-                                            <input type="hidden" name="current_room_id" value="<?= $st['room_id'] ?? '' ?>">
-                                            <select name="adviser_id" class="assign-select" <?= $st['adviser_name'] ? 'disabled' : '' ?>>
-                                                <option value="">— Select Adviser —</option>
-                                                <?php foreach ($adviserList as $adv): ?>
-                                                    <?php if (!$adv['room_id'])
-                                                        continue; ?>
-                                                    <option value="<?= $adv['id'] ?>" <?= ($st['room_id'] && $adv['room_id'] == $st['room_id']) ? 'selected' : '' ?>>
-                                                        <?= htmlspecialchars($adv['full_name']) ?>
-                                                        (<?= htmlspecialchars($adv['room_name']) ?>)
+                                        <form method="POST" id="assign-form-<?= $adv['id'] ?>">
+                                            <input type="hidden" name="adviser_id" value="<?= $adv['id'] ?>">
+                                            <select name="section" class="assign-select" required>
+                                                <option value="">— Select Section —</option>
+                                                <?php foreach ($openSections as $s): ?>
+                                                    <option
+                                                        value="<?= htmlspecialchars($s['program'] . '|' . $s['year_level'] . '|' . $s['section']) ?>">
+                                                        <?= htmlspecialchars(ucwords($s['program']) . ' ' . $s['year_level'] . '-' . $s['section']) ?>
                                                     </option>
                                                 <?php endforeach; ?>
                                             </select>
                                         </form>
                                     </td>
                                     <td>
-                                        <?php if ($st['adviser_name']): ?>
-                                            <span class="badge rounded-pill px-3"
-                                                style="background:#eaf3de;color:#27500a;font-size:12px;font-weight:500;">
-                                                <i class="bi bi-check-circle-fill me-1"></i> Assigned
-                                            </span>
-                                        <?php else: ?>
-                                            <button type="submit" form="assign-form-<?= $st['id'] ?>" name="assign_adviser"
-                                                class="btn-update" style="padding:8px; important;">
-                                                <i class="bi bi-person-check me-1"></i> Assign
-                                            </button>
-                                        <?php endif; ?>
+                                        <button type="submit" form="assign-form-<?= $adv['id'] ?>" name="assign_section"
+                                            class="btn-update" style="padding:8px;">
+                                            <i class="bi bi-person-check me-1"></i> Assign
+                                        </button>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>

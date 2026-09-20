@@ -8,9 +8,166 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'superadmin') {
     header("Location: login-ui.php");
     exit();
 }
-
+function formatSection(?string $key): string
+{
+    if (!$key)
+        return '';
+    [$p, $y, $s] = array_pad(explode('|', $key), 3, '');
+    return ucwords($p) . " {$y}-{$s}";
+}
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // for create admin and adviser, we will check if the delete button was clicked first to avoid conflicts
+    // for assigning a section to an adviser
+    if (isset($_POST['assign_section'])) {
+        $adviser_id = (int) ($_POST['adviser_id'] ?? 0);
+        $parts = array_map('trim', explode('|', $_POST['section'] ?? ''));
+
+        if (!$adviser_id || count($parts) !== 3 || in_array('', $parts, true)) {
+            $_SESSION['error'] = "Please select an adviser and a section.";
+            header("Location: superadmin.php");
+            exit;
+        }
+        [$program, $year, $section] = $parts;
+        $program = strtolower($program);
+
+        // must be an internship adviser
+        $advStmt = $pdo->prepare("SELECT full_name FROM advisers WHERE id = ? AND role = 'internship_adviser'");
+        $advStmt->execute([$adviser_id]);
+        $adviserName = $advStmt->fetchColumn();
+        if (!$adviserName) {
+            $_SESSION['error'] = "Invalid adviser.";
+            header("Location: superadmin.php");
+            exit;
+        }
+
+        // section must not already have an adviser room
+        $takenStmt = $pdo->prepare("
+        SELECT id FROM rooms
+        WHERE adviser_id IS NOT NULL AND is_archived = FALSE
+          AND LOWER(department) = :program
+          AND CAST(year_level AS TEXT) = :year
+          AND section = :section
+    ");
+        $takenStmt->execute([':program' => $program, ':year' => $year, ':section' => $section]);
+        if ($takenStmt->fetch()) {
+            $_SESSION['error'] = "That section already has an adviser.";
+            header("Location: superadmin.php");
+            exit;
+        }
+
+        try {
+            $pdo->beginTransaction();
+
+            // 1. create the new room
+            $roomName = "{$adviserName}'s Room (" . ucwords($program) . " {$year}-{$section})";
+            $roomStmt = $pdo->prepare("
+            INSERT INTO rooms (room_name, section, year_level, department, adviser_id, is_archived, created_at)
+            VALUES (:name, :section, :year, :program, :adviser, FALSE, NOW())
+            RETURNING id
+        ");
+            $roomStmt->execute([
+                ':name' => $roomName,
+                ':section' => $section,
+                ':year' => $year,
+                ':program' => $program,
+                ':adviser' => $adviser_id
+            ]);
+            $new_room_id = (int) $roomStmt->fetchColumn();
+
+            // 2. delete these students' memberships from other internship-adviser rooms
+            $pdo->prepare("
+            DELETE FROM room_members
+            WHERE user_type = 'student'
+              AND room_id <> :room
+              AND room_id IN (
+                  SELECT r.id FROM rooms r
+                  JOIN advisers a ON a.id = r.adviser_id
+                  WHERE a.role = 'internship_adviser'
+              )
+              AND user_id IN (
+                  SELECT id FROM students
+                  WHERE LOWER(program) = :program
+                    AND CAST(year_level AS TEXT) = :year
+                    AND section = :section
+              )
+        ")->execute([
+                        ':room' => $new_room_id,
+                        ':program' => $program,
+                        ':year' => $year,
+                        ':section' => $section
+                    ]);
+
+            // 3. add every student of the section to the new room
+            $ins = $pdo->prepare("
+            INSERT INTO room_members (room_id, user_id, user_type)
+            SELECT :room, s.id, 'student'
+            FROM students s
+            WHERE LOWER(s.program) = :program
+              AND CAST(s.year_level AS TEXT) = :year
+              AND s.section = :section
+        ");
+            $ins->execute([
+                ':room' => $new_room_id,
+                ':program' => $program,
+                ':year' => $year,
+                ':section' => $section
+            ]);
+            $added = $ins->rowCount();
+
+            // 4. audit log
+            $pdo->prepare("
+            INSERT INTO audits (user_id, roles, activity, activity_date)
+            VALUES (:user_id, :roles, :activity, NOW())
+        ")->execute([
+                        ':user_id' => $_SESSION['user_id'],
+                        ':roles' => 'superadmin',
+                        ':activity' => "Assigned section {$program} {$year}-{$section} to adviser ID {$adviser_id} (room ID {$new_room_id})"
+                    ]);
+
+            $pdo->commit();
+            $_SESSION['success'] = "Room created. {$added} student(s) moved into {$roomName}.";
+        } catch (Exception $e) {
+            $pdo->rollBack();
+            $_SESSION['error'] = "Could not assign the section.";
+        }
+
+        header("Location: superadmin.php");
+        exit;
+    }
+
+    // ---- data for the table ----
+    $adviserList = $pdo->query("
+    SELECT id, full_name, email
+    FROM advisers
+    WHERE role = 'internship_adviser'
+    ORDER BY full_name
+")->fetchAll(PDO::FETCH_ASSOC);
+
+    // sections already handled, grouped by adviser
+    $assignedSections = [];
+    $takenKeys = [];
+    $rows = $pdo->query("
+    SELECT adviser_id, LOWER(department) AS program, year_level, section
+    FROM rooms
+    WHERE adviser_id IS NOT NULL AND is_archived = FALSE
+      AND section IS NOT NULL AND section <> ''
+    ORDER BY program, year_level, section
+")->fetchAll(PDO::FETCH_ASSOC);
+    foreach ($rows as $r) {
+        $assignedSections[$r['adviser_id']][] = ucwords($r['program']) . ' ' . $r['year_level'] . '-' . $r['section'];
+        $takenKeys[] = "{$r['program']}|{$r['year_level']}|{$r['section']}";
+    }
+
+    // sections that no adviser has yet
+    $allSections = $pdo->query("
+    SELECT DISTINCT LOWER(program) AS program, year_level, section
+    FROM students
+    WHERE program IS NOT NULL AND year_level IS NOT NULL AND section IS NOT NULL
+    ORDER BY program, year_level, section
+")->fetchAll(PDO::FETCH_ASSOC);
+
+    $openSections = array_values(array_filter($allSections, function ($s) use ($takenKeys) {
+        return !in_array("{$s['program']}|{$s['year_level']}|{$s['section']}", $takenKeys, true);
+    }));
     //admin 
     if (isset($_POST['create-admin'])) {
 
