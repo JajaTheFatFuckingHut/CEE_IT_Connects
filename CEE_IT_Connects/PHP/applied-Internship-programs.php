@@ -827,6 +827,11 @@ foreach ($internships as $loc) {
                 font-size: 14px;
             }
         }
+
+        #map {
+            width: 60%;
+            height: 542px;
+        }
     </style>
 </head>
 
