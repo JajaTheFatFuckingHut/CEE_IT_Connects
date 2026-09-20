@@ -1145,19 +1145,25 @@ foreach ($internships as $loc) {
                                             <span class="detail-val"><?= htmlspecialchars($internship['address']) ?></span>
                                         </div>
                                     <?php endif; ?>
+                                    <div>
+                                        <?php if (!empty($internship['ojt_time_in'])): ?>
+                                            <div class="detail-row">
+                                                <span class="detail-label">OJT Time In:</span>
+                                                <span class="detail-val">
+                                                    <?= htmlspecialchars($internship['ojt_time_in']) ?>
+                                                </span>
+                                            </div>
+                                        <?php endif; ?>
+                                        <?php if (!empty($internship['ojt_time_out'])): ?>
+                                            <div class="detail-row">
+                                                <span class="detail-label">OJT Time Out:</span>
+                                                <span class="detail-val">
+                                                    <?= htmlspecialchars($internship['ojt_time_out']) ?>
+                                                </span>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
 
-                                    <?php if (!empty($internship['ojt_time_in'])): ?>
-                                        <div class="detail-row">
-                                            <span class="detail-label">OJT Time In:</span>
-                                            <span class="detail-val"><?= htmlspecialchars($internship['ojt_time_in']) ?></span>
-                                        </div>
-                                    <?php endif; ?>
-                                    <?php if (!empty($internship['ojt_time_out'])): ?>
-                                        <div class="detail-row">
-                                            <span class="detail-label">OJT Time Out:</span>
-                                            <span class="detail-val"><?= htmlspecialchars($internship['ojt_time_out']) ?></span>
-                                        </div>
-                                    <?php endif; ?>
                                 </div>
                                 <hr>
                                 <section class="map-section">
@@ -1480,7 +1486,6 @@ foreach ($internships as $loc) {
             ).addTo(map);
 
             addInternshipMarkers();
-            setTimeout(() => map.invalidateSize(), 200);
         }
         window.addEventListener('load', initMap);
     </script>
