@@ -143,74 +143,107 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_role'])) {
     exit;
 }
 
-// Assign adviser POST handler
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['assign_adviser'])) {
-    $student_id = (int) $_POST['student_id'];
-    $adviser_id = (int) $_POST['adviser_id'];
-    $current_room_id = (int) ($_POST['current_room_id'] ?? 0);
+$sectionSettings = $pdo->query("
+    SELECT year_level, section_count FROM section_settings ORDER BY year_level
+")->fetchAll(PDO::FETCH_ASSOC);
 
-    if (!$student_id || !$adviser_id) {
-        $_SESSION['error'] = "Please select a valid adviser.";
-        header("Location: superadmin.php");
-        exit;
-    }
+$adviserList = $pdo->query("
+    SELECT id, full_name, email
+    FROM advisers
+    WHERE role = 'internship_adviser'
+    ORDER BY full_name
+")->fetchAll(PDO::FETCH_ASSOC);
 
-    // Get the adviser's room
-    $roomStmt = $pdo->prepare("
-        SELECT id FROM rooms 
-        WHERE adviser_id = ? AND is_archived = FALSE 
-        LIMIT 1
-    ");
-    $roomStmt->execute([$adviser_id]);
-    $adviserRoom = $roomStmt->fetch(PDO::FETCH_ASSOC);
-
-    if (!$adviserRoom) {
-        $_SESSION['error'] = "This adviser has no active room yet.";
-        header("Location: superadmin.php");
-        exit;
-    }
-
-    $new_room_id = $adviserRoom['id'];
-
-    // Remove student from current room if they're already in one
-    if ($current_room_id && $current_room_id !== $new_room_id) {
-        $removeStmt = $pdo->prepare("
-            DELETE FROM room_members 
-            WHERE room_id = ? AND user_id = ? AND user_type = 'student'
-        ");
-        $removeStmt->execute([$current_room_id, $student_id]);
-    }
-
-    // Check if already in the new room
-    $checkStmt = $pdo->prepare("
-        SELECT id FROM room_members 
-        WHERE room_id = ? AND user_id = ? AND user_type = 'student'
-    ");
-    $checkStmt->execute([$new_room_id, $student_id]);
-
-    if (!$checkStmt->fetch()) {
-        $insertStmt = $pdo->prepare("
-            INSERT INTO room_members (room_id, user_id, user_type)
-            VALUES (?, ?, 'student')
-        ");
-        $insertStmt->execute([$new_room_id, $student_id]);
-    }
-
-    // Audit log
-    $stmtActivity = $pdo->prepare("
-        INSERT INTO audits (user_id, roles, activity, activity_date) 
-        VALUES (:user_id, :roles, :activity, NOW())
-    ");
-    $stmtActivity->execute([
-        ':user_id' => $_SESSION['user_id'],
-        ':roles' => 'superadmin',
-        ':activity' => "Assigned student ID {$student_id} to adviser ID {$adviser_id}"
-    ]);
-
-    $_SESSION['success'] = "Student successfully assigned to adviser's room.";
-    header("Location: superadmin.php");
-    exit;
+$assignedSections = [];
+$takenKeys = [];
+$rows = $pdo->query("
+    SELECT adviser_id, year_level, section
+    FROM rooms
+    WHERE adviser_id IS NOT NULL AND is_archived = FALSE
+      AND section IS NOT NULL AND section <> '' AND year_level IS NOT NULL
+    ORDER BY year_level, section
+")->fetchAll(PDO::FETCH_ASSOC);
+foreach ($rows as $r) {
+    $assignedSections[$r['adviser_id']][] = "Year {$r['year_level']}-{$r['section']}";
+    $takenKeys[] = "{$r['year_level']}|{$r['section']}";
 }
+
+$openSections = [];
+foreach ($sectionSettings as $cfg) {
+    for ($n = 1; $n <= (int) $cfg['section_count']; $n++) {
+        if (!in_array("{$cfg['year_level']}|{$n}", $takenKeys, true)) {
+            $openSections[] = ['year_level' => $cfg['year_level'], 'section' => $n];
+        }
+    }
+}
+// Assign adviser POST handler
+// if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['assign_adviser'])) {
+//     $student_id = (int) $_POST['student_id'];
+//     $adviser_id = (int) $_POST['adviser_id'];
+//     $current_room_id = (int) ($_POST['current_room_id'] ?? 0);
+
+//     if (!$student_id || !$adviser_id) {
+//         $_SESSION['error'] = "Please select a valid adviser.";
+//         header("Location: superadmin.php");
+//         exit;
+//     }
+
+//     // Get the adviser's room
+//     $roomStmt = $pdo->prepare("
+//         SELECT id FROM rooms 
+//         WHERE adviser_id = ? AND is_archived = FALSE 
+//         LIMIT 1
+//     ");
+//     $roomStmt->execute([$adviser_id]);
+//     $adviserRoom = $roomStmt->fetch(PDO::FETCH_ASSOC);
+
+//     if (!$adviserRoom) {
+//         $_SESSION['error'] = "This adviser has no active room yet.";
+//         header("Location: superadmin.php");
+//         exit;
+//     }
+
+//     $new_room_id = $adviserRoom['id'];
+
+//     // Remove student from current room if they're already in one
+//     if ($current_room_id && $current_room_id !== $new_room_id) {
+//         $removeStmt = $pdo->prepare("
+//             DELETE FROM room_members 
+//             WHERE room_id = ? AND user_id = ? AND user_type = 'student'
+//         ");
+//         $removeStmt->execute([$current_room_id, $student_id]);
+//     }
+
+//     // Check if already in the new room
+//     $checkStmt = $pdo->prepare("
+//         SELECT id FROM room_members 
+//         WHERE room_id = ? AND user_id = ? AND user_type = 'student'
+//     ");
+//     $checkStmt->execute([$new_room_id, $student_id]);
+
+//     if (!$checkStmt->fetch()) {
+//         $insertStmt = $pdo->prepare("
+//             INSERT INTO room_members (room_id, user_id, user_type)
+//             VALUES (?, ?, 'student')
+//         ");
+//         $insertStmt->execute([$new_room_id, $student_id]);
+//     }
+
+//     // Audit log
+//     $stmtActivity = $pdo->prepare("
+//         INSERT INTO audits (user_id, roles, activity, activity_date) 
+//         VALUES (:user_id, :roles, :activity, NOW())
+//     ");
+//     $stmtActivity->execute([
+//         ':user_id' => $_SESSION['user_id'],
+//         ':roles' => 'superadmin',
+//         ':activity' => "Assigned student ID {$student_id} to adviser ID {$adviser_id}"
+//     ]);
+
+//     $_SESSION['success'] = "Student successfully assigned to adviser's room.";
+//     header("Location: superadmin.php");
+//     exit;
+// }
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_assign_csv'])) {
     $headers = array_map('strtolower', array_map('trim', $_POST['headers'] ?? []));
     $rows = $_POST['csv'] ?? [];
@@ -300,15 +333,7 @@ $stmt = $pdo->query("
 ");
 $activityLogs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Adviser list with rooms
-$adviserListStmt = $pdo->query("
-    SELECT a.id, a.full_name, a.email, r.id AS room_id, r.room_name
-    FROM advisers a
-    LEFT JOIN rooms r ON r.adviser_id = a.id AND r.is_archived = FALSE
-    WHERE a.role = 'internship_adviser'
-    ORDER BY a.full_name ASC
-");
-$adviserList = $adviserListStmt->fetchAll(PDO::FETCH_ASSOC);
+
 
 // Student list with current adviser/room
 $studentListStmt = $pdo->query("
