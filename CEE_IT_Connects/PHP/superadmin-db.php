@@ -89,7 +89,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ]);
             $new_room_id = (int) $roomStmt->fetchColumn();
             $step = '2 delete old memberships';
-
+            $err = $pdo->errorInfo();
+            if (!empty($err[0]) && $err[0] !== '00000') {
+                throw new Exception("Step [{$step}] SQL error: " . print_r($err, true));
+            }
             // 2. delete these students' memberships from other internship-adviser rooms
             $pdo->prepare("
             DELETE FROM room_members
@@ -106,7 +109,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               )
         ")->execute([':room' => $new_room_id, ':year' => (string) $year, ':section' => (string) $section]);
             $step = '3 add students';
-
+            $err = $pdo->errorInfo();
+            if (!empty($err[0]) && $err[0] !== '00000') {
+                throw new Exception("Step [{$step}] SQL error: " . print_r($err, true));
+            }
             // 3. add every student of that year level + section to the new room
             $ins = $pdo->prepare("
             INSERT INTO room_members (room_id, user_id, user_type)
@@ -117,7 +123,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $ins->execute([':room' => $new_room_id, ':year' => (string) $year, ':section' => (string) $section]);
             $added = $ins->rowCount();
             $step = '4 audit log';
-
+            $err = $pdo->errorInfo();
+            if (!empty($err[0]) && $err[0] !== '00000') {
+                throw new Exception("Step [{$step}] SQL error: " . print_r($err, true));
+            }
             // 4. audit log
             $pdo->prepare("
             INSERT INTO audits (user_id, roles, activity, activity_date)
@@ -127,7 +136,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         ':roles' => 'superadmin',
                         ':activity' => "Assigned year {$year} section {$section} to adviser ID {$adviser_id} (room ID {$new_room_id})"
                     ]);
-
+            $err = $pdo->errorInfo();
+            if (!empty($err[0]) && $err[0] !== '00000') {
+                throw new Exception("Step [{$step}] SQL error: " . print_r($err, true));
+            }
             $pdo->commit();
             $_SESSION['success'] = "Room created. {$added} student(s) moved into {$roomName}.";
         } catch (Exception $e) {
