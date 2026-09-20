@@ -23,7 +23,7 @@ COPY JS /var/www/html/JS
 COPY Sources /var/www/html/Sources
 COPY uploads/resumes /var/www/html/uploads/resumes
 COPY PHP/uploads/weekly_reports /var/www/html/uploads/weekly_reports
-
+COPY vendor/ /var/www/html/vendor/
 COPY PHPMailer-master /var/www/html/PHPMailer-master
 
 RUN chown -R www-data:www-data /var/www/html/Sources \

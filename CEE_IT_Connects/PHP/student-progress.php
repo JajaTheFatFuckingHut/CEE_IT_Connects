@@ -470,6 +470,13 @@ elseif ($action === 'cancel_application') {
             WHERE student_id = ?
               AND internship_id = ?
         ")->execute([$student_id, $application_internship_id]);
+
+        $pdo->prepare("
+            DELETE FROM ojt_hours
+            WHERE user_id  = ? AND user_type = 'student'
+        ")->execute([
+                    $student_id
+                ]);
     }
 
     $pdo->prepare("
@@ -479,12 +486,6 @@ elseif ($action === 'cancel_application') {
                 $student_id
             ]);
 
-    $pdo->prepare("
-        DELETE FROM ojt_hours
-        WHERE user_id  = ? AND user_type = 'student'
-    ")->execute([
-                $student_id
-            ]);
     $_SESSION['success'] =
         'Application cancelled and progress reset.';
 
