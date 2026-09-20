@@ -121,7 +121,7 @@ $myRoomsStmt->execute([
 ]);
 $myRooms = $myRoomsStmt->fetchAll(PDO::FETCH_ASSOC);
 
-// $isAdviser = isset($_SESSION['role']) && $_SESSION['role'] === 'hte_adviser';
+$isAdviser = isset($_SESSION['role']) && $_SESSION['role'] === 'hte_adviser';
 // if ($isAdviser) {
 
 //     $checkRoomStmt = $pdo->prepare("

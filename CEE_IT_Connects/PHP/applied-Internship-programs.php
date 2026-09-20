@@ -1134,6 +1134,7 @@ $internships = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <?php endif; ?>
                                 </div>
                                 <hr>
+                                <div id="map"></div>
                                 <!-- <p class="details-section-title">Application Documents</p>
 
                                 <div class="file-row">
@@ -1351,6 +1352,76 @@ $internships = $stmt->fetchAll(PDO::FETCH_ASSOC);
             if (desk) desk.value = this.value;
             applyFilters();
         });
+
+        let map;
+        let markers = {};
+
+
+        // ========================================
+        // CUSTOM LEAFLET MARKER ICONS
+        // ========================================
+
+        const greenIcon = L.icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+        });
+
+        const redIcon = L.icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+        });
+
+
+        // ========================================
+        // INITIALIZE MAP
+        // ========================================
+
+        function initMap() {
+
+            console.log("Initializing Leaflet map...");
+
+            // Check that Leaflet loaded
+            if (typeof L === 'undefined') {
+                console.error("Leaflet is NOT loaded.");
+                return;
+            }
+
+            // Check map container
+            const mapElement = document.getElementById('map');
+
+            if (!mapElement) {
+                console.error("Map element #map was not found.");
+                return;
+            }
+
+
+            // Create map
+            map = L.map('map').setView(
+                [14.70, 120.98],
+                10
+            );
+
+
+            // OpenStreetMap tiles
+            L.tileLayer(
+                'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                {
+                    maxZoom: 19,
+
+                    attribution:
+                        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                }
+            ).addTo(map);
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
