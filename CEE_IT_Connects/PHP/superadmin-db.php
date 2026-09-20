@@ -621,7 +621,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (isset($_POST['restore'])) {
 
-        $tables = ['students' => 'students', 'admins' => 'admins', 'advisers' => 'advisers'];
+        $tables = ['student' => 'students', 'admin' => 'admins', 'adviser' => 'advisers'];
         $table = $tables[$_POST['source'] ?? ''] ?? null;
         $userId = (int) ($_POST['user_id'] ?? 0);
 
