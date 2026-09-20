@@ -1994,6 +1994,7 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
 
                 <form method="POST" class="mb-3 p-3"
                     style="background:#f7f8fc; border-radius:12px; border:1px solid #e3e6f3;">
+                    <input type="hidden" name="save_section_settings" value="1">
                     <input type="hidden" name="school_year" value="<?= htmlspecialchars($schoolYear) ?>">
                     <div class="fw-semibold mb-2" style="font-size:13px; color:#272f54;">
                         <i class="bi bi-sliders me-1"></i> Sections per year level
