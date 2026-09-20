@@ -57,11 +57,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
         $takenStmt = $pdo->prepare("
-        SELECT id FROM rooms
-        WHERE adviser_id IS NOT NULL AND is_archived = FALSE
-          AND CAST(year_level AS TEXT) = :year AND section = :section
-    ");
-        $takenStmt->execute([':year' => (string) $year, ':section' => (string) $section]);
+            SELECT id FROM rooms
+            WHERE adviser_id IS NOT NULL AND is_archived = FALSE
+            AND school_year = :sy
+            AND CAST(year_level AS TEXT) = :year AND section = :section
+        ");
+        $takenStmt->execute([':sy' => $sy, ':year' => (string) $year, ':section' => (string) $section]);
         if ($takenStmt->fetch()) {
             $_SESSION['error'] = "That section already has an adviser.";
             header("Location: superadmin.php");
