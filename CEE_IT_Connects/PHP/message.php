@@ -359,14 +359,46 @@ $avatarPalette = ['#ff2c8f', '#2c6fff', '#1abc9c', '#9b59b6', '#e67e22', '#e74c3
 
 $messages = [];
 
+$requiredSteps = ['mou', 'waiver', 'reco_letter'];
+$selectedInternship = [];
+if (!empty($application_internship_id)) {
+    $intStmt = $pdo->prepare("
+        SELECT company_classification, is_plv_internal, is_valenzuela_lgu
+        FROM internships
+        WHERE id = ?
+    ");
+    $intStmt->execute([(int) $application_internship_id]);
+    $selectedInternship = $intStmt->fetch(PDO::FETCH_ASSOC) ?: [];
+}
+
+// 2. Your logic, unchanged
+$classification = $selectedInternship['company_classification'] ?? 'private';
+$is_plv = filter_var($selectedInternship['is_plv_internal'] ?? false, FILTER_VALIDATE_BOOLEAN);
+$is_val_lgu = filter_var($selectedInternship['is_valenzuela_lgu'] ?? false, FILTER_VALIDATE_BOOLEAN);
+$is_public = ($classification === 'public');
+
+$needs_bir_dti_sec = !$is_public;
+$needs_waiver = !$is_plv;
+$needs_reco_letter = !$is_plv && !$is_val_lgu;
+
+// 3. Required steps (addendum = your MOU step)
+$requiredSteps = ['addendum'];
+if ($needs_reco_letter)
+    $requiredSteps[] = 'reco_letter';
+if ($needs_waiver)
+    $requiredSteps[] = 'waiver';
+
+$placeholders = implode(',', array_fill(0, count($requiredSteps), '?'));
 $hasProgressStmt = $pdo->prepare("
-    SELECT COUNT(*) FROM student_progress sp
-    JOIN internship_bookmarks ib ON ib.student_id = sp.student_id
-    WHERE sp.student_id = ? AND sp.is_done = TRUE
-    LIMIT 1
+    SELECT COUNT(DISTINCT step_key)
+    FROM student_progress
+    WHERE student_id = ? AND is_done = TRUE AND step_key IN ($placeholders)
 ");
-$hasProgressStmt->execute([$_SESSION['user_id']]);
-$hasActiveProgress = $hasProgressStmt->fetchColumn() > 0;
+$hasProgressStmt->execute(array_merge([$_SESSION['user_id']], $requiredSteps));
+
+// locked if the student hasn't chosen an internship yet
+$hasActiveProgress = !empty($application_internship_id)
+    && (int) $hasProgressStmt->fetchColumn() === count($requiredSteps);
 
 if ($current_chat_id) {
     $stmt = $pdo->prepare("
