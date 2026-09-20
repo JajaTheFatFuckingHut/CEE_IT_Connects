@@ -1,12 +1,13 @@
 <?php
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    error_log('POST KEYS: ' . implode(',', array_keys($_POST)));
+}
 require 'db.php';
 require 'auth.php';
 
 $role = strtolower(trim($_SESSION['role'] ?? ''));
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    error_log('POST KEYS: ' . implode(',', array_keys($_POST)));
-}
+
 
 if ($role !== 'superadmin') {
     header("Location: index.php");
