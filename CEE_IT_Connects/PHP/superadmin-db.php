@@ -68,10 +68,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             header("Location: superadmin.php");
             exit;
         }
+        $step = 'start';
 
         try {
             $pdo->beginTransaction();
-
+            $step = '1 create room';
             // 1. create the new room
             $roomName = "{$adviserName}'s Room (Year {$year}-{$section})";
             $roomStmt = $pdo->prepare("
@@ -87,6 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ':adviser' => $adviser_id
             ]);
             $new_room_id = (int) $roomStmt->fetchColumn();
+            $step = '2 delete old memberships';
 
             // 2. delete these students' memberships from other internship-adviser rooms
             $pdo->prepare("
@@ -103,6 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                   WHERE CAST(year_level AS TEXT) = :year AND CAST(section AS TEXT) = :section
               )
         ")->execute([':room' => $new_room_id, ':year' => (string) $year, ':section' => (string) $section]);
+            $step = '3 add students';
 
             // 3. add every student of that year level + section to the new room
             $ins = $pdo->prepare("
@@ -113,6 +116,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ");
             $ins->execute([':room' => $new_room_id, ':year' => (string) $year, ':section' => (string) $section]);
             $added = $ins->rowCount();
+            $step = '4 audit log';
 
             // 4. audit log
             $pdo->prepare("
@@ -127,8 +131,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $pdo->commit();
             $_SESSION['success'] = "Room created. {$added} student(s) moved into {$roomName}.";
         } catch (Exception $e) {
-            $pdo->rollBack();
-            $_SESSION['error'] = "Could not assign the section." . $e->getMessage();
+            if ($pdo->inTransaction())
+                $pdo->rollBack();
+            $_SESSION['error'] = "Failed at step [{$step}]: " . $e->getMessage();
         }
 
         header("Location: superadmin.php");
