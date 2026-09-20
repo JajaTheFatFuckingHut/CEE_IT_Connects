@@ -542,6 +542,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 if (isset($_POST['save_section_settings'])) {
+    error_log('SAVE HANDLER REACHED: ' . json_encode($_POST));
     $sy = $_POST['school_year'] ?? '';
     if (!preg_match('/^\d{4}-\d{4}$/', $sy)) {
         $_SESSION['error'] = "Invalid school year.";
