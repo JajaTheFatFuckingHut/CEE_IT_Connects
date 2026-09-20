@@ -1303,18 +1303,17 @@ foreach ($internships as $loc) {
             const panel = card.querySelector('.details-panel');
             const isOpen = panel.classList.contains('open');
 
+            // close everything first
             document.querySelectorAll('.details-panel.open').forEach(p => p.classList.remove('open'));
             document.querySelectorAll('.btn-readmore.active').forEach(b => b.classList.remove('active'));
 
-            const panel = document.getElementById('details-' + id);
-            panel.classList.toggle('open');
-            if (panel.classList.contains('open')) { initDetailMap(id) };
+            // reopen this one only if it was closed
             if (!isOpen) {
                 panel.classList.add('open');
                 btn.classList.add('active');
+                initDetailMap(id);
             }
         }
-
         function applyFilters() {
             const search = document.getElementById('search-internship').value.toLowerCase();
             const dlRadio = document.querySelector('input[name="deadline"]:checked');
