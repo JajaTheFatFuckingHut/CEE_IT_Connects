@@ -2100,18 +2100,32 @@ $page = 'messages';
                 </div>
                 <?php
                 $reportsStmt = $pdo->prepare("
-                    SELECT wr.id, wr.week_number, wr.wr_filepath, wr.created_at,
-                        s.full_name AS student_name, rm.*
+                    SELECT wr.id, wr.student_id, wr.week_number, wr.wr_filepath, wr.created_at,
+                        s.full_name AS student_name
                     FROM weekly_reports wr
-                    JOIN students s ON wr.student_id = s.id
-                    JOIN room_members rm ON rm.user_id = s.id AND rm.user_type = 'student'
-                    JOIN rooms r ON r.id = rm.room_id
-                    WHERE r.adviser_id = ?
-                    AND r.is_archived = FALSE
-                    ORDER BY wr.week_number DESC
-        ");
+                    JOIN students s ON s.id = wr.student_id
+                    WHERE EXISTS (
+                        SELECT 1
+                        FROM room_members rm
+                        JOIN rooms r ON r.id = rm.room_id
+                        WHERE rm.user_id = s.id AND rm.user_type = 'student'
+                        AND r.adviser_id = ? AND r.is_archived = FALSE
+                    )
+                    ORDER BY s.full_name, wr.week_number
+                ");
                 $reportsStmt->execute([$adviser_id]);
-                $reports = $reportsStmt->fetchAll(PDO::FETCH_ASSOC);
+
+                // one entry per student, holding all of their reports
+                $byStudent = [];
+                foreach ($reportsStmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
+                    $sid = (int) $r['student_id'];
+                    $byStudent[$sid]['name'] = $r['student_name'];
+                    $byStudent[$sid]['reports'][] = [
+                        'week' => (int) $r['week_number'],
+                        'file' => $r['wr_filepath'],
+                        'date' => date('M d, Y', strtotime($r['created_at'])),
+                    ];
+                }
                 ?>
                 <div
                     style="display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap; align-items:center; justify-content:space-between;">
@@ -2138,51 +2152,58 @@ $page = 'messages';
                         <thead style="background:#f8f9fa;">
                             <tr>
                                 <th>Student</th>
-                                <th>Week #</th>
-                                <th>Submitted</th>
+                                <th>Reports Submitted</th>
+                                <th>Latest Submission</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody id="reports-tbody">
-                            <?php if (empty($reports)): ?>
+                            <?php if (empty($byStudent)): ?>
                                 <tr>
-                                    <td colspan="5" class="text-center text-muted py-4">
-                                        No weekly reports submitted yet.
-                                    </td>
+                                    <td colspan="4" class="text-center text-muted py-4">No weekly reports submitted yet.</td>
                                 </tr>
                             <?php else: ?>
-                                <?php foreach ($reports as $r):
+                                <?php foreach ($byStudent as $sid => $st):
                                     $avatarColors = ['#ff2c8f', '#2c6fff', '#1abc9c', '#9b59b6', '#e67e22'];
-                                    $avatarColor = $avatarColors[crc32($r['student_name']) % count($avatarColors)];
+                                    $avatarColor = $avatarColors[crc32($st['name']) % count($avatarColors)];
+                                    $count = count($st['reports']);
+                                    $latest = end($st['reports'])['date'];
                                     ?>
                                     <tr>
                                         <td>
                                             <div class="student-cell">
                                                 <div class="avatar" style="background:<?= $avatarColor ?>;">
-                                                    <strong><?= strtoupper(substr($r['student_name'], 0, 1)) ?></strong>
+                                                    <strong><?= strtoupper(substr($st['name'], 0, 1)) ?></strong>
                                                 </div>
-                                                <span><?= htmlspecialchars($r['student_name']) ?></span>
+                                                <span><?= htmlspecialchars($st['name']) ?></span>
                                             </div>
                                         </td>
+                                        <td><?= $count ?> report<?= $count > 1 ? 's' : '' ?></td>
+                                        <td><?= $latest ?></td>
                                         <td>
-                                            <p>Week
-                                                <?= $r['week_number'] ?>
-                                            </p>
-                                        </td>
-                                        <td><?= date('M d, Y', strtotime($r['created_at'])) ?></td>
-                                        <td>
-                                            <a href="<?= htmlspecialchars($r['wr_filepath']) ?>" target="_blank" class="btn btn-sm"
-                                                style="display:inline-flex; align-items:center; gap:5px; padding:5px 10px;
-                                                    background:#dbeafe; color:#1e40af; border-radius:6px; font-size:11px;
-                                                    font-weight:600; border:1px solid #93c5fd; text-decoration:none; white-space:nowrap;">
+                                            <button type="button" onclick="openReports(<?= (int) $sid ?>)" style="display:inline-flex; align-items:center; gap:5px; padding:5px 10px;
+                               background:#dbeafe; color:#1e40af; border-radius:6px; font-size:11px;
+                               font-weight:600; border:1px solid #93c5fd; cursor:pointer; white-space:nowrap;">
                                                 <i class="fa fa-eye"></i> View
-                                            </a>
+                                            </button>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
                             <?php endif; ?>
                         </tbody>
                     </table>
+                </div>
+                <div id="reportsModal" onclick="if(event.target===this) closeReports()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:2000;
+                                align-items:center; justify-content:center; padding:16px;">
+                    <div style="background:#fff; border-radius:14px; width:100%; max-width:520px; max-height:80vh;
+                                        overflow:auto; padding:20px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                            <h5 id="reportsModalTitle" style="margin:0; color:#272f54;"></h5>
+                            <button type="button" onclick="closeReports()"
+                                style="border:none; background:none; font-size:22px; cursor:pointer;">&times;</button>
+                        </div>
+                        <div id="reportsModalBody"></div>
+                    </div>
                 </div>
             </div>
 
@@ -2670,6 +2691,44 @@ $page = 'messages';
                 const studentName = row.querySelector('td:first-child')?.textContent.toLowerCase() || '';
                 row.style.display = studentName.includes(searchValue) ? '' : 'none';
             });
+        }
+
+        const studentReports = <?= json_encode($byStudent, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
+
+        function escH(s) {
+            const d = document.createElement('div');
+            d.textContent = s ?? '';
+            return d.innerHTML;
+        }
+
+        function openReports(sid) {
+            const st = studentReports[sid];
+            if (!st) return;
+
+            document.getElementById('reportsModalTitle').textContent = st.name + ' — Weekly Reports';
+
+            document.getElementById('reportsModalBody').innerHTML = st.reports.map(r => `
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;
+                    padding:10px 12px; border:1px solid #e5e7eb; border-radius:10px; margin-bottom:8px;">
+            <div>
+                <strong>Week ${r.week}</strong><br>
+                <small class="text-muted">Submitted ${escH(r.date)}</small>
+            </div>
+            <div style="display:flex; gap:6px;">
+                <a href="${escH(r.file)}" target="_blank" rel="noopener" class="btn btn-sm btn-outline-primary">
+                    <i class="fa fa-eye"></i> View
+                </a>
+                <a href="${escH(r.file)}" download class="btn btn-sm btn-outline-secondary">
+                    <i class="fa fa-download"></i>
+                </a>
+            </div>
+        </div>`).join('');
+
+            document.getElementById('reportsModal').style.display = 'flex';
+        }
+
+        function closeReports() {
+            document.getElementById('reportsModal').style.display = 'none';
         }
     </script>
 </body>
