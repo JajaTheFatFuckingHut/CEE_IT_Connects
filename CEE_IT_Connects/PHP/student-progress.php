@@ -480,11 +480,6 @@ elseif ($action === 'cancel_application') {
     where id = ? AND student_id = ?
     ")->execute([$report_id, $student_id]);
 
-    $full_path = __DIR__ . '/' . $report['wr_filepath'];
-    if (is_file($full_path)) {
-        unlink($full_path);
-    }
-
     $_SESSION['success'] = 'Weekly report deleted.';
 
     header('Location: message.php?section=progress_report&room_id=' . urlencode($current_room_id ?? ''));
