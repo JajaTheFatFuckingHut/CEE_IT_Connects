@@ -274,14 +274,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_assign_csv'])) {
 }
 
 $stmt = $pdo->query("
-    SELECT id, full_name AS name, email, 'student' AS role, 'students' AS source FROM students
+    SELECT id, full_name AS name, email, 'student' AS role, 'students' AS source,
+           COALESCE(is_archived, FALSE) AS is_archived
+    FROM students
     UNION ALL
-    SELECT id, name, email, role, 'admins' AS source FROM admins WHERE role != 'superadmin'
+    SELECT id, name, email, role, 'admins' AS source,
+           COALESCE(is_archived, FALSE) AS is_archived
+    FROM admins WHERE role != 'superadmin'
     UNION ALL
-    SELECT id, full_name AS name, email, role::text AS role, 'advisers' AS source FROM advisers
+    SELECT id, full_name AS name, email, role::text AS role, 'advisers' AS source,
+           COALESCE(is_archived, FALSE) AS is_archived
+    FROM advisers
     ORDER BY name ASC
 ");
 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+$stmt = $pdo->query("
+    SELECT id, full_name AS name, email, 'student' AS role, 'students' AS source,
+           COALESCE(is_archived, TRUE) AS is_archived
+    FROM students
+    UNION ALL
+    SELECT id, name, email, role, 'admins' AS source,
+           COALESCE(is_archived, TRUE) AS is_archived
+    FROM admins WHERE role != 'superadmin'
+    UNION ALL
+    SELECT id, full_name AS name, email, role::text AS role, 'advisers' AS source,
+           COALESCE(is_archived, TRUE) AS is_archived
+    FROM advisers
+    ORDER BY name ASC
+");
+$archivedUsers = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 $stmt = $pdo->query("
     SELECT 
@@ -1094,6 +1116,10 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
                 <i class="bi bi-gear me-2"></i>
                 <span class="nav-label">Section</span>
             </a>
+            <a href="#" onclick="showSection(event, 'restore')" data-tooltip="Settings">
+                <i class="bi bi-gear me-2"></i>
+                <span class="nav-label">Archived</span>
+            </a>
         </div>
 
         <div class="main-content">
@@ -1498,7 +1524,74 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
                 </div>
             </div>
 
-            <!-- add updated delete account with danger top card -->
+            <!-- Archived stuff -->
+            <div id="restore" class="section sysAdm-section">
+                <div class="sysAdm-header--update">
+                    <div class="sysAdm-header-left">
+                        <div class="sysAdm-header-icon">
+                            <i class="fa-solid fa-trash"></i>
+                        </div>
+                        <h2>Archived Accounts</h2>
+                        <p>Accounts deleted in the system</p>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                    <div class="d-flex gap-2 flex-wrap">
+                        <input type="text" id="search-delete" oninput="filterDelete()"
+                            placeholder="Search for a student"
+                            style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:220px;">
+                        <select id="filter-role" onchange="filterDelete()"
+                            style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:200px;">
+                            <option value="">All Roles</option>
+                            <option value="student">Student</option>
+                            <option value="adviser">Adviser</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                    </div>
+                </div>
+
+
+                <div class="sysAdm-table-wrapper">
+                    <table class="sysAdm-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="delete-tbody">
+                            <?php foreach ($archivedUsers as $u): ?>
+                                <tr>
+                                    <td>
+                                        <?= htmlspecialchars($u['name']) ?>
+                                    </td>
+                                    <td>
+                                        <?= htmlspecialchars($u['email']) ?>
+                                    </td>
+                                    <td>
+                                        <?= htmlspecialchars(ucwords(str_replace('_', ' ', $u['role']))) ?>
+                                    </td>
+                                    <td>
+                                        <form method="POST" action="superadmin-db.php"
+                                            onsubmit="return confirm('Are you sure you want to delete this user?')">
+                                            <input type="hidden" name="id" value="<?= $u['id'] ?>">
+                                            <input type="hidden" name="source" value="<?= $u['source'] ?>">
+                                            <button type="submit" name="delete" class="btn-delete">
+                                                <i class="bi bi-trash-fill"></i> Delete
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+
             <!-- CHANGE ROLES / Admin Management -->
             <div id="roles" class="section sysAdm-section">
                 <div class="sysAdm-header--danger sysAdm-header--blue">

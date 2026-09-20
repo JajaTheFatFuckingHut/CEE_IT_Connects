@@ -421,7 +421,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $fetchStmt->execute([$id]);
         $deletedUser = $fetchStmt->fetch(PDO::FETCH_ASSOC);
 
-        $stmt = $pdo->prepare("DELETE FROM $source WHERE id = ?");
+        $stmt = $pdo->prepare("UPDATE $source SET is_archived = TRUE WHERE id = ?");
         $stmt->execute([$id]);
 
         $stmtActivity = $pdo->prepare("INSERT INTO audits (user_id, roles, activity, activity_date) VALUES (:user_id, :roles, :activity, NOW())");
