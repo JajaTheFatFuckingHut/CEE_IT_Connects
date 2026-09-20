@@ -290,17 +290,22 @@ $stmt = $pdo->query("
 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 $stmt = $pdo->query("
-    SELECT id, full_name AS name, email, 'student' AS role, 'students' AS source,
-           COALESCE(is_archived, TRUE) AS is_archived
+    SELECT id, full_name AS name, email, 'student' AS role, 'students' AS source, is_archived
     FROM students
+    WHERE is_archived = TRUE
+
     UNION ALL
-    SELECT id, name, email, role, 'admins' AS source,
-           COALESCE(is_archived, TRUE) AS is_archived
-    FROM admins WHERE role != 'superadmin'
+
+    SELECT id, name, email, role, 'admins' AS source, is_archived
+    FROM admins
+    WHERE role != 'superadmin' AND is_archived = TRUE
+
     UNION ALL
-    SELECT id, full_name AS name, email, role::text AS role, 'advisers' AS source,
-           COALESCE(is_archived, TRUE) AS is_archived
+
+    SELECT id, full_name AS name, email, role::text AS role, 'advisers' AS source, is_archived
     FROM advisers
+    WHERE is_archived = TRUE
+
     ORDER BY name ASC
 ");
 $archivedUsers = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -1526,7 +1531,7 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
 
             <!-- Archived stuff -->
             <div id="restore" class="section sysAdm-section">
-                <div class="sysAdm-header--update">
+                <div class="sysAdm-header--danger">
                     <div class="sysAdm-header-left">
                         <div class="sysAdm-header-icon">
                             <i class="fa-solid fa-trash"></i>
