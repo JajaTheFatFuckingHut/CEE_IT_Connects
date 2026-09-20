@@ -1515,7 +1515,7 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
                                     <td>
                                         <form method="POST" action="superadmin-db.php"
                                             onsubmit="return confirm('Are you sure you want to delete this user?')">
-                                            <input type="hidden" name="user_id" value="<?= $u['id'] ?>">
+                                            <input type="hidden" name="id" value="<?= $u['id'] ?>">
                                             <input type="hidden" name="source" value="<?= $u['source'] ?>">
                                             <button type="submit" name="delete" class="btn-delete">
                                                 <i class="bi bi-trash-fill"></i> Delete
@@ -1583,11 +1583,11 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
                                     <td>
                                         <form method="POST" action="superadmin-db.php"
                                             onsubmit="return confirm('Restore this user?')">
-                                            <input type="hidden" name="id" value="<?= $u['id'] ?>">
+                                            <input type="hidden" name="user_id" value="<?= $u['id'] ?>">
                                             <input type="hidden" name="source"
                                                 value="<?= htmlspecialchars($u['source']) ?>">
                                             <input type="hidden" name="restore" value="1">
-                                            <button type="submit" class="btn btn-sucess">
+                                            <button type="submit" class="btn btn-success btn-sm">
                                                 <i class="bi bi-check2-circle"></i> Restore
                                             </button>
                                         </form>
