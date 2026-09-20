@@ -21,13 +21,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $adviser_id = (int) ($_POST['adviser_id'] ?? 0);
         $parts = array_map('trim', explode('|', $_POST['section'] ?? ''));
 
-        if (!$adviser_id || count($parts) !== 3 || in_array('', $parts, true)) {
+        if (!$adviser_id || count($parts) !== 2 || in_array('', $parts, true)) {
             $_SESSION['error'] = "Please select an adviser and a section.";
             header("Location: superadmin.php");
             exit;
         }
-        [$program, $year, $section] = $parts;
-        $program = strtolower($program);
+        [$year, $section] = $parts;
+        $year = (int) $year;
+        $section = (int) $section;
 
         // must be an internship adviser
         $advStmt = $pdo->prepare("SELECT full_name FROM advisers WHERE id = ? AND role = 'internship_adviser'");
@@ -39,15 +40,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
 
-        // section must not already have an adviser room
+        // section must be within the base amount for that year level
+        $cfg = $pdo->prepare("SELECT section_count FROM section_settings WHERE year_level = ?");
+        $cfg->execute([$year]);
+        $max = (int) $cfg->fetchColumn();
+        if ($section < 1 || $section > $max) {
+            $_SESSION['error'] = "That section is outside the configured range for year {$year}.";
+            header("Location: superadmin.php");
+            exit;
+        }
         $takenStmt = $pdo->prepare("
         SELECT id FROM rooms
         WHERE adviser_id IS NOT NULL AND is_archived = FALSE
-          AND LOWER(department) = :program
-          AND CAST(year_level AS TEXT) = :year
-          AND section = :section
+          AND CAST(year_level AS TEXT) = :year AND section = :section
     ");
-        $takenStmt->execute([':program' => $program, ':year' => $year, ':section' => $section]);
+        $takenStmt->execute([':year' => (string) $year, ':section' => (string) $section]);
         if ($takenStmt->fetch()) {
             $_SESSION['error'] = "That section already has an adviser.";
             header("Location: superadmin.php");
@@ -58,17 +65,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $pdo->beginTransaction();
 
             // 1. create the new room
-            $roomName = "{$adviserName}'s Room (" . ucwords($program) . " {$year}-{$section})";
+            $roomName = "{$adviserName}'s Room (Year {$year}-{$section})";
             $roomStmt = $pdo->prepare("
-            INSERT INTO rooms (room_name, section, year_level, department, adviser_id, is_archived, created_at)
-            VALUES (:name, :section, :year, :program, :adviser, FALSE, NOW())
+            INSERT INTO rooms (room_name, section, year_level, adviser_id, is_archived, created_at)
+            VALUES (:name, :section, :year, :adviser, FALSE, NOW())
             RETURNING id
         ");
             $roomStmt->execute([
                 ':name' => $roomName,
-                ':section' => $section,
+                ':section' => (string) $section,
                 ':year' => $year,
-                ':program' => $program,
                 ':adviser' => $adviser_id
             ]);
             $new_room_id = (int) $roomStmt->fetchColumn();
@@ -85,32 +91,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               )
               AND user_id IN (
                   SELECT id FROM students
-                  WHERE LOWER(program) = :program
-                    AND CAST(year_level AS TEXT) = :year
-                    AND section = :section
+                  WHERE CAST(year_level AS TEXT) = :year AND CAST(section AS TEXT) = :section
               )
-        ")->execute([
-                        ':room' => $new_room_id,
-                        ':program' => $program,
-                        ':year' => $year,
-                        ':section' => $section
-                    ]);
+        ")->execute([':room' => $new_room_id, ':year' => (string) $year, ':section' => (string) $section]);
 
-            // 3. add every student of the section to the new room
+            // 3. add every student of that year level + section to the new room
             $ins = $pdo->prepare("
             INSERT INTO room_members (room_id, user_id, user_type)
             SELECT :room, s.id, 'student'
             FROM students s
-            WHERE LOWER(s.program) = :program
-              AND CAST(s.year_level AS TEXT) = :year
-              AND s.section = :section
+            WHERE CAST(s.year_level AS TEXT) = :year AND CAST(s.section AS TEXT) = :section
         ");
-            $ins->execute([
-                ':room' => $new_room_id,
-                ':program' => $program,
-                ':year' => $year,
-                ':section' => $section
-            ]);
+            $ins->execute([':room' => $new_room_id, ':year' => (string) $year, ':section' => (string) $section]);
             $added = $ins->rowCount();
 
             // 4. audit log
@@ -120,7 +112,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ")->execute([
                         ':user_id' => $_SESSION['user_id'],
                         ':roles' => 'superadmin',
-                        ':activity' => "Assigned section {$program} {$year}-{$section} to adviser ID {$adviser_id} (room ID {$new_room_id})"
+                        ':activity' => "Assigned year {$year} section {$section} to adviser ID {$adviser_id} (room ID {$new_room_id})"
                     ]);
 
             $pdo->commit();
@@ -132,6 +124,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         header("Location: superadmin.php");
         exit;
+    }
+
+    // ---- data for the page ----
+    $sectionSettings = $pdo->query("
+    SELECT year_level, section_count FROM section_settings ORDER BY year_level
+")->fetchAll(PDO::FETCH_ASSOC);
+
+    $adviserList = $pdo->query("
+    SELECT id, full_name, email
+    FROM advisers
+    WHERE role = 'internship_adviser'
+    ORDER BY full_name
+")->fetchAll(PDO::FETCH_ASSOC);
+
+    // sections already handled, grouped by adviser
+    $assignedSections = [];
+    $takenKeys = [];
+    $rows = $pdo->query("
+    SELECT adviser_id, year_level, section
+    FROM rooms
+    WHERE adviser_id IS NOT NULL AND is_archived = FALSE
+      AND section IS NOT NULL AND section <> '' AND year_level IS NOT NULL
+    ORDER BY year_level, section
+")->fetchAll(PDO::FETCH_ASSOC);
+    foreach ($rows as $r) {
+        $assignedSections[$r['adviser_id']][] = "Year {$r['year_level']}-{$r['section']}";
+        $takenKeys[] = "{$r['year_level']}|{$r['section']}";
+    }
+
+    // open sections = 1..N for each year level, minus the ones already taken
+    $openSections = [];
+    foreach ($sectionSettings as $cfg) {
+        for ($n = 1; $n <= (int) $cfg['section_count']; $n++) {
+            if (!in_array("{$cfg['year_level']}|{$n}", $takenKeys, true)) {
+                $openSections[] = ['year_level' => $cfg['year_level'], 'section' => $n];
+            }
+        }
     }
 
     // ---- data for the table ----
@@ -504,62 +533,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 }
+if (isset($_POST['save_section_counts'])) {
+    $counts = $_POST['section_count'] ?? [];
 
+    try {
+        $pdo->beginTransaction();
+        $up = $pdo->prepare("
+            INSERT INTO section_settings (year_level, section_count)
+            VALUES (:y, :c)
+            ON CONFLICT (year_level) DO UPDATE SET section_count = EXCLUDED.section_count
+        ");
+        foreach ($counts as $y => $c) {
+            $y = (int) $y;
+            $c = max(0, min(50, (int) $c));   // clamp to 0-50
+            if ($y > 0)
+                $up->execute([':y' => $y, ':c' => $c]);
+        }
+
+        $pdo->prepare("
+            INSERT INTO audits (user_id, roles, activity, activity_date)
+            VALUES (:user_id, :roles, :activity, NOW())
+        ")->execute([
+                    ':user_id' => $_SESSION['user_id'],
+                    ':roles' => 'superadmin',
+                    ':activity' => "Updated section counts per year level"
+                ]);
+        $pdo->commit();
+        $_SESSION['success'] = "Section counts saved.";
+    } catch (Exception $e) {
+        $pdo->rollBack();
+        $_SESSION['error'] = "Could not save section counts.";
+    }
+    header("Location: superadmin.php");
+    exit;
+}
 ?>
-
-if (isset($_POST['save_program_hours'])) {
-
-$programs = $_POST['program'] ?? [];
-$hours = $_POST['required_hours'] ?? [];
-
-$updateStmt = $pdo->prepare("
-UPDATE internships
-SET required_hours = ?
-WHERE program = ?
-");
-
-$updatedCount = 0;
-
-foreach ($programs as $i => $prog) {
-
-$prog = trim($prog);
-
-$hrs = max(
-1,
-(int) ($hours[$i] ?? 486)
-);
-
-if ($prog !== '') {
-
-$updateStmt->execute([
-$hrs,
-$prog
-]);
-
-$updatedCount += $updateStmt->rowCount();
-}
-}
-
-$pdo->prepare("
-INSERT INTO audits (
-user_id,
-roles,
-activity,
-activity_date
-)
-VALUES (?, 'superadmin', ?, NOW())
-")->execute([
-$_SESSION['user_id'],
-"Updated required OJT hours for "
-. count($programs)
-. " program(s), affecting "
-. $updatedCount
-. " internship(s)"
-]);
-
-$_SESSION['success'] =
-"Required hours updated for {$updatedCount} internship(s).";
-
-header("Location: superadmin.php?section=ojt_hours");
-exit;
-}
