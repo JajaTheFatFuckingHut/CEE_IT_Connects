@@ -23,11 +23,11 @@ if (!isset($roleMap[$role])) {
 $user_type = $roleMap[$role]['user_type'];
 $table = $roleMap[$role]['table'];
 
-$departmentRoomIds = [
-    'information technology' => 24,
-    'electrical engineering' => 25,
-    'civil engineering' => 26,
-];
+// $departmentRoomIds = [
+//     'information technology' => 24,
+//     'electrical engineering' => 25,
+//     'civil engineering' => 26,
+// ];
 
 // added para sa sidebar thingy sa baba
 $userInfoStmt = $pdo->prepare("SELECT full_name FROM {$table} WHERE id = ?");
@@ -51,7 +51,13 @@ if (!isset($_GET['room_id'])) {
         die('No department assigned to this account.');
     }
 
-    $roomId = $departmentRoomIds[$user['department']] ?? null;
+    $deptStmt = $pdo->prepare("
+    SELECT id FROM rooms
+    WHERE LOWER(department) = LOWER(?) AND adviser_id IS NULL AND is_archived = FALSE
+    LIMIT 1
+");
+    $deptStmt->execute([$user['department']]);
+    $roomId = $deptStmt->fetchColumn() ?: null;
 
     if (!$roomId) {
         die('No room mapped for department: ' . htmlspecialchars($user['department']));
@@ -70,7 +76,6 @@ if (!isset($_GET['room_id'])) {
         die('Room not found or archived for department: ' . htmlspecialchars($user['department']));
     }
 
-    // Ensure membership
     $checkStmt = $pdo->prepare("
         SELECT 1 FROM room_members
         WHERE room_id = ? AND user_id = ? AND user_type = ?
