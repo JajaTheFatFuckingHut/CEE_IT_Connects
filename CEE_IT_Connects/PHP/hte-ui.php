@@ -186,28 +186,34 @@ $adviserStmt->execute([$adviser_id]);
 $adviserInternshipId = $adviserStmt->fetchColumn();
 
 $stmt = $pdo->prepare("
-    SELECT 
+    SELECT
         s.id,
         s.full_name,
-        r.room_name,
-        i.company,
-        COALESCE(SUM(l.hours_worked), 0) AS total_hours,
-        MAX(m.remarks) AS latest_remarks
-    FROM students s
-    JOIN room_members rm ON s.id = rm.user_id
-    JOIN rooms r ON rm.room_id = r.id
-    LEFT JOIN student_internships si ON s.id = si.student_id
-    LEFT JOIN internships i ON si.internship_id = i.id
-    LEFT JOIN ojt_logs l ON s.id = l.student_id
-    LEFT JOIN (
-        SELECT DISTINCT ON (student_id)
-            student_id, remarks
-        FROM ojt_remarks
-        ORDER BY student_id, updated_at DESC
-    ) m ON s.id = m.student_id
-    GROUP BY s.id, s.full_name, r.room_name, i.company
+        oa.company_name,
+        oa.status AS application_status,
+        oa.submitted_at,
+        i.required_hours,
+        COALESCE((
+            SELECT ROUND(SUM(
+                GREATEST(0, EXTRACT(EPOCH FROM (h.m_out - h.m_in)) / 3600) +
+                GREATEST(0, EXTRACT(EPOCH FROM (h.a_out - h.a_in)) / 3600)
+            )::numeric, 2)
+            FROM ojt_hours h
+            WHERE h.user_id = s.id
+              AND h.user_type = 'student'
+              AND h.m_in IS NOT NULL AND h.m_out IS NOT NULL
+              AND h.a_in IS NOT NULL AND h.a_out IS NOT NULL
+        ), 0) AS total_hours,
+        (SELECT remarks FROM ojt_remarks m
+         WHERE m.student_id = s.id
+         ORDER BY m.updated_at DESC LIMIT 1) AS latest_remarks
+    FROM ojt_applications oa
+    JOIN students s ON s.id = oa.student_id
+    LEFT JOIN internships i ON i.id = oa.internship_id
+    WHERE oa.internship_id = ?
+    ORDER BY oa.submitted_at DESC
 ");
-$stmt->execute();
+$stmt->execute([$adviserInternshipId]);
 $statuses = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Fetch all students bookmarked to this adviser's internship
