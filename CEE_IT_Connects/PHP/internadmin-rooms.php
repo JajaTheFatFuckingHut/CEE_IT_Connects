@@ -24,11 +24,11 @@ if (!isset($roleMap[$role])) {
 $user_type = $roleMap[$role]['user_type'];
 $table = $roleMap[$role]['table'];
 
-$departmentRoomIds = [
-    'information technology' => 24,
-    'electrical engineering' => 25,
-    'civil engineering' => 26,
-];
+// $departmentRoomIds = [
+//     'information technology' => 24,
+//     'electrical engineering' => 25,
+//     'civil engineering' => 26,
+// ];
 
 if (!isset($_GET['room_id'])) {
     // Get the department
@@ -40,8 +40,13 @@ if (!isset($_GET['room_id'])) {
         die('No department assigned to this account.');
     }
 
-    $roomId = $departmentRoomIds[$user['department']] ?? null;
-
+    $deptStmt = $pdo->prepare("
+    SELECT id FROM rooms
+    WHERE LOWER(department) = LOWER(?) AND adviser_id IS NULL AND is_archived = FALSE
+    LIMIT 1
+");
+    $deptStmt->execute([$user['department']]);
+    $roomId = $deptStmt->fetchColumn() ?: null;
     if (!$roomId) {
         die('No room mapped for department: ' . htmlspecialchars($user['department']));
     }
@@ -1271,7 +1276,7 @@ $page = 'messages';
     <!-- SIDEBAR -->
     <div class="sidebar">
         <div style="display:flex; flex-direction:column; width:100%;">
-<!-- 
+            <!-- 
             <a href="internadmin-rooms.php?room_id=<?= $current_room_id ?>"
                 class="<?= $section === '' ? 'active' : '' ?>" title="Room">
                 <i class="bi bi-display-fill me-2" style="font-weight: 800;"></i> <span class="sidebar-text">Room</span>
