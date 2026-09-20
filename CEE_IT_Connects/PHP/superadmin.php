@@ -1531,7 +1531,7 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
 
             <!-- Archived stuff -->
             <div id="restore" class="section sysAdm-section">
-                <div class="sysAdm-header--success">
+                <div class="sysAdm-header--danger">
                     <div class="sysAdm-header-left">
                         <div class="sysAdm-header-icon">
                             <i class="fa-solid fa-trash"></i>
@@ -1584,7 +1584,7 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
                                             onsubmit="return confirm('Are you sure you want to delete this user?')">
                                             <input type="hidden" name="id" value="<?= $u['id'] ?>">
                                             <input type="hidden" name="source" value="<?= $u['source'] ?>">
-                                            <button type="submit" name="delete" class="btn-success">
+                                            <button type="submit" name="delete" class="btn btn-sucess">
                                                 <i class="bi bi-check2-circle"></i> Restore
                                             </button>
                                         </form>
