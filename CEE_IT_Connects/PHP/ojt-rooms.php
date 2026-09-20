@@ -1854,6 +1854,7 @@ $page = 'messages';
 
             <?php
             $stepLabels = [
+                'resume' => 'Resume',
                 'mou' => 'MOU',
                 'company_profile' => 'Company Profile',
                 'addendum' => 'Addendum',
@@ -1863,7 +1864,6 @@ $page = 'messages';
                 'internship_plan' => 'Internship Plan',
                 'vicinity_map' => 'Vicinity Map',
                 'oath' => 'Oath',
-                'ojt_started' => 'OJT Started',
             ];
             ?>
 
