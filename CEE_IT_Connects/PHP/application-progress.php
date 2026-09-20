@@ -104,6 +104,7 @@ function stepDate(array $p, string $k): string
 $checklist = [
     'internship' => false,
     // 'hte_form' => false,
+    'mou' => false,
     'resume' => false,
     'addendum' => false,
     'reco_letter' => false,
@@ -117,6 +118,7 @@ $checklist['internship'] = is_array($selectedInternship) && !empty($selectedInte
 // $checklist['acceptance_letter'] = isDone($progress, 'acceptance_letter');
 $checklist['company_profile'] = isDone($progress, 'company_profile');
 // $checklist['hte_form'] = isDone($progress, 'hte_form');
+$checklist['mou'] = isDone($progress, 'mou');
 $checklist['resume'] = isDone($progress, 'resume');
 $checklist['addendum'] = isDone($progress, 'addendum');
 $checklist['reco_letter'] = !$needs_reco_letter || isDone($progress, 'reco_letter');
@@ -890,50 +892,77 @@ function uploadBlock(string $step_key, string $label, array $progress, ?int $int
                 </div>
             </div>
 
-            <!-- STEP 6: Pre-deployment Requirements Pickup (MOU / Partnership Letter) -->
-            <?php $s6done = $checklist['addendum'] ?? false; ?>
-            <div class="step-card <?= $s6done ? 'is-done' : 'is-active' ?>">
+            <!-- STEP 6a: MOU / Partnership Letter -->
+            <?php $s6adone = $checklist['mou'] ?? false; ?>
+            <div class="step-card <?= $s6adone ? 'is-done' : 'is-active' ?>">
                 <div class="step-header" onclick="toggle(this)">
-                    <div class="step-num <?= $s6done ? 'sn-done' : 'sn-active' ?>">
-                        <?= $s6done ? '<i class="fa fa-check"></i>' : 'X' ?>
+                    <div class="step-num <?= $s6adone ? 'sn-done' : 'sn-active' ?>">
+                        <?= $s6adone ? '<i class="fa fa-check"></i>' : 'X' ?>
                     </div>
                     <div class="step-meta">
-                        <h3>MOU / Partnership Letter &amp; Addendum</h3>
+                        <h3>MOU / Partnership Letter</h3>
                         <p>Pick up from college secretary — submit photocopy to OJT Coordinator, original to HTE</p>
                     </div>
                     <div class="step-right">
-                        <span class="pill <?= $s6done ? 'pill-done' : 'pill-active' ?>">
-                            <?= $s6done ? '<i class="fa fa-check"></i> Done' : 'Pending' ?>
+                        <span class="pill <?= $s6adone ? 'pill-done' : 'pill-active' ?>">
+                            <?= $s6adone ? '<i class="fa fa-check"></i> Done' : 'Pending' ?>
                         </span>
                         <span class="chevron"><i class="fa fa-chevron-down"></i></span>
                     </div>
                 </div>
                 <div class="step-body">
-                    <?php if ($s6done): ?>
+                    <?php if ($s6adone): ?>
                         <div class="confirmed">
                             <i class="fa fa-check-circle"></i> Marked complete &middot;
-                            <?= stepDate($progress, 'addendum') ?>
+                            <?= stepDate($progress, 'mou') ?>
                         </div>
                     <?php endif; ?>
                     <div class="info-box amber">
                         <i class="fa fa-triangle-exclamation"></i>
                         <div>
                             <p>Wait for confirmation before pickup</p>
-                            <span>Wait for your OJT Coordinator to confirm that your pre-deployment requirements
-                                are ready for pickup at the college secretary's office.</span>
+                            <span>Wait for your OJT Coordinator to confirm that your MOU / Partnership Letter
+                                is ready for pickup at the college secretary's office.</span>
                         </div>
                     </div>
                     <div class="info-box blue">
                         <i class="fa fa-circle-info"></i>
                         <div>
-                            <p>What to pick up</p>
-                            <span>
-                                <strong>MOU / Partnership Letter</strong> — photocopy submit to OJT coordinator,
-                                return original to college secretary<br>
-                                <strong>Addendum</strong> — auto-generated, download below
-                            </span>
+                            <p>What to do</p>
+                            <span>Submit a photocopy to the OJT Coordinator and return the original to the HTE.</span>
                         </div>
                     </div>
+                    <?php if (!$s6adone): ?>
+                        <?= uploadBlock('mou', 'I have picked up the MOU/Partnership Letter and submitted the photocopy to the OJT Coordinator.', $progress, $internship_id) ?>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <!-- STEP 6b: Addendum -->
+            <?php $s6bdone = $checklist['addendum'] ?? false; ?>
+            <div class="step-card <?= $s6bdone ? 'is-done' : 'is-active' ?>">
+                <div class="step-header" onclick="toggle(this)">
+                    <div class="step-num <?= $s6bdone ? 'sn-done' : 'sn-active' ?>">
+                        <?= $s6bdone ? '<i class="fa fa-check"></i>' : 'X' ?>
+                    </div>
+                    <div class="step-meta">
+                        <h3>Addendum for Student Intern Placement</h3>
+                        <p>Auto-generated — download, print and submit to the college</p>
+                    </div>
+                    <div class="step-right">
+                        <span class="pill <?= $s6bdone ? 'pill-done' : 'pill-active' ?>">
+                            <?= $s6bdone ? '<i class="fa fa-check"></i> Done' : 'Pending' ?>
+                        </span>
+                        <span class="chevron"><i class="fa fa-chevron-down"></i></span>
+                    </div>
+                </div>
+                <div class="step-body">
+                    <?php if ($s6bdone): ?>
+                        <div class="confirmed">
+                            <i class="fa fa-check-circle"></i> Marked complete &middot;
+                            <?= stepDate($progress, 'addendum') ?>
+                        </div>
+                    <?php endif; ?>
                     <div class="doc-row">
                         <i class="fa fa-file-lines" style="color:var(--brand);"></i>
                         <span class="doc-name">Addendum for Student Intern Placement</span>
@@ -949,8 +978,8 @@ function uploadBlock(string $step_key, string $label, array $progress, ?int $int
                             </a>
                         <?php endif; ?>
                     </div>
-                    <?php if (!$s6done): ?>
-                        <?= uploadBlock('addendum', 'I have picked up the MOU/Partnership Letter and submitted the Addendum to the college.', $progress, $internship_id) ?>
+                    <?php if (!$s6bdone): ?>
+                        <?= uploadBlock('addendum', 'I have submitted the Addendum to the college.', $progress, $internship_id) ?>
                     <?php endif; ?>
                 </div>
             </div>
@@ -1147,279 +1176,279 @@ function uploadBlock(string $step_key, string $label, array $progress, ?int $int
             <?php $s1done = $checklist['medical_cert'] ?? false; ?>
             <div class="step-card <?= $s1done ? 'is-done' : 'is-active' ?>">
                 <div class=" step-header" onclick="toggle(this)">
-                <div class="step-num <?= $s1done ? 'sn-done' : 'sn-active' ?>">
-                    <?= $s1done ? '<i class="fa fa-check"></i>' : 'X' ?>
-                </div>
-                <div class="step-meta">
-                    <h3>Medical Certificate</h3>
-                    <p>Fit-to-work cert from a DOH-accredited clinic — submit to OJT Coordinator</p>
-                </div>
-                <div class="step-right">
-                    <span class="pill <?= $s1done ? 'pill-done' : 'pill-active' ?>">
-                        <?= $s1done ? '<i class="fa fa-check"></i> Done' : 'Pending' ?>
-                    </span>
-                    <span class="chevron"><i class="fa fa-chevron-down"></i></span>
-                </div>
-            </div>
-            <div class="step-body">
-                <?php if ($s1done): ?>
-                    <div class="confirmed">
-                        <i class="fa fa-check-circle"></i> Marked complete &middot;
-                        <?= stepDate($progress, 'medical_cert') ?>
+                    <div class="step-num <?= $s1done ? 'sn-done' : 'sn-active' ?>">
+                        <?= $s1done ? '<i class="fa fa-check"></i>' : 'X' ?>
                     </div>
-                <?php endif; ?>
-                <div class="info-box blue">
-                    <i class="fa fa-stethoscope"></i>
-                    <div>
-                        <p>Complete this first before applying to any HTE</p>
-                        <span>Obtain a medical certificate tagged <strong>"fit to work / fit for OJT"</strong>
-                            signed by a licensed physician from a DOH-accredited clinic.
-                            Submit to your OJT Coordinator before anything else.</span>
+                    <div class="step-meta">
+                        <h3>Medical Certificate</h3>
+                        <p>Fit-to-work cert from a DOH-accredited clinic — submit to OJT Coordinator</p>
+                    </div>
+                    <div class="step-right">
+                        <span class="pill <?= $s1done ? 'pill-done' : 'pill-active' ?>">
+                            <?= $s1done ? '<i class="fa fa-check"></i> Done' : 'Pending' ?>
+                        </span>
+                        <span class="chevron"><i class="fa fa-chevron-down"></i></span>
                     </div>
                 </div>
-                <div class="info-box amber">
-                    <i class="fa fa-triangle-exclamation"></i>
-                    <div>
-                        <p>Physical submission required</p>
-                        <span>You must personally submit a photocopy to the PLV CEIT office — this cannot be
-                            submitted online.</span>
-                    </div>
-                </div>
-                <?php if (!$s1done): ?>
-                    <?= uploadBlock('medical_cert', 'I have obtained my medical certificate (fit to work/OJT) and submitted a photocopy to my OJT Coordinator.', $progress, $internship_id) ?>
-                <?php endif; ?>
-            </div>
-        </div>
-
-
-        <!-- STEP 11: Internship Plan -->
-        <?php $s11done = $checklist['internship_plan'] ?? false; ?>
-        <div class="step-card <?= $s11done ? 'is-done' : 'is-active' ?>">
-            <div class="step-header" onclick="toggle(this)">
-                <div class="step-num <?= $s11done ? 'sn-done' : 'sn-active' ?>">
-                    <?= $s11done ? '<i class="fa fa-check"></i>' : 'X' ?>
-                </div>
-                <div class="step-meta">
-                    <h3>Internship Plan</h3>
-                    <p>Fill out at HTE site — signed by Coordinator, Supervisor &amp; you</p>
-                </div>
-                <div class="step-right">
-                    <span class="pill <?= $s11done ? 'pill-done' : 'pill-active' ?>">
-                        <?= $s11done ? '<i class="fa fa-check"></i> Done' : 'Pending' ?>
-                    </span>
-                    <span class="chevron"><i class="fa fa-chevron-down"></i></span>
-                </div>
-            </div>
-            <div class="step-body">
-                <?php if ($s11done): ?>
-                    <div class="confirmed">
-                        <i class="fa fa-check-circle"></i> Marked complete &middot;
-                        <?= stepDate($progress, 'internship_plan') ?>
-                    </div>
-                <?php endif; ?>
-                <div class="info-box blue">
-                    <i class="fa fa-clipboard-list"></i>
-                    <div>
-                        <p>Complete this form at the HTE site</p>
-                        <span>Fill in the Internship Plan (CEIT-OJTF-002) at your HTE.
-                            It must be signed by your <strong>OJT Coordinator</strong>,
-                            your <strong>HTE Supervisor</strong>, and <strong>yourself</strong>.
-                            Submit before completing 30% of your required OJT hours.</span>
-                    </div>
-                </div>
-                <div class="action-row">
-                    <?php if ($internship_id): ?>
-                        <a href="mou-preview.php?id=<?= $internship_id ?>&student_id=<?= $student_id ?>&action=internship_plan"
-                            target="_blank" class="btn-action btn-outline-action">
-                            <i class="fa fa-eye"></i> Preview
-                        </a>
-                        <a href="download-form.php?id=<?= $internship_id ?>&action=internship_plan"
-                            class="btn-action btn-primary-action">
-                            <i class="fa fa-download"></i> Download Internship Plan
-                        </a>
-                    <?php else: ?>
-                        <span class="pill pill-idle"><i class="fa fa-lock"></i> Select an internship first</span>
-                    <?php endif; ?>
-                </div>
-                <?php if (!$s11done): ?>
-                    <?= uploadBlock('internship_plan', 'The Internship Plan has been completed, signed by all required parties, and submitted to my OJT Coordinator.', $progress, $internship_id) ?>
-                <?php endif; ?>
-            </div>
-        </div>
-
-        <!-- STEP 10: Vicinity Map -->
-        <?php $s10done = $checklist['vicinity_map'] ?? false; ?>
-        <div class="step-card <?= $s10done ? 'is-done' : 'is-active' ?>">
-            <div class="step-header" onclick="toggle(this)">
-                <div class="step-num <?= $s10done ? 'sn-done' : 'sn-active' ?>">
-                    <?= $s10done ? '<i class="fa fa-check"></i>' : 'X' ?>
-                </div>
-                <div class="step-meta">
-                    <h3>Vicinity Map</h3>
-                    <p>Auto-generated PDF showing route to your HTE — submit to OJT Coordinator</p>
-                </div>
-                <div class="step-right">
-                    <span class="pill <?= $s10done ? 'pill-done' : 'pill-active' ?>">
-                        <?= $s10done ? '<i class="fa fa-check"></i> Done' : 'Pending' ?>
-                    </span>
-                    <span class="chevron"><i class="fa fa-chevron-down"></i></span>
-                </div>
-            </div>
-            <div class="step-body">
-                <?php if ($s10done): ?>
-                    <div class="confirmed">
-                        <i class="fa fa-check-circle"></i> Marked complete &middot;
-                        <?= stepDate($progress, 'vicinity_map') ?>
-                    </div>
-                <?php endif; ?>
-                <div class="info-box blue">
-                    <i class="fa fa-map-location-dot"></i>
-                    <div>
-                        <p>Automatically generated from your HTE address</p>
-                        <span>Download and submit to your OJT Coordinator.</span>
-                    </div>
-                </div>
-                <div class="action-row">
-                    <?php if ($internship_id): ?>
-                        <a href="mou-preview.php?id=<?= $internship_id ?>&student_id=<?= $student_id ?>&action=vicinity"
-                            target="_blank" class="btn-action btn-outline-action">
-                            <i class="fa fa-eye"></i> Preview
-                        </a>
-                        <a href="download-form.php?id=<?= $internship_id ?>&action=vicinity"
-                            class="btn-action btn-primary-action">
-                            <i class="fa fa-download"></i> Download Vicinity Map
-                        </a>
-                    <?php else: ?>
-                        <span class="pill pill-idle"><i class="fa fa-lock"></i> Select an internship first</span>
-                    <?php endif; ?>
-                </div>
-                <?php if (!$s10done): ?>
-                    <?= uploadBlock('vicinity_map', 'I have downloaded the Vicinity Map and submitted it to my OJT Coordinator.', $progress, $internship_id) ?>
-                <?php endif; ?>
-            </div>
-        </div>
-
-        <!-- STEP 9: Oath of Undertaking -->
-        <?php $s9done = $checklist['oath'] ?? false; ?>
-        <div class="step-card <?= $s9done ? 'is-done' : 'is-active' ?>">
-            <div class="step-header" onclick="toggle(this)">
-                <div class="step-num <?= $s9done ? 'sn-done' : 'sn-active' ?>">
-                    <?= $s9done ? '<i class="fa fa-check"></i>' : 'X' ?>
-                </div>
-                <div class="step-meta">
-                    <h3>Oath of Undertaking</h3>
-                    <p>Submit to OJT Coordinator — typically done during OJT Orientation</p>
-                </div>
-                <div class="step-right">
-                    <span class="pill <?= $s9done ? 'pill-done' : 'pill-active' ?>">
-                        <?= $s9done ? '<i class="fa fa-check"></i> Done' : 'Pending' ?>
-                    </span>
-                    <span class="chevron"><i class="fa fa-chevron-down"></i></span>
-                </div>
-            </div>
-            <div class="step-body">
-                <?php if ($s9done): ?>
-                    <div class="confirmed">
-                        <i class="fa fa-check-circle"></i> Marked complete &middot; <?= stepDate($progress, 'oath') ?>
-                    </div>
-                <?php endif; ?>
-                <div class="info-box blue">
-                    <i class="fa fa-file-signature"></i>
-                    <div>
-                        <p>Automatically generated from your student profile</p>
-                        <span>Download, sign, and submit the original to your OJT Coordinator.
-                            This is typically done during the OJT Orientation.</span>
-                    </div>
-                </div>
-                <div class="action-row">
-                    <?php if ($internship_id): ?>
-                        <a href="mou-preview.php?id=<?= $internship_id ?>&student_id=<?= $student_id ?>&action=oath"
-                            target="_blank" class="btn-action btn-outline-action">
-                            <i class="fa fa-eye"></i> Preview
-                        </a>
-                        <a href="download-form.php?id=<?= $internship_id ?>&action=oath"
-                            class="btn-action btn-primary-action">
-                            <i class="fa fa-download"></i> Download Oath
-                        </a>
-                    <?php else: ?>
-                        <span class="pill pill-idle"><i class="fa fa-lock"></i> Select an internship first</span>
-                    <?php endif; ?>
-                </div>
-                <?php if (!$s9done): ?>
-                    <?= uploadBlock('oath', 'I have signed the Oath of Undertaking and submitted the original to my OJT Coordinator.', $progress, $internship_id) ?>
-                <?php endif; ?>
-            </div>
-        </div>
-
-        <!-- STEP 12: Start OJT -->
-
-
-    </div><!-- /.checklist -->
-    <?php if ($selectedInternship): ?>
-        <div class="step-card" style="margin-top:28px; border-color:#fecaca;">
-            <div class="step-header" onclick="toggle(this)" style="cursor:pointer;">
-                <div class="step-num" style="background:#fef2f2; color:#dc2626;">
-                    <i class="fa fa-xmark"></i>
-                </div>
-                <div class="step-meta">
-                    <h3 style="color:#dc2626;">Cancel Application</h3>
-                    <p>Withdraw from this internship and reset your progress</p>
-                </div>
-                <div class="step-right">
-                    <span class="chevron"><i class="fa fa-chevron-down"></i></span>
-                </div>
-            </div>
-            <div class="step-body">
-
-                <div class="info-box amber">
-                    <i class="fa fa-triangle-exclamation"></i>
-                    <div>
-                        <p>This cannot be undone</p>
-                        <span>Cancelling will permanently delete all uploaded documents and reset
-                            checklist progress for this internship. You can apply again afterward,
-                            but you will need to redo the checklist from the start.</span>
-                    </div>
-                </div>
-
-                <!-- Documents that will be deleted -->
-                <div class="body-label" style="margin-top:14px;">Documents that will be removed</div>
-                <?php
-                $anyDocs = false;
-                foreach ($checklist as $key => $done) {
-                    if (!empty($progress[$key]['file_path'])) {
-                        $anyDocs = true;
-                        ?>
-                        <div class="doc-row">
-                            <i class="fa fa-file" style="color:var(--gray-400);"></i>
-                            <span class="doc-name">
-                                <?= htmlspecialchars(ucwords(str_replace('_', ' ', $key))) ?>
-                            </span>
-                            <a href="<?= htmlspecialchars($progress[$key]['file_path']) ?>" target="_blank"
-                                style="font-size:11.5px; color:var(--blue); text-decoration:none;">
-                                <i class="fa fa-eye"></i> View
-                            </a>
+                <div class="step-body">
+                    <?php if ($s1done): ?>
+                        <div class="confirmed">
+                            <i class="fa fa-check-circle"></i> Marked complete &middot;
+                            <?= stepDate($progress, 'medical_cert') ?>
                         </div>
-                        <?php
-                    }
-                }
-                if (!$anyDocs): ?>
-                    <p style="font-size:12.5px; color:var(--gray-400);">No documents uploaded yet.</p>
-                <?php endif; ?>
-
-                <form action="student-progress.php" method="POST"
-                    onsubmit="return confirm('Are you sure you want to cancel this application? All uploaded documents and progress for this internship will be permanently deleted. This cannot be undone.');"
-                    style="margin-top:16px;">
-                    <input type="hidden" name="action" value="cancel_application">
-                    <input type="hidden" name="application_id"
-                        value="<?= (int) ($selectedInternship['application_id'] ?? 0) ?>">
-                    <button type="submit" class="btn-action" style="background:#dc2626; color:white;">
-                        <i class="fa fa-trash-can"></i> Cancel Application
-                    </button>
-                </form>
-
+                    <?php endif; ?>
+                    <div class="info-box blue">
+                        <i class="fa fa-stethoscope"></i>
+                        <div>
+                            <p>Complete this first before applying to any HTE</p>
+                            <span>Obtain a medical certificate tagged <strong>"fit to work / fit for OJT"</strong>
+                                signed by a licensed physician from a DOH-accredited clinic.
+                                Submit to your OJT Coordinator before anything else.</span>
+                        </div>
+                    </div>
+                    <div class="info-box amber">
+                        <i class="fa fa-triangle-exclamation"></i>
+                        <div>
+                            <p>Physical submission required</p>
+                            <span>You must personally submit a photocopy to the PLV CEIT office — this cannot be
+                                submitted online.</span>
+                        </div>
+                    </div>
+                    <?php if (!$s1done): ?>
+                        <?= uploadBlock('medical_cert', 'I have obtained my medical certificate (fit to work/OJT) and submitted a photocopy to my OJT Coordinator.', $progress, $internship_id) ?>
+                    <?php endif; ?>
+                </div>
             </div>
-        </div>
-    <?php endif; ?>
+
+
+            <!-- STEP 11: Internship Plan -->
+            <?php $s11done = $checklist['internship_plan'] ?? false; ?>
+            <div class="step-card <?= $s11done ? 'is-done' : 'is-active' ?>">
+                <div class="step-header" onclick="toggle(this)">
+                    <div class="step-num <?= $s11done ? 'sn-done' : 'sn-active' ?>">
+                        <?= $s11done ? '<i class="fa fa-check"></i>' : 'X' ?>
+                    </div>
+                    <div class="step-meta">
+                        <h3>Internship Plan</h3>
+                        <p>Fill out at HTE site — signed by Coordinator, Supervisor &amp; you</p>
+                    </div>
+                    <div class="step-right">
+                        <span class="pill <?= $s11done ? 'pill-done' : 'pill-active' ?>">
+                            <?= $s11done ? '<i class="fa fa-check"></i> Done' : 'Pending' ?>
+                        </span>
+                        <span class="chevron"><i class="fa fa-chevron-down"></i></span>
+                    </div>
+                </div>
+                <div class="step-body">
+                    <?php if ($s11done): ?>
+                        <div class="confirmed">
+                            <i class="fa fa-check-circle"></i> Marked complete &middot;
+                            <?= stepDate($progress, 'internship_plan') ?>
+                        </div>
+                    <?php endif; ?>
+                    <div class="info-box blue">
+                        <i class="fa fa-clipboard-list"></i>
+                        <div>
+                            <p>Complete this form at the HTE site</p>
+                            <span>Fill in the Internship Plan (CEIT-OJTF-002) at your HTE.
+                                It must be signed by your <strong>OJT Coordinator</strong>,
+                                your <strong>HTE Supervisor</strong>, and <strong>yourself</strong>.
+                                Submit before completing 30% of your required OJT hours.</span>
+                        </div>
+                    </div>
+                    <div class="action-row">
+                        <?php if ($internship_id): ?>
+                            <a href="mou-preview.php?id=<?= $internship_id ?>&student_id=<?= $student_id ?>&action=internship_plan"
+                                target="_blank" class="btn-action btn-outline-action">
+                                <i class="fa fa-eye"></i> Preview
+                            </a>
+                            <a href="download-form.php?id=<?= $internship_id ?>&action=internship_plan"
+                                class="btn-action btn-primary-action">
+                                <i class="fa fa-download"></i> Download Internship Plan
+                            </a>
+                        <?php else: ?>
+                            <span class="pill pill-idle"><i class="fa fa-lock"></i> Select an internship first</span>
+                        <?php endif; ?>
+                    </div>
+                    <?php if (!$s11done): ?>
+                        <?= uploadBlock('internship_plan', 'The Internship Plan has been completed, signed by all required parties, and submitted to my OJT Coordinator.', $progress, $internship_id) ?>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <!-- STEP 10: Vicinity Map -->
+            <?php $s10done = $checklist['vicinity_map'] ?? false; ?>
+            <div class="step-card <?= $s10done ? 'is-done' : 'is-active' ?>">
+                <div class="step-header" onclick="toggle(this)">
+                    <div class="step-num <?= $s10done ? 'sn-done' : 'sn-active' ?>">
+                        <?= $s10done ? '<i class="fa fa-check"></i>' : 'X' ?>
+                    </div>
+                    <div class="step-meta">
+                        <h3>Vicinity Map</h3>
+                        <p>Auto-generated PDF showing route to your HTE — submit to OJT Coordinator</p>
+                    </div>
+                    <div class="step-right">
+                        <span class="pill <?= $s10done ? 'pill-done' : 'pill-active' ?>">
+                            <?= $s10done ? '<i class="fa fa-check"></i> Done' : 'Pending' ?>
+                        </span>
+                        <span class="chevron"><i class="fa fa-chevron-down"></i></span>
+                    </div>
+                </div>
+                <div class="step-body">
+                    <?php if ($s10done): ?>
+                        <div class="confirmed">
+                            <i class="fa fa-check-circle"></i> Marked complete &middot;
+                            <?= stepDate($progress, 'vicinity_map') ?>
+                        </div>
+                    <?php endif; ?>
+                    <div class="info-box blue">
+                        <i class="fa fa-map-location-dot"></i>
+                        <div>
+                            <p>Automatically generated from your HTE address</p>
+                            <span>Download and submit to your OJT Coordinator.</span>
+                        </div>
+                    </div>
+                    <div class="action-row">
+                        <?php if ($internship_id): ?>
+                            <a href="mou-preview.php?id=<?= $internship_id ?>&student_id=<?= $student_id ?>&action=vicinity"
+                                target="_blank" class="btn-action btn-outline-action">
+                                <i class="fa fa-eye"></i> Preview
+                            </a>
+                            <a href="download-form.php?id=<?= $internship_id ?>&action=vicinity"
+                                class="btn-action btn-primary-action">
+                                <i class="fa fa-download"></i> Download Vicinity Map
+                            </a>
+                        <?php else: ?>
+                            <span class="pill pill-idle"><i class="fa fa-lock"></i> Select an internship first</span>
+                        <?php endif; ?>
+                    </div>
+                    <?php if (!$s10done): ?>
+                        <?= uploadBlock('vicinity_map', 'I have downloaded the Vicinity Map and submitted it to my OJT Coordinator.', $progress, $internship_id) ?>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <!-- STEP 9: Oath of Undertaking -->
+            <?php $s9done = $checklist['oath'] ?? false; ?>
+            <div class="step-card <?= $s9done ? 'is-done' : 'is-active' ?>">
+                <div class="step-header" onclick="toggle(this)">
+                    <div class="step-num <?= $s9done ? 'sn-done' : 'sn-active' ?>">
+                        <?= $s9done ? '<i class="fa fa-check"></i>' : 'X' ?>
+                    </div>
+                    <div class="step-meta">
+                        <h3>Oath of Undertaking</h3>
+                        <p>Submit to OJT Coordinator — typically done during OJT Orientation</p>
+                    </div>
+                    <div class="step-right">
+                        <span class="pill <?= $s9done ? 'pill-done' : 'pill-active' ?>">
+                            <?= $s9done ? '<i class="fa fa-check"></i> Done' : 'Pending' ?>
+                        </span>
+                        <span class="chevron"><i class="fa fa-chevron-down"></i></span>
+                    </div>
+                </div>
+                <div class="step-body">
+                    <?php if ($s9done): ?>
+                        <div class="confirmed">
+                            <i class="fa fa-check-circle"></i> Marked complete &middot; <?= stepDate($progress, 'oath') ?>
+                        </div>
+                    <?php endif; ?>
+                    <div class="info-box blue">
+                        <i class="fa fa-file-signature"></i>
+                        <div>
+                            <p>Automatically generated from your student profile</p>
+                            <span>Download, sign, and submit the original to your OJT Coordinator.
+                                This is typically done during the OJT Orientation.</span>
+                        </div>
+                    </div>
+                    <div class="action-row">
+                        <?php if ($internship_id): ?>
+                            <a href="mou-preview.php?id=<?= $internship_id ?>&student_id=<?= $student_id ?>&action=oath"
+                                target="_blank" class="btn-action btn-outline-action">
+                                <i class="fa fa-eye"></i> Preview
+                            </a>
+                            <a href="download-form.php?id=<?= $internship_id ?>&action=oath"
+                                class="btn-action btn-primary-action">
+                                <i class="fa fa-download"></i> Download Oath
+                            </a>
+                        <?php else: ?>
+                            <span class="pill pill-idle"><i class="fa fa-lock"></i> Select an internship first</span>
+                        <?php endif; ?>
+                    </div>
+                    <?php if (!$s9done): ?>
+                        <?= uploadBlock('oath', 'I have signed the Oath of Undertaking and submitted the original to my OJT Coordinator.', $progress, $internship_id) ?>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <!-- STEP 12: Start OJT -->
+
+
+        </div><!-- /.checklist -->
+        <?php if ($selectedInternship): ?>
+            <div class="step-card" style="margin-top:28px; border-color:#fecaca;">
+                <div class="step-header" onclick="toggle(this)" style="cursor:pointer;">
+                    <div class="step-num" style="background:#fef2f2; color:#dc2626;">
+                        <i class="fa fa-xmark"></i>
+                    </div>
+                    <div class="step-meta">
+                        <h3 style="color:#dc2626;">Cancel Application</h3>
+                        <p>Withdraw from this internship and reset your progress</p>
+                    </div>
+                    <div class="step-right">
+                        <span class="chevron"><i class="fa fa-chevron-down"></i></span>
+                    </div>
+                </div>
+                <div class="step-body">
+
+                    <div class="info-box amber">
+                        <i class="fa fa-triangle-exclamation"></i>
+                        <div>
+                            <p>This cannot be undone</p>
+                            <span>Cancelling will permanently delete all uploaded documents and reset
+                                checklist progress for this internship. You can apply again afterward,
+                                but you will need to redo the checklist from the start.</span>
+                        </div>
+                    </div>
+
+                    <!-- Documents that will be deleted -->
+                    <div class="body-label" style="margin-top:14px;">Documents that will be removed</div>
+                    <?php
+                    $anyDocs = false;
+                    foreach ($checklist as $key => $done) {
+                        if (!empty($progress[$key]['file_path'])) {
+                            $anyDocs = true;
+                            ?>
+                            <div class="doc-row">
+                                <i class="fa fa-file" style="color:var(--gray-400);"></i>
+                                <span class="doc-name">
+                                    <?= htmlspecialchars(ucwords(str_replace('_', ' ', $key))) ?>
+                                </span>
+                                <a href="<?= htmlspecialchars($progress[$key]['file_path']) ?>" target="_blank"
+                                    style="font-size:11.5px; color:var(--blue); text-decoration:none;">
+                                    <i class="fa fa-eye"></i> View
+                                </a>
+                            </div>
+                            <?php
+                        }
+                    }
+                    if (!$anyDocs): ?>
+                        <p style="font-size:12.5px; color:var(--gray-400);">No documents uploaded yet.</p>
+                    <?php endif; ?>
+
+                    <form action="student-progress.php" method="POST"
+                        onsubmit="return confirm('Are you sure you want to cancel this application? All uploaded documents and progress for this internship will be permanently deleted. This cannot be undone.');"
+                        style="margin-top:16px;">
+                        <input type="hidden" name="action" value="cancel_application">
+                        <input type="hidden" name="application_id"
+                            value="<?= (int) ($selectedInternship['application_id'] ?? 0) ?>">
+                        <button type="submit" class="btn-action" style="background:#dc2626; color:white;">
+                            <i class="fa fa-trash-can"></i> Cancel Application
+                        </button>
+                    </form>
+
+                </div>
+            </div>
+        <?php endif; ?>
     </div><!-- /.page-wrap -->
 
     <!-- HTE Supervisor Modal -->

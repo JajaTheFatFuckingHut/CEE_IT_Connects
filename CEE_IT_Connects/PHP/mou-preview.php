@@ -1,7 +1,7 @@
 <?php
 require 'db.php';
 require __DIR__ . '/auth.php';
-require __DIR__ . '../vendor/autoload.php';
+require __DIR__ . '/vendor/autoload.php';
 
 use setasign\Fpdi\Fpdi;
 

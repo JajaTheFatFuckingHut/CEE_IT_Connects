@@ -371,7 +371,6 @@ if (!empty($application_internship_id)) {
     $selectedInternship = $intStmt->fetch(PDO::FETCH_ASSOC) ?: [];
 }
 
-// 2. Your logic, unchanged
 $classification = $selectedInternship['company_classification'] ?? 'private';
 $is_plv = filter_var($selectedInternship['is_plv_internal'] ?? false, FILTER_VALIDATE_BOOLEAN);
 $is_val_lgu = filter_var($selectedInternship['is_valenzuela_lgu'] ?? false, FILTER_VALIDATE_BOOLEAN);
@@ -381,8 +380,8 @@ $needs_bir_dti_sec = !$is_public;
 $needs_waiver = !$is_plv;
 $needs_reco_letter = !$is_plv && !$is_val_lgu;
 
-// 3. Required steps (addendum = your MOU step)
-$requiredSteps = ['addendum'];
+// Required steps
+$requiredSteps = ['mou'];
 if ($needs_reco_letter)
     $requiredSteps[] = 'reco_letter';
 if ($needs_waiver)

@@ -478,6 +478,12 @@ elseif ($action === 'cancel_application') {
                 $student_id
             ]);
 
+    $pdo->prepare("
+        DELETE FROM ojt_applications
+        WHERE user_id  = ? AND user_type = 'student'
+    ")->execute([
+                $student_id
+            ]);
     $_SESSION['success'] =
         'Application cancelled and progress reset.';
 
