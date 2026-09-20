@@ -105,7 +105,7 @@ $department = getDepartment($studentProg);
 $programCode = getProgramCode($studentProg);
 
 $plv_lat = 14.698835;
-$plv_lng = 120.9830;
+$plv_lng = 120.979268;
 
 $hte_lat = $internship['latitude'] ?? null;
 $hte_lng = $internship['longtitude'] ?? null;
