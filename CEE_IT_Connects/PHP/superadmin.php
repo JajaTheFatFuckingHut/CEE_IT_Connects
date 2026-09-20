@@ -1584,8 +1584,8 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
                                             onsubmit="return confirm('Are you sure you want to delete this user?')">
                                             <input type="hidden" name="id" value="<?= $u['id'] ?>">
                                             <input type="hidden" name="source" value="<?= $u['source'] ?>">
-                                            <input type="hidden" name="id" value="<?= $u['id'] ?>">
-                                            <button type="submit" name="restore" class="btn btn-sucess">
+                                            <input type="hidden" name="restore" value="1">
+                                            <button type="submit" class="btn btn-sucess">
                                                 <i class="bi bi-check2-circle"></i> Restore
                                             </button>
                                         </form>
