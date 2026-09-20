@@ -117,10 +117,9 @@ $now = new DateTime();
 
         .phone-dropdown {
             display: none;
-            position: fixed;
-            /* positioned by JS, relative to the viewport */
-            z-index: 10000;
-            min-width: 140px;
+            margin-top: 8px;
+            width: max-content;
+            max-width: 100%;
             background: #fff;
             border-radius: 12px;
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
@@ -143,23 +142,24 @@ $now = new DateTime();
             background: #f2f2f2;
         }
 
-        .phone-backdrop {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.25);
-            backdrop-filter: blur(3px);
-            -webkit-backdrop-filter: blur(3px);
-            z-index: 9999;
-        }
+        /* 
+            .phone-backdrop {
+                display: none;
+                position: fixed;
+                inset: 0;
+                background: rgba(0, 0, 0, 0.25);
+                backdrop-filter: blur(3px);
+                -webkit-backdrop-filter: blur(3px);
+                z-index: 9999;
+            }
 
-        .phone-backdrop.show {
-            display: block;
-        }
+            .phone-backdrop.show {
+                display: block;
+            }
 
-        .phone-backdrop.show {
-            display: block;
-        }
+            .phone-backdrop.show {
+                display: block;
+            } */
     </style>
 </head>
 
@@ -276,6 +276,7 @@ $now = new DateTime();
                                     onclick="getDirections(<?= $loc['latitude'] ?>, <?= $loc['longtitude'] ?>)">
                                 </i>
                             </div>
+                            <div class="phone-dropdown"></div>
 
                         </div>
                     <?php endforeach; ?>
@@ -317,9 +318,9 @@ $now = new DateTime();
             </div>
         </div>
     </section>
-
+    <!-- 
     <div id="phoneBackdrop" class="phone-backdrop"></div>
-    <div id="phoneDropdown" class="phone-dropdown"></div>
+    <div id="phoneDropdown" class="phone-dropdown"></div> -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 
@@ -599,46 +600,39 @@ $now = new DateTime();
 
         function closePhoneDropdown() {
             phoneDropdown.classList.remove('show');
-            phoneBackdrop.classList.remove('show');
             phoneAnchor = null;
         }
 
         function toggleNumbers(event, iconEl, numbersStr) {
             event.stopPropagation();
 
-            // clicking the same icon again closes it
-            if (phoneAnchor === iconEl) {
-                closePhoneDropdown();
-                return;
-            }
+            const dropdown = iconEl.closest('.listing').querySelector('.phone-dropdown');
+
+            // close any other open dropdowns
+            document.querySelectorAll('.phone-dropdown.show').forEach(d => {
+                if (d !== dropdown) d.classList.remove('show');
+            });
+
+            const isOpen = dropdown.classList.toggle('show');
+            if (!isOpen) return;
 
             const numbers = numbersStr
                 .split(/\s*[,;]\s*|\s+\/\s+/)
                 .map(n => n.trim())
                 .filter(Boolean);
 
-            phoneDropdown.replaceChildren(...numbers.map(num => {
+            dropdown.replaceChildren(...numbers.map(num => {
                 const a = document.createElement('a');
                 a.href = 'tel:' + num.replace(/[^\d+]/g, '');
                 a.textContent = num;
                 return a;
             }));
-
-            // show first so it can be measured, then position
-            phoneDropdown.classList.add('show');
-            phoneBackdrop.classList.add('show');
-            phoneAnchor = iconEl;
-
-            const r = iconEl.getBoundingClientRect();
-            const d = phoneDropdown.getBoundingClientRect();
-
-            let top = r.top - d.height - 8;                 // prefer above the icon
-            if (top < 8) top = r.bottom + 8;                // flip below if no room
-            const left = Math.max(8, Math.min(r.left, window.innerWidth - d.width - 8));
-
-            phoneDropdown.style.top = top + 'px';
-            phoneDropdown.style.left = left + 'px';
         }
+
+        // click anywhere else to close
+        document.addEventListener('click', () => {
+            document.querySelectorAll('.phone-dropdown.show').forEach(d => d.classList.remove('show'));
+        });
 
         // close on outside click, scroll (including the panel's), or resize
         document.addEventListener('click', closePhoneDropdown);
