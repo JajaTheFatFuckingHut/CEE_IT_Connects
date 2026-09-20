@@ -832,6 +832,11 @@ foreach ($internships as $loc) {
             width: 60%;
             height: 542px;
         }
+
+        .main {
+            display: flex;
+            width: 100%;
+        }
     </style>
 </head>
 
@@ -1154,7 +1159,13 @@ foreach ($internships as $loc) {
                                     <?php endif; ?>
                                 </div>
                                 <hr>
-                                <div id="map"></div>
+                                <section class="map-section">
+                                    <div class="map-section-wrapper">
+                                        <div class="main">
+                                            <div id="map"></div>
+                                        </div>
+                                    </div>
+                                </section>
                                 <!-- <p class="details-section-title">Application Documents</p>
 
                                 <div class="file-row">
