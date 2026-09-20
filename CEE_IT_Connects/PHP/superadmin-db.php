@@ -88,6 +88,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ':adviser' => $adviser_id
             ]);
             $new_room_id = (int) $roomStmt->fetchColumn();
+            $pdo->prepare("
+                INSERT INTO room_members (room_id, user_id, user_type)
+                VALUES (?, ?, 'adviser')
+            ")->execute([$new_room_id, $adviser_id]);
+
             $step = '2 delete old memberships';
             $err = $pdo->errorInfo();
             if (!empty($err[0]) && $err[0] !== '00000') {
