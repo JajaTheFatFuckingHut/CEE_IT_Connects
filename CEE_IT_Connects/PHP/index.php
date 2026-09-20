@@ -120,7 +120,7 @@ $now = new DateTime();
             position: absolute;
             left: 0;
             bottom: calc(100% + 8px);
-            z-index: 100;
+            z-index: 9999;
             min-width: 140px;
             background: #fff;
             border-radius: 12px;
