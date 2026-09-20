@@ -1098,6 +1098,9 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
                 <i class="bi bi-clock-history me-2"></i>
                 <span class="nav-label">OJT Hours</span>
             </a>
+            <a href="#" onclick="showSection(event, 'settings')" data-tooltip="Settings">
+                <i class="bi bi-gear me-2"></i>
+                <span class="nav-label">Section</span>
         </div>
 
         <div class="main-content">
@@ -1994,6 +1997,27 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
                 </div>
             </div>
 
+            <div id="section_settings" class="section sysAdm-section">
+                <form method="POST" class="mb-3 p-3"
+                    style="background:#f7f8fc; border-radius:12px; border:1px solid #e3e6f3;">
+                    <div class="fw-semibold mb-2" style="font-size:13px; color:#272f54;">
+                        <i class="bi bi-sliders me-1"></i> Sections per year level
+                    </div>
+                    <div class="d-flex flex-wrap align-items-end gap-3">
+                        <?php foreach ($sectionSettings as $cfg): ?>
+                            <div>
+                                <label style="font-size:12px; color:#666;">Year <?= (int) $cfg['year_level'] ?></label>
+                                <input type="number" min="0" max="50" name="section_count[<?= (int) $cfg['year_level'] ?>]"
+                                    value="<?= (int) $cfg['section_count'] ?>"
+                                    style="display:block; width:90px; padding:8px 10px; border-radius:10px; border:1px solid #ddd; font-size:13px;">
+                            </div>
+                        <?php endforeach; ?>
+                        <button type="submit" name="save_section_settings" class="btn-update" style="padding:8px 14px;">
+                            <i class="bi bi-save me-1"></i> Save
+                        </button>
+                    </div>
+                </form>
+            </div>
             <!-- ASSIGN ADVISER -->
             <div id="assign_adviser" class="section sysAdm-section">
                 <div class="sysAdm-header--danger sysAdm-header--blue">
@@ -2027,6 +2051,7 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
                             <?php endforeach; ?>
                         </select>
                     </div>
+
                     <button class="btn-update" data-bs-toggle="modal" data-bs-target="#csvAssignModal">
                         <i class="bi bi-file-earmark-spreadsheet me-1"></i> Import via CSV
                     </button>
@@ -2078,9 +2103,8 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
                                             <select name="section" class="assign-select" required>
                                                 <option value="">— Select Section —</option>
                                                 <?php foreach ($openSections as $s): ?>
-                                                    <option
-                                                        value="<?= htmlspecialchars($s['program'] . '|' . $s['year_level'] . '|' . $s['section']) ?>">
-                                                        <?= htmlspecialchars(ucwords($s['program']) . ' ' . $s['year_level'] . '-' . $s['section']) ?>
+                                                    <option value="<?= (int) $s['year_level'] . '|' . (int) $s['section'] ?>">
+                                                        Year <?= (int) $s['year_level'] ?> - Section <?= (int) $s['section'] ?>
                                                     </option>
                                                 <?php endforeach; ?>
                                             </select>
