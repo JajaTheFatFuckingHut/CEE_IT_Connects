@@ -2979,19 +2979,32 @@ foreach ($roomStatuses as $s) {
         }
 
         function openSupEvalModal(studentId) {
-            fetch('get-student-eval.php?student_id=' + studentId)
+            const modalEl = document.getElementById('supEvalModal');
+            const form = document.getElementById('supEvalForm');
+
+            // Store the ID where the submit handler looks for it
+            modalEl.dataset.studentId = studentId;
+
+            // Reset previous student's answers and any old error
+            form.reset();
+            document.getElementById('sup-eval-error-msg').style.display = 'none';
+
+            fetch('get-student-eval.php?student_id=' + encodeURIComponent(studentId))
                 .then(res => res.json())
                 .then(data => {
-                    document.querySelector('[name="intern_name"]').value = data.intern_name || '';
-                    document.querySelector('[name="student_no"]').value = data.student_id || '';
-                    document.querySelector('[name="company_name"]').value = data.company_name || '';
-                    document.querySelector('[name="supervisor_name"]').value = data.supervisor_name || '';
+                    form.querySelector('[name="intern_name"]').value = data.intern_name || '';
+                    form.querySelector('[name="student_no"]').value = data.student_id || '';
+                    form.querySelector('[name="company_name"]').value = data.company_name || '';
+                    form.querySelector('[name="supervisor_name"]').value = data.supervisor_name || '';
 
-                    const modal = new bootstrap.Modal(document.getElementById('supEvalModal'), {
+                    bootstrap.Modal.getOrCreateInstance(modalEl, {
                         backdrop: 'static',
                         keyboard: false
-                    });
-                    modal.show();
+                    }).show();
+                })
+                .catch(err => {
+                    console.error('Failed to load student data', err);
+                    alert('Could not load student details. Please try again.');
                 });
         }
 
