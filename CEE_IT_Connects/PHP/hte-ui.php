@@ -2754,8 +2754,11 @@ foreach ($roomStatuses as $s) {
                     <h5 class="modal-title" id="dtr-view-modal-title">Student DTR</h5>
                     <button type="button" class="btn-close" onclick="closeDtrModal()"></button>
                 </div>
-                <div class="modal-body" id="dtr-view-modal-body">
-                    <div class="text-center py-5"><i class="fa fa-spinner fa-spin fa-2x text-muted"></i></div>
+                <div class="modal-body">
+                    <div id="dtr-summary-section"></div>
+                    <div id="dtr-view-modal-body">
+                        <div class="text-center py-5"><i class="fa fa-spinner fa-spin fa-2x text-muted"></i></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -2777,32 +2780,19 @@ foreach ($roomStatuses as $s) {
         async function viewStudentDtr(studentId) {
             openDtrModal();
 
+            const summaryEl = document.getElementById('dtr-summary-section');
             const body = document.getElementById('dtr-view-modal-body');
 
-            body.innerHTML = `
-        <div class="text-center py-5">
-            <i class="fa fa-spinner fa-spin fa-2x text-muted"></i>
-        </div>
-    `;
+            summaryEl.innerHTML = '';
+            body.innerHTML = `<div class="text-center py-5"><i class="fa fa-spinner fa-spin fa-2x text-muted"></i></div>`;
 
             try {
-                console.log('Student ID:', studentId);
-
                 const res = await fetch(
                     `/get-student-dtr.php?student_id=${encodeURIComponent(studentId)}`,
                     { credentials: 'same-origin' }
                 );
-
-                console.log('HTTP Status:', res.status);
-                console.log('Response OK:', res.ok);
-
                 const text = await res.text();
-
-                console.log('RAW RESPONSE:', text);
-
                 const data = JSON.parse(text);
-
-                console.log('Parsed JSON:', data);
 
                 if (!data.success) {
                     body.innerHTML = `<p class="text-danger">${data.message}</p>`;
@@ -2812,23 +2802,147 @@ foreach ($roomStatuses as $s) {
                 document.getElementById('dtr-view-modal-title').textContent =
                     `${data.student.full_name} — ${data.student.company}`;
 
+                summaryEl.innerHTML = renderDtrSummary(data);
+
                 if (data.weeks.length === 0) {
-                    body.innerHTML =
-                        '<p class="text-muted">No DTR entries logged yet.</p>';
+                    body.innerHTML = '<p class="text-muted">No DTR entries logged yet.</p>';
                     return;
                 }
 
-                body.innerHTML =
-                    data.weeks.map(week => renderDtrWeekReadOnly(week, data.student)).join('');
+                body.innerHTML = data.weeks.map(week => renderDtrWeekReadOnly(week, data.student)).join('');
 
             } catch (err) {
                 console.error('DTR ERROR:', err);
-
                 body.innerHTML = `
             <p class="text-danger">Failed to load DTR.</p>
             <p class="small text-muted">${err.message}</p>
         `;
             }
+        }
+
+        /* ---------- time helpers ---------- */
+
+        // "08:30" or "08:30:00" -> minutes since midnight. Returns null if blank/invalid.
+        function timeToMinutes(str) {
+            if (!str) return null;
+            const m = String(str).match(/^(\d{1,2}):(\d{2})/);
+            if (!m) return null;
+            return parseInt(m[1], 10) * 60 + parseInt(m[2], 10);
+        }
+
+        function diffHours(inStr, outStr) {
+            const inMin = timeToMinutes(inStr);
+            const outMin = timeToMinutes(outStr);
+            if (inMin === null || outMin === null) return 0;
+            let diff = outMin - inMin;
+            if (diff < 0) diff += 24 * 60; // guard against overnight/bad data
+            return diff / 60;
+        }
+
+        /* ---------- stats ---------- */
+
+        function computeDtrStats(data, graceMinutes = 0) {
+            const scheduledIn = timeToMinutes(data.student.ojt_time_in);
+            const scheduledOut = timeToMinutes(data.student.ojt_time_out);
+
+            let totalHours = 0;
+            let loggedDays = 0;
+            let lateDays = 0;
+            let overtimeDays = 0;
+
+            for (const week of data.weeks) {
+                for (const row of week.rows) {
+                    const hasAnyTime = row.m_in || row.m_out || row.a_in || row.a_out;
+                    if (!hasAnyTime) continue;
+
+                    loggedDays++;
+                    totalHours += diffHours(row.m_in, row.m_out) + diffHours(row.a_in, row.a_out);
+
+                    // Late: morning time-in later than the scheduled start (+ grace)
+                    const actualIn = timeToMinutes(row.m_in);
+                    if (scheduledIn !== null && actualIn !== null && actualIn > scheduledIn + graceMinutes) {
+                        lateDays++;
+                    }
+
+                    // Overtime: end of day (afternoon out, falling back to morning out) later than scheduled end
+                    const actualOut = timeToMinutes(row.a_out) ?? timeToMinutes(row.m_out);
+                    if (scheduledOut !== null && actualOut !== null && actualOut > scheduledOut + graceMinutes) {
+                        overtimeDays++;
+                    }
+                }
+            }
+
+            const requiredHours = parseFloat(data.student.required_hours) || 0;
+            const progressPct = requiredHours > 0
+                ? Math.min(Math.round((totalHours / requiredHours) * 100), 100)
+                : 0;
+            const latePct = loggedDays > 0 ? Math.round((lateDays / loggedDays) * 100) : 0;
+            const overtimePct = loggedDays > 0 ? Math.round((overtimeDays / loggedDays) * 100) : 0;
+
+            return { totalHours, requiredHours, progressPct, loggedDays, lateDays, overtimeDays, latePct, overtimePct };
+        }
+
+        function renderDtrSummary(data) {
+            const s = computeDtrStats(data);
+
+            const circumference = 2 * Math.PI * 54;
+            const dashOffset = circumference - (s.progressPct / 100) * circumference;
+
+            return `
+    <div style="display:flex; gap:24px; flex-wrap:wrap; align-items:center;
+                background:#f8f9fb; border:1px solid #e2e8f0; border-radius:12px;
+                padding:20px 24px; margin-bottom:20px;">
+
+        <div style="display:flex; align-items:center; gap:16px;">
+            <svg width="130" height="130" viewBox="0 0 130 130">
+                <circle cx="65" cy="65" r="54" fill="none" stroke="#e5e7eb" stroke-width="12"/>
+                <circle cx="65" cy="65" r="54" fill="none" stroke="#ff6b2c" stroke-width="12"
+                        stroke-linecap="round"
+                        stroke-dasharray="${circumference}"
+                        stroke-dashoffset="${dashOffset}"
+                        transform="rotate(-90 65 65)"/>
+                <text x="65" y="60" text-anchor="middle" font-size="22" font-weight="700" fill="#1f2937">
+                    ${s.progressPct}%
+                </text>
+                <text x="65" y="80" text-anchor="middle" font-size="11" fill="#6b7280">
+                    completed
+                </text>
+            </svg>
+            <div>
+                <div style="font-size:13px; color:#6b7280; font-weight:600; text-transform:uppercase; letter-spacing:.05em;">
+                    OJT Hours
+                </div>
+                <div style="font-size:20px; font-weight:700; color:#1f2937; margin-top:2px;">
+                    ${s.totalHours.toFixed(1)} <span style="font-size:14px; color:#9ca3af; font-weight:500;">/ ${s.requiredHours} hrs</span>
+                </div>
+            </div>
+        </div>
+
+        <div style="display:flex; gap:14px; flex:1; min-width:260px;">
+            <div style="flex:1; background:#fff; border:1px solid #fde68a; border-radius:10px; padding:14px 16px;">
+                <div style="font-size:11px; color:#92400e; font-weight:700; text-transform:uppercase; letter-spacing:.05em;">
+                    Late
+                </div>
+                <div style="font-size:24px; font-weight:700; color:#92400e; margin-top:4px;">
+                    ${s.latePct}%
+                </div>
+                <div style="font-size:11px; color:#a16207; margin-top:2px;">
+                    ${s.lateDays} of ${s.loggedDays} logged day(s)
+                </div>
+            </div>
+            <div style="flex:1; background:#fff; border:1px solid #93c5fd; border-radius:10px; padding:14px 16px;">
+                <div style="font-size:11px; color:#1e40af; font-weight:700; text-transform:uppercase; letter-spacing:.05em;">
+                    Overtime
+                </div>
+                <div style="font-size:24px; font-weight:700; color:#1e40af; margin-top:4px;">
+                    ${s.overtimePct}%
+                </div>
+                <div style="font-size:11px; color:#2563eb; margin-top:2px;">
+                    ${s.overtimeDays} of ${s.loggedDays} logged day(s)
+                </div>
+            </div>
+        </div>
+    </div>`;
         }
 
         function renderDtrWeekReadOnly(week) {
