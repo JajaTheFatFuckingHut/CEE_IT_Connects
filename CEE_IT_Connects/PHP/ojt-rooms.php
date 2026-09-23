@@ -1666,8 +1666,12 @@ $page = 'messages';
                 class="<?= $section === 'home' ? 'active' : '' ?>" title="Home">
                 <i class="fa-solid fa-house me-2"></i> <span class="sidebar-text">Home</span>
             </a>
-            <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=announcements"
+            <!-- <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=announcements"
                 class="<?= $section === 'announcements' ? 'active' : '' ?>" title="Announcements">
+                <i class="fa-solid fa-bullhorn me-2"></i> <span class="sidebar-text">Announcements</span>
+            </a> -->
+            <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>" class="<?= $section === '' ? 'active' : '' ?>"
+                title="Announcements">
                 <i class="fa-solid fa-bullhorn me-2"></i> <span class="sidebar-text">Announcements</span>
             </a>
             <!-- addtl e -->

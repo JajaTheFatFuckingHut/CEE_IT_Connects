@@ -130,11 +130,11 @@ $backLink = getDashboardByRole($_SESSION['role']);
         }
 
         .tab-link:hover {
-            color: #dc3545;
+            color: #ff6b2c;
         }
 
         .active-tab {
-            border-bottom: 2px solid #dc3545;
+            border-bottom: 2px solid #ff6b2c;
         }
 
         .modal-overlay {
@@ -228,7 +228,7 @@ $backLink = getDashboardByRole($_SESSION['role']);
         }
 
         .search-input-wrap input:focus {
-            border-color: #d63ba5;
+            border-color: #272f54;
         }
 
         .progress-bar-bg {
@@ -261,11 +261,11 @@ $backLink = getDashboardByRole($_SESSION['role']);
         }
 
         .participant-item:hover {
-            background: #fdf0f9;
+            background: #fff7ed;
         }
 
         .participant-item input[type="checkbox"] {
-            accent-color: #d63ba5;
+            accent-color: #272f54;
             width: 16px;
             height: 16px;
             cursor: pointer;
@@ -275,12 +275,12 @@ $backLink = getDashboardByRole($_SESSION['role']);
             width: 34px;
             height: 34px;
             border-radius: 50%;
-            background: #e0c4d8;
+            background: #ffe7b3;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 700;
-            color: #d63ba5;
+            color: #272f54;
             font-size: 14px;
         }
 
@@ -303,18 +303,18 @@ $backLink = getDashboardByRole($_SESSION['role']);
             font-size: 14px;
             font-weight: 600;
             cursor: not-allowed;
-            background: #f0c6e8;
+            background: #ffe0cc;
             color: #c278aa;
         }
 
         .btn-add-confirm.has-selection {
-            background: #d63ba5;
+            background: #272f54;
             color: #fff;
             cursor: pointer;
         }
 
         .btn-add-confirm.has-selection:hover {
-            background: #bc2e8e;
+            background: #e4572e;
         }
 
         .btn-update {
@@ -349,12 +349,12 @@ $backLink = getDashboardByRole($_SESSION['role']);
             width: 38px;
             height: 38px;
             border-radius: 50%;
-            background: #e0c4d8;
+            background: #ffe7b3;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 700;
-            color: #d63ba5;
+            color: #272f54;
             font-size: 14px;
             flex-shrink: 0;
         }
@@ -378,7 +378,7 @@ $backLink = getDashboardByRole($_SESSION['role']);
         }
 
         .badge-student {
-            color: #c2278e;
+            color: #1e40af;
             font-size: 14px;
         }
 
@@ -420,12 +420,12 @@ $backLink = getDashboardByRole($_SESSION['role']);
             width: 30px;
             height: 30px;
             border-radius: 50%;
-            background: #e0c4d8;
+            background: #ffe7b3;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 700;
-            color: #d63ba5;
+            color: #272f54;
             font-size: .7rem;
             flex-shrink: 0;
         }
@@ -458,13 +458,13 @@ $backLink = getDashboardByRole($_SESSION['role']);
 
         .msg-row:not(.me) .msg-bubble {
             background: #fff;
-            border: 1px solid #ecdaea;
+            border: 1px solid #ffe0cc;
             border-bottom-left-radius: 4px;
             color: #222;
         }
 
         .msg-row.me .msg-bubble {
-            background: #d63ba5;
+            background: #272f54;
             color: #fff;
             border-bottom-right-radius: 4px;
         }
@@ -488,7 +488,7 @@ $backLink = getDashboardByRole($_SESSION['role']);
             gap: 8px;
             padding: 8px 12px;
             border-radius: 12px;
-            border: 1px solid #ecdaea;
+            border: 1px solid #ffe0cc;
             background: #fff;
             color: #222;
             font-size: 12px;
@@ -496,7 +496,7 @@ $backLink = getDashboardByRole($_SESSION['role']);
         }
 
         .msg-row.me .msg-file {
-            background: #bc2e8e;
+            background: #e4572e;
             color: #fff;
             border-bottom-left-radius: 12px;
             border-bottom-right-radius: 4px;
@@ -555,18 +555,18 @@ $backLink = getDashboardByRole($_SESSION['role']);
             display: flex;
             align-items: center;
             gap: 6px;
-            background: #fce8f5;
-            border: 1px solid #f0c6e8;
+            background: #ffe0cc;
+            border: 1px solid #ffe0cc;
             border-radius: 20px;
             padding: 4px 10px 4px 8px;
             font-size: 12px;
-            color: #b5237f;
+            color: #c05621;
         }
 
         .file-chip button {
             background: none;
             border: none;
-            color: #b5237f;
+            color: #c05621;
             cursor: pointer;
             padding: 0;
             line-height: 1;
@@ -592,7 +592,7 @@ $backLink = getDashboardByRole($_SESSION['role']);
         }
 
         .chat-input-row textarea:focus {
-            border-color: #d63ba5;
+            border-color: #272f54;
         }
 
         .chat-attach-btn,
@@ -609,8 +609,8 @@ $backLink = getDashboardByRole($_SESSION['role']);
         }
 
         .chat-attach-btn {
-            background: #f5e6f2;
-            color: #d63ba5;
+            background: #eef1fb;
+            color: #272f54;
         }
 
         .chat-attach-btn:hover {
@@ -618,16 +618,16 @@ $backLink = getDashboardByRole($_SESSION['role']);
         }
 
         .chat-send-btn {
-            background: #d63ba5;
+            background: #272f54;
             color: #fff;
         }
 
         .chat-send-btn:hover {
-            background: #bc2e8e;
+            background: #e4572e;
         }
 
         .chat-send-btn:disabled {
-            background: #e5b8d8;
+            background: ##ffcfa8;
             cursor: not-allowed;
         }
 
@@ -647,7 +647,7 @@ $backLink = getDashboardByRole($_SESSION['role']);
             width: 46px;
             height: 46px;
             border-radius: 50%;
-            background: #d63ba5;
+            background: #272f54;
             color: #fff;
             font-size: 11px;
             font-weight: 700;
@@ -743,7 +743,7 @@ $backLink = getDashboardByRole($_SESSION['role']);
     </div>
 <?php endif; ?>
 <!-- HEADER -->
-<div class="p-3 text-white rounded d-flex justify-content-between align-items-center" style="background:#d63ba5;">
+<div class="p-3 text-white rounded d-flex justify-content-between align-items-center" style="background:#272f54;">
 
     <!-- LEFT SIDE -->
     <div>
@@ -817,7 +817,7 @@ $backLink = getDashboardByRole($_SESSION['role']);
             <span class="text-muted" style="font-size:14px;" id="memberCount">
                 <?= count($members) ?> participant(s)
             </span>
-            <button class="btn btn-sm text-white fw-semibold" style="background:#d63ba5;border-radius:8px;font-size:14px;"
+            <button class="btn btn-sm text-white fw-semibold" style="background:#272f54;border-radius:8px;font-size:14px;"
                 onclick="openModal()">
                 <i class="fa-solid fa-user-plus me-1"></i> Add Participant
             </button>
@@ -862,7 +862,7 @@ $backLink = getDashboardByRole($_SESSION['role']);
                 </div>
 
                 <div class="msg-row me">
-                    <div class="msg-avatar" style="background:#d63ba5;color:#fff;">Me</div>
+                    <div class="msg-avatar" style="background:#272f54;color:#fff;">Me</div>
                     <div class="msg-bubble-wrap">
                         <div class="msg-sender">You</div>
                         <div class="msg-bubble">Good morning! Got it, thank you!</div>
@@ -916,11 +916,11 @@ $backLink = getDashboardByRole($_SESSION['role']);
 
                         <textarea name="content" class="form-control mb-2" rows="3"
                             placeholder="Write an announcement for this room…" required
-                            style="resize:none; border-color:#f0c6e8; font-size:14px;"></textarea>
+                            style="resize:none; border-color:#ffe0cc; font-size:14px;"></textarea>
 
                         <div class="d-flex justify-content-end">
                             <button type="submit" class="btn btn-sm fw-semibold text-white"
-                                style="background:#d63ba5; border-radius:8px; font-size:14px;">
+                                style="background:#272f54; border-radius:8px; font-size:14px;">
                                 <i class="fa-solid fa-bullhorn me-1"></i> Post Announcement
                             </button>
                         </div>
@@ -1185,7 +1185,7 @@ $backLink = getDashboardByRole($_SESSION['role']);
         if (text) {
             msgs.innerHTML += `
                 <div class="msg-row me">
-                    <div class="msg-avatar" style="background:#d63ba5;color:#fff;">Me</div>
+                    <div class="msg-avatar" style="background:#272f54;color:#fff;">Me</div>
                     <div class="msg-bubble-wrap">
                         <div class="msg-sender">You</div>
                         <div class="msg-bubble">${escHtml(text)}</div>
@@ -1197,7 +1197,7 @@ $backLink = getDashboardByRole($_SESSION['role']);
         attachedFiles.forEach(f => {
             msgs.innerHTML += `
                 <div class="msg-row me">
-                    <div class="msg-avatar" style="background:#d63ba5;color:#fff;">Me</div>
+                    <div class="msg-avatar" style="background:#272f54;color:#fff;">Me</div>
                     <div class="msg-bubble-wrap">
                         <div class="msg-sender">You</div>
                         <div class="msg-file">
