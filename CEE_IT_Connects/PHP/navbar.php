@@ -231,6 +231,36 @@ function timeAgo($datetime)
             border-radius: 50%;
         }
 
+
+        [data-tip] {
+            position: relative;
+        }
+
+        [data-tip]::after {
+            content: attr(data-tip);
+            position: absolute;
+            top: 120%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(39, 47, 84, 0.85);
+            color: #fff;
+            font-size: 12px;
+            font-weight: 500;
+            padding: 5px 10px;
+            border-radius: 6px;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity .15s ease;
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        [data-tip]:hover::after {
+            opacity: 1;
+            visibility: visible;
+        }
+
         /* ── NOTIF POPUP ── */
         .notif-popup {
             display: none;
@@ -584,10 +614,15 @@ function timeAgo($datetime)
                     </a>
                 </div>
             <?php endif; ?>
+            <!-- addtl s -->
+            <a onclick="openHelpModal()" class="navbar-icon-btn" data-tip="Help &amp; Guide">
+                <i class="fa-solid fa-circle-question"></i>
+            </a>
+            <!-- addtl e -->
 
             <!-- Bell + Notification popup -->
             <div class="position-relative">
-                <i class="fa-regular fa-bell" id="notifBell" style="cursor:pointer;"></i>
+                <i class="fa-regular fa-bell" id="notifBell" style="cursor:pointer;" data-tip="Notifications"></i>
 
                 <?php if ($unread_count > 0): ?>
                     <span class="notif-badge"><?= $unread_count ?></span>
@@ -640,7 +675,7 @@ function timeAgo($datetime)
 
             <!-- Profile dropdown -->
             <div class="profile-wrapper">
-                <button class="icon-btn" id="profileBtn" title="Profile">
+                <button class="icon-btn" id="profileBtn" datatip="Profile">
                     <i class="fa-<?= ($page == 'profile') ? 'solid' : 'regular' ?> fa-user"></i>
                 </button>
 
@@ -655,10 +690,6 @@ function timeAgo($datetime)
                     <button class="btn-update" onclick="window.location.href='personal-information.php'">
                         <i class="bi bi-pencil-square"></i> Edit Profile
                     </button>
-                    <a onclick="openHelpModal()" class="logout"
-                        style="margin-top:6px;color:#2255cc;cursor:pointer;display:flex;align-items:center;gap:6px;justify-content:center;">
-                        Help &amp; Guide
-                    </a>
                     <a href="logout.php" class="logout">Log Out?</a>
                 </div>
             </div>

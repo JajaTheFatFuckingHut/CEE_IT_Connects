@@ -1661,6 +1661,12 @@ $page = 'messages';
         <hr style="border-top: 2px solid rgba(255,255,255,0.59); margin: 16px auto; width: calc(100% - 32px);">
 
         <div style="display:flex; flex-direction:column; width:100%;">
+            <!-- addtl s -->
+            <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=announcements"
+                class="<?= $section === 'announcements' ? 'active' : '' ?>" title="Announcements">
+                <i class="fa-solid fa-bullhorn me-2"></i> <span class="sidebar-text">Announcements</span>
+            </a>
+            <!-- addtl e -->
             <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=status" tooltip="Status"
                 class="<?= $section === 'status' ? 'active' : '' ?>" title="Status">
                 <i class="fa-solid fa-calendar-check me-2"></i> <span class="sidebar-text">Status</span>

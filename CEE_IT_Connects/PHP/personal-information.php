@@ -537,7 +537,7 @@ $initials = strtoupper(
                                 value="<?= htmlspecialchars($val_email) ?>">
                         </div>
 
-                        <div class="col-md-4">
+                        <!-- <div class="col-md-4">
                             <label class="form-label">Title</label>
                             <select name="title" class="form-select">
                                 <?php foreach (['Adviser', 'Professor', 'Engineer', 'Doctor', 'Instructor'] as $t): ?>
@@ -546,7 +546,7 @@ $initials = strtoupper(
                                     </option>
                                 <?php endforeach; ?>
                             </select>
-                        </div>
+                        </div> -->
                         <div class="col-md-4">
                             <label class="form-label">Member Since</label>
                             <input type="text" class="form-control" readonly
