@@ -486,6 +486,7 @@ function timeAgo($datetime)
             transition: background-color .15s ease, color .15s ease;
             padding: 4px 18px;
             border-radius: 8px;
+            font-size: 0.6 rem;
         }
 
         .btn-update i {

@@ -1662,6 +1662,10 @@ $page = 'messages';
 
         <div style="display:flex; flex-direction:column; width:100%;">
             <!-- addtl s -->
+            <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=home"
+                class="<?= $section === 'home' ? 'active' : '' ?>" title="Home">
+                <i class="fa-solid fa-house me-2"></i> <span class="sidebar-text">Home</span>
+            </a>
             <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=announcements"
                 class="<?= $section === 'announcements' ? 'active' : '' ?>" title="Announcements">
                 <i class="fa-solid fa-bullhorn me-2"></i> <span class="sidebar-text">Announcements</span>
