@@ -621,8 +621,8 @@ function timeAgo($datetime)
             <!-- addtl e -->
 
             <!-- Bell + Notification popup -->
-            <div class="position-relative">
-                <i class="fa-regular fa-bell" id="notifBell" style="cursor:pointer;" data-tip="Notifications"></i>
+            <div class="position-relative" data-tip="Notifications">
+                <i class="fa-regular fa-bell" id="notifBell" style="cursor:pointer;"></i>
 
                 <?php if ($unread_count > 0): ?>
                     <span class="notif-badge"><?= $unread_count ?></span>
@@ -674,8 +674,8 @@ function timeAgo($datetime)
             </div>
 
             <!-- Profile dropdown -->
-            <div class="profile-wrapper">
-                <button class="icon-btn" id="profileBtn" datatip="Profile">
+            <div class="profile-wrapper" datatip="Profile">
+                <button class="icon-btn" id="profileBtn">
                     <i class="fa-<?= ($page == 'profile') ? 'solid' : 'regular' ?> fa-user"></i>
                 </button>
 
