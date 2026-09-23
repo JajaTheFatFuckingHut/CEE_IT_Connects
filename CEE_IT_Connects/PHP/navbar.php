@@ -490,6 +490,8 @@ function timeAgo($datetime)
 
         .btn-update i {
             color: #7a5200 !important;
+            width: 14px;
+            height: 14px;
         }
 
         .btn-update:hover {
