@@ -616,7 +616,7 @@ function timeAgo($datetime)
             <?php endif; ?>
             <!-- addtl s -->
             <a onclick="openHelpModal()" class="navbar-icon-btn" data-tip="Help &amp; Guide">
-                <i class="fa-solid fa-circle-question"></i>
+                <i class="fa-regular fa-circle-question"></i>
             </a>
             <!-- addtl e -->
 
@@ -674,7 +674,7 @@ function timeAgo($datetime)
             </div>
 
             <!-- Profile dropdown -->
-            <div class="profile-wrapper" datatip="Profile">
+            <div class="profile-wrapper" data-tip="Profile">
                 <button class="icon-btn" id="profileBtn">
                     <i class="fa-<?= ($page == 'profile') ? 'solid' : 'regular' ?> fa-user"></i>
                 </button>
@@ -687,8 +687,9 @@ function timeAgo($datetime)
                     </div>
                     <div class="p-name"><?= htmlspecialchars($displayName) ?></div>
                     <div class="p-email"><?= htmlspecialchars($displayEmail) ?></div>
-                    <button class="btn-update" onclick="window.location.href='personal-information.php'">
-                        <i class="bi bi-pencil-square"></i> Edit Profile
+                    <button class="btn-update" style="padding: 2px 12px !important;"
+                        onclick="window.location.href='personal-information.php'">
+                        <i class="bi bi-pencil-square" style="width: 18px; height: 18px;"></i> Edit Profile
                     </button>
                     <a href="logout.php" class="logout">Log Out?</a>
                 </div>
