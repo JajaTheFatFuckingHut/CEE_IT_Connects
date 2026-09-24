@@ -1800,10 +1800,7 @@ $page = 'messages';
     <!-- MAIN CONTENT -->
     <div class="main">
 
-        <!-- <?php if ($section === ''): ?>
-            <?php include 'chat-room-content.php'; ?>
-
-        <?php elseif ($section === 'status'): ?> -->
+        
             <!-- addtl s -->
              <?php if ($section === '' || $section === 'home'): ?>
             <?php
@@ -1884,7 +1881,7 @@ $page = 'messages';
                 </div>
             </div>
 
-        <?php if ($section === 'announcements'): ?>
+        <?php elseif ($section === 'announcements'): ?>
             <?php include 'chat-room-content.php'; ?>
 
         <?php elseif ($section === 'status'): ?>
