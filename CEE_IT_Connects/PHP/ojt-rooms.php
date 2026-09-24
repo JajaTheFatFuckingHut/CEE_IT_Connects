@@ -1546,10 +1546,10 @@ $page = 'messages';
 
         .dash-bottom { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 16px; }
 
-        .home-card.accent-orange { box-shadow: inset 0 4px 0 #ff6b2c, 0 2px 10px rgba(0,0,0,0.05); }
-        .home-card.accent-blue   { box-shadow: inset 0 4px 0 #2c6fff, 0 2px 10px rgba(0,0,0,0.05); }
-        .home-card.accent-green  { box-shadow: inset 0 4px 0 #1abc9c, 0 2px 10px rgba(0,0,0,0.05); }
-        .home-card.accent-amber  { box-shadow: inset 0 4px 0 #FFB62F, 0 2px 10px rgba(0,0,0,0.05); }
+        .home-card.accent-orange { box-shadow: inset 0 4px 0 #ff6b2c, 0 2px 10px rgba(0, 0, 0, 0.08); }
+        .home-card.accent-blue   { box-shadow: inset 0 4px 0 #2c6fff, 0 2px 10px rgba(0, 0, 0, 0.08); }
+        .home-card.accent-green  { box-shadow: inset 0 4px 0 #1abc9c, 0 2px 10px rgba(0, 0, 0, 0.08); }
+        .home-card.accent-amber  { box-shadow: inset 0 4px 0 #FFB62F, 0 2px 10px rgba(0, 0, 0, 0.08); }
         @media (max-width: 1200px) { .dash-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
         @media (max-width: 992px)  { .dash-bottom { grid-template-columns: 1fr; } }
         @media (max-width: 576px)  { .dash-stats { grid-template-columns: 1fr; } .dash-hours { display: none; } }
