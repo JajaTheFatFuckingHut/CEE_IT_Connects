@@ -733,8 +733,98 @@ $backLink = getDashboardByRole($_SESSION['role']);
                 flex: 1 1 auto;
             }
         }
+        /* addtl s */
+        /* ── ROOM PAGE REDESIGN ── */
+        .rm-hero { background:#272f54; color:#fff; border-radius:12px; padding:20px 24px; border-left:4px solid #FFB62F;
+            display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap; }
+        .rm-hero h5 { font-size:22px; font-weight:700; margin:0 0 10px; }
+        .rm-chips { display:flex; gap:8px; flex-wrap:wrap; }
+        .rm-chip { display:inline-flex; align-items:center; gap:6px; font-size:13px; padding:4px 12px; border-radius:999px; background:rgba(255,255,255,.14); }
+        .rm-hero-right { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+        .rm-count { background:rgba(255,255,255,.12); border-radius:10px; padding:8px 16px; text-align:center; min-width:76px; }
+        .rm-count b { display:block; font-size:20px; line-height:1.2; }
+        .rm-count small { font-size:11px; opacity:.8; }
+
+        .rm-tabs { display:flex; gap:24px; border-bottom:1px solid #e5e7eb; margin:16px 0; }
+        .rm-tab { display:inline-flex; align-items:center; gap:8px; padding-bottom:10px; font-weight:700; font-size:14px; color:#1e293b; text-decoration:none; }
+        .rm-tab:hover { color:#ff6b2c; }
+        .rm-tab.on { color:#ff6b2c; box-shadow:inset 0 -2px 0 #ff6b2c; }
+        .rm-cnt { font-size:11px; font-weight:600; padding:1px 8px; border-radius:999px; background:#eef1fb; color:#64748b; }
+        .rm-tab.on .rm-cnt { background:#ffe5d9; color:#a13d1f; }
+
+        .rm-grid { display:grid; grid-template-columns:minmax(0,2fr) minmax(0,1fr); gap:16px; align-items:start; }
+        .rm-col { display:flex; flex-direction:column; gap:16px; }
+        .rm-card { background:#fff; border-radius:12px; padding:16px 18px; box-shadow:0 2px 10px rgba(0,0,0,.05); }
+        .rm-avatar { width:38px; height:38px; min-width:38px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+            color:#fff; font-weight:700; font-size:14px; }
+
+        .rm-composer-row { display:flex; gap:12px; align-items:flex-start; }
+        .rm-composer textarea { flex:1; border:1.5px solid #ffe0cc; border-radius:10px; padding:10px 14px; font-size:14px; font-family:inherit;
+            resize:none; outline:none; background:#fafbfc; transition:border-color .2s; }
+        .rm-composer textarea:focus { border-color:#ff6b2c; background:#fff; }
+        .rm-composer-foot { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-top:12px; padding-left:50px; flex-wrap:wrap; }
+        .rm-hint { font-size:12px; color:#94a3b8; }
+        .rm-post-btn { background:#272f54; color:#fff; border:none; border-radius:8px; padding:8px 16px; font-size:14px; font-weight:600; cursor:pointer; transition:background .15s; }
+        .rm-post-btn:hover { background:#e4572e; }
+
+        .rm-post-head { display:flex; align-items:center; gap:12px; margin-bottom:10px; }
+        .rm-post-who strong { font-size:15px; color:#272f54; margin-right:6px; }
+        .rm-post-who small { display:block; color:#94a3b8; font-size:12px; }
+        .rm-post-body { margin:0; font-size:14px; line-height:1.6; color:#334155; white-space:pre-line; word-break:break-word; }
+        .rm-pill { font-size:11px; font-weight:600; padding:2px 8px; border-radius:6px; vertical-align:middle; white-space:nowrap; }
+        .rm-pill-adviser { background:#dbeafe; color:#1e40af; }
+        .rm-pill-hte     { background:#d1fae5; color:#065f46; }
+        .rm-pill-admin   { background:#fff4d6; color:#7a5200; }
+        .rm-pill-student { background:#eef1fb; color:#272f54; }
+
+        .rm-empty { text-align:center; padding:36px 20px; color:#64748b; }
+        .rm-empty-ic { width:56px; height:56px; border-radius:14px; background:#ffe5d9; color:#ff6b2c; display:flex;
+            align-items:center; justify-content:center; font-size:22px; margin:0 auto 12px; }
+        .rm-empty strong { display:block; color:#272f54; font-size:15px; margin-bottom:4px; }
+        .rm-empty p { margin:0; font-size:13px; }
+
+        .rm-side-title { font-weight:700; font-size:14px; color:#272f54; margin:0 0 6px; }
+        .rm-dr { display:flex; justify-content:space-between; gap:12px; padding:9px 0; border-top:1px solid #f0f2f7; font-size:13px; }
+        .rm-dl .rm-dr:first-child { border-top:none; }
+        .rm-dr span:first-child { color:#94a3b8; }
+        .rm-dr span:last-child { color:#272f54; font-weight:600; text-align:right; }
+        .rm-side-sub { display:flex; align-items:center; gap:8px; margin:14px 0 8px; padding-top:12px; border-top:1px solid #f0f2f7;
+            font-weight:700; font-size:13px; color:#272f54; }
+        .rm-admin-row { display:flex; align-items:center; gap:10px; padding:5px 0; font-size:13px; color:#272f54; }
+        .rm-admin-row .rm-avatar { width:28px; height:28px; min-width:28px; font-size:11px; }
+        .rm-stack { display:flex; }
+        .rm-stack .rm-avatar { width:32px; height:32px; min-width:32px; font-size:12px; border:2px solid #fff; margin-left:-8px; }
+        .rm-stack .rm-avatar:first-child { margin-left:0; }
+        .rm-stack .rm-more { background:#eef1fb; color:#64748b; }
+        .rm-link { font-size:12px; font-weight:600; color:#ff6b2c; text-decoration:none; }
+
+        .rm-toolbar { display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:14px; }
+        .rm-search { position:relative; flex:1; min-width:200px; max-width:340px; }
+        .rm-search i { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:#f97316; font-size:13px; }
+        .rm-search input { width:100%; padding:8px 12px 8px 34px; border:1.5px solid #aeaeae; border-radius:22px; font-size:13px; outline:none; font-family:inherit; }
+        .rm-search input:focus { border-color:#f97316; }
+        .rm-filters { display:flex; gap:6px; flex-wrap:wrap; }
+        .rm-filter { border:1px solid #e5e7eb; background:#fff; color:#475569; border-radius:999px; padding:5px 12px; font-size:12px; font-weight:600; cursor:pointer; }
+        .rm-filter.on { background:#272f54; border-color:#272f54; color:#fff; }
+        .rm-group { margin-bottom:20px; }
+        .rm-group-title { display:flex; align-items:center; gap:8px; font-size:12px; font-weight:700; letter-spacing:.06em;
+            text-transform:uppercase; color:#64748b; margin-bottom:10px; }
+        .rm-mgrid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:12px; }
+        .rm-mcard { display:flex; align-items:center; gap:12px; background:#fff; border-radius:12px; padding:12px 14px; box-shadow:0 2px 10px rgba(0,0,0,.05); }
+        .rm-minfo { flex:1; min-width:0; }
+        .rm-minfo strong { display:block; font-size:14px; color:#272f54; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .rm-minfo small { display:block; font-size:12px; color:#94a3b8; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+        @media (max-width: 992px) { .rm-grid { grid-template-columns:1fr; } }
+        @media (max-width: 768px) {
+            .rm-hero { flex-direction:column; align-items:flex-start; }
+            .rm-hero-right { width:100%; }
+            .rm-composer-foot { padding-left:0; }
+        }
+        /* addtl e */
     </style>
 </head>
+
 <?php if (isset($_SESSION['role']) === 'student'): ?>
     <div class="d-flex justify-content-end mb-2">
         <a href="<?= $backLink ?>" class="text-danger fw-semibold" style="text-decoration:none;">
@@ -742,70 +832,71 @@ $backLink = getDashboardByRole($_SESSION['role']);
         </a>
     </div>
 <?php endif; ?>
-<!-- HEADER -->
-<div class="p-3 text-white rounded d-flex justify-content-between align-items-center" style="background:#272f54;">
 
-    <!-- LEFT SIDE -->
+<!-- HEADER -->
+<div class="rm-hero">
     <div>
-        <h5 class="mb-0"><?= htmlspecialchars($room['room_name']) ?></h5>
-        <small>
+        <h5><?= htmlspecialchars($room['room_name']) ?></h5>
+        <div class="rm-chips">
             <?php if (!empty($room['department'])): ?>
-                <?= htmlspecialchars(ucwords($room['department'])) ?>
+                <span class="rm-chip"><i class="fa-solid fa-building-columns"></i> <?= htmlspecialchars(ucwords($room['department'])) ?></span>
             <?php elseif (!empty($room['section'])): ?>
-                Year <?= (int) $room['year_level'] ?> - Section <?= htmlspecialchars($room['section']) ?>
+                <span class="rm-chip"><i class="fa-solid fa-graduation-cap"></i> <?= htmlspecialchars($rmClassLabel) ?></span>
                 <?php if (!empty($room['school_year'])): ?>
-                    | S.Y. <?= htmlspecialchars($room['school_year']) ?>
+                    <span class="rm-chip"><i class="fa-solid fa-calendar"></i> S.Y. <?= htmlspecialchars($room['school_year']) ?></span>
                 <?php endif; ?>
                 <?php if (!empty($room['full_name'])): ?>
-                    | <?= htmlspecialchars($room['full_name']) ?>
+                    <span class="rm-chip"><i class="fa-solid fa-user"></i> <?= htmlspecialchars($room['full_name']) ?></span>
                 <?php endif; ?>
             <?php else: ?>
-                <?= htmlspecialchars($room['full_name'] ?? '') ?>
-                |
-                <?= htmlspecialchars($room['role'] ?? '') ?>
+                <?php if (!empty($room['full_name'])): ?>
+                    <span class="rm-chip"><i class="fa-solid fa-user"></i> <?= htmlspecialchars($room['full_name']) ?></span>
+                <?php endif; ?>
+                <?php if (!empty($room['role'])): ?>
+                    <span class="rm-chip"><?= htmlspecialchars($room['role']) ?></span>
+                <?php endif; ?>
             <?php endif; ?>
-
-        </small>
+        </div>
     </div>
 
-    <!-- RIGHT SIDE -->
-    <?php if ($_SESSION['role'] === 'hte_adviser'): ?>
-        <?php foreach ($mouUploads as $m): ?>
-            <a href="<?= htmlspecialchars($m['file_path']) ?>" target="_blank" class="btn-update"
-                style="font-size: 15px;font-weight:bold;color:#ffffff;display:inline-block;width:auto;padding:11px 24px;text-align:center;text-decoration:none;">
-                <i class="bi bi-file-earmark-pdf me-1"></i> View MOU
-            </a>
-        <?php endforeach; ?>
-    <?php endif; ?>
-    <?php
-    if ($_SESSION['role'] === 'student'):
-        if ($status):
-            $progressWidth = min(round(($status['total_hours'] / $requiredHours) * 100, 2), 100);
-            ?>
-            <div class="text-end">
-
-                <div class="text-end">
-                    <div class="circle-progress" style="--pct: <?= $progressWidth ?>;">
-                        <span><?= $progressWidth ?>%</span>
-                    </div>
-                    <small><?= $status['total_hours'] ?> / <?= $requiredHours ?> hours</small>
-                </div>
-            </div>
+    <div class="rm-hero-right">
+        <?php if ($_SESSION['role'] === 'hte_adviser'): ?>
+            <?php foreach ($mouUploads as $m): ?>
+                <a href="<?= htmlspecialchars($m['file_path']) ?>" target="_blank" class="btn-update"
+                    style="font-size: 15px;font-weight:bold;color:#ffffff;display:inline-block;width:auto;padding:11px 24px;text-align:center;text-decoration:none;">
+                    <i class="bi bi-file-earmark-pdf me-1"></i> View MOU
+                </a>
+            <?php endforeach; ?>
         <?php endif; ?>
-    <?php endif; ?>
+        <?php
+        if ($_SESSION['role'] === 'student'):
+            if ($status):
+                $progressWidth = min(round(($status['total_hours'] / $requiredHours) * 100, 2), 100);
+                ?>
+                <div class="text-end">
+                    <div class="text-end">
+                        <div class="circle-progress" style="--pct: <?= $progressWidth ?>;">
+                            <span><?= $progressWidth ?>%</span>
+                        </div>
+                        <small><?= $status['total_hours'] ?> / <?= $requiredHours ?> hours</small>
+                    </div>
+                </div>
+            <?php endif; ?>
+        <?php else: ?>
+            <div class="rm-count"><b><?= $rmMemberCount ?></b><small>Members</small></div>
+            <div class="rm-count"><b><?= $rmPostCount ?></b><small>Posts</small></div>
+        <?php endif; ?>
+    </div>
 </div>
 
 <!-- TABS -->
-<div class="mt-3 border-bottom pb-2">
-    <a href="?room_id=<?= $room_id ?>&tab=updates"
-        class="me-3 fw-bold tab-link <?= $tab === 'updates' ? 'text-danger active-tab' : 'text-dark' ?>">
-        Updates
+<div class="rm-tabs">
+    <a href="?room_id=<?= $room_id ?>&tab=updates" class="rm-tab <?= $tab === 'updates' ? 'on' : '' ?>">
+        <i class="fa-solid fa-bullhorn"></i> Updates <span class="rm-cnt"><?= $rmPostCount ?></span>
     </a>
-    <a href="?room_id=<?= $room_id ?>&tab=members"
-        class="me-3 fw-bold tab-link <?= $tab === 'members' ? 'text-danger active-tab' : 'text-dark' ?>">
-        Members
+    <a href="?room_id=<?= $room_id ?>&tab=members" class="rm-tab <?= $tab === 'members' ? 'on' : '' ?>">
+        <i class="fa-solid fa-users"></i> Members <span class="rm-cnt"><?= $rmMemberCount ?></span>
     </a>
-    <!-- Chats tab removed -->
 </div>
 
 <!-- CONTENT -->
@@ -813,8 +904,23 @@ $backLink = getDashboardByRole($_SESSION['role']);
 
     <?php if ($tab === 'members'): ?>
 
-        <div class="d-flex align-items-center justify-content-between mb-3">
-            <span class="text-muted" style="font-size:14px;" id="memberCount">
+        <div class="rm-toolbar">
+            <div class="rm-search">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="rmMemberSearch" placeholder="Search by name, student no., or program…"
+                    oninput="rmApplyMembers()">
+            </div>
+            <div class="rm-filters">
+                <button type="button" class="rm-filter on" onclick="rmSetFilter('all', this)">All <?= $rmMemberCount ?></button>
+                <?php foreach ($rmGroupMeta as $rmType => [$rmTitle, $rmIcon]): ?>
+                    <?php if (empty($rmGroups[$rmType]))
+                        continue; ?>
+                    <button type="button" class="rm-filter" onclick="rmSetFilter('<?= $rmType ?>', this)">
+                        <?= $rmTitle ?> <?= count($rmGroups[$rmType]) ?>
+                    </button>
+                <?php endforeach; ?>
+            </div>
+            <span class="text-muted ms-auto" style="font-size:14px;" id="memberCount">
                 <?= count($members) ?> participant(s)
             </span>
             <button class="btn btn-sm text-white fw-semibold" style="background:#272f54;border-radius:8px;font-size:14px;"
@@ -824,137 +930,212 @@ $backLink = getDashboardByRole($_SESSION['role']);
         </div>
 
         <div id="memberList">
-            <?php foreach ($members as $m): ?>
-                <div class="member-card">
-                    <div class="member-avatar">
-                        <?= strtoupper(substr($m['full_name'], 0, 2)) ?>
-                    </div>
-                    <div class="member-info">
-                        <strong><?= htmlspecialchars($m['full_name']) ?></strong>
-                    </div>
-                    <span class="badge-role badge-student"><?php if ($m['user_type'] === 'adviser') {
-                        echo 'Adviser';
-                    } elseif ($m['user_type'] === 'admin') {
-                        echo 'Admin';
-                    } else {
-                        echo 'Student';
+            <?php if (empty($members)): ?>
+                <div class="rm-card rm-empty">
+                    <div class="rm-empty-ic"><i class="fa-solid fa-users"></i></div>
+                    <strong>No members yet</strong>
+                    <p>Add participants to start building this room.</p>
+                </div>
+            <?php endif; ?>
 
-                    } ?></span>
+            <?php foreach ($rmGroupMeta as $rmType => [$rmTitle, $rmIcon]): ?>
+                <?php if (empty($rmGroups[$rmType]))
+                    continue; ?>
+                <div class="rm-group">
+                    <div class="rm-group-title">
+                        <i class="fa-solid <?= $rmIcon ?>"></i> <?= $rmTitle ?>
+                        <span class="rm-cnt"><?= count($rmGroups[$rmType]) ?></span>
+                    </div>
+                    <div class="rm-mgrid">
+                        <?php foreach ($rmGroups[$rmType] as $rmMember):
+                            $rmName = (string) ($rmMember['full_name'] ?? 'Unknown');
+                            $rmId = $rmMember['user_id'];
+
+                            if ($rmType === 'student') {
+                                $rmBadge = ['Student', 'rm-pill-student'];
+                                $rmSub = implode(' · ', array_filter([
+                                    $rmStudentInfo[$rmId]['student_no'] ?? '',
+                                    $rmStudentInfo[$rmId]['program'] ?? '',
+                                ]));
+                            } elseif ($rmType === 'adviser') {
+                                $rmIsHte = stripos($rmAdvInfo[$rmId]['role'] ?? '', 'hte') !== false;
+                                $rmBadge = $rmIsHte ? ['HTE Adviser', 'rm-pill-hte'] : ['OJT Adviser', 'rm-pill-adviser'];
+                                $rmSub = (string) ($rmAdvInfo[$rmId]['title'] ?? '');
+                            } else {
+                                $rmBadge = ['Admin', 'rm-pill-admin'];
+                                $rmSub = '';
+                            }
+                            ?>
+                            <div class="rm-mcard" data-type="<?= $rmType ?>"
+                                data-name="<?= htmlspecialchars(strtolower($rmName . ' ' . $rmSub), ENT_QUOTES) ?>">
+                                <div class="rm-avatar" style="background:<?= $rmColor($rmName) ?>;"><?= $rmInitials($rmName) ?></div>
+                                <div class="rm-minfo">
+                                    <strong><?= htmlspecialchars($rmName) ?></strong>
+                                    <?php if ($rmSub !== ''): ?><small><?= htmlspecialchars($rmSub) ?></small><?php endif; ?>
+                                </div>
+                                <span class="rm-pill <?= $rmBadge[1] ?>"><?= $rmBadge[0] ?></span>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
                 </div>
             <?php endforeach; ?>
+
+            <div id="rmNoMatch" class="rm-card rm-empty" style="display:none;">
+                <strong>No members match your search</strong>
+                <p>Try a different name or filter.</p>
+            </div>
         </div>
 
-        <!-- <?php elseif ($tab === 'chats'): ?>
-
-        <div class="chat-container">
-
-            <div class="chat-messages" id="chatMessages">
-                <div class="chat-day-divider">Today, Apr 26</div>
-
-                <div class="msg-row">
-                    <div class="msg-avatar">OA</div>
-                    <div class="msg-bubble-wrap">
-                        <div class="msg-sender">OJT Adviser Name</div>
-                        <div class="msg-bubble">Good morning everyone! Please check the announcements tab for the
-                            orientation details.</div>
-                        <div class="msg-time">9:02 AM</div>
-                    </div>
-                </div>
-
-                <div class="msg-row me">
-                    <div class="msg-avatar" style="background:#272f54;color:#fff;">Me</div>
-                    <div class="msg-bubble-wrap">
-                        <div class="msg-sender">You</div>
-                        <div class="msg-bubble">Good morning! Got it, thank you!</div>
-                        <div class="msg-time">9:05 AM</div>
-                    </div>
-                </div>
-
-                <div class="msg-row">
-                    <div class="msg-avatar">OA</div>
-                    <div class="msg-bubble-wrap">
-                        <div class="msg-sender">OJT Adviser Name</div>
-                        <div class="msg-bubble">Make sure to also submit your endorsement letter by Friday.</div>
-                        <div class="msg-time">9:18 AM</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="chat-input-bar">
-                <div class="file-preview-strip" id="filePreviewStrip" style="display:none;"></div>
-                <div class="chat-input-row">
-                    <input type="file" id="fileInput" multiple style="display:none;" onchange="handleFiles(this.files)">
-                    <button class="chat-attach-btn" title="Attach file"
-                        onclick="document.getElementById('fileInput').click()">
-                        <i class="fa-solid fa-paperclip"></i>
-                    </button>
-                    <textarea id="chatTextarea" rows="1" placeholder="Type a message…"
-                        oninput="autoResize(this); toggleSend()" onkeydown="handleEnter(event)"></textarea>
-                    <button class="chat-send-btn" id="sendBtn" disabled onclick="sendMessage()">
-                        <i class="fa-solid fa-paper-plane"></i>
-                    </button>
-                </div>
-            </div>
-
-        </div> -->
-
+        <script>
+            let rmRoleFilter = 'all';
+            function rmApplyMembers() {
+                const q = document.getElementById('rmMemberSearch').value.toLowerCase().trim();
+                let shown = 0;
+                document.querySelectorAll('.rm-mcard').forEach(card => {
+                    const ok = (rmRoleFilter === 'all' || card.dataset.type === rmRoleFilter) && card.dataset.name.includes(q);
+                    card.style.display = ok ? '' : 'none';
+                    if (ok) shown++;
+                });
+                document.querySelectorAll('.rm-group').forEach(g => {
+                    g.style.display = [...g.querySelectorAll('.rm-mcard')].some(c => c.style.display !== 'none') ? '' : 'none';
+                });
+                const none = document.getElementById('rmNoMatch');
+                if (none) none.style.display = (shown === 0 && document.querySelector('.rm-mcard')) ? 'block' : 'none';
+            }
+            function rmSetFilter(type, btn) {
+                rmRoleFilter = type;
+                document.querySelectorAll('.rm-filter').forEach(b => b.classList.toggle('on', b === btn));
+                rmApplyMembers();
+            }
+        </script>
 
     <?php else: ?>
 
-        <?php if (
-            $_SESSION['role'] === 'internship_adviser' || $_SESSION['role'] === 'hte_adviser'
-            || $_SESSION['role'] === 'superadmin' || $_SESSION['role'] === 'internship_admin'
-        ): ?>
-            <div class="card mb-3 border-0 shadow-sm">
-                <div class="card-body">
-                    <form action="chat-room-content-db.php" method="POST">
-                        <!-- tells the backend WHICH room this post belongs to -->
-                        <input type="hidden" name="room_id" value="<?= $room_id ?>">
-                        <!-- triggers the post_announcement block in chat-room-content-db.php -->
-                        <input type="hidden" name="tab" value="updates">
-                        <input type="hidden" name="post_announcement" value="1">
+        <div class="rm-grid">
+            <!-- LEFT: composer + live announcements -->
+            <div class="rm-col">
 
-                        <textarea name="content" class="form-control mb-2" rows="3"
-                            placeholder="Write an announcement for this room…" required
-                            style="resize:none; border-color:#ffe0cc; font-size:14px;"></textarea>
+                <?php if ($rmCanPost): ?>
+                    <div class="rm-card rm-composer">
+                        <form action="chat-room-content-db.php" method="POST">
+                            <!-- tells the backend WHICH room this post belongs to -->
+                            <input type="hidden" name="room_id" value="<?= $room_id ?>">
+                            <!-- triggers the post_announcement block in chat-room-content-db.php -->
+                            <input type="hidden" name="tab" value="updates">
+                            <input type="hidden" name="post_announcement" value="1">
 
-                        <div class="d-flex justify-content-end">
-                            <button type="submit" class="btn btn-sm fw-semibold text-white"
-                                style="background:#272f54; border-radius:8px; font-size:14px;">
-                                <i class="fa-solid fa-bullhorn me-1"></i> Post Announcement
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        <?php endif; ?>
-
-        <?php foreach ($posts as $post): ?>
-            <div class="card mb-3">
-                <div class="card-body">
-                    <div class="d-flex align-items-center mb-2">
-                        <div style="width:35px;height:35px;border-radius:50%;background:#ccc;margin-right:10px;"></div>
-                        <div>
-                            <strong><?= htmlspecialchars($post['sender_name']) ?></strong><br>
-                            <small class="text-muted">
-                                <?php if ($post['sender_role'] === 'superadmin') {
-                                    echo htmlspecialchars('System Admin');
-                                } else {
-                                    echo htmlspecialchars($post['sender_role']);
-                                } ?> •
-                                <?= date("M d, Y", strtotime($post['created_at'])) ?>
-                            </small>
-                        </div>
+                            <div class="rm-composer-row">
+                                <div class="rm-avatar" style="background:#272f54;"><?= $rmInitials($rmMeName) ?></div>
+                                <textarea name="content" rows="3" placeholder="Share an update with your room…" required></textarea>
+                            </div>
+                            <div class="rm-composer-foot">
+                                <span class="rm-hint"><i class="fa-solid fa-eye me-1"></i>Visible to everyone in this room</span>
+                                <button type="submit" class="rm-post-btn">
+                                    <i class="fa-solid fa-bullhorn me-1"></i> Post Announcement
+                                </button>
+                            </div>
+                        </form>
                     </div>
-                    <p class="mb-0"><?= htmlspecialchars($post['content']) ?></p>
+                <?php endif; ?>
+
+                <?php if (empty($posts)): ?>
+                    <div class="rm-card rm-empty">
+                        <div class="rm-empty-ic"><i class="fa-solid fa-bullhorn"></i></div>
+                        <strong>No announcements yet</strong>
+                        <p><?= $rmCanPost
+                            ? 'Post your first update to keep everyone in this room informed.'
+                            : 'When your adviser posts an update, it will show up here.' ?></p>
+                    </div>
+                <?php else: ?>
+                    <?php foreach ($posts as $post):
+                        $rmSender = (string) ($post['sender_name'] ?? 'Unknown');
+                        [$rmRoleText, $rmRoleClass] = $rmPostRole(strtolower((string) ($post['sender_role'] ?? '')));
+                        ?>
+                        <div class="rm-card">
+                            <div class="rm-post-head">
+                                <div class="rm-avatar" style="background:<?= $rmColor($rmSender) ?>;"><?= $rmInitials($rmSender) ?></div>
+                                <div class="rm-post-who">
+                                    <div>
+                                        <strong><?= htmlspecialchars($rmSender) ?></strong>
+                                        <span class="rm-pill <?= $rmRoleClass ?>"><?= htmlspecialchars($rmRoleText) ?></span>
+                                    </div>
+                                    <small><?= date("M d, Y · g:i A", strtotime($post['created_at'])) ?></small>
+                                </div>
+                            </div>
+                            <p class="rm-post-body"><?= htmlspecialchars($post['content']) ?></p>
+                        </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </div>
+
+            <!-- RIGHT: room details + members preview -->
+            <div class="rm-col">
+                <div class="rm-card">
+                    <h6 class="rm-side-title">Room details</h6>
+                    <div class="rm-dl">
+                        <?php if ($rmProgram !== ''): ?>
+                            <div class="rm-dr"><span>Program</span><span><?= htmlspecialchars($rmProgram) ?></span></div>
+                        <?php endif; ?>
+                        <?php if (!empty($room['year_level'])): ?>
+                            <div class="rm-dr"><span>Year level</span><span><?= (int) $room['year_level'] ?></span></div>
+                        <?php endif; ?>
+                        <?php if (!empty($room['section'])): ?>
+                            <div class="rm-dr"><span>Section</span><span><?= htmlspecialchars($room['section']) ?></span></div>
+                        <?php endif; ?>
+                        <?php if (!empty($room['department'])): ?>
+                            <div class="rm-dr"><span>Department</span><span><?= htmlspecialchars(ucwords($room['department'])) ?></span></div>
+                        <?php endif; ?>
+                        <?php if (!empty($room['school_year'])): ?>
+                            <div class="rm-dr"><span>School year</span><span><?= htmlspecialchars($room['school_year']) ?></span></div>
+                        <?php endif; ?>
+                        <?php if (!empty($room['full_name'])): ?>
+                            <div class="rm-dr"><span>Adviser</span><span><?= htmlspecialchars($room['full_name']) ?></span></div>
+                        <?php endif; ?>
+                        <div class="rm-dr"><span>Members</span><span><?= $rmMemberCount ?></span></div>
+                    </div>
+
+                    <?php if (!empty($rmGroups['admin'])): ?>
+                        <div class="rm-side-sub">
+                            <i class="fa-solid fa-shield-halved" style="color:#ff6b2c;"></i> Admins
+                            <span class="rm-cnt"><?= count($rmGroups['admin']) ?></span>
+                        </div>
+                        <?php foreach ($rmGroups['admin'] as $rmAdmin):
+                            $rmAdminName = (string) ($rmAdmin['full_name'] ?? 'Unknown'); ?>
+                            <div class="rm-admin-row">
+                                <div class="rm-avatar" style="background:<?= $rmColor($rmAdminName) ?>;"><?= $rmInitials($rmAdminName) ?></div>
+                                <span><?= htmlspecialchars($rmAdminName) ?></span>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
+
+                <div class="rm-card">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="rm-side-title mb-0">Members</h6>
+                        <a href="?room_id=<?= $room_id ?>&tab=members" class="rm-link">View all</a>
+                    </div>
+                    <?php if (empty($members)): ?>
+                        <div class="text-muted" style="font-size:13px;">No members yet.</div>
+                    <?php else: ?>
+                        <?php $rmMore = max(0, $rmMemberCount - 5); ?>
+                        <div class="rm-stack">
+                            <?php foreach (array_slice($members, 0, 5) as $rmMember):
+                                $rmName = (string) ($rmMember['full_name'] ?? 'Unknown'); ?>
+                                <div class="rm-avatar" title="<?= htmlspecialchars($rmName) ?>"
+                                    style="background:<?= $rmColor($rmName) ?>;"><?= $rmInitials($rmName) ?></div>
+                            <?php endforeach; ?>
+                            <?php if ($rmMore > 0): ?>
+                                <div class="rm-avatar rm-more">+<?= $rmMore ?></div>
+                            <?php endif; ?>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </div>
-        <?php endforeach; ?>
+        </div>
 
     <?php endif; ?>
 
 </div>
-
 
 <!-- MODAL FOR ADD PARTICIPANT -->
 <div class="modal-overlay" id="addParticipantModal" onclick="if(event.target===this) closeModal()">
