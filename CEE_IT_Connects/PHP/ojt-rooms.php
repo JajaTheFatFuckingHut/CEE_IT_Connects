@@ -1880,7 +1880,99 @@ $page = 'messages';
             </div>
 
         <?php elseif ($section === 'announcements'): ?>
-            <?php include 'chat-room-content.php'; ?>
+            <div id="documents" class="section sysAdm-section">
+                <div class="sysAdm-header--danger sysAdm-header--blue mb-4">
+                    <div class="sysAdm-header-left">
+                        <div class="sysAdm-header-icon">
+                            <i class="bi bi-file-earmark-text-fill"></i>
+                        </div>
+                        <div class="sysAdm-header-text">
+                            <h2>Documents Now Available</h2>
+                            <p>Check which documents are available for each partner company</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Search -->
+                <div style="display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap;
+                    align-items:center; justify-content:space-between;">
+                    <div style="position:relative; flex:1; min-width:200px;">
+                        <i class="fa fa-search"
+                            style="position:absolute; color:#f97316; left:10px; top:50%; transform:translateY(-50%); font-size:13px;"></i>
+                        <input type="text" id="docsSearchInput" placeholder="Search company..." oninput="filterDocsTable()"
+                            style="width:50%; padding:8px 12px 8px 32px; border:1.5px solid #aeaeae; border-radius:22px;
+                            font-size:13px; font-family:inherit; outline:none; transition:border-color .2s;"
+                            onfocus="this.style.borderColor='#f97316'" onblur="this.style.borderColor='#e5e7eb'">
+                    </div>
+                </div>
+
+                <?php
+                // Reusable pill: same look as the Supervisor Eval badge in the status block
+                $docPill = function (bool $available): string {
+                    if ($available) {
+                        return '<span style="display:inline-flex; align-items:center; gap:5px; padding:5px 10px;
+                            background:#ffe5d9; color:#ff6b2c; border-radius:6px; font-size:11px;
+                            font-weight:600; border:1px solid #ff6b2c; white-space:nowrap;">
+                            <i class="fa fa-check"></i> Available</span>';
+                    }
+                    return '<span style="display:inline-flex; align-items:center; gap:5px; padding:5px 10px;
+                        background:#f3f4f6; color:#9ca3af; border-radius:6px; font-size:11px;
+                        font-weight:600; border:1px solid #e5e7eb; white-space:nowrap;">
+                        N/A</span>';
+                };
+                ?>
+
+                <div style="background:white; border:1px solid #ddd; border-radius:8px; overflow:hidden;">
+                    <div class="sysAdm-table-wrapper">
+                        <table class="sysAdm-table" id="docs-availability-table">
+                            <thead style="background:#f8f9fa;">
+                                <tr>
+                                    <th>COMPANY</th>
+                                    <th>MOU</th>
+                                    <th>RECOMMENDATION LETTER</th>
+                                    <th>WAIVER</th>
+                                </tr>
+                            </thead>
+                            <tbody id="docs-availability-tbody">
+                                <?php if (empty($docAvailability)): ?>
+                                    <tr>
+                                        <td colspan="4" class="text-center text-muted py-4">
+                                            No document availability announced yet.
+                                        </td>
+                                    </tr>
+                                <?php else: ?>
+                                    <?php foreach ($docAvailability as $d): ?>
+                                        <tr>
+                                            <td>
+                                                <div class="student-cell">
+                                                    <div class="avatar" style="background:<?= $avatarColors[crc32($d['company']) % count($avatarColors)] ?? '#2c6fff' ?>;">
+                                                        <strong><?= strtoupper(substr($d['company'], 0, 1)) ?></strong>
+                                                    </div>
+                                                    <span><?= htmlspecialchars($d['company']) ?></span>
+                                                </div>
+                                            </td>
+                                            <td><?= $docPill(!empty($d['mou_available'])) ?></td>
+                                            <td><?= $docPill(!empty($d['recommendation_letter_available'])) ?></td>
+                                            <td><?= $docPill(!empty($d['waiver_available'])) ?></td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+            function filterDocsTable() {
+                const q = document.getElementById('docsSearchInput').value.toLowerCase();
+                document.querySelectorAll('#docs-availability-tbody tr').forEach(row => {
+                    // skip the empty-state row (single cell with colspan)
+                    if (row.children.length < 2) return;
+                    row.style.display = row.children[0].textContent.toLowerCase().includes(q) ? '' : 'none';
+                });
+            }
+            </script>
 
         <?php elseif ($section === 'status'): ?>
             <!-- addtl e -->
