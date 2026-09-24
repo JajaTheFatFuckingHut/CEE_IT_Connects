@@ -1800,7 +1800,7 @@ $page = 'messages';
     <!-- MAIN CONTENT -->
     <div class="main">
 
-        
+        <?php if ($section === '' || $section === 'home'): ?>
             <!-- addtl s -->
              <?php if ($section === '' || $section === 'home'): ?>
             <?php
