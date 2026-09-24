@@ -186,7 +186,8 @@ if (!isset($_GET['room_id'])) {
     exit;
 }
 
-$section = $_GET['section'] ?? '';
+// changed
+$section = $_GET['section'] ?? 'room';
 
 // Load statuses for the status section
 $stmt = $pdo->prepare("
@@ -1745,7 +1746,7 @@ $page = 'messages';
         <div style="display:flex; flex-direction:column; width:100%;">
             <!-- addtl s -->
             <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=home"
-                class="<?= ($section === 'home') ? 'active' : '' ?>" title="Home">
+                class="<?= ($section === 'home'):?>" title="Home">
                 <i class="fa-solid fa-house me-2"></i> <span class="sidebar-text">Home</span>
             </a>
             <!-- <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>" class="<?= $section === '' ? 'active' : '' ?>"
