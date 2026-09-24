@@ -1995,6 +1995,7 @@ $page = 'messages';
                         <?php endif; ?>
                     </div>
                     <!-- addtl s -->
+                     <br><br>
                     <div class="dash-stats">
                         <a href="<?= $dashUrl ?>status" class="dash-stat tone-blue">
                             <div class="dash-stat-icon"><i class="fa-solid fa-users"></i></div>
