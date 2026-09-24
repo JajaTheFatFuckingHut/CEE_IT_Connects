@@ -30,24 +30,11 @@ $table = $roleMap[$role]['table'];
 // ];
 
 // added sa announcements page or section
-<?php $page = 'announcements';
-require 'db.php';
-require 'auth.php';
+$stmt->execute([$adviser_id]);
+$statuses = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-$stmt = $pdo->query("SELECT * FROM announcements ORDER BY created_at DESC");
-
-$announcements = [
-    'news' => [],
-    'updates' => [],
-    'FAQs' => []
-];
-
-while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-    if (!isset($announcements[$row['category']])) {
-        $announcements[$row['category']] = [];
-    }
-    $announcements[$row['category']][] = $row;
-}
+// ── Documents availability (for the Announcements section) ──
+$avatarColors = ['#ff2c8f', '#2c6fff', '#1abc9c', '#9b59b6', '#e67e22'];
 
 $docAvailStmt = $pdo->query("
     SELECT ida.internship_id, ida.mou_available, ida.recommendation_letter_available,
@@ -57,7 +44,6 @@ $docAvailStmt = $pdo->query("
     ORDER BY ida.updated_at DESC
 ");
 $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
-?>
 
 // added para sa sidebar thingy sa baba
 $userInfoStmt = $pdo->prepare("SELECT full_name FROM {$table} WHERE id = ?");
