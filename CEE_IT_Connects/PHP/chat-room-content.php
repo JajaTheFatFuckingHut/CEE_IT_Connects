@@ -825,6 +825,87 @@ $backLink = getDashboardByRole($_SESSION['role']);
     </style>
 </head>
 
+<?php
+// ═══ UI-ONLY additions: read-only queries and display helpers ═══
+$rmColors   = ['#ff2c8f', '#2c6fff', '#1abc9c', '#9b59b6', '#e67e22', '#e74c3c', '#16a085'];
+$rmColor    = fn($name) => $rmColors[crc32((string) $name) % count($rmColors)];
+$rmInitials = function ($name): string {
+    $i = strtoupper(substr(trim((string) $name), 0, 1));
+    return $i !== '' ? $i : '?';
+};
+$rmMeName  = $userFullName ?? 'You';
+$rmCanPost = in_array($_SESSION['role'] ?? '', ['internship_adviser', 'hte_adviser', 'superadmin', 'internship_admin'], true);
+
+// Role label + pill color for a post's sender_role
+$rmPostRole = function (string $role): array {
+    $map = [
+        'superadmin'         => ['System Admin', 'rm-pill-admin'],
+        'internship_admin'   => ['Internship Admin', 'rm-pill-admin'],
+        'internship_adviser' => ['OJT Adviser', 'rm-pill-adviser'],
+        'hte_adviser'        => ['HTE Adviser', 'rm-pill-hte'],
+    ];
+    return $map[$role] ?? [ucfirst(str_replace('_', ' ', $role)), 'rm-pill-adviser'];
+};
+
+// Program: rooms.program if that column exists, otherwise the most common students.program in this room
+$rmProgram = trim((string) ($room['program'] ?? ''));
+if ($rmProgram === '') {
+    $rmProgStmt = $pdo->prepare("
+        SELECT s.program
+        FROM students s
+        JOIN room_members rm ON rm.user_id = s.id AND rm.user_type = 'student'
+        WHERE rm.room_id = ? AND s.program IS NOT NULL AND s.program <> ''
+        GROUP BY s.program
+        ORDER BY COUNT(*) DESC
+        LIMIT 1
+    ");
+    $rmProgStmt->execute([$room_id]);
+    $rmProgram = (string) $rmProgStmt->fetchColumn();
+}
+$rmYearSection = (!empty($room['year_level']) && !empty($room['section']))
+    ? (int) $room['year_level'] . '-' . $room['section'] : '';
+$rmClassLabel = ($rmProgram !== '' && $rmYearSection !== '')
+    ? $rmProgram . ' ' . $rmYearSection
+    : 'Year ' . (int) ($room['year_level'] ?? 0) . ' - Section ' . ($room['section'] ?? '');
+
+// Extra details for member cards (student no. + program, adviser role + title)
+$rmInfoStmt = $pdo->prepare("
+    SELECT s.id, s.student_id AS student_no, s.program
+    FROM students s
+    JOIN room_members rm ON rm.user_id = s.id AND rm.user_type = 'student'
+    WHERE rm.room_id = ?
+");
+$rmInfoStmt->execute([$room_id]);
+$rmStudentInfo = [];
+foreach ($rmInfoStmt->fetchAll(PDO::FETCH_ASSOC) as $rmRow) {
+    $rmStudentInfo[$rmRow['id']] = $rmRow;
+}
+$rmAdvStmt = $pdo->prepare("
+    SELECT a.id, a.role, a.title
+    FROM advisers a
+    JOIN room_members rm ON rm.user_id = a.id AND rm.user_type = 'adviser'
+    WHERE rm.room_id = ?
+");
+$rmAdvStmt->execute([$room_id]);
+$rmAdvInfo = [];
+foreach ($rmAdvStmt->fetchAll(PDO::FETCH_ASSOC) as $rmRow) {
+    $rmAdvInfo[$rmRow['id']] = $rmRow;
+}
+
+// Group members by type (uses your existing $members)
+$rmGroups = ['adviser' => [], 'admin' => [], 'student' => []];
+foreach ($members as $rmMember) {
+    $rmGroups[$rmMember['user_type']][] = $rmMember;
+}
+$rmGroupMeta = [
+    'adviser' => ['Advisers', 'fa-user-tie'],
+    'admin'   => ['Admins', 'fa-shield-halved'],
+    'student' => ['Students', 'fa-user-graduate'],
+];
+$rmMemberCount = count($members);
+$rmPostCount   = count($posts);
+?>
+
 <?php if (isset($_SESSION['role']) === 'student'): ?>
     <div class="d-flex justify-content-end mb-2">
         <a href="<?= $backLink ?>" class="text-danger fw-semibold" style="text-decoration:none;">
