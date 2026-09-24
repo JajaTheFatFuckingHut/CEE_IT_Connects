@@ -1729,7 +1729,7 @@ $page = 'messages';
         <div class="rooms-list" style="margin-top: 0;">
             <h6>ROOMS</h6>
             <?php foreach ($myRooms as $room): ?>
-                <a href="ojt-rooms.php?room_id=<?= $room['id'] ?>&section=announcements"
+                <a href="ojt-rooms.php?room_id=<?= $room['id'] ?>&section=room"
                     class="<?= ((int) $current_room_id === (int) $room['id']) ? 'active' : '' ?>"
                     title="<?= htmlspecialchars($room['room_name']) ?>">
                     <i class="bi bi-people-fill me-2"></i>
