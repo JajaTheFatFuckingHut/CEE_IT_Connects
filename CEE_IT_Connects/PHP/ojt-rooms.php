@@ -1536,13 +1536,14 @@ $page = 'messages';
         .dash-date { font-size: 12px; color: #94a3b8; white-space: nowrap; }
 
         .dash-side { display: flex; flex-direction: column; gap: 16px; height: 100%; }
-        .dash-side-card { flex: 1; display: flex; flex-direction: column; justify-content: space-between; gap: 12px;
-            background: #fff; border-radius: 12px; padding: 16px 18px; text-decoration: none; color: inherit;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05); transition: transform .15s ease; }
+        .dash-side-card.tint-req   { background: #eef4ff; }
+        .dash-side-card.tint-rep  { background: #fff8e6; }
+        .dash-side-card.tint-chats { background: #f0f3fb; }
+        .dash-side-card.tint-docu { background: #fff1ea; }
+        .dash-side-card .dash-side-meta { border-top-color: rgba(0,0,0,.08); }
         .dash-side-card:hover { transform: translateY(-2px); color: inherit; }
         .dash-side-top { display: flex; align-items: center; gap: 14px; }
-        .dash-side-meta { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #64748b;
-            padding-top: 12px; border-top: 1px solid #f0f2f7; }
+        
 
         .dash-bottom { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 16px; }
 
