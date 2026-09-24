@@ -30,9 +30,6 @@ $table = $roleMap[$role]['table'];
 // ];
 
 // added sa announcements page or section
-$stmt->execute([$adviser_id]);
-$statuses = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
 // ── Documents availability (for the Announcements section) ──
 $avatarColors = ['#ff2c8f', '#2c6fff', '#1abc9c', '#9b59b6', '#e67e22'];
 
