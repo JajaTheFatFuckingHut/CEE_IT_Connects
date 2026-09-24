@@ -557,6 +557,75 @@ $page = 'messages';
             color: #FFB62F;
         }
 
+        /* addtl s */
+        .home-hero {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, #272f54 0%, #33448f 60%, #2c6fff 100%);
+            border-radius: 14px;
+            padding: 28px 32px;
+            color: #fff;
+            margin-bottom: 20px;
+        }
+        .home-hero::before,
+        .home-hero::after {
+            content: '';
+            position: absolute;
+            top: -30%;
+            height: 160%;
+            width: 60px;
+            transform: skewX(-20deg);
+        }
+        .home-hero::before { right: 90px; background: rgba(255,107,44,0.85); }
+        .home-hero::after  { right: 20px; background: rgba(255,182,47,0.85); }
+        .home-hero-bar {
+            border-left: 4px solid #FFB62F;
+            padding-left: 14px;
+            position: relative;
+            z-index: 1;
+        }
+        .home-hero h2 { font-size: 26px; font-weight: 800; margin: 2px 0 6px; }
+        .home-hero p  { margin: 0; opacity: .85; font-size: 14px; }
+
+        .home-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px 22px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .home-empty {
+            display: flex;
+            align-items: center;
+            background: #f7f9fc;
+            border-radius: 10px;
+            padding: 24px;
+            color: #94a3b8;
+        }
+        .quick-card {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: #fff;
+            border-radius: 12px;
+            padding: 16px 18px;
+            text-decoration: none;
+            color: inherit;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 12px;
+            transition: transform .15s ease;
+        }
+        .quick-card:hover { transform: translateY(-2px); color: inherit; }
+        .quick-card-icon {
+            width: 44px; height: 44px;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 17px; flex-shrink: 0;
+        }
+        .quick-card-text strong { display: block; font-size: 14.5px; }
+        .quick-card-text small { color: #888; font-size: 12px; }
+        .quick-card-arrow { margin-left: auto; color: #cbd5e1; }
+        /* addtl e */
+
         /* ── ROOMS LIST ── */
         .rooms-list {
             font-size: 11px;
@@ -1666,12 +1735,12 @@ $page = 'messages';
                 class="<?= $section === 'home' ? 'active' : '' ?>" title="Home">
                 <i class="fa-solid fa-house me-2"></i> <span class="sidebar-text">Home</span>
             </a>
-            <!-- <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=announcements"
-                class="<?= $section === 'announcements' ? 'active' : '' ?>" title="Announcements">
+            <!-- <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>" class="<?= $section === '' ? 'active' : '' ?>"
+                title="Announcements">
                 <i class="fa-solid fa-bullhorn me-2"></i> <span class="sidebar-text">Announcements</span>
             </a> -->
-            <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>" class="<?= $section === '' ? 'active' : '' ?>"
-                title="Announcements">
+            <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=announcements"
+                class="<?= $section === 'announcements' ? 'active' : '' ?>" title="Announcements">
                 <i class="fa-solid fa-bullhorn me-2"></i> <span class="sidebar-text">Announcements</span>
             </a>
             <!-- addtl e -->
@@ -1731,10 +1800,95 @@ $page = 'messages';
     <!-- MAIN CONTENT -->
     <div class="main">
 
-        <?php if ($section === ''): ?>
+        <!-- <?php if ($section === ''): ?>
+            <?php include 'chat-room-content.php'; ?>
+
+        <?php elseif ($section === 'status'): ?> -->
+            <!-- addtl s -->
+             <?php if ($section === '' || $section === 'home'): ?>
+            <?php
+            // ── HOME DASHBOARD DATA (added) ──
+            $latestPostStmt = $pdo->prepare("SELECT * FROM room_posts WHERE room_id = ? ORDER BY created_at DESC LIMIT 1");
+            $latestPostStmt->execute([$current_room_id]);
+            $latestPost = $latestPostStmt->fetch(PDO::FETCH_ASSOC);
+            ?>
+
+            <div class="home-hero">
+                <div class="home-hero-bar">
+                    <div style="font-size:12px; letter-spacing:.08em; text-transform:uppercase; opacity:.75;">Rooms</div>
+                    <h2>Welcome back, <?= htmlspecialchars($userFullName) ?></h2>
+                    <p>Stay connected, track updates, and support your interns — all in one place.</p>
+                </div>
+            </div>
+
+            <div class="row g-3">
+                <div class="col-lg-8">
+                    <div class="home-card">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <h5 class="fw-bold mb-0"><i class="fa-solid fa-bullhorn me-2" style="color:#ff6b2c;"></i>Announcements</h5>
+                                <small class="text-muted">Latest updates and important notices for your room.</small>
+                            </div>
+                            <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=announcements"
+                            class="btn btn-sm" style="background:#eef1fb;color:#272f54;border-radius:20px;font-weight:600;">
+                                View All <i class="fa-solid fa-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+
+                        <?php if ($latestPost): ?>
+                            <div style="border:1px solid #eee; border-radius:10px; padding:16px;">
+                                <strong><?= htmlspecialchars($latestPost['sender_name']) ?></strong>
+                                <small class="text-muted d-block mb-2">
+                                    <?= date("M d, Y", strtotime($latestPost['created_at'])) ?>
+                                </small>
+                                <p class="mb-0"><?= htmlspecialchars($latestPost['content']) ?></p>
+                            </div>
+                        <?php else: ?>
+                            <div class="home-empty">
+                                <div class="d-flex align-items-center gap-3">
+                                    <i class="fa-solid fa-bullhorn fa-2x" style="color:#ff6b2c;"></i>
+                                    <div>
+                                        <strong style="color:#475569;">No announcements yet</strong>
+                                        <div style="font-size:13px;">When there are new updates, they will appear here.</div>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=announcements" class="quick-card">
+                        <div class="quick-card-icon" style="background:#ffe5d9;color:#ff6b2c;"><i class="fa-solid fa-people-group"></i></div>
+                        <div class="quick-card-text"><strong>My Room</strong><small>View your room details</small></div>
+                        <i class="fa-solid fa-chevron-right quick-card-arrow"></i>
+                    </a>
+                    <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=ojt_applications" class="quick-card">
+                        <div class="quick-card-icon" style="background:#dbeafe;color:#1e40af;"><i class="fa-solid fa-file-lines"></i></div>
+                        <div class="quick-card-text"><strong>Requirements</strong><small>Check pending requirements</small></div>
+                        <?php if (!empty($pCount) && $pCount > 0): ?>
+                            <span class="badge rounded-pill ms-1" style="background:#ff6b2c;"><?= $pCount ?></span>
+                        <?php endif; ?>
+                        <i class="fa-solid fa-chevron-right quick-card-arrow"></i>
+                    </a>
+                    <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=weekly_reports" class="quick-card">
+                        <div class="quick-card-icon" style="background:#ffe7b3;color:#7a5200;"><i class="fa-solid fa-calendar-days"></i></div>
+                        <div class="quick-card-text"><strong>Weekly Reports</strong><small>View and submit weekly reports</small></div>
+                        <i class="fa-solid fa-chevron-right quick-card-arrow"></i>
+                    </a>
+                    <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=chats" class="quick-card">
+                        <div class="quick-card-icon" style="background:#dbeafe;color:#272f54;"><i class="fa-solid fa-comments"></i></div>
+                        <div class="quick-card-text"><strong>Chats</strong><small>Communicate with your team</small></div>
+                        <i class="fa-solid fa-chevron-right quick-card-arrow"></i>
+                    </a>
+                </div>
+            </div>
+
+        <?php elseif ($section === 'announcements'): ?>
             <?php include 'chat-room-content.php'; ?>
 
         <?php elseif ($section === 'status'): ?>
+            <!-- addtl e -->
             <div id="status" class="section sysAdm-section">
                 <div class="sysAdm-header--danger sysAdm-header--blue mb-4">
                     <div class="sysAdm-header-left">
