@@ -1799,10 +1799,8 @@ $page = 'messages';
 
     <!-- MAIN CONTENT -->
     <div class="main">
-
+        <!-- addtl s -->
         <?php if ($section === '' || $section === 'home'): ?>
-            <!-- addtl s -->
-             <?php if ($section === '' || $section === 'home'): ?>
             <?php
             // ── HOME DASHBOARD DATA (added) ──
             $latestPostStmt = $pdo->prepare("SELECT * FROM room_posts WHERE room_id = ? ORDER BY created_at DESC LIMIT 1");
