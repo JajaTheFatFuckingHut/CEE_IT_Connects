@@ -1884,7 +1884,7 @@ $page = 'messages';
                 </div>
             </div>
 
-        <?php elseif ($section === 'announcements'): ?>
+        <?php if ($section === 'announcements'): ?>
             <?php include 'chat-room-content.php'; ?>
 
         <?php elseif ($section === 'status'): ?>
