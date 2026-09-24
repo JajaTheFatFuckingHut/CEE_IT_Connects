@@ -29,6 +29,36 @@ $table = $roleMap[$role]['table'];
 //     'civil engineering' => 26,
 // ];
 
+// added sa announcements page or section
+<?php $page = 'announcements';
+require 'db.php';
+require 'auth.php';
+
+$stmt = $pdo->query("SELECT * FROM announcements ORDER BY created_at DESC");
+
+$announcements = [
+    'news' => [],
+    'updates' => [],
+    'FAQs' => []
+];
+
+while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+    if (!isset($announcements[$row['category']])) {
+        $announcements[$row['category']] = [];
+    }
+    $announcements[$row['category']][] = $row;
+}
+
+$docAvailStmt = $pdo->query("
+    SELECT ida.internship_id, ida.mou_available, ida.recommendation_letter_available,
+           ida.waiver_available, ida.updated_at, i.title, i.company
+    FROM internship_document_availability ida
+    JOIN internships i ON i.id = ida.internship_id
+    ORDER BY ida.updated_at DESC
+");
+$docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
+?>
+
 // added para sa sidebar thingy sa baba
 $userInfoStmt = $pdo->prepare("SELECT full_name FROM {$table} WHERE id = ?");
 $userInfoStmt->execute([$adviser_id]);
@@ -1880,6 +1910,16 @@ $page = 'messages';
             </div>
 
         <?php elseif ($section === 'announcements'): ?>
+            <?php
+            $docAvailStmt = $pdo->query("
+                SELECT ida.internship_id, ida.mou_available, ida.recommendation_letter_available,
+                    ida.waiver_available, ida.updated_at, i.title, i.company
+                FROM internship_document_availability ida
+                JOIN internships i ON i.id = ida.internship_id
+                ORDER BY ida.updated_at DESC
+            ");
+            $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
+            ?>
             <div id="documents" class="section sysAdm-section">
                 <div class="sysAdm-header--danger sysAdm-header--blue mb-4">
                     <div class="sysAdm-header-left">
