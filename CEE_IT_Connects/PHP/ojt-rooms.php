@@ -1729,7 +1729,7 @@ $page = 'messages';
         <div class="rooms-list" style="margin-top: 0;">
             <h6>ROOMS</h6>
             <?php foreach ($myRooms as $room): ?>
-                <a href="ojt-rooms.php?room_id=<?= $room['id'] ?>&section=room"
+                <a href="ojt-rooms.php?room_id=<?= $room['id'] ?>&section=home"
                     class="<?= ((int) $current_room_id === (int) $room['id']) ? 'active' : '' ?>"
                     title="<?= htmlspecialchars($room['room_name']) ?>">
                     <i class="bi bi-people-fill me-2"></i>
@@ -1745,7 +1745,7 @@ $page = 'messages';
         <div style="display:flex; flex-direction:column; width:100%;">
             <!-- addtl s -->
             <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=home"
-                class="<?= $section === 'home' ? 'active' : '' ?>" title="Home">
+                class="<?= ($section === 'home' || $section === '') ? 'active' : '' ?>" title="Home">
                 <i class="fa-solid fa-house me-2"></i> <span class="sidebar-text">Home</span>
             </a>
             <!-- <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>" class="<?= $section === '' ? 'active' : '' ?>"
@@ -1866,11 +1866,11 @@ $page = 'messages';
                 </div>
 
                 <div class="col-lg-4">
-                    <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=announcements" class="quick-card">
+                    <!-- <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=announcements" class="quick-card">
                         <div class="quick-card-icon" style="background:#ffe5d9;color:#ff6b2c;"><i class="fa-solid fa-people-group"></i></div>
                         <div class="quick-card-text"><strong>My Room</strong><small>View your room details</small></div>
                         <i class="fa-solid fa-chevron-right quick-card-arrow"></i>
-                    </a>
+                    </a> -->
                     <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=ojt_applications" class="quick-card">
                         <div class="quick-card-icon" style="background:#dbeafe;color:#1e40af;"><i class="fa-solid fa-file-lines"></i></div>
                         <div class="quick-card-text"><strong>Requirements</strong><small>Check pending requirements</small></div>
