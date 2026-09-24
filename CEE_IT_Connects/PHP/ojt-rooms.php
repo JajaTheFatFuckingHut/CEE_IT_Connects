@@ -1509,7 +1509,7 @@ $page = 'messages';
 
         /* addtl s */
         /* ── HOME DASHBOARD ── */
-        .dash-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin-bottom: 16px; }
+        .dash-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin-bottom: 16px; margin-top: 16px; }
         .dash-stat { display: flex; align-items: center; gap: 14px; border-radius: 12px; padding: 16px 18px;
             text-decoration: none; color: inherit; transition: transform .15s ease; }
         .dash-stat:hover { transform: translateY(-2px); color: inherit; }
@@ -1995,7 +1995,6 @@ $page = 'messages';
                         <?php endif; ?>
                     </div>
                     <!-- addtl s -->
-                     <br><br>
                     <div class="dash-stats">
                         <a href="<?= $dashUrl ?>status" class="dash-stat tone-blue">
                             <div class="dash-stat-icon"><i class="fa-solid fa-users"></i></div>
