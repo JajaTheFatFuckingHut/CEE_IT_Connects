@@ -563,7 +563,7 @@ function timeAgo($datetime)
         </a>
 
         <!-- Center Menu (students only) -->
-        <?php if (!$hideAdviserNav): ?>
+        <?php if (!$hideStudentNav): ?>
             <div class="navbar-center d-none d-lg-flex">
                 <ul class="navbar-nav gap-5">
                     <li class="nav-item">
@@ -579,21 +579,16 @@ function timeAgo($datetime)
 
                                 } ?>">Home</a>
                     </li>
-                <?php endif; ?>
-                <?php if (!$hideStudentNav): ?>
                     <li class="nav-item">
                         <a class="nav-link <?= ($page == 'opportunity') ? 'active' : '' ?>"
                             href="/applied-Internship-programs.php">Internships</a>
                     </li>
-                <?php endif; ?>
-                <?php if (!$hideAdviserNav): ?>
                     <li class="nav-item">
                         <a class="nav-link <?= ($page == 'announcements') ? 'active' : '' ?>"
                             href="announcement.php">Announcements</a>
                     </li>
                 </ul>
             </div>
-
         <?php endif; ?>
 
         <!-- Right Icons -->
