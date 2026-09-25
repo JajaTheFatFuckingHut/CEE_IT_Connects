@@ -904,6 +904,13 @@ $rmGroupMeta = [
 ];
 $rmMemberCount = count($members);
 $rmPostCount   = count($posts);
+
+// Show stored timestamps in Philippine time
+$rmFmtTime = function ($ts): string {
+    $dt = new DateTime((string) $ts, new DateTimeZone('UTC'));
+    $dt->setTimezone(new DateTimeZone('Asia/Manila'));
+    return $dt->format('M d, Y · g:i A');
+};
 ?>
 
 <?php if (isset($_SESSION['role']) === 'student'): ?>
@@ -921,6 +928,9 @@ $rmPostCount   = count($posts);
         <div class="rm-chips">
             <?php if (!empty($room['department'])): ?>
                 <span class="rm-chip"><i class="fa-solid fa-building-columns"></i> <?= htmlspecialchars(ucwords($room['department'])) ?></span>
+                <?php if (!empty($room['school_year'])): ?>
+                    <span class="rm-chip"><i class="fa-solid fa-calendar"></i> S.Y. <?= htmlspecialchars($room['school_year']) ?></span>
+                <?php endif; ?>
             <?php elseif (!empty($room['section'])): ?>
                 <span class="rm-chip"><i class="fa-solid fa-graduation-cap"></i> <?= htmlspecialchars($rmClassLabel) ?></span>
                 <?php if (!empty($room['school_year'])): ?>
@@ -988,7 +998,7 @@ $rmPostCount   = count($posts);
         <div class="rm-toolbar">
             <div class="rm-search">
                 <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" id="rmMemberSearch" placeholder="Search by name, student no., or program…"
+                <input type="text" id="rmMemberSearch" placeholder="Search…"
                     oninput="rmApplyMembers()">
             </div>
             <div class="rm-filters">
