@@ -158,6 +158,21 @@ if (isset($_POST['reset_password'])) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        .password-group { position: relative; }
+        .password-group .form-control { padding-right: 40px; }
+        .toggle-password {
+            position: absolute;
+            top: 50%;
+            right: 14px;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #888;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        body { font-family: 'Poppins', sans-serif; background: #f4f5f9; }
+        .fp-card { width: 400px; border: none; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); padding: 2rem; }
+
         body { font-family: 'Poppins', sans-serif; background: #f4f5f9; }
         .fp-card { width: 400px; border: none; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); padding: 2rem; }
         .fp-title { font-weight: 700; color: #1b1c39; margin-bottom: 1.25rem; }
@@ -232,7 +247,7 @@ if (isset($_POST['reset_password'])) {
                 }
                 setupToggle('toggleNewPasswordIcon', 'newPassword');
                 setupToggle('toggleConfirmPasswordIcon', 'confirmPassword');
-                
+
                 document.getElementById('resetForm').addEventListener('submit', function (e) {
                     const pass = document.getElementById('newPassword');
                     const confirm = document.getElementById('confirmPassword');
