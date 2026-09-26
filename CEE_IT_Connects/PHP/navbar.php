@@ -768,15 +768,6 @@ function timeAgo($datetime)
                             ]
                         ],
                         [
-                            'bi-hand-thumbs-up-fill',
-                            'Express Interest in an Internship',
-                            [
-                                'Open the internship listing you are interested in.',
-                                'Click the <strong>Interest</strong> button.',
-                                'Confirm your application when prompted.',
-                            ]
-                        ],
-                        [
                             'bi-file-earmark-text-fill',
                             'View Internship Documentation',
                             [

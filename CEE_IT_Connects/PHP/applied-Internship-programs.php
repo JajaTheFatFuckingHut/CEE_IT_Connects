@@ -1229,7 +1229,7 @@ foreach ($internships as $loc) {
                             </div>
 
                             <div class="mobile-filter-row">
-                                <div class="mobile-filter-group">
+                                <!-- <div class="mobile-filter-group">
                                     <strong>Deadline</strong>
                                     <div class="form-check">
                                         <input class="form-check-input" type="radio" name="m_deadline" value="week">
@@ -1243,25 +1243,20 @@ foreach ($internships as $loc) {
                                         <input class="form-check-input" type="radio" name="m_deadline" value="future">
                                         <label class="form-check-label">Upcoming</label>
                                     </div>
-                                </div>
+                                </div> -->
 
                                 <div class="mobile-filter-group">
-                                    <strong>Internship Type</strong>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="m_internship_type"
-                                            value="All">
-                                        <label class="form-check-label">All types</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="m_internship_type"
-                                            value="paid">
-                                        <label class="form-check-label">With stipend</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="m_internship_type"
-                                            value="unpaid">
-                                        <label class="form-check-label">Without stipend</label>
-                                    </div>
+                                    <strong>Program</strong>
+                                    <?php
+                                    $programs = ['Information Technology', 'Civil Engineering', 'Electrical Engineering'];
+                                    foreach ($programs as $p):
+                                        $checked = (isset($_GET['program']) && $_GET['program'] == $p) ? 'checked' : '';
+                                        ?>
+                                        <label class="fc-item">
+                                            <input type="radio" name="program" value="<?= htmlspecialchars($p) ?>" <?= $checked ?>>
+                                            <?= htmlspecialchars($p) ?>
+                                        </label>
+                                    <?php endforeach; ?>
                                 </div>
                             </div>
 
