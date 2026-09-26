@@ -87,9 +87,6 @@
                     <div class="mb-3">
                         <input type="password" name="password" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?&quot;:{}|&lt;&gt;_\-+=~`\[\];'/\\]).{8,16}$"
                             class="form-control" placeholder="Password" id="password" required>
-                        <small class="form-text text-muted">
-                            Use 8-16 characters with at least one uppercase, one lowercase, one number, and one special character.
-                        </small>
                         <small class="form-text text-danger d-none" id="password-error">
                             Password must be 8-16 characters and include an uppercase letter, a lowercase letter, a number, and a special character.
                         </small>
