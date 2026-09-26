@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function checkPassword(password){
-        const regex = /^(?=.*[a-z])(?=.*[A-Z]).{8,16}$/;
+        const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>_\-+=~`\[\];'/\\]).{8,16}$/;
         return regex.test(password);
     }
 

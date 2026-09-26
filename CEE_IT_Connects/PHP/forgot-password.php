@@ -120,7 +120,11 @@ if (isset($_POST['reset_password'])) {
     $new_password = $_POST['new_password'];
     $confirm_password = $_POST['confirm_password'];
 
-    if ($new_password !== $confirm_password) {
+    $passwordRegex = '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>_\-+=~`\[\];\'\/\\\\]).{8,16}$/';
+
+    if (!preg_match($passwordRegex, $new_password)) {
+        $error = "Password must be 8-16 characters and include an uppercase letter, a lowercase letter, a number, and a special character.";
+    } elseif ($new_password !== $confirm_password) {
         $error = "Passwords do not match.";
     } else {
         $hashed = password_hash($new_password, PASSWORD_DEFAULT);
@@ -192,11 +196,11 @@ if (isset($_POST['reset_password'])) {
 
             <form method="POST" id="resetForm">
                 <input type="hidden" name="email" value="<?php echo htmlspecialchars($_GET['email']); ?>">
-                <input type="password" name="new_password" id="newPassword" pattern="^(?=.*[a-z])(?=.*[A-Z]).{8,16}$"
+                <input type="password" name="new_password" id="newPassword" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&amp;*(),.?&quot;:{}|&lt;&gt;_\-+=~`\[\];'/\\]).{8,16}$"
                     class="form-control fp-input mb-1" placeholder="New Password" required oninput="this.setCustomValidity('')"
-                    oninvalid="this.setCustomValidity('Password must be 8–16 characters and include at least one uppercase and one lowercase letter.')">
+                    oninvalid="this.setCustomValidity('Password must be 8–16 characters and include an uppercase letter, a lowercase letter, a number, and a special character.')">
                 <div class="text-muted mb-2" style="font-size:12px;">
-                    Must be 8–16 characters, with at least 1 uppercase and 1 lowercase letter.
+                    Must be 8–16 characters, with at least 1 uppercase, 1 lowercase, 1 number, and 1 special character.
                 </div>
 
                 <input type="password" name="confirm_password" id="confirmPassword" class="form-control fp-input mb-1"

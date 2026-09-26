@@ -34,6 +34,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $section = $_POST['section'];
     $contact_number = $_POST['contact_number'];
 
+    // VALIDATE PASSWORD
+    $passwordRegex = '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>_\-+=~`\[\];\'\/\\\\]).{8,16}$/';
+
+    if (!preg_match($passwordRegex, $_POST['password'])) {
+        die("Password must be 8-16 characters and include an uppercase letter, a lowercase letter, a number, and a special character.");
+    }
+
     // HASH PASSWORD
     $password_hash = password_hash($_POST['password'], PASSWORD_DEFAULT);
 
