@@ -1557,16 +1557,15 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
                 <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
                     <div style="display:flex; align-items:center; flex-wrap:wrap; gap:10px;">
                         <div class="search-box">
-                            <input type="text" id="search-archive"
-                                style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:220px;"
-                                placeholder="Search by name or email..." oninput="filterDelete()">
-                            <i class="bi bi-search" style="color:#272f54 !important;"></i>
+                            <input type="text" id="search-archive" oninput="filterArchive()"
+                            placeholder="Search by name or email..."
+                            style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:220px;">
                         </div>
 
                         <select class="filter-select"
                             style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:200px;"
                             id="filter-role-archive" onchange="filterArchive()">
-                            <option value="All">Role</option>
+                            <option value="">All Roles</option>
                             <option value="student">Student</option>
                             <option value="adviser">Adviser</option>
                             <option value="admin">Admin</option>
@@ -2102,7 +2101,7 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
             </div>
 
             <div id="section_settings" class="section sysAdm-section">
-                <div class="sysAdm-header--dange sysAdm-header--blue mb-4">
+                <div class="sysAdm-header--danger sysAdm-header--blue mb-4">
                     <div class="sysAdm-header-left">
                         <div class="sysAdm-header-icon">
                             <i class="bi bi-sliders"></i>
@@ -2133,28 +2132,29 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
                     <input type="hidden" name="add_school_year" value="1">
                 </form>
 
-                <form method="POST" class="mb-3 p-3" action="superadmin-db.php"
-                    style="background:#f7f8fc; border-radius:12px; border:1px solid #e3e6f3;">
-                    <input type="hidden" name="save_section_settings" value="1">
-                    <input type="hidden" name="school_year" value="<?= htmlspecialchars($schoolYear) ?>">
-                    <div class="fw-semibold mb-2" style="font-size:13px; color:#272f54;">
-                        <i class="bi bi-sliders me-1"></i> Sections per year level
-                        (<?= htmlspecialchars($schoolYear) ?>)
-                    </div>
-                    <div class="d-flex flex-wrap align-items-end gap-3">
-                        <?php for ($yl = 1; $yl <= 4; $yl++): ?>
-                            <div>
-                                <label style="font-size:12px; color:#666;">Year <?= $yl ?></label>
-                                <input type="number" min="0" max="50" name="section_count[<?= $yl ?>]"
-                                    value="<?= $sectionCounts[$yl] ?? 0 ?>"
-                                    style="display:block; width:90px; padding:8px 10px; border-radius:10px; border:1px solid #ddd; font-size:13px;">
-                            </div>
-                        <?php endfor; ?>
-                        <button type="submit" name="save_section_settings" class="btn-update" style="padding:8px 14px;">
-                            <i class="bi bi-save me-1"></i> Save
-                        </button>
-                    </div>
-                </form>
+                <div class="sysAdm-table-wrapper mb-3">
+                    <form method="POST" class="p-3" action="superadmin-db.php">
+                        <input type="hidden" name="save_section_settings" value="1">
+                        <input type="hidden" name="school_year" value="<?= htmlspecialchars($schoolYear) ?>">
+                        <div class="fw-semibold mb-2" style="font-size:13px; color:#272f54;">
+                            <i class="bi bi-sliders me-1"></i> Sections per year level
+                            (<?= htmlspecialchars($schoolYear) ?>)
+                        </div>
+                        <div class="d-flex flex-wrap align-items-end gap-3">
+                            <?php for ($yl = 1; $yl <= 4; $yl++): ?>
+                                <div>
+                                    <label style="font-size:12px; color:#666;">Year <?= $yl ?></label>
+                                    <input type="number" min="0" max="50" name="section_count[<?= $yl ?>]"
+                                        value="<?= $sectionCounts[$yl] ?? 0 ?>"
+                                        style="display:block; width:90px; padding:8px 10px; border-radius:10px; border:1px solid #ddd; font-size:13px;">
+                                </div>
+                            <?php endfor; ?>
+                            <button type="submit" name="save_section_settings" class="btn-update" style="padding:8px 14px;">
+                                <i class="bi bi-save me-1"></i> Save
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
             <!-- ASSIGN ADVISER -->
             <div id="assign_adviser" class="section sysAdm-section">
@@ -2164,8 +2164,8 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
                             <i class="bi bi-person-check-fill"></i>
                         </div>
                         <div class="sysAdm-header-text">
-                            <h2>Assign Adviser to Student</h2>
-                            <p>Assign an internship adviser to a student. The student will automatically be added to
+                            <h2>Assign Adviser to Sections</h2>
+                            <p>Assign an internship adviser to a section. The section will automatically be linked to
                                 that
                                 adviser's room.</p>
                         </div>
