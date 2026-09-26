@@ -196,3 +196,13 @@ select:invalid {
         display: none;
     }
 }
+
+#termsModal .modal-content { border-radius: 16px; border: none; overflow: hidden; }
+#termsModal .modal-header { background: #1b1c39; color: #fff; border-bottom: none; }
+#termsModal .modal-header .btn-close { filter: invert(1); }
+#termsModal .modal-title { font-weight: 700; }
+#termsModal .modal-body { padding: 1.5rem 1.75rem; font-size: 0.95rem; line-height: 1.6; color: #333; }
+#termsModal .modal-body h6 { color: #e05834; font-weight: 700; text-transform: uppercase;
+                              font-size: 0.85rem; letter-spacing: 0.5px; margin-top: 1.25rem; }
+#termsModal .modal-footer { border-top: none; padding: 1rem 1.75rem 1.5rem; }
+#termsModal .btn-secondary { background: #1b1c39; border: none; border-radius: 8px; }
