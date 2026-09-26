@@ -1078,26 +1078,10 @@ foreach ($internships as $loc) {
                                         </div>
                                     <?php endif; ?>
 
-                                    <!-- <?php //if (!empty($internship['year_level'])): ?>
-                                        <div class="detail-row">
-                                            <span class="detail-label">Year dnjwadnjanjdwhdahLevel:</span>
-                                            <span class="detail-val"><?= htmlspecialchars($internship['year_level']) ?></span>
-                                        </div>
-                                    <?php //endif; ?> -->
-
-                                    <?php if (!empty($internship['internship_type'])): ?>
-                                        <div class="detail-row">
-                                            <span class="detail-label">Type:</span>
-                                            <span
-                                                class="detail-val"><?= $internship['internship_type'] === 'paid' ? 'With stipend' : 'Without stipend' ?></span>
-                                        </div>
-                                    <?php endif; ?>
-
                                     <?php if (!empty($internship['company_classification'])): ?>
                                         <div class="detail-row">
                                             <span class="detail-label">Classification:</span>
-                                            <span
-                                                class="detail-val"><?= htmlspecialchars($internship['company_classification']) ?></span>
+                                            <span class="detail-val"><?= htmlspecialchars(ucwords(str_replace('_', ' ', $internship['company_classification']))) ?></span>
                                         </div>
                                     <?php endif; ?>
 
@@ -1111,8 +1095,7 @@ foreach ($internships as $loc) {
                                     <?php if (!empty($internship['phone_numbers'])): ?>
                                         <div class="detail-row">
                                             <span class="detail-label">Contact:</span>
-                                            <span
-                                                class="detail-val"><?= htmlspecialchars($internship['phone_numbers']) ?></span>
+                                            <span class="detail-val"><?= htmlspecialchars(str_replace(',', ', ', $internship['phone_numbers'])) ?></span>
                                         </div>
                                     <?php endif; ?>
 
@@ -1144,25 +1127,22 @@ foreach ($internships as $loc) {
                                             <span class="detail-val"><?= htmlspecialchars($internship['address']) ?></span>
                                         </div>
                                     <?php endif; ?>
-                                    <div>
-                                        <?php if (!empty($internship['ojt_time_in'])): ?>
-                                            <div class="detail-row">
-                                                <span class="detail-label">OJT Time In:</span>
-                                                <span class="detail-val">
-                                                    <?= htmlspecialchars(date('g:i A', strtotime($internship['ojt_time_in']))) ?>
-                                                </span>
-                                            </div>
-                                        <?php endif; ?>
-                                        <?php if (!empty($internship['ojt_time_out'])): ?>
-                                            <div class="detail-row">
-                                                <span class="detail-label">OJT Time Out:</span>
-                                                <span class="detail-val">
-                                                    <?= htmlspecialchars(date('g:i A', strtotime($internship['ojt_time_out']))) ?>
-                                                </span>
-                                            </div>
-                                        <?php endif; ?>
-                                    </div>
-
+                                    <?php if (!empty($internship['ojt_time_in'])): ?>
+                                        <div class="detail-row">
+                                            <span class="detail-label">OJT Time In:</span>
+                                            <span class="detail-val">
+                                                <?= htmlspecialchars(date('g:i A', strtotime($internship['ojt_time_in']))) ?>
+                                            </span>
+                                        </div>
+                                    <?php endif; ?>
+                                    <?php if (!empty($internship['ojt_time_out'])): ?>
+                                        <div class="detail-row">
+                                            <span class="detail-label">OJT Time Out:</span>
+                                            <span class="detail-val">
+                                                <?= htmlspecialchars(date('g:i A', strtotime($internship['ojt_time_out']))) ?>
+                                            </span>
+                                        </div>
+                                    <?php endif; ?>
                                 </div>
                                 <hr>
                                 <?php
@@ -1183,38 +1163,6 @@ foreach ($internships as $loc) {
                                         <?php endif; ?>
                                     </div>
                                 </section>
-                                <!-- <p class="details-section-title">Application Documents</p>
-
-                                <div class="file-row">
-                                    <span class="file-name">Memorandum of Understanding (MOU)</span>
-                                    <div class="file-btns">
-                                        <a href="mou-preview.php?id=<?= $internship['id'] ?>&student_id=<?= $_SESSION['user_id'] ?>&action=mou"
-                                            class="btn-preview" target="_blank">Preview</a>
-                                        <a href="download-mou.php?id=<?= $internship['id'] ?>&action=mou"
-                                            class="btn-dl">Download PDF</a>
-                                    </div>
-                                </div>
-
-                                <div class="file-row">
-                                    <span class="file-name">Recommendation Letter</span>
-                                    <div class="file-btns">
-                                        <a href="mou-preview.php?id=<?= $internship['id'] ?>&student_id=<?= $_SESSION['user_id'] ?>&action=rl"
-                                            class="btn-preview" target="_blank">Preview</a>
-                                        <a href="download-mou.php?id=<?= $internship['id'] ?>&action=rl"
-                                            class="btn-dl">Download PDF</a>
-                                    </div>
-                                </div>
-
-                                <div class="file-row">
-                                    <span class="file-name">Waiver</span>
-                                    <div class="file-btns">
-                                        <a href="mou-preview.php?id=<?= $internship['id'] ?>&student_id=<?= $_SESSION['user_id'] ?>&action=waiver"
-                                            class="btn-preview" target="_blank">Preview</a>
-                                    <a href="download-mou.php?id=<?= $internship['id'] ?>&action=waiver"
-                                        class="btn-dl">Download PDF</a>
-                                    </div>
-                                </div> -->
-
                             </div>
                         </div>
                     <?php endforeach; ?>
@@ -1229,22 +1177,6 @@ foreach ($internships as $loc) {
                             </div>
 
                             <div class="mobile-filter-row">
-                                <!-- <div class="mobile-filter-group">
-                                    <strong>Deadline</strong>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="m_deadline" value="week">
-                                        <label class="form-check-label">Due this week</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="m_deadline" value="month">
-                                        <label class="form-check-label">Due this month</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="m_deadline" value="future">
-                                        <label class="form-check-label">Upcoming</label>
-                                    </div>
-                                </div> -->
-
                                 <div class="mobile-filter-group">
                                     <strong>Program</strong>
                                     <?php
