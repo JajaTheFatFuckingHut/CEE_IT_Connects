@@ -1120,7 +1120,7 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
             </a>
             <a href="#" onclick="showSection(event, 'restore')" data-tooltip="Settings">
                 <i class="bi bi-archive me-2"></i>
-                <span class="nav-label">Archived</span>
+                <span class="nav-label">Archives</span>
             </a>
         </div>
 
@@ -1528,17 +1528,19 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
 
             <!-- Archived stuff -->
             <div id="restore" class="section sysAdm-section">
-                <div class="sysAdm-header--danger">
+                <div class="sysAdm-header--danger mb-4">
                     <div class="sysAdm-header-left">
                         <div class="sysAdm-header-icon">
-                            <i class="fa-solid fa-trash"></i>
+                            <i class="fa-solid fa-archive"></i>
                         </div>
-                        <h2>Archived Accounts</h2>
-                        <p>Accounts deleted in the system</p>
+                        <div class="sysAdm-header-text">
+                            <h2>Archived Accounts</h2>
+                            <p>Manage accounts that are archived.</p>
+                        </div>
                     </div>
                 </div>
 
-                <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                <!-- <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
                     <div class="d-flex gap-2 flex-wrap">
                         <input type="text" id="search-delete" oninput="filterDelete()"
                             placeholder="Search for a student"
@@ -1551,11 +1553,30 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
                             <option value="admin">Admin</option>
                         </select>
                     </div>
+                </div> -->
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
+                    <div style="display:flex; align-items:center; flex-wrap:wrap; gap:10px;">
+                        <div class="search-box">
+                            <input type="text" id="search-archive"
+                                style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:220px;"
+                                placeholder="Search by name or email..." oninput="filterDelete()">
+                            <i class="bi bi-search" style="color:#272f54 !important;"></i>
+                        </div>
+
+                        <select class="filter-select"
+                            style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:200px;"
+                            id="filter-role-archive" onchange="filterArchive()">
+                            <option value="All">Role</option>
+                            <option value="student">Student</option>
+                            <option value="adviser">Adviser</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                    </div>
                 </div>
 
 
                 <div class="sysAdm-table-wrapper">
-                    <table class="sysAdm-table">
+                    <table class="sysAdm-table" id="archive-table">
                         <thead>
                             <tr>
                                 <th>Name</th>
@@ -1564,25 +1585,17 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
                                 <th>Action</th>
                             </tr>
                         </thead>
-                        <tbody id="delete-tbody">
+                        <tbody id="archive-tbody">
                             <?php foreach ($archivedUsers as $u): ?>
                                 <tr>
-                                    <td>
-                                        <?= htmlspecialchars($u['name']) ?>
-                                    </td>
-                                    <td>
-                                        <?= htmlspecialchars($u['email']) ?>
-                                    </td>
-                                    <td>
-                                        <?= htmlspecialchars(ucwords(str_replace('_', ' ', $u['role']))) ?>
-
-                                    </td>
+                                    <td><?= htmlspecialchars($u['name']) ?></td>
+                                    <td><?= htmlspecialchars($u['email']) ?></td>
+                                    <td><?= htmlspecialchars(ucwords(str_replace('_', ' ', $u['role']))) ?></td>
                                     <td>
                                         <form method="POST" action="superadmin-db.php"
                                             onsubmit="return confirm('Restore this user?')">
                                             <input type="hidden" name="user_id" value="<?= $u['id'] ?>">
-                                            <input type="hidden" name="source"
-                                                value="<?= htmlspecialchars($u['source']) ?>">
+                                            <input type="hidden" name="source" value="<?= htmlspecialchars($u['source']) ?>">
                                             <input type="hidden" name="restore" value="1">
                                             <button type="submit" class="btn btn-success btn-sm">
                                                 <i class="bi bi-check2-circle"></i> Restore
@@ -2649,6 +2662,19 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
             const role = document.getElementById('filter-role').value.toLowerCase();
 
             document.querySelectorAll('#delete-tbody tr').forEach(row => {
+                const rowText = row.innerText.toLowerCase();
+                const matchesSearch = rowText.includes(search);
+                const matchesRole = role === '' || rowText.includes(role);
+
+                row.style.display = (matchesSearch && matchesRole) ? '' : 'none';
+            });
+        }
+
+        function filterArchive() {
+            const search = document.getElementById('search-archive').value.toLowerCase();
+            const role = document.getElementById('filter-role-archive').value.toLowerCase();
+
+            document.querySelectorAll('#archive-tbody tr').forEach(row => {
                 const rowText = row.innerText.toLowerCase();
                 const matchesSearch = rowText.includes(search);
                 const matchesRole = role === '' || rowText.includes(role);
