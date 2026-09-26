@@ -1051,9 +1051,6 @@ foreach ($internships as $loc) {
                                 </button>
                                 <form method="POST" action="applied-Internship-programs-db.php" style="margin:0;">
                                     <input type="hidden" name="internship_id" value="<?= $internship['id'] ?>">
-                                    <!-- <button type="submit" class="btn-interested">
-                                        <i class="fa fa-bookmark"></i> Interested
-                                    </button> -->
                                 </form>
                             </div>
 
@@ -1185,7 +1182,7 @@ foreach ($internships as $loc) {
                                         $checked = (isset($_GET['program']) && $_GET['program'] == $p) ? 'checked' : '';
                                         ?>
                                         <label class="fc-item">
-                                            <input type="radio" name="program" value="<?= htmlspecialchars($p) ?>" <?= $checked ?>>
+                                            <input type="radio" name="m_program" value="<?= htmlspecialchars($p) ?>" <?= $checked ?>>
                                             <?= htmlspecialchars($p) ?>
                                         </label>
                                     <?php endforeach; ?>
@@ -1312,16 +1309,12 @@ foreach ($internships as $loc) {
             document.getElementById('search-internship').value = this.value;
             applyFilters();
         });
-
-        document.querySelectorAll('input[name="m_deadline"]').forEach(r => r.addEventListener('change', function () {
-            const desk = document.querySelector(`input[name="deadline"][value="${this.value}"]`);
-            if (desk) desk.checked = true;
-            applyFilters();
-        }));
-        document.querySelectorAll('input[name="m_internship_type"]').forEach(r => r.addEventListener('change', function () {
-            const desk = document.querySelector(`input[name="internship_type"][value="${this.value}"]`);
-            if (desk) desk.checked = true;
-            applyFilters();
+        document.querySelectorAll('input[name="m_program"]').forEach(r => r.addEventListener('change', function () {
+            const desk = document.querySelector(`input[name="program"][value="${this.value}"]`);
+            if (desk) {
+                desk.checked = true;
+                document.getElementById('filter-form').submit();
+            }
         }));
 
         document.getElementById('m_company_classification')?.addEventListener('change', function () {
