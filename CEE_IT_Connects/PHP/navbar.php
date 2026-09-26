@@ -607,8 +607,7 @@ function timeAgo($datetime)
                     } else {
                         echo 'message.php';
 
-                    } ?>">
-                    <a href="#" class="navbar-icon-btn" data-tip="Rooms">
+                    } ?>" class="navbar-icon-btn" data-tip="Rooms">
                         <i class="fa-solid fa-desktop"></i>
                     </a>
                 </div>
