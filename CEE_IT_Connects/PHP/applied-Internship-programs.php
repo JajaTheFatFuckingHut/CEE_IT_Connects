@@ -1129,7 +1129,7 @@ foreach ($internships as $loc) {
                                     <?php endif; ?>
                                     <?php if (!empty($internship['ojt_time_in'])): ?>
                                         <div class="detail-row">
-                                            <span class="detail-label">OJT Time In:</span>
+                                            <span class="detail-label">Opens at:</span>
                                             <span class="detail-val">
                                                 <?= htmlspecialchars(date('g:i A', strtotime($internship['ojt_time_in']))) ?>
                                             </span>
@@ -1137,7 +1137,7 @@ foreach ($internships as $loc) {
                                     <?php endif; ?>
                                     <?php if (!empty($internship['ojt_time_out'])): ?>
                                         <div class="detail-row">
-                                            <span class="detail-label">OJT Time Out:</span>
+                                            <span class="detail-label">Closes at:</span>
                                             <span class="detail-val">
                                                 <?= htmlspecialchars(date('g:i A', strtotime($internship['ojt_time_out']))) ?>
                                             </span>
