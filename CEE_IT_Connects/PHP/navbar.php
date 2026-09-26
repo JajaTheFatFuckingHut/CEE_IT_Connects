@@ -608,9 +608,9 @@ function timeAgo($datetime)
                         echo 'message.php';
 
                     } ?>">
-                    <div class="navbar-icon-btn" data-tip="Rooms">
+                    <a href="#" class="navbar-icon-btn" data-tip="Rooms">
                         <i class="fa-solid fa-desktop"></i>
-                    </div>
+                    </a>
                 </div>
             <?php endif; ?>
             <!-- addtl s -->
