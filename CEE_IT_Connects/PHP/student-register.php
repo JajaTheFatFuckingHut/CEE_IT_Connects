@@ -86,9 +86,13 @@
 
                     <div class="mb-3">
                         <input type="password" name="password" pattern="^(?=.*[a-z])(?=.*[A-Z]).{8,16}$"
-                            class="form-control"
-                            placeholder="Password (Use 8-16 characters with at least one uppercase and one lowercase letter)"
-                            id="password" required>
+                            class="form-control" placeholder="Password" id="password" required>
+                        <small class="form-text text-muted">
+                            Use 8-16 characters with at least one uppercase and one lowercase letter.
+                        </small>
+                        <small class="form-text text-danger d-none" id="password-error">
+                            Password must be 8-16 characters long and include at least one uppercase and one lowercase letter.
+                        </small>
                     </div>
 
                     <div class="mb-3">
@@ -100,8 +104,13 @@
                         <input type="email" name="email" class="form-control" placeholder="Email Address">
                     </div>
 
-                    <div class="terms-text">
+                    <!-- <div class="terms-text">
                         By clicking "Create Account," you agree to the <a href="#" class="terms-link">Terms of Use and Privacy Policy.</a>
+                    </div> -->
+
+                    <div class="terms-text">
+                        By clicking "Create Account," you agree to the
+                        <a href="#" class="terms-link" data-bs-toggle="modal" data-bs-target="#termsModal">Terms of Use and Privacy Policy.</a>
                     </div>
 
                     <button type="submit" class="btn-login mt-3">
@@ -120,6 +129,30 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script src="../JS/student-register.js"></script>
+
+    <!-- Terms of Use & Privacy Policy Modal -->
+    <div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="termsModalLabel">Terms of Use &amp; Privacy Policy</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <h6>Terms of Use</h6>
+            <p>CEE IT Connects is an internship hours-tracking system for PLV CEIT students. By registering, you agree to provide accurate personal and academic information, use the platform only for legitimate internship documentation and communication with your adviser, and refrain from submitting falsified time records or files.</p>
+            <p>Your account and any uploaded documents (e.g. Certificate of Registration) may be reviewed by your adviser and department administrators for verification purposes.</p>
+
+            <h6 class="mt-3">Privacy Policy</h6>
+            <p>Information you submit — full name, student ID, program, section, contact number, email, and uploaded documents — is used solely to verify enrollment and manage internship tracking within CEE IT Connects.</p>
+            <p>Your data will not be shared outside PLV's CEIT department and its internship partners, except as required for academic or administrative processes. You may request corrections to your information through your adviser.</p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+        </div>
+    </div>
+    </div>
 </body>
 
 </html>

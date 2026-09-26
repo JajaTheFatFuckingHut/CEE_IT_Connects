@@ -80,7 +80,7 @@ $registerVisible = file_exists($statePath) ? trim(file_get_contents($statePath))
                     <a href="forgot-password.php" class="forgot-link">Forgot password?</a>
                     <button type="submit" class="btn-login">Login</button>
                 </form>
-                <?php if ($registerVisible === 'show'): ?>
+                <?php if ($registerVisible === 'show' && $role === 'student'): ?>
                     <div class="register-text mt-3" style="text-align: center; margin-top: 20px; 
                     font-size: 0.9rem; color: #333;">Click <a href="student-register.php"
                             style="color: #e05834;">here</a>
