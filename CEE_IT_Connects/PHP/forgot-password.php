@@ -196,15 +196,21 @@ if (isset($_POST['reset_password'])) {
 
             <form method="POST" id="resetForm">
                 <input type="hidden" name="email" value="<?php echo htmlspecialchars($_GET['email']); ?>">
-                <input type="password" name="new_password" id="newPassword" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&amp;*(),.?&quot;:{}|&lt;&gt;_\-+=~`\[\];'/\\]).{8,16}$"
-                    class="form-control fp-input mb-1" placeholder="New Password" required oninput="this.setCustomValidity('')"
-                    oninvalid="this.setCustomValidity('Password must be 8–16 characters and include an uppercase letter, a lowercase letter, a number, and a special character.')">
+                <div class="password-group position-relative">
+                    <input type="password" name="new_password" id="newPassword" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&amp;*(),.?&quot;:{}|&lt;&gt;_\-+=~`\[\];'/\\]).{8,16}$"
+                        class="form-control fp-input mb-1" placeholder="New Password" required oninput="this.setCustomValidity('')"
+                        oninvalid="this.setCustomValidity('Password must be 8–16 characters and include an uppercase letter, a lowercase letter, a number, and a special character.')">
+                    <i class="fa fa-eye-slash toggle-password" id="toggleNewPasswordIcon"></i>
+                </div>
                 <div class="text-muted mb-2" style="font-size:12px;">
                     Must be 8–16 characters, with at least 1 uppercase, 1 lowercase, 1 number, and 1 special character.
                 </div>
 
-                <input type="password" name="confirm_password" id="confirmPassword" class="form-control fp-input mb-1"
-                    placeholder="Confirm Password" required oninput="this.setCustomValidity('')">
+                <div class="password-group position-relative">
+                    <input type="password" name="confirm_password" id="confirmPassword" class="form-control fp-input mb-1"
+                        placeholder="Confirm Password" required oninput="this.setCustomValidity('')">
+                    <i class="fa fa-eye-slash toggle-password" id="toggleConfirmPasswordIcon"></i>
+                </div>
                 <div id="confirmError" class="text-danger mb-2" style="font-size:12px; display:none;">
                     Passwords do not match.
                 </div>
@@ -212,6 +218,21 @@ if (isset($_POST['reset_password'])) {
             <button name="reset_password" class="btn btn-success btn-fp w-100">Reset Password</button>            </form>
 
             <script>
+                function setupToggle(iconId, inputId) {
+                    const icon = document.getElementById(iconId);
+                    const input = document.getElementById(inputId);
+                    if (icon && input) {
+                        icon.addEventListener('click', function () {
+                            const isPassword = input.getAttribute('type') === 'password';
+                            input.setAttribute('type', isPassword ? 'text' : 'password');
+                            this.classList.toggle('fa-eye');
+                            this.classList.toggle('fa-eye-slash');
+                        });
+                    }
+                }
+                setupToggle('toggleNewPasswordIcon', 'newPassword');
+                setupToggle('toggleConfirmPasswordIcon', 'confirmPassword');
+                
                 document.getElementById('resetForm').addEventListener('submit', function (e) {
                     const pass = document.getElementById('newPassword');
                     const confirm = document.getElementById('confirmPassword');

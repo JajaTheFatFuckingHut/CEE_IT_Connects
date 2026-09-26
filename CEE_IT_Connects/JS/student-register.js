@@ -72,4 +72,15 @@ document.addEventListener('DOMContentLoaded', () => {
             passwordInput.classList.add('is-invalid');
         });
     }
+
+        // --- PASSWORD VISIBILITY TOGGLE ---
+    const toggleIcon = document.getElementById('togglePasswordIcon');
+    if (toggleIcon && passwordInput) {
+        toggleIcon.addEventListener('click', function () {
+            const isPassword = passwordInput.getAttribute('type') === 'password';
+            passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
+            this.classList.toggle('fa-eye');
+            this.classList.toggle('fa-eye-slash');
+        });
+    }
 });

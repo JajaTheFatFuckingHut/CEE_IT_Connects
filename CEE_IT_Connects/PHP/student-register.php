@@ -85,8 +85,11 @@
                     </div>
 
                     <div class="mb-3">
-                        <input type="password" name="password" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?&quot;:{}|&lt;&gt;_\-+=~`\[\];'/\\]).{8,16}$"
-                            class="form-control" placeholder="Password" id="password" required>
+                        <div class="password-group position-relative">
+                            <input type="password" name="password" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?&quot;:{}|&lt;&gt;_\-+=~`\[\];'/\\]).{8,16}$"
+                                class="form-control" placeholder="Password" id="password" required>
+                            <i class="fa fa-eye-slash toggle-password" id="togglePasswordIcon"></i>
+                        </div>
                         <small class="form-text text-danger d-none" id="password-error">
                             Password must be 8-16 characters and include an uppercase letter, a lowercase letter, a number, and a special character.
                         </small>
@@ -100,10 +103,6 @@
                     <div class="mb-3">
                         <input type="email" name="email" class="form-control" placeholder="Email Address">
                     </div>
-
-                    <!-- <div class="terms-text">
-                        By clicking "Create Account," you agree to the <a href="#" class="terms-link">Terms of Use and Privacy Policy.</a>
-                    </div> -->
 
                     <div class="terms-text">
                         By clicking "Create Account," you agree to the
