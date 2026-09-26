@@ -40,8 +40,36 @@ document.addEventListener('DOMContentLoaded', () => {
         return regex.test(password);
     }
 
-    const passwordInput = document.getElementById('password').value;
-    if(!checkPassword(passwordInput)){
-        alert('Password must be 8-16 characters long and include at least one uppercase and one lowercase letter.');
+    // const passwordInput = document.getElementById('password').value;
+    // if(!checkPassword(passwordInput)){
+    //     alert('Password must be 8-16 characters long and include at least one uppercase and one lowercase letter.');
+    // }
+
+    // added for wrong password input
+    const passwordInput = document.getElementById('password');
+    const passwordError = document.getElementById('password-error');
+
+    if (passwordInput && passwordError) {
+        passwordInput.addEventListener('input', function () {
+            if (this.value.length === 0) {
+                // don't show error on empty field
+                passwordError.classList.add('d-none');
+                passwordInput.classList.remove('is-invalid');
+                return;
+            }
+            if (!checkPassword(this.value)) {
+                passwordError.classList.remove('d-none');
+                passwordInput.classList.add('is-invalid');
+            } else {
+                passwordError.classList.add('d-none');
+                passwordInput.classList.remove('is-invalid');
+            }
+        });
+
+        passwordInput.addEventListener('invalid', function (e) {
+            e.preventDefault();
+            passwordError.classList.remove('d-none');
+            passwordInput.classList.add('is-invalid');
+        });
     }
 });

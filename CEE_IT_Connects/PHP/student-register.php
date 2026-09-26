@@ -101,8 +101,7 @@
                     </div>
 
                     <div class="terms-text">
-                        By creating an account, you agree to the <a href="#" class="terms-link">Terms of Use</a> and <a
-                            href="#" class="terms-link">Privacy Policy</a>
+                        By clicking "Create Account," you agree to the <a href="#" class="terms-link">Terms of Use and Privacy Policy.</a>
                     </div>
 
                     <button type="submit" class="btn-login mt-3">

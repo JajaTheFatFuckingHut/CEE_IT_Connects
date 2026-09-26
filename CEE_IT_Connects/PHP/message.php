@@ -2083,7 +2083,7 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
         <a href="?section=application<?php if ($current_room_id)
             echo "&room_id=$current_room_id"; ?>"
             class="sidebar-link <?= $current_section === 'application' ? 'active' : '' ?>">
-            <i class="fa-solid fa-user-group"></i> <span class="sidebar-text">Application</span>
+            <i class="fa-solid fa-user-group"></i> <span class="sidebar-text">Checklist</span>
         </a>
 
         <?php if ($hasActiveProgress): ?>
