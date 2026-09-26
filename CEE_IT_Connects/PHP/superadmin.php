@@ -1109,20 +1109,17 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
                 <i class="bi bi-person-lines-fill me-2"></i>
                 <span class="nav-label">Assign Adviser</span>
             </a>
-            <!-- <a href="#" onclick="showSection(event, 'supervisor_requests')" data-tooltip="Supervisor Requests">
-                <i class="bi bi-person-badge me-2"></i>
-                <span class="nav-label">Supervisor Requests</span> -->
             </a>
             <a href="#" onclick="showSection(event, 'ojt_hours')" data-tooltip="OJT Hours">
                 <i class="bi bi-clock-history me-2"></i>
                 <span class="nav-label">OJT Hours</span>
             </a>
             <a href="#" onclick="showSection(event, 'section_settings')" data-tooltip="Settings">
-                <i class="bi bi-gear me-2"></i>
+                <i class="bi bi-ui-checks me-2"></i>
                 <span class="nav-label">Section</span>
             </a>
             <a href="#" onclick="showSection(event, 'restore')" data-tooltip="Settings">
-                <i class="bi bi-gear me-2"></i>
+                <i class="bi bi-archive me-2"></i>
                 <span class="nav-label">Archived</span>
             </a>
         </div>
@@ -2092,6 +2089,18 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
             </div>
 
             <div id="section_settings" class="section sysAdm-section">
+                <div class="sysAdm-header--dange sysAdm-header--blue mb-4">
+                    <div class="sysAdm-header-left">
+                        <div class="sysAdm-header-icon">
+                            <i class="bi bi-sliders"></i>
+                        </div>
+                        <div class="sysAdm-header-text">
+                            <h2>Sections</h2>
+                            <p>Manage which sections are available for each program.</p>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- school year picker -->
                 <form method="GET" id="syForm" class="mb-2 d-flex align-items-center gap-2">
                     <label style="font-size:13px; color:#272f54;" class="fw-semibold">School year</label>
