@@ -170,6 +170,11 @@ if (isset($_POST['reset_password'])) {
             user-select: none;
             -webkit-user-select: none;
         }
+        .password-group .form-control.is-invalid {
+            background-image: none;
+            padding-right: 40px;
+        }
+        
         body { font-family: 'Poppins', sans-serif; background: #f4f5f9; }
         .fp-card { width: 400px; border: none; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); padding: 2rem; }
 

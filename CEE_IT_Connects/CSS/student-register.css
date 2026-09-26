@@ -209,6 +209,10 @@ select:invalid {
     user-select: none;
     -webkit-user-select: none;
 }
+.password-group .form-control.is-invalid {
+    background-image: none;
+    padding-right: 40px;
+}
 
 #termsModal .modal-content { border-radius: 16px; border: none; overflow: hidden; }
 #termsModal .modal-header { background: #1b1c39; color: #fff; border-bottom: none; }
