@@ -37,15 +37,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $year = (int) $year;
         $section = (int) $section;
 
-        // must be an internship adviser
-        $advStmt = $pdo->prepare("SELECT full_name FROM advisers WHERE id = ? AND role = 'internship_adviser'");
+        // must be an internship adviser — now also grab department for the room name
+        $advStmt = $pdo->prepare("SELECT full_name, department FROM advisers WHERE id = ? AND role = 'internship_adviser'");
         $advStmt->execute([$adviser_id]);
-        $adviserName = $advStmt->fetchColumn();
-        if (!$adviserName) {
+        $adviserRow = $advStmt->fetch(PDO::FETCH_ASSOC);
+        if (!$adviserRow) {
             $_SESSION['error'] = "Invalid adviser.";
             header("Location: superadmin.php");
             exit;
         }
+        $adviserName = $adviserRow['full_name'];
+        $adviserDept = $adviserRow['department'];
 
         // section must be within the base amount for that year level
         $cfg = $pdo->prepare("SELECT section_count FROM section_settings WHERE school_year = ? AND year_level = ?");
@@ -57,11 +59,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
         $takenStmt = $pdo->prepare("
-            SELECT id FROM rooms
-            WHERE adviser_id IS NOT NULL AND is_archived = FALSE
-            AND school_year = :sy
-            AND CAST(year_level AS TEXT) = :year AND section = :section
-        ");
+        SELECT id FROM rooms
+        WHERE adviser_id IS NOT NULL AND is_archived = FALSE
+        AND school_year = :sy
+        AND CAST(year_level AS TEXT) = :year AND section = :section
+    ");
         $takenStmt->execute([':sy' => $sy, ':year' => (string) $year, ':section' => (string) $section]);
         if ($takenStmt->fetch()) {
             $_SESSION['error'] = "That section already has an adviser.";
@@ -74,12 +76,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $pdo->beginTransaction();
             $step = '1 create room';
             // 1. create the new room
-            $roomName = "Year {$year}-{$section} Room";
+            $roomName = deptCode($adviserDept) . " {$year}-{$section}";
             $roomStmt = $pdo->prepare("
-            INSERT INTO rooms (room_name, section, year_level, school_year, adviser_id, is_archived, created_at)
-            VALUES (:name, :section, :year, :sy, :adviser, FALSE, NOW())
-            RETURNING id
-        ");
+        INSERT INTO rooms (room_name, section, year_level, school_year, adviser_id, is_archived, created_at)
+        VALUES (:name, :section, :year, :sy, :adviser, FALSE, NOW())
+        RETURNING id
+    ");
             $roomStmt->execute([
                 ':name' => $roomName,
                 ':section' => (string) $section,
@@ -89,9 +91,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ]);
             $new_room_id = (int) $roomStmt->fetchColumn();
             $pdo->prepare("
-                INSERT INTO room_members (room_id, user_id, user_type)
-                VALUES (?, ?, 'adviser')
-            ")->execute([$new_room_id, $adviser_id]);
+            INSERT INTO room_members (room_id, user_id, user_type)
+            VALUES (?, ?, 'adviser')
+        ")->execute([$new_room_id, $adviser_id]);
 
             $step = '2 delete old memberships';
             $err = $pdo->errorInfo();
@@ -100,19 +102,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             // 2. delete these students' memberships from other internship-adviser rooms
             $pdo->prepare("
-            DELETE FROM room_members
-            WHERE user_type = 'student'
-              AND room_id <> :room
-              AND room_id IN (
-                  SELECT r.id FROM rooms r
-                  JOIN advisers a ON a.id = r.adviser_id
-                  WHERE a.role = 'internship_adviser'
-              )
-              AND user_id IN (
-                  SELECT id FROM students
-                  WHERE CAST(year_level AS TEXT) = :year AND CAST(section AS TEXT) = :section
-              )
-        ")->execute([':room' => $new_room_id, ':year' => (string) $year, ':section' => (string) $section]);
+        DELETE FROM room_members
+        WHERE user_type = 'student'
+          AND room_id <> :room
+          AND room_id IN (
+              SELECT r.id FROM rooms r
+              JOIN advisers a ON a.id = r.adviser_id
+              WHERE a.role = 'internship_adviser'
+          )
+          AND user_id IN (
+              SELECT id FROM students
+              WHERE CAST(year_level AS TEXT) = :year AND CAST(section AS TEXT) = :section
+          )
+    ")->execute([':room' => $new_room_id, ':year' => (string) $year, ':section' => (string) $section]);
             $step = '3 add students';
             $err = $pdo->errorInfo();
             if (!empty($err[0]) && $err[0] !== '00000') {
@@ -120,11 +122,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             // 3. add every student of that year level + section to the new room
             $ins = $pdo->prepare("
-                INSERT INTO room_members (room_id, user_id, user_type)
-                SELECT CAST(:room AS INTEGER), s.id, 'student'
-                FROM students s
-                WHERE CAST(s.year_level AS TEXT) = :year AND CAST(s.section AS TEXT) = :section
-            ");
+            INSERT INTO room_members (room_id, user_id, user_type)
+            SELECT CAST(:room AS INTEGER), s.id, 'student'
+            FROM students s
+            WHERE CAST(s.year_level AS TEXT) = :year AND CAST(s.section AS TEXT) = :section
+        ");
             $ins->execute([':room' => $new_room_id, ':year' => (string) $year, ':section' => (string) $section]);
             $added = $ins->rowCount();
             $step = '4 audit log';
@@ -134,9 +136,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             // 4. audit log
             $pdo->prepare("
-            INSERT INTO audits (user_id, roles, activity, activity_date)
-            VALUES (:user_id, :roles, :activity, NOW())
-        ")->execute([
+        INSERT INTO audits (user_id, roles, activity, activity_date)
+        VALUES (:user_id, :roles, :activity, NOW())
+    ")->execute([
                         ':user_id' => $_SESSION['user_id'],
                         ':roles' => 'superadmin',
                         ':activity' => "Assigned year {$year} section {$section} to adviser ID {$adviser_id} (room ID {$new_room_id})"
@@ -238,7 +240,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             $pdo->commit();
-            $_SESSION['success'] = "Unassigned adviser from section {$section}";
+            $_SESSION['success'] = "Unassigned adviser from section '{$year_level}-{$section}'";
 
             header("Location: superadmin.php?msg=unassigned");
             exit;
