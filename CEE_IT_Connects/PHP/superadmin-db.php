@@ -238,6 +238,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             $pdo->commit();
+            $_SESSION['success'] = "Unassigned adviser from section {$section}";
 
             header("Location: superadmin.php?msg=unassigned");
             exit;
