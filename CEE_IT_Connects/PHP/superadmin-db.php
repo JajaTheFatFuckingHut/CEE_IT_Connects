@@ -72,6 +72,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         $step = 'start';
 
+        if (!function_exists('deptCode')) {
+            function deptCode($department)
+            {
+                $department = strtolower(trim((string) ($department ?? '')));
+
+                if ($department === '') {
+                    return '—';
+                }
+
+                $map = [
+                    'information technology' => 'BSIT',
+                    'electrical engineering' => 'BSEE',
+                    'civil engineering' => 'BSCE'
+                ];
+                if (isset($map[$department])) {
+                    return $map[$department];
+                }
+
+                $words = preg_split('/\s+/', $department);
+                $initials = '';
+                foreach ($words as $w) {
+                    if ($w !== '')
+                        $initials .= strtoupper($w[0]);
+                }
+                return $initials ?: '—';
+            }
+        }
+
         try {
             $pdo->beginTransaction();
             $step = '1 create room';
