@@ -340,7 +340,39 @@ if (isset($_POST['edit_csv'])) {
                 ]);
 
                 $added++;
+                $newStudentId = (int) $pdo->lastInsertId();
 
+                // -----------------------------------------------------
+                // ADD STUDENT TO THEIR MATCHING ROOM (by year_level + section)
+                // -----------------------------------------------------
+                if ($year_level !== '' && $section !== '') {
+                    $roomStmt = $pdo->prepare("
+                        SELECT id FROM rooms
+                        WHERE adviser_id IS NOT NULL
+                        AND is_archived = FALSE
+                        AND school_year = :sy
+                        AND CAST(year_level AS TEXT) = :year
+                        AND CAST(section AS TEXT) = :section
+                        LIMIT 1
+                    ");
+                    $roomStmt->execute([
+                        ':sy' => $schoolYear, // <-- confirm this matches your actual variable name
+                        ':year' => (string) $year_level,
+                        ':section' => (string) $section,
+                    ]);
+                    $roomId = $roomStmt->fetchColumn();
+
+                    if ($roomId) {
+                        $pdo->prepare("
+                        INSERT INTO room_members (room_id, user_id, user_type)
+                        VALUES (?, ?, 'student')
+                    ")->execute([(int) $roomId, $newStudentId]);
+                    } else {
+                        $errors[] =
+                            "Row " . ($rowIndex + 1) .
+                            ": Student was added, but no room exists yet for Year {$year_level} Section {$section} — they'll be added automatically once an adviser is assigned.";
+                    }
+                }
                 $emailSent = sendStudentCredentials(
                     $email,
                     $full_name,
@@ -493,7 +525,6 @@ if ($source === 'ojt-rooms') {
     exit;
 }
 
-// put here the upload
 
 $_SESSION['error'] = "Unknown action.";
 header("Location: superadmin.php");
