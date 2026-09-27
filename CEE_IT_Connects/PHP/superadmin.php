@@ -2246,11 +2246,25 @@ function deptCode($department)
                                     <td><?= htmlspecialchars($adv['email']) ?></td>
                                     <td>
                                         <?php if ($isAssigned): ?>
-                                            <?php foreach ($mine as $label): ?>
-                                                <span class="badge rounded-pill px-3 me-1"
-                                                    style="background:#eaf3de;color:#27500a;font-size:12px;font-weight:500;">
-                                                    <?= htmlspecialchars($label) ?>
-                                                </span>
+                                            <?php foreach ($mine as $sectionKey => $label): ?>
+                                                <?php
+                                                [$yr, $sec] = explode('|', $sectionKey);
+                                                ?>
+                                                <form method="POST" action="superadmin-db.php" class="d-inline unassign-form"
+                                                    onsubmit="return confirm('Unassign this adviser from Year <?= (int) $yr ?> - Section <?= htmlspecialchars($sec) ?>? This will delete the room and remove all its members.');">
+                                                    <input type="hidden" name="school_year"
+                                                        value="<?= htmlspecialchars($schoolYear) ?>">
+                                                    <input type="hidden" name="adviser_id" value="<?= $adv['id'] ?>">
+                                                    <input type="hidden" name="year_level" value="<?= (int) $yr ?>">
+                                                    <input type="hidden" name="section" value="<?= htmlspecialchars($sec) ?>">
+                                                    <span
+                                                        class="badge rounded-pill px-3 me-1 d-inline-flex align-items-center gap-1"
+                                                        style="background:#eaf3de;color:#27500a;font-size:12px;font-weight:500;">
+                                                        <?= htmlspecialchars($label) ?>
+                                                        <button type="submit" name="unassign_section" class="btn-close btn-close-sm"
+                                                            style="font-size:8px;" aria-label="Unassign"></button>
+                                                    </span>
+                                                </form>
                                             <?php endforeach; ?>
                                         <?php else: ?>
                                             <span class="badge rounded-pill px-3"

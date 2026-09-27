@@ -202,6 +202,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     ORDER BY full_name
 ")->fetchAll(PDO::FETCH_ASSOC);
 
+    if (isset($_POST['unassign_section'])) {
+        $adviserId = $_POST['adviser_id'];
+        $schoolYear = $_POST['school_year'];
+        $yearLevel = $_POST['year_level'];
+        $section = $_POST['section'];
+
+        try {
+            $pdo->beginTransaction();
+
+            // 1. Find the room tied to this adviser/section/school year
+            $stmt = $pdo->prepare("
+            SELECT id FROM rooms
+            WHERE adviser_id = :adviser_id
+              AND year_level = :year_level
+              AND section = :section
+              AND school_year = :school_year
+        ");
+            $stmt->execute([
+                ':adviser_id' => $adviserId,
+                ':year_level' => $yearLevel,
+                ':section' => $section,
+                ':school_year' => $schoolYear,
+            ]);
+            $room = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($room) {
+                // 2. Delete members of that room
+                $pdo->prepare("DELETE FROM room_members WHERE room_id = ?")
+                    ->execute([$room['id']]);
+
+                // 3. Delete the room itself
+                $pdo->prepare("DELETE FROM rooms WHERE id = ?")
+                    ->execute([$room['id']]);
+            }
+            header("Location: superadmin.php?msg=unassigned");
+            exit;
+        } catch (Exception $e) {
+            $pdo->rollBack();
+            header("Location: superadmin.php?error=unassign_failed");
+            exit;
+        }
+    }
+
+
     //admin 
     if (isset($_POST['create-admin'])) {
 
