@@ -145,7 +145,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_role'])) {
     exit;
 }
 $adviserList = $pdo->query("
-    SELECT id, full_name, email
+    SELECT id, full_name, email, department
     FROM advisers
     WHERE role = 'internship_adviser'
     ORDER BY full_name
