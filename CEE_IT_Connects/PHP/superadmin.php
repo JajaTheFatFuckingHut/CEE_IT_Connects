@@ -197,8 +197,9 @@ $stmt->execute([$schoolYear]);
 $assignedSections = [];
 $takenKeys = [];
 foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
-    $assignedSections[$r['adviser_id']][] = "Year {$r['year_level']}-{$r['section']}";
-    $takenKeys[] = "{$r['year_level']}|{$r['section']}";
+    $key = "{$r['year_level']}|{$r['section']}";
+    $assignedSections[$r['adviser_id']][$key] = "Year {$r['year_level']}-{$r['section']}";
+    $takenKeys[] = $key;
 }
 
 // open sections = 1..N per year level, minus taken ones
@@ -2247,9 +2248,7 @@ function deptCode($department)
                                     <td>
                                         <?php if ($isAssigned): ?>
                                             <?php foreach ($mine as $sectionKey => $label): ?>
-                                                <?php
-                                                [$yr, $sec] = explode('|', $sectionKey);
-                                                ?>
+                                                <?php [$yr, $sec] = explode('|', $sectionKey); ?>
                                                 <form method="POST" action="superadmin-db.php" class="d-inline unassign-form"
                                                     onsubmit="return confirm('Unassign this adviser from Year <?= (int) $yr ?> - Section <?= htmlspecialchars($sec) ?>? This will delete the room and remove all its members.');">
                                                     <input type="hidden" name="school_year"
