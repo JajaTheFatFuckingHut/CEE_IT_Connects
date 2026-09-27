@@ -368,6 +368,26 @@ $programHoursStmt = $pdo->query("
     ORDER BY program ASC
 ");
 $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
+
+function deptCode($department)
+{
+    $department = strtolower(trim($department));
+    $map = [
+        'information technology' => 'BSIT',
+        'electrical engineering' => 'BSEE',
+        'civil engineering' => 'BSCE'
+    ];
+    if (isset($map[$department])) {
+        return $map[$department];
+    }
+    $words = preg_split('/\s+/', $department);
+    $initials = '';
+    foreach ($words as $w) {
+        if ($w !== '')
+            $initials .= strtoupper($w[0]);
+    }
+    return $initials ?: '—';
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -1554,12 +1574,13 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
                         </select>
                     </div>
                 </div> -->
-                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
+                <div
+                    style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
                     <div style="display:flex; align-items:center; flex-wrap:wrap; gap:10px;">
                         <div class="search-box">
                             <input type="text" id="search-archive" oninput="filterArchive()"
-                            placeholder="Search by name or email..."
-                            style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:220px;">
+                                placeholder="Search by name or email..."
+                                style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:220px;">
                         </div>
 
                         <select class="filter-select"
@@ -1594,7 +1615,8 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
                                         <form method="POST" action="superadmin-db.php"
                                             onsubmit="return confirm('Restore this user?')">
                                             <input type="hidden" name="user_id" value="<?= $u['id'] ?>">
-                                            <input type="hidden" name="source" value="<?= htmlspecialchars($u['source']) ?>">
+                                            <input type="hidden" name="source"
+                                                value="<?= htmlspecialchars($u['source']) ?>">
                                             <input type="hidden" name="restore" value="1">
                                             <button type="submit" class="btn btn-success btn-sm">
                                                 <i class="bi bi-check2-circle"></i> Restore
@@ -2149,7 +2171,8 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
                                         style="display:block; width:90px; padding:8px 10px; border-radius:10px; border:1px solid #ddd; font-size:13px;">
                                 </div>
                             <?php endfor; ?>
-                            <button type="submit" name="save_section_settings" class="btn-update" style="padding:8px 14px;">
+                            <button type="submit" name="save_section_settings" class="btn-update"
+                                style="padding:8px 14px;">
                                 <i class="bi bi-save me-1"></i> Save
                             </button>
                         </div>
@@ -2207,21 +2230,22 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
                         </thead>
                         <tbody id="assign-tbody">
                             <?php foreach ($adviserList as $adv):
-                                $mine = $assignedSections[$adv['id']] ?? []; ?>
+                                $mine = $assignedSections[$adv['id']] ?? [];
+                                $isAssigned = !empty($mine); ?>
                                 <tr data-name="<?= htmlspecialchars(strtolower($adv['full_name'])) ?>"
-                                    data-has="<?= $mine ? 'has' : 'none' ?>">
+                                    data-has="<?= $isAssigned ? 'has' : 'none' ?>">
                                     <td>
                                         <div class="d-flex align-items-center gap-2">
                                             <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold flex-shrink-0"
-                                                style="width:34px;height:34px;background:#eef1ff;color:#272f54;font-size:12px;">
-                                                <?= strtoupper(substr($adv['full_name'], 0, 1)) ?>
+                                                style="width:34px;height:34px;background:#eef1ff;color:#272f54;font-size:11px;">
+                                                <?= htmlspecialchars(deptCode($adv['department'])) ?>
                                             </div>
                                             <?= htmlspecialchars($adv['full_name']) ?>
                                         </div>
                                     </td>
                                     <td><?= htmlspecialchars($adv['email']) ?></td>
                                     <td>
-                                        <?php if ($mine): ?>
+                                        <?php if ($isAssigned): ?>
                                             <?php foreach ($mine as $label): ?>
                                                 <span class="badge rounded-pill px-3 me-1"
                                                     style="background:#eaf3de;color:#27500a;font-size:12px;font-weight:500;">
@@ -2240,7 +2264,7 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
                                             <input type="hidden" name="school_year"
                                                 value="<?= htmlspecialchars($schoolYear) ?>">
                                             <input type="hidden" name="adviser_id" value="<?= $adv['id'] ?>">
-                                            <select name="section" class="assign-select" required>
+                                            <select name="section" class="assign-select" required <?= $isAssigned ? 'disabled title="Already assigned"' : '' ?>>
                                                 <option value="">— Select Section —</option>
                                                 <?php foreach ($openSections as $s): ?>
                                                     <option value="<?= (int) $s['year_level'] . '|' . (int) $s['section'] ?>">
@@ -2252,8 +2276,9 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
                                     </td>
                                     <td>
                                         <button type="submit" form="assign-form-<?= $adv['id'] ?>" name="assign_section"
-                                            class="btn-update" style="padding:8px 14px;">
-                                            <i class="bi bi-person-check me-1"></i> Assign
+                                            class="btn-update" style="padding:8px 14px;" <?= $isAssigned ? 'disabled' : '' ?>>
+                                            <i class="bi bi-person-check me-1"></i>
+                                            <?= $isAssigned ? 'Assigned' : 'Assign' ?>
                                         </button>
                                     </td>
                                 </tr>
