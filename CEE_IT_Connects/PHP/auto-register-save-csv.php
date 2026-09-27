@@ -125,6 +125,18 @@ if (isset($_POST['edit_csv'])) {
 
     // Add to database
     if (isset($_POST['import_to_database'])) {
+        $schoolYear = $pdo->query("
+            SELECT school_year FROM section_settings
+            ORDER BY school_year DESC
+            LIMIT 1
+        ")->fetchColumn();
+
+        if (!$schoolYear) {
+            $_SESSION['error'] = "No school year is configured in section settings.";
+            header("Location: superadmin.php?section=student_register");
+            exit;
+        }
+
         $normalizedHeaders = array_map(
             fn($h) => strtolower(trim($h)),
             $headers
@@ -347,16 +359,16 @@ if (isset($_POST['edit_csv'])) {
                 // -----------------------------------------------------
                 if ($year_level !== '' && $section !== '') {
                     $roomStmt = $pdo->prepare("
-                        SELECT id FROM rooms
-                        WHERE adviser_id IS NOT NULL
-                        AND is_archived = FALSE
-                        AND school_year = :sy
-                        AND CAST(year_level AS TEXT) = :year
-                        AND CAST(section AS TEXT) = :section
-                        LIMIT 1
-                    ");
+                    SELECT id FROM rooms
+                    WHERE adviser_id IS NOT NULL
+                    AND is_archived = FALSE
+                    AND school_year = :sy
+                    AND CAST(year_level AS TEXT) = :year
+                    AND CAST(section AS TEXT) = :section
+                    LIMIT 1
+                ");
                     $roomStmt->execute([
-                        ':sy' => $schoolYear, // <-- confirm this matches your actual variable name
+                        ':sy' => $schoolYear,
                         ':year' => (string) $year_level,
                         ':section' => (string) $section,
                     ]);
