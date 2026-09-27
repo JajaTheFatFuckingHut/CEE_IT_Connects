@@ -236,6 +236,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $pdo->prepare("DELETE FROM rooms WHERE id = ?")
                     ->execute([$room['id']]);
             }
+
+            $pdo->commit();
+
             header("Location: superadmin.php?msg=unassigned");
             exit;
         } catch (Exception $e) {
