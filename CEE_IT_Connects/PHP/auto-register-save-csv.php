@@ -187,8 +187,8 @@ if (isset($_POST['edit_csv'])) {
 
         $insertStmt = $pdo->
             prepare("INSERT INTO students (email, full_name, student_id, program, 
-            year_level, section, contact_number, password_hash) 
-        VALUES (?,?,?,?,?,?,?,?)");
+            year_level, section, contact_number, password_hash, is_archived) 
+        VALUES (?,?,?,?,?,?,?,?, FALSE)");
 
 
         // COUNTERS
