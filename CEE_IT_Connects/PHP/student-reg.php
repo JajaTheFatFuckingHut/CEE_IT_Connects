@@ -93,7 +93,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         ':activity' => 'Student registered an account with schoold Id ' . $student_id
     ]);
     // Redirect after success
-    header("Location: ../PHP/student-welcome.php");
+    header("Location: ../PHP/index.php");
     exit();
 }
 ?>
