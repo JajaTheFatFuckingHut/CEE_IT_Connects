@@ -45,31 +45,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $password_hash = password_hash($_POST['password'], PASSWORD_DEFAULT);
 
     // UPLOAD
-    $cor_path = null;
-    $allowed_types = ['image/jpeg', 'image/png', 'application/pdf'];
+    // $cor_path = null;
+    // $allowed_types = ['image/jpeg', 'image/png', 'application/pdf'];
 
-    if (!in_array($_FILES['cor_upload']['type'], $allowed_types)) {
-        die("Only JPG, PNG, PDF allowed.");
-    }
-    if (!empty($_FILES['cor_upload']['name'])) {
-        $target_dir = "../uploads/";
+    // if (!in_array($_FILES['cor_upload']['type'], $allowed_types)) {
+    //     die("Only JPG, PNG, PDF allowed.");
+    // }
+    // if (!empty($_FILES['cor_upload']['name'])) {
+    //     $target_dir = "../uploads/";
 
-        $file_name = time() . "_" . basename($_FILES["cor_upload"]["name"]);
-        $full_path = $target_dir . $file_name;
+    //     $file_name = time() . "_" . basename($_FILES["cor_upload"]["name"]);
+    //     $full_path = $target_dir . $file_name;
 
-        if (move_uploaded_file($_FILES["cor_upload"]["tmp_name"], $full_path)) {
-            $cor_path = $file_name; // Save only filename
-        } else {
-            die("Upload failed.");
-        }
-    }
+    //     if (move_uploaded_file($_FILES["cor_upload"]["tmp_name"], $full_path)) {
+    //         $cor_path = $file_name; // Save only filename
+    //     } else {
+    //         die("Upload failed.");
+    //     }
+    // }
 
     // INSERT INTO DATABASE
     $stmt = $pdo->prepare("
         INSERT INTO students
-        (full_name, student_id, program, year_level, section, cor_file, password_hash, contact_number, email)
+        (full_name, student_id, program, year_level, section, password_hash, contact_number, email)
         VALUES
-        (:full_name, :student_id, :program, :year_level, :section, :cor_file, :password_hash, :contact_number, :email)
+        (:full_name, :student_id, :program, :year_level, :section, :password_hash, :contact_number, :email)
     ");
 
     $stmt->execute([
@@ -78,7 +78,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         ':program' => $program,
         ':year_level' => $year_level,
         ':section' => $section,
-        ':cor_file' => $cor_path,
         ':password_hash' => $password_hash,
         ':contact_number' => $contact_number,
         ':email' => $email
