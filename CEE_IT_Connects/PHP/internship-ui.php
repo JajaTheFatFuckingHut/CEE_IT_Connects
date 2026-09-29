@@ -1269,7 +1269,7 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                                     foreach ($documents as $r) {
                                         $allDocs[] = [
                                             'name' => $r['full_name'],
-                                            'type' => htmlspecialchars($r['step_key']),
+                                            'type' => htmlspecialchars(['mou' => 'MOU'][$r['step_key']] ?? ucwords(str_replace('_', ' ', $r['step_key']))),
                                             'date' => $r['uploaded_at'],
                                             'bg' => '#EAF3DE',
                                             'color' => '#27500A'
@@ -1761,7 +1761,7 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                                     <td><?= htmlspecialchars($doc['full_name']) ?></td>
                                     <td><?= htmlspecialchars($doc['student_number']) ?></td>
                                     <td><?= htmlspecialchars($doc['program']) ?></td>
-                                    <td><span><?= htmlspecialchars(ucwords(str_replace('_', ' ', $doc['step_key']))) ?></span>
+                                    <td><span><?= htmlspecialchars(['mou' => 'MOU'][$doc['step_key']] ?? ucwords(str_replace('_', ' ', $doc['step_key']))) ?></span>
                                     </td>
                                     <td><?= date("M d, Y", strtotime($doc['uploaded_at'])) ?></td>
                                     <td style="text-align:center;">
