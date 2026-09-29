@@ -386,6 +386,7 @@ $page = 'messages';
     <title>OJT Adviser | CEE IT Connects</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
         body {
             background-color: #f0f2f7;
@@ -1949,6 +1950,43 @@ $page = 'messages';
                 !empty($d['mou_available']) || !empty($d['recommendation_letter_available']) || !empty($d['waiver_available'])
             ));
             $docsCompanyCount = count($docAvailability);
+            // ── CHART DATA (added) ──
+            // Attendance trend: total hours logged per day, last 14 days, this room's students
+            // ASSUMPTION: ojt_hours has no separate date column, so the day is derived from
+            // whichever of m_in/a_in is present. Adjust COALESCE(...) below if your schema differs.
+            $attStmt = $pdo->prepare("
+                SELECT
+                    COALESCE(DATE(h.m_in), DATE(h.a_in)) AS log_day,
+                    SUM(
+                        GREATEST(0, EXTRACT(EPOCH FROM (h.m_out - h.m_in)) / 3600) +
+                        GREATEST(0, EXTRACT(EPOCH FROM (h.a_out - h.a_in)) / 3600)
+                    ) AS hours
+                FROM ojt_hours h
+                JOIN room_members rm ON rm.user_id = h.user_id AND rm.user_type = 'student'
+                WHERE rm.room_id = ?
+                AND h.user_type = 'student'
+                AND COALESCE(DATE(h.m_in), DATE(h.a_in)) >= (CURRENT_DATE - INTERVAL '13 days')
+                GROUP BY log_day
+                ORDER BY log_day
+            ");
+            $attStmt->execute([$dashRoomId]);
+            $attRows = $attStmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // Build a full 14-day range so missing days show as 0 instead of skipping
+            $attLabels = [];
+            $attData = [];
+            $attByDay = [];
+            foreach ($attRows as $r) {
+                $attByDay[$r['log_day']] = round((float) $r['hours'], 1);
+            }
+            for ($i = 13; $i >= 0; $i--) {
+                $d = date('Y-m-d', strtotime("-{$i} days"));
+                $attLabels[] = date('M j', strtotime($d));
+                $attData[] = $attByDay[$d] ?? 0;
+            }
+
+            // Completion pie: complete vs incomplete, using the same totals already computed above
+            $completeCount = max(0, $totalStudents - $incompleteCount);
             // addtl e
             ?>
 
@@ -2192,6 +2230,28 @@ $page = 'messages';
                             <?php endforeach; ?>
                         </div>
                     <?php endif; ?>
+                </div>
+            </div>
+            
+            <div class="dash-bottom">
+                <div class="home-card accent-blue">
+                    <div class="dash-head">
+                        <div>
+                            <h5 class="fw-bold mb-0"><i class="fa-solid fa-chart-line me-2" style="color:#ff6b2c;"></i>Attendance Trend</h5>
+                            <small class="text-muted">Total hours logged per day, last 14 days.</small>
+                        </div>
+                    </div>
+                    <canvas id="attendanceChart" height="180"></canvas>
+                </div>
+
+                <div class="home-card accent-orange">
+                    <div class="dash-head">
+                        <div>
+                            <h5 class="fw-bold mb-0"><i class="fa-solid fa-chart-pie me-2" style="color:#ff6b2c;"></i>Requirements Completion</h5>
+                            <small class="text-muted">Share of students who finished all requirements.</small>
+                        </div>
+                    </div>
+                    <canvas id="completionChart" height="180"></canvas>
                 </div>
             </div>
              <!-- addtl e -->
@@ -3067,6 +3127,51 @@ $page = 'messages';
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- addtl s -->
+    <script>
+        if (document.getElementById('attendanceChart')) {
+            new Chart(document.getElementById('attendanceChart'), {
+                type: 'line',
+                data: {
+                    labels: <?= json_encode($attLabels) ?>,
+                    datasets: [{
+                        label: 'Hours logged',
+                        data: <?= json_encode($attData) ?>,
+                        borderColor: '#ff6b2c',
+                        backgroundColor: 'rgba(255,107,44,0.1)',
+                        tension: 0.3,
+                        fill: true,
+                        pointRadius: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+        }
+
+        if (document.getElementById('completionChart')) {
+            new Chart(document.getElementById('completionChart'), {
+                type: 'pie',
+                data: {
+                    labels: ['Completed', 'Incomplete'],
+                    datasets: [{
+                        data: [<?= (int) $completeCount ?>, <?= (int) $incompleteCount ?>],
+                        backgroundColor: ['#1abc9c', '#ffe7b3'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { position: 'bottom' } }
+                }
+            });
+        }
+    </script>
+<!-- addtl e -->
+    
     <script>
         // Flash alert auto-dismiss
         setTimeout(() => {
