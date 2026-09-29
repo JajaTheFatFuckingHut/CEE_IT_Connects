@@ -1953,7 +1953,7 @@ $page = 'messages';
             // ── CHART DATA (added) ──
             $attStmt = $pdo->prepare("
                 SELECT
-                    h.\"date\" AS log_day,
+                    h.date AS log_day,
                     SUM(
                         COALESCE(GREATEST(0, EXTRACT(EPOCH FROM (h.m_out - h.m_in)) / 3600), 0) +
                         COALESCE(GREATEST(0, EXTRACT(EPOCH FROM (h.a_out - h.a_in)) / 3600), 0)
@@ -1962,10 +1962,11 @@ $page = 'messages';
                 JOIN room_members rm ON rm.user_id = h.user_id AND rm.user_type = 'student'
                 WHERE rm.room_id = ?
                 AND h.user_type = 'student'
-                AND h.\"date\" >= (CURRENT_DATE - INTERVAL '13 days')
-                GROUP BY h.\"date\"
-                ORDER BY h.\"date\"
+                AND h.date >= (CURRENT_DATE - INTERVAL '13 days')
+                GROUP BY h.date
+                ORDER BY h.date
             ");
+            $attStmt->execute([$dashRoomId]);
             $attStmt->execute([$dashRoomId]);
             $attRows = $attStmt->fetchAll(PDO::FETCH_ASSOC);
 
