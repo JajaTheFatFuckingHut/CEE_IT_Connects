@@ -1637,6 +1637,18 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
 
             <!-- ── APPLICANTS ── -->
             <div id="interns" class="section sysAdm-section">
+                <div class="sysAdm-header--danger sysAdm-header--blue mb-4">
+                    <div class="sysAdm-header-left">
+                        <div class="sysAdm-header-icon">
+                            <i class="bi bi-pencil-fill"></i>
+                        </div>
+                        <div class="sysAdm-header-text">
+                            <h2>Interns</h2>
+                            <p>View and track all deployed interns, their assigned companies, and submission status.</p>
+                        </div>
+                    </div>
+                </div>
+
                 <div
                     style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
                     <div style="display:flex; align-items:center; flex-wrap:wrap; gap:10px;">
