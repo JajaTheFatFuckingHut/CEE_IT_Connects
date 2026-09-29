@@ -1951,24 +1951,20 @@ $page = 'messages';
             ));
             $docsCompanyCount = count($docAvailability);
             // ── CHART DATA (added) ──
-            // Attendance trend: total hours logged per day, last 14 days, this room's students
-            // ASSUMPTION: ojt_hours has no separate date column, so the day is derived from
-            // whichever of m_in/a_in is present. Adjust COALESCE(...) below if your schema differs.
             $attStmt = $pdo->prepare("
                 SELECT
-                    
-                    h.log_day AS log_day
+                    h.\"date\" AS log_day,
                     SUM(
-                        GREATEST(0, EXTRACT(EPOCH FROM (h.m_out - h.m_in)) / 3600) +
-                        GREATEST(0, EXTRACT(EPOCH FROM (h.a_out - h.a_in)) / 3600)
+                        COALESCE(GREATEST(0, EXTRACT(EPOCH FROM (h.m_out - h.m_in)) / 3600), 0) +
+                        COALESCE(GREATEST(0, EXTRACT(EPOCH FROM (h.a_out - h.a_in)) / 3600), 0)
                     ) AS hours
                 FROM ojt_hours h
                 JOIN room_members rm ON rm.user_id = h.user_id AND rm.user_type = 'student'
                 WHERE rm.room_id = ?
                 AND h.user_type = 'student'
-                AND COALESCE(DATE(h.m_in), DATE(h.a_in)) >= (CURRENT_DATE - INTERVAL '13 days')
-                GROUP BY log_day
-                ORDER BY log_day
+                AND h.\"date\" >= (CURRENT_DATE - INTERVAL '13 days')
+                GROUP BY h.\"date\"
+                ORDER BY h.\"date\"
             ");
             $attStmt->execute([$dashRoomId]);
             $attRows = $attStmt->fetchAll(PDO::FETCH_ASSOC);
