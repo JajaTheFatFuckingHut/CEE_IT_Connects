@@ -645,6 +645,26 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
             color: #791f1f;
         }
 
+        .ojtc-tooltip {
+            position: fixed;
+            transform: translate(-50%, -100%);
+            background: #1a1a2e;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 500;
+            padding: 5px 10px;
+            border-radius: 6px;
+            white-space: nowrap;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            z-index: 99999;
+        }
+
+        .ojtc-tooltip.show {
+            opacity: 1;
+        }
+
         @media (max-width: 768px) {
             .layout {
                 flex-direction: row;
@@ -2588,6 +2608,23 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
             document.getElementById('mou-form-panel').style.display = 'none';
         }
         // Map
+        // Tooltip for action icons (view / save / delete)
+        const ojtcTip = document.createElement('div');
+        ojtcTip.className = 'ojtc-tooltip';
+        document.body.appendChild(ojtcTip);
+
+        document.addEventListener('mouseover', function (e) {
+            const el = e.target.closest('.btn-delete[data-tooltip]');
+            if (!el) return;
+            const r = el.getBoundingClientRect();
+            ojtcTip.textContent = el.dataset.tooltip;
+            ojtcTip.style.left = (r.left + r.width / 2) + 'px';
+            ojtcTip.style.top = (r.top - 8) + 'px';
+            ojtcTip.classList.add('show');
+        });
+        document.addEventListener('mouseout', function (e) {
+            if (e.target.closest('.btn-delete[data-tooltip]')) ojtcTip.classList.remove('show');
+        });
         let postingMap;
         let postingMarker;
 
