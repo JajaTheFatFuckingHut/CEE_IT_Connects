@@ -1395,15 +1395,10 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                                     data-program="<?= htmlspecialchars($p['program'] ?? '') ?>">
                                     <td><?= htmlspecialchars($p['company']) ?></td>
                                     <td><?= htmlspecialchars($p['title']) ?></td>
-                                    <!-- CHANGED: now reads $p['program'] / $p['location'] instead of
-                                         a hardcoded "—". This only shows real data if the query that
-                                         populates $internships actually selects those columns —
-                                         check that on your end if these still come up blank. -->
                                     <td><?= !empty($p['program']) ? htmlspecialchars($p['program']) : '—' ?></td>
                                     <td><?= !empty($p['location']) ? htmlspecialchars($p['location']) : '—' ?></td>
                                     <td>
-                                        <!-- CHANGED  -->
-                                        <button class="btn-delete" title="Delete" tooltip="Delete"
+                                        <button class="btn-delete" data-tooltip="Delete"
                                             onclick="deleteRow(this)">
                                             <i class="bi bi-trash-fill"></i>
                                         </button>
@@ -2275,13 +2270,13 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                                         <td><?= date("M d, Y", strtotime($a['created_at'])) ?></td>
                                         <td class="text-center">
                                             <input type="hidden" name="announcement_id" value="<?= $a['id'] ?>">
-                                            <button type="submit" name="edit_announcement" class="btn-delete"
+                                            <button type="submit" name="edit_announcement" class="btn-delete" data-tooltip="Save Changes"
                                                 style="color: #384887; border:1px solid #5766a68a; background-color: #dfe4f8; transition: background-color 0.2s ease;"
                                                 onmouseover="this.style.backgroundColor='#adbbe6';"
                                                 onmouseout="this.style.backgroundColor='#dfe4f8';">
                                                 <i class="bi bi-floppy2"></i>
                                             </button>
-                                            <button type="submit" name="delete_announcement" class="btn-delete">
+                                            <button type="submit" name="delete_announcement" class="btn-delete" data-tooltip="Delete">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </td>
@@ -2403,7 +2398,7 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                                                 onmouseover="this.style.backgroundColor='#dbbe83';"
                                                 onmouseout="this.style.backgroundColor='#FFE7B3';"><i class="bi bi-eye"></i>
                                             </a>
-                                            <button type="submit" class="btn-delete" title="Delete" tooltip="Delete">
+                                            <button type="submit" class="btn-delete" data-tooltip="Delete">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </form>
