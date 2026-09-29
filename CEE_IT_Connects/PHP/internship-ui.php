@@ -1324,10 +1324,6 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                     </div>
                 </div>
 
-                <!-- CHANGED: switched from Bootstrap "d-flex" utility classes to explicit inline
-                     flex styles. Those classes only work if Bootstrap's CSS is actually loaded on
-                     this page — since the row was stacking instead of aligning, it likely isn't, so
-                     this no longer depends on that. -->
                 <div
                     style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
                     <div style="display:flex; align-items:center; flex-wrap:wrap; gap:10px;">
@@ -1335,15 +1331,9 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                             <input type="text" id="search-postings"
                                 style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:220px;"
                                 placeholder="Search by company or title..." oninput="filterPostings()">
-                            <!-- CHANGED: search icon color overridden to blue (#272f54, same navy
-                                 used elsewhere in the app) — couldn't find the actual rule you
-                                 mentioned, so this is a direct override. Swap the color value if you
-                                 track down the real one. -->
                             <i class="bi bi-search" style="color:#272f54 !important;"></i>
                         </div>
-                        <!-- CHANGED: added the 4 combo options (IT & CE, IT & EE, CE & EE, IT/CE/EE)
-                             matching the exact values used in the "Add Internship Post" form's
-                             Program select, so filtering matches how postings are actually saved. -->
+                        
                         <select class="filter-select"
                             style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:200px;"
                             id="postings-program-filter" onchange="filterPostings()">
@@ -1351,11 +1341,6 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                             <option value="Information Technology">IT</option>
                             <option value="Civil Engineering">CE</option>
                             <option value="Electrical Engineering">EE</option>
-                            <!-- <option value="Information Technology, Civil Engineering">IT &amp; CE</option> -->
-                            <!-- <option value="Information Technology, Electrical Engineering">IT &amp; EE</option>
-                            <option value="Civil Engineering, Electrical Engineering">CE &amp; EE</option>
-                            <option value="Information Technology, Civil Engineering, Electrical Engineering">IT, CE
-                                &amp; EE</option> -->
                         </select>
                     </div>
                     <!-- CHANGED: swapped "btn-button" for "btn-update" (already in your CSS) — same
@@ -1640,7 +1625,7 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                 <div class="sysAdm-header--danger sysAdm-header--blue mb-4">
                     <div class="sysAdm-header-left">
                         <div class="sysAdm-header-icon">
-                            <i class="bi bi-pencil-fill"></i>
+                            <i class="bi bi-people-fill"></i>
                         </div>
                         <div class="sysAdm-header-text">
                             <h2>Interns</h2>
@@ -1655,7 +1640,7 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                         <div class="search-box">
                             <input type="text" id="search-applicants"
                                 style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:220px;"
-                                placeholder="Search by company or title..." oninput="filterApplicants()">
+                                placeholder="Search by student name..." oninput="filterApplicants()">
                             <i class="bi bi-search" style="color:#272f54 !important;"></i>
                         </div>
 
@@ -1705,11 +1690,12 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                                     $pc = $phaseColors[$a['current_phase']] ?? ['bg' => '#f3f4f6', 'color' => '#6b7280'];
                                     ?>
                                     <tr data-name="<?= strtolower(htmlspecialchars($a['full_name'])) ?>"
-                                        data-program="<?= htmlspecialchars($a['program']) ?>"
+                                        
+                                        data-program="<?= strtolower(htmlspecialchars($a['program'])) ?>"
                                         data-phase="<?= htmlspecialchars($a['current_phase']) ?>"
                                         data-req="<?= htmlspecialchars($a['requirements']) ?>">
                                         <td><?= htmlspecialchars($a['full_name']) ?></td>
-                                        <td><?= htmlspecialchars($a['program']) ?></td>
+                                        <td><?= htmlspecialchars(ucwords(strtolower($a['program']))) ?></td>
                                         <td><?= htmlspecialchars($a['internship_title']) ?></td>
                                         <td><?= htmlspecialchars($a['company']) ?></td>
                                         <td>
