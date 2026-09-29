@@ -1024,11 +1024,6 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
 
 
                 <!-- SUMMARY CARDS -->
-                <!-- CHANGED: replaced the custom .summary-container/.summary-card/.gold-icon flex
-                     layout with a bootstrap grid of card tiles (icon box left, label+count right),
-                     matching the System Admin dashboard's stat cards. Every PHP value below
-                     ($totalApplications, $totalInternships, $totalAnnouncements, $totalDocuments)
-                     is untouched — only the surrounding markup changed. -->
                 <div class="row g-3 mb-4">
                     <div class="col-lg-3 col-md-6">
                         <div class="ojtc-stat-card card-tint-applications">
@@ -1259,9 +1254,8 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                         </div>
                     </div>
 
-                    <!-- Recently Uploaded Documents (static placeholder from first code) -->
+                    <!-- Recently Uploaded Documents -->
                     <div class="col-lg-5">
-                        <!-- CHANGED: added ojtc-panel-card for rounded corners + hover-lift. -->
                         <div class="card border-0 shadow-sm h-100 ojtc-panel-card">
                             <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
                                 <i class="bi bi-file-earmark-arrow-up" style="color:#272f54;"></i>
@@ -1324,13 +1318,6 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
 
             <!-- ── POSTINGS  ── -->
             <div id="postings" class="section sysAdm-section">
-
-                <!-- CHANGED: header now uses your existing .sysAdm-header--danger / .sysAdm-header-left /
-                     .sysAdm-header-icon / .sysAdm-header-text classes (already defined in your global
-                     stylesheet — same ones Account Deletion/Account Management use) instead of the
-                     plain, unstyled .sysAdm-header div. Wrapped h2+p in .sysAdm-header-text (also
-                     already in your CSS) so the title stacks above the subtitle like Account
-                     Management, instead of sitting inline like Account Deletion currently does. -->
                 <div class="sysAdm-header--danger sysAdm-header--blue mb-4">
                     <div class="sysAdm-header-left">
                         <div class="sysAdm-header-icon">
@@ -1363,16 +1350,11 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                             <option value="Electrical Engineering">EE</option>
                         </select>
                     </div>
-                    <!-- CHANGED: swapped "btn-button" for "btn-update" (already in your CSS) — same
-                         style as Account Management's "Add Admin"/"Add Adviser" buttons. -->
                     <button class="btn-update" onclick="showPostingForm()">
                         <i class="bi bi-plus-circle me-1"></i> Add Internship Post
                     </button>
                 </div>
 
-                <!-- CHANGED: swapped the unstyled .table-container/.custom-table for your existing
-                     .sysAdm-table-wrapper/.sysAdm-table classes (same ones Account Deletion uses) —
-                     this is what gives the grey header row + row hover seen in your screenshots. -->
                 <div class="sysAdm-table-wrapper">
                     <table class="sysAdm-table" id="postings-table">
                         <thead>
@@ -1386,10 +1368,6 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                         </thead>
                         <tbody id="postings-tbody">
                             <?php foreach ($internships as $p): ?>
-                                <!-- CHANGED: data-program now reads $p['program'] instead of
-                                     $p['company'] (looked like a bug — the attribute is named
-                                     data-program). Also added data-company/data-title so the search
-                                     box has something to actually filter against. -->
                                 <tr data-company="<?= htmlspecialchars(strtolower($p['company'])) ?>"
                                     data-title="<?= htmlspecialchars(strtolower($p['title'])) ?>"
                                     data-program="<?= htmlspecialchars($p['program'] ?? '') ?>">
@@ -1582,8 +1560,6 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                                     style="background:#888;color:white;border:none;padding:11px 24px;border-radius:8px;font-weight:600;cursor:pointer;">
                                     Cancel
                                 </button>
-                                <!-- CHANGED: swapped "submit-btn" for "btn-create" — already in your
-                                     CSS, unused anywhere else, and literally named for this action. -->
                                 <button type="submit" class="btn-update" style="width:auto;padding:11px 24px;">
                                     Create Posting
                                 </button>
@@ -1592,25 +1568,6 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                     </div>
                 </div>
             </div>
-
-            <!-- <script>
-                function filterPostings() {
-                    const searchVal = document.getElementById('search-postings').value.trim().toLowerCase();
-                    const programVal = document.getElementById('postings-program-filter').value;
-                    const rows = document.querySelectorAll('#postings-tbody tr');
-
-                    rows.forEach(function (row) {
-                        const company = row.getAttribute('data-company') || '';
-                        const title = row.getAttribute('data-title') || '';
-                        const program = row.getAttribute('data-program') || '';
-
-                        const matchesSearch = !searchVal || company.includes(searchVal) || title.includes(searchVal);
-                        const matchesProgram = programVal === 'All' || program === programVal;
-
-                        row.style.display = (matchesSearch && matchesProgram) ? '' : 'none';
-                    });
-                }
-            </script> -->
 
             <!-- ADDED -->
             <style>
@@ -1875,53 +1832,7 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                         </div>
                     </div>
                 </div>
-
-
-
-                <!-- copy from here -->
-                <!-- <div class="form-card mt-4">
-                    <h3>Announce Document Availability</h3>
-                    <p class="text-muted" style="font-size:13px;">
-                        Let students know which documents are ready for a given internship.
-                    </p>
-                    
-                    
-                    <form action="internship-db.php" method="POST">
-                        <input type="hidden" name="form_type" value="document_availability">
-
-                        <div class="mb-3">
-                            <label>Internship</label>
-                            <select name="internship_id" required>
-                                <option value="" disabled selected>Select Internship</option>
-                                <?php foreach ($internships as $intn): ?>
-                                    <option value="<?= $intn['id'] ?>">
-                                        <?= htmlspecialchars($intn['company']) ?> —
-                                        <?= htmlspecialchars($intn['title']) ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-
-                        <div class="mb-3 d-flex gap-4">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="mou_available" id="mouCheck">
-                                <label class="form-check-label" for="mouCheck">MOU</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="recommendation_letter_available"
-                                    id="rlCheck">
-                                <label class="form-check-label" for="rlCheck">Recommendation Letter</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="waiver_available"
-                                    id="waiverCheck">
-                                <label class="form-check-label" for="waiverCheck">Waiver</label>
-                            </div>
-                        </div>
-
-                        <button type="submit" class="submit-btn">Save Availability</button>
-                    </form>
-                </div> -->
+                
                 <!-- editing to make the announce document availability popup instead na nakalabas -->
                 <div id="document-availability-form-panel" class="ojtc-modal-backdrop" style="display:none;"
                     onclick="if(event.target===this) hideDocAvailForm()">
