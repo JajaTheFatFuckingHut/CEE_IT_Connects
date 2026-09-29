@@ -1875,48 +1875,121 @@ $page = 'messages';
             $dashRoomId = (int) $current_room_id;
             $dashUrl    = "ojt-rooms.php?room_id={$dashRoomId}&section=";
 
+            // Students in any active room owned by this adviser (same rule as the other sections)
+            $myStudentsSql = "
+                SELECT rm.user_id
+                FROM room_members rm
+                JOIN rooms r ON r.id = rm.room_id
+                WHERE rm.user_type = 'student'
+                AND r.adviser_id = ?
+                AND r.is_archived = FALSE
+            ";
+
             // same 10 steps as the Requirements page
             $dashSteps  = ['resume', 'mou', 'company_profile', 'addendum', 'reco_letter',
                         'waiver', 'medical_cert', 'internship_plan', 'vicinity_map', 'oath'];
             $totalSteps = count($dashSteps);
 
             // Students in this room
-            $q = $pdo->prepare("SELECT COUNT(*) FROM room_members WHERE room_id = ? AND user_type = 'student'");
-            $q->execute([$dashRoomId]);
+            // $q = $pdo->prepare("SELECT COUNT(*) FROM room_members WHERE room_id = ? AND user_type = 'student'");
+            // $q->execute([$dashRoomId]);
+            // $totalStudents = (int) $q->fetchColumn();
+            
+            // ^^ Students under this adviser
+            $q = $pdo->prepare("SELECT COUNT(*) FROM ($myStudentsSql) x");
+            $q->execute([$adviser_id]);
             $totalStudents = (int) $q->fetchColumn();
 
-            // Weekly reports from this room's students (total + latest 5)
+            // // Weekly reports from this room's students (total + latest 5)
+            // $q = $pdo->prepare("
+            //     SELECT s.full_name, wr.week_number, wr.created_at
+            //     FROM weekly_reports wr
+            //     JOIN students s ON s.id = wr.student_id
+            //     JOIN room_members rm ON rm.user_id = s.id AND rm.user_type = 'student'
+            //     WHERE rm.room_id = ?
+            //     ORDER BY wr.created_at DESC
+            // ");
+            // $q->execute([$dashRoomId]);
+            // $dashReportsAll = $q->fetchAll(PDO::FETCH_ASSOC);
+            // $totalReports   = count($dashReportsAll);
+            // $dashReports    = array_slice($dashReportsAll, 0, 5);
+
+            // ^^ Weekly reports from this adviser's students (total + latest 5)
             $q = $pdo->prepare("
                 SELECT s.full_name, wr.week_number, wr.created_at
                 FROM weekly_reports wr
                 JOIN students s ON s.id = wr.student_id
-                JOIN room_members rm ON rm.user_id = s.id AND rm.user_type = 'student'
-                WHERE rm.room_id = ?
+                WHERE s.id IN ($myStudentsSql)
                 ORDER BY wr.created_at DESC
             ");
-            $q->execute([$dashRoomId]);
+            $q->execute([$adviser_id]);
             $dashReportsAll = $q->fetchAll(PDO::FETCH_ASSOC);
             $totalReports   = count($dashReportsAll);
             $dashReports    = array_slice($dashReportsAll, 0, 5);
 
             // Requirements checklist progress per student (lowest first)
+            // $placeholders = implode(',', array_fill(0, $totalSteps, '?'));
+            // $q = $pdo->prepare("
+            //     SELECT s.id, s.full_name,
+            //         COUNT(DISTINCT sp.step_key) FILTER (WHERE sp.is_done) AS done_count
+            //     FROM students s
+            //     JOIN room_members rm ON rm.user_id = s.id AND rm.user_type = 'student'
+            //     LEFT JOIN student_progress sp ON sp.student_id = s.id AND sp.step_key IN ($placeholders)
+            //     WHERE rm.room_id = ?
+            //     GROUP BY s.id, s.full_name
+            //     ORDER BY done_count ASC, s.full_name
+            // ");
+            // $q->execute([...$dashSteps, $dashRoomId]);
+            // $dashReqAll      = $q->fetchAll(PDO::FETCH_ASSOC);
+            // $incompleteCount = count(array_filter($dashReqAll, fn($r) => (int) $r['done_count'] < $totalSteps));
+            // $dashReq         = array_slice($dashReqAll, 0, 5);
+
+            // ^^ Requirements checklist progress per student (lowest first)
             $placeholders = implode(',', array_fill(0, $totalSteps, '?'));
             $q = $pdo->prepare("
                 SELECT s.id, s.full_name,
                     COUNT(DISTINCT sp.step_key) FILTER (WHERE sp.is_done) AS done_count
                 FROM students s
-                JOIN room_members rm ON rm.user_id = s.id AND rm.user_type = 'student'
                 LEFT JOIN student_progress sp ON sp.student_id = s.id AND sp.step_key IN ($placeholders)
-                WHERE rm.room_id = ?
+                WHERE s.id IN ($myStudentsSql)
                 GROUP BY s.id, s.full_name
                 ORDER BY done_count ASC, s.full_name
             ");
-            $q->execute([...$dashSteps, $dashRoomId]);
+            $q->execute([...$dashSteps, $adviser_id]);
             $dashReqAll      = $q->fetchAll(PDO::FETCH_ASSOC);
             $incompleteCount = count(array_filter($dashReqAll, fn($r) => (int) $r['done_count'] < $totalSteps));
             $dashReq         = array_slice($dashReqAll, 0, 5);
 
             // Student hours progress
+            // $q = $pdo->prepare("
+            //     SELECT DISTINCT ON (s.id)
+            //         s.id, s.full_name,
+            //         COALESCE(i.company, oa.company_name) AS company,
+            //         COALESCE(i.required_hours, 486) AS required_hours,
+            //         COALESCE((
+            //             SELECT ROUND(SUM(
+            //                 GREATEST(0, EXTRACT(EPOCH FROM (h.m_out - h.m_in)) / 3600) +
+            //                 GREATEST(0, EXTRACT(EPOCH FROM (h.a_out - h.a_in)) / 3600)
+            //             )::numeric, 2)
+            //             FROM ojt_hours h
+            //             WHERE h.user_id = s.id AND h.user_type = 'student'
+            //             AND h.m_in IS NOT NULL AND h.m_out IS NOT NULL
+            //             AND h.a_in IS NOT NULL AND h.a_out IS NOT NULL
+            //         ), 0) AS total_hours
+            //     FROM students s
+            //     JOIN room_members rm ON rm.user_id = s.id AND rm.user_type = 'student'
+            //     LEFT JOIN student_internships si ON si.student_id = s.id
+            //     LEFT JOIN internships i ON i.id = si.internship_id
+            //     LEFT JOIN ojt_applications oa ON oa.student_id = s.id
+            //     WHERE rm.room_id = ?
+            //     ORDER BY s.id
+            // ");
+            // $q->execute([$dashRoomId]);
+            // $dashStudents = $q->fetchAll(PDO::FETCH_ASSOC);
+            // usort($dashStudents, fn($a, $b) => strcmp($a['full_name'], $b['full_name']));
+            // $dashStudents = array_slice($dashStudents, 0, 5);
+
+            // ^^ Student hours progress
             $q = $pdo->prepare("
                 SELECT DISTINCT ON (s.id)
                     s.id, s.full_name,
@@ -1933,17 +2006,14 @@ $page = 'messages';
                         AND h.a_in IS NOT NULL AND h.a_out IS NOT NULL
                     ), 0) AS total_hours
                 FROM students s
-                JOIN room_members rm ON rm.user_id = s.id AND rm.user_type = 'student'
                 LEFT JOIN student_internships si ON si.student_id = s.id
                 LEFT JOIN internships i ON i.id = si.internship_id
                 LEFT JOIN ojt_applications oa ON oa.student_id = s.id
-                WHERE rm.room_id = ?
+                WHERE s.id IN ($myStudentsSql)
                 ORDER BY s.id
             ");
-            $q->execute([$dashRoomId]);
+            $q->execute([$adviser_id]);
             $dashStudents = $q->fetchAll(PDO::FETCH_ASSOC);
-            usort($dashStudents, fn($a, $b) => strcmp($a['full_name'], $b['full_name']));
-            $dashStudents = array_slice($dashStudents, 0, 5);
 
             // Companies with at least one document available (loaded at the top of the file)
             $docsAvailableCount = count(array_filter($docAvailability, fn($d) =>
@@ -1951,6 +2021,26 @@ $page = 'messages';
             ));
             $docsCompanyCount = count($docAvailability);
             // ── CHART DATA (added) ──
+            // $attStmt = $pdo->prepare("
+            //     SELECT
+            //         h.date AS log_day,
+            //         SUM(
+            //             COALESCE(GREATEST(0, EXTRACT(EPOCH FROM (h.m_out - h.m_in)) / 3600), 0) +
+            //             COALESCE(GREATEST(0, EXTRACT(EPOCH FROM (h.a_out - h.a_in)) / 3600), 0)
+            //         ) AS hours
+            //     FROM ojt_hours h
+            //     JOIN room_members rm ON rm.user_id = h.user_id AND rm.user_type = 'student'
+            //     WHERE rm.room_id = ?
+            //     AND h.user_type = 'student'
+            //     AND h.date >= (CURRENT_DATE - INTERVAL '13 days')
+            //     GROUP BY h.date
+            //     ORDER BY h.date
+            // ");
+            // $attStmt->execute([$dashRoomId]);
+            // $attStmt->execute([$dashRoomId]);
+            // $attRows = $attStmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // ^^ ── CHART DATA (added) ──
             $attStmt = $pdo->prepare("
                 SELECT
                     h.date AS log_day,
@@ -1959,15 +2049,13 @@ $page = 'messages';
                         COALESCE(GREATEST(0, EXTRACT(EPOCH FROM (h.a_out - h.a_in)) / 3600), 0)
                     ) AS hours
                 FROM ojt_hours h
-                JOIN room_members rm ON rm.user_id = h.user_id AND rm.user_type = 'student'
-                WHERE rm.room_id = ?
-                AND h.user_type = 'student'
+                WHERE h.user_type = 'student'
+                AND h.user_id IN ($myStudentsSql)
                 AND h.date >= (CURRENT_DATE - INTERVAL '13 days')
                 GROUP BY h.date
                 ORDER BY h.date
             ");
-            $attStmt->execute([$dashRoomId]);
-            $attStmt->execute([$dashRoomId]);
+            $attStmt->execute([$adviser_id]);
             $attRows = $attStmt->fetchAll(PDO::FETCH_ASSOC);
 
             // Build a full 14-day range so missing days show as 0 instead of skipping
