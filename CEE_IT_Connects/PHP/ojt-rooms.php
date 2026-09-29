@@ -1956,7 +1956,8 @@ $page = 'messages';
             // whichever of m_in/a_in is present. Adjust COALESCE(...) below if your schema differs.
             $attStmt = $pdo->prepare("
                 SELECT
-                    COALESCE(DATE(h.m_in), DATE(h.a_in)) AS log_day,
+                    
+                    h.log_day AS log_day
                     SUM(
                         GREATEST(0, EXTRACT(EPOCH FROM (h.m_out - h.m_in)) / 3600) +
                         GREATEST(0, EXTRACT(EPOCH FROM (h.a_out - h.a_in)) / 3600)
