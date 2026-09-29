@@ -1786,7 +1786,7 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                                     <td><?= date("M d, Y", strtotime($doc['uploaded_at'])) ?></td>
                                     <td style="text-align:center;">
                                         <a href="../<?= htmlspecialchars($doc['file_path']) ?>" target="_blank"
-                                            class="btn-delete" tooltip="View MOU" title="View MOU"
+                                            class="btn-delete" data-tooltip="View Document"
                                             style="text-decoration: none; background: #FFE7B3;
                             color: #7a5200; border:1px solid #7a5200; background-color: #FFE7B3; transition: background-color 0.2s ease;"
                                             onmouseover="this.style.backgroundColor='#dbbe83';"
@@ -2377,7 +2377,7 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                                             <input type="hidden" name="form_type" value="mou_delete">
                                             <input type="hidden" name="mou_id" value="<?= (int) $m['id'] ?>">
                                             <a href="<?= htmlspecialchars($m['file_path']) ?>" target="_blank"
-                                                target="_blank" class="btn-delete" tooltip="View MOU" title="View MOU"
+                                                target="_blank" class="btn-delete" data-tooltip="View Document"
                                                 style="text-decoration: none; background: #FFE7B3;
                                             color: #7a5200; border:1px solid #7a5200; background-color: #FFE7B3; transition: background-color 0.2s ease;"
                                                 onmouseover="this.style.backgroundColor='#dbbe83';"
