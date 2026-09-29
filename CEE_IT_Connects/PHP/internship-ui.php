@@ -1719,9 +1719,17 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                         <select class="filter-select"
                             style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:200px;"
                             id="doc-type-filter" onchange="filterDocs()">
-                            <option value="all">Document Type</option>
+                            <option value="all">All Document Types</option>
+                            <option value="company_profile">Company Profile</option>
                             <option value="resume">Resume</option>
-                            <option value="credential">Credential</option>
+                            <!-- <option value="addendum">Addendum</option>
+                            <option value="medical_cert">Medical Cert</option>
+                            <option value="internship_plan">Internship Plan</option>
+                            <option value="vicinity_map">Vicinity Map</option>
+                            <option value="oath">Oath</option> -->
+                            <option value="reco_letter">Reco Letter</option>
+                            <option value="waiver">Waiver</option>
+                            <option value="mou">MOU</option>
                         </select>
                         <select class="filter-select" id="doc-program-filter" onchange="filterDocs()">
                             <option value="programs">Programs</option>
