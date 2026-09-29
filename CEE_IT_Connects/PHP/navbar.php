@@ -479,6 +479,14 @@ function timeAgo($datetime)
             word-break: break-all;
         }
 
+        .profile-drop .p-name {
+            color: #272f54 !important;
+        }
+
+        .profile-drop .p-email {
+            color: #888 !important;
+        }
+
         .btn-update {
             background: #FFE7B3 !important;
             color: #7a5200 !important;
