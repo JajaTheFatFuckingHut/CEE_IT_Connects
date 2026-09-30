@@ -582,6 +582,7 @@ $page = 'messages';
             color: #fff;
             margin-bottom: 20px;
         }
+
         .home-hero::before,
         .home-hero::after {
             content: '';
@@ -591,23 +592,43 @@ $page = 'messages';
             width: 60px;
             transform: skewX(-20deg);
         }
-        .home-hero::before { right: 90px; background: rgba(255,107,44,0.85); }
-        .home-hero::after  { right: 20px; background: rgba(255,182,47,0.85); }
+
+        .home-hero::before {
+            right: 90px;
+            background: rgba(255, 107, 44, 0.85);
+        }
+
+        .home-hero::after {
+            right: 20px;
+            background: rgba(255, 182, 47, 0.85);
+        }
+
         .home-hero-bar {
             border-left: 4px solid #FFB62F;
             padding-left: 14px;
             position: relative;
             z-index: 1;
         }
-        .home-hero h2 { font-size: 26px; font-weight: 800; margin: 2px 0 6px; }
-        .home-hero p  { margin: 0; opacity: .85; font-size: 14px; }
+
+        .home-hero h2 {
+            font-size: 26px;
+            font-weight: 800;
+            margin: 2px 0 6px;
+        }
+
+        .home-hero p {
+            margin: 0;
+            opacity: .85;
+            font-size: 14px;
+        }
 
         .home-card {
             background: #fff;
             border-radius: 12px;
             padding: 20px 22px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
         }
+
         .home-empty {
             display: flex;
             align-items: center;
@@ -616,6 +637,7 @@ $page = 'messages';
             padding: 24px;
             color: #94a3b8;
         }
+
         .quick-card {
             display: flex;
             align-items: center;
@@ -625,20 +647,42 @@ $page = 'messages';
             padding: 16px 18px;
             text-decoration: none;
             color: inherit;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
             margin-bottom: 12px;
             transition: transform .15s ease;
         }
-        .quick-card:hover { transform: translateY(-2px); color: inherit; }
-        .quick-card-icon {
-            width: 44px; height: 44px;
-            border-radius: 10px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 17px; flex-shrink: 0;
+
+        .quick-card:hover {
+            transform: translateY(-2px);
+            color: inherit;
         }
-        .quick-card-text strong { display: block; font-size: 14.5px; }
-        .quick-card-text small { color: #888; font-size: 12px; }
-        .quick-card-arrow { margin-left: auto; color: #cbd5e1; }
+
+        .quick-card-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 17px;
+            flex-shrink: 0;
+        }
+
+        .quick-card-text strong {
+            display: block;
+            font-size: 14.5px;
+        }
+
+        .quick-card-text small {
+            color: #888;
+            font-size: 12px;
+        }
+
+        .quick-card-arrow {
+            margin-left: auto;
+            color: #cbd5e1;
+        }
+
         /* addtl e */
 
         /* ── ROOMS LIST ── */
@@ -1510,50 +1554,245 @@ $page = 'messages';
 
         /* addtl s */
         /* ── HOME DASHBOARD ── */
-        .dash-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin-bottom: 16px; margin-top: 16px; }
-        .dash-stat { display: flex; align-items: center; gap: 14px; border-radius: 12px; padding: 16px 18px;
-            text-decoration: none; color: inherit; transition: transform .15s ease; }
-        .dash-stat:hover { transform: translateY(-2px); color: inherit; }
-        .dash-stat-icon { width: 44px; height: 44px; min-width: 44px; border-radius: 10px; background: #fff;
-            display: flex; align-items: center; justify-content: center; font-size: 18px; }
-        .dash-stat-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; margin: 0 0 2px; line-height: 1.25; }
-        .dash-stat-value { font-size: 26px; font-weight: 700; margin: 0; line-height: 1.1; }
-        .tone-blue   { background: #eef1fb; color: #272f54; }
-        .tone-amber  { background: #fff4d6; color: #7a5200; }
-        .tone-green  { background: #eaf3de; color: #27500a; }
-        .tone-orange { background: #ffe5d9; color: #a13d1f; }
+        .dash-stats {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 16px;
+            margin-bottom: 16px;
+            margin-top: 16px;
+        }
 
-        .dash-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
-        .dash-list .dash-row { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-top: 1px solid #f0f2f7; }
-        .dash-list .dash-row:first-child { border-top: none; padding-top: 0; }
-        .dash-row-main { flex: 1; min-width: 0; }
-        .dash-row-name { font-weight: 600; font-size: 13.5px; color: #272f54; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .dash-row-sub { font-size: 11.5px; color: #94a3b8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .dash-hours { font-size: 12px; color: #94a3b8; white-space: nowrap; }
-        .dash-hours strong { color: #272f54; }
-        .dash-bar { width: 90px; height: 8px; background: #e0e0e0; border-radius: 4px; flex-shrink: 0; }
-        .dash-bar > div { height: 100%; border-radius: 4px; background: #ff6b2c; }
-        .dash-pct { font-size: 12px; color: #64748b; width: 36px; text-align: right; }
-        .dash-date { font-size: 12px; color: #94a3b8; white-space: nowrap; }
+        .dash-stat {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            border-radius: 12px;
+            padding: 16px 18px;
+            text-decoration: none;
+            color: inherit;
+            transition: transform .15s ease;
+        }
 
-        .dash-side { display: flex; flex-direction: column; gap: 16px; height: 100%; }
-        .dash-side-card { flex: 1; display: flex; flex-direction: column; justify-content: space-between; gap: 12px;
-            background: #fff; border-radius: 12px; padding: 16px 18px; text-decoration: none; color: inherit;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05); transition: transform .15s ease; }
-        .dash-side-card:hover { transform: translateY(-2px); color: inherit; }
-        .dash-side-top { display: flex; align-items: center; gap: 14px; }
-        .dash-side-meta { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #64748b;
-            padding-top: 12px; border-top: 1px solid #f0f2f7; }
+        .dash-stat:hover {
+            transform: translateY(-2px);
+            color: inherit;
+        }
 
-        .dash-bottom { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 16px; }
+        .dash-stat-icon {
+            width: 44px;
+            height: 44px;
+            min-width: 44px;
+            border-radius: 10px;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
 
-        .home-card.accent-orange { box-shadow: inset 0 4px 0 #ff6b2c, 0 2px 10px rgba(0, 0, 0, 0.08); }
-        .home-card.accent-blue   { box-shadow: inset 0 4px 0 #2c6fff, 0 2px 10px rgba(0, 0, 0, 0.08); }
-        .home-card.accent-green  { box-shadow: inset 0 4px 0 #1abc9c, 0 2px 10px rgba(0, 0, 0, 0.08); }
-        .home-card.accent-amber  { box-shadow: inset 0 4px 0 #FFB62F, 0 2px 10px rgba(0, 0, 0, 0.08); }
-        @media (max-width: 1200px) { .dash-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-        @media (max-width: 992px)  { .dash-bottom { grid-template-columns: 1fr; } }
-        @media (max-width: 576px)  { .dash-stats { grid-template-columns: 1fr; } .dash-hours { display: none; } }
+        .dash-stat-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            margin: 0 0 2px;
+            line-height: 1.25;
+        }
+
+        .dash-stat-value {
+            font-size: 26px;
+            font-weight: 700;
+            margin: 0;
+            line-height: 1.1;
+        }
+
+        .tone-blue {
+            background: #eef1fb;
+            color: #272f54;
+        }
+
+        .tone-amber {
+            background: #fff4d6;
+            color: #7a5200;
+        }
+
+        .tone-green {
+            background: #eaf3de;
+            color: #27500a;
+        }
+
+        .tone-orange {
+            background: #ffe5d9;
+            color: #a13d1f;
+        }
+
+        .dash-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+
+        .dash-list .dash-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 0;
+            border-top: 1px solid #f0f2f7;
+        }
+
+        .dash-list .dash-row:first-child {
+            border-top: none;
+            padding-top: 0;
+        }
+
+        .dash-row-main {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .dash-row-name {
+            font-weight: 600;
+            font-size: 13.5px;
+            color: #272f54;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .dash-row-sub {
+            font-size: 11.5px;
+            color: #94a3b8;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .dash-hours {
+            font-size: 12px;
+            color: #94a3b8;
+            white-space: nowrap;
+        }
+
+        .dash-hours strong {
+            color: #272f54;
+        }
+
+        .dash-bar {
+            width: 90px;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            flex-shrink: 0;
+        }
+
+        .dash-bar>div {
+            height: 100%;
+            border-radius: 4px;
+            background: #ff6b2c;
+        }
+
+        .dash-pct {
+            font-size: 12px;
+            color: #64748b;
+            width: 36px;
+            text-align: right;
+        }
+
+        .dash-date {
+            font-size: 12px;
+            color: #94a3b8;
+            white-space: nowrap;
+        }
+
+        .dash-side {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            height: 100%;
+        }
+
+        .dash-side-card {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 12px;
+            background: #fff;
+            border-radius: 12px;
+            padding: 16px 18px;
+            text-decoration: none;
+            color: inherit;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: transform .15s ease;
+        }
+
+        .dash-side-card:hover {
+            transform: translateY(-2px);
+            color: inherit;
+        }
+
+        .dash-side-top {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .dash-side-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: #64748b;
+            padding-top: 12px;
+            border-top: 1px solid #f0f2f7;
+        }
+
+        .dash-bottom {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .home-card.accent-orange {
+            box-shadow: inset 0 4px 0 #ff6b2c, 0 2px 10px rgba(0, 0, 0, 0.08);
+        }
+
+        .home-card.accent-blue {
+            box-shadow: inset 0 4px 0 #2c6fff, 0 2px 10px rgba(0, 0, 0, 0.08);
+        }
+
+        .home-card.accent-green {
+            box-shadow: inset 0 4px 0 #1abc9c, 0 2px 10px rgba(0, 0, 0, 0.08);
+        }
+
+        .home-card.accent-amber {
+            box-shadow: inset 0 4px 0 #FFB62F, 0 2px 10px rgba(0, 0, 0, 0.08);
+        }
+
+        @media (max-width: 1200px) {
+            .dash-stats {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 992px) {
+            .dash-bottom {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .dash-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .dash-hours {
+                display: none;
+            }
+        }
+
         /* addtl e */
 
         /*===(MEDIA QUERY)===*/
@@ -1873,7 +2112,7 @@ $page = 'messages';
             // addtl s
             // ── DASHBOARD DATA ──
             $dashRoomId = (int) $current_room_id;
-            $dashUrl    = "ojt-rooms.php?room_id={$dashRoomId}&section=";
+            $dashUrl = "ojt-rooms.php?room_id={$dashRoomId}&section=";
 
             // Students in any active room owned by this adviser (same rule as the other sections)
             $myStudentsSql = "
@@ -1886,15 +2125,25 @@ $page = 'messages';
             ";
 
             // same 10 steps as the Requirements page
-            $dashSteps  = ['resume', 'mou', 'company_profile', 'addendum', 'reco_letter',
-                        'waiver', 'medical_cert', 'internship_plan', 'vicinity_map', 'oath'];
+            $dashSteps = [
+                'resume',
+                'mou',
+                'company_profile',
+                'addendum',
+                'reco_letter',
+                'waiver',
+                'medical_cert',
+                'internship_plan',
+                'vicinity_map',
+                'oath'
+            ];
             $totalSteps = count($dashSteps);
 
             // Students in this room
             // $q = $pdo->prepare("SELECT COUNT(*) FROM room_members WHERE room_id = ? AND user_type = 'student'");
             // $q->execute([$dashRoomId]);
             // $totalStudents = (int) $q->fetchColumn();
-            
+        
             // ^^ Students under this adviser
             $q = $pdo->prepare("SELECT COUNT(*) FROM ($myStudentsSql) x");
             $q->execute([$adviser_id]);
@@ -1913,7 +2162,7 @@ $page = 'messages';
             // $dashReportsAll = $q->fetchAll(PDO::FETCH_ASSOC);
             // $totalReports   = count($dashReportsAll);
             // $dashReports    = array_slice($dashReportsAll, 0, 5);
-
+        
             // ^^ Weekly reports from this adviser's students (total + latest 5)
             $q = $pdo->prepare("
                 SELECT s.full_name, wr.week_number, wr.created_at
@@ -1924,8 +2173,8 @@ $page = 'messages';
             ");
             $q->execute([$adviser_id]);
             $dashReportsAll = $q->fetchAll(PDO::FETCH_ASSOC);
-            $totalReports   = count($dashReportsAll);
-            $dashReports    = array_slice($dashReportsAll, 0, 5);
+            $totalReports = count($dashReportsAll);
+            $dashReports = array_slice($dashReportsAll, 0, 5);
 
             // Requirements checklist progress per student (lowest first)
             // $placeholders = implode(',', array_fill(0, $totalSteps, '?'));
@@ -1943,7 +2192,7 @@ $page = 'messages';
             // $dashReqAll      = $q->fetchAll(PDO::FETCH_ASSOC);
             // $incompleteCount = count(array_filter($dashReqAll, fn($r) => (int) $r['done_count'] < $totalSteps));
             // $dashReq         = array_slice($dashReqAll, 0, 5);
-
+        
             // ^^ Requirements checklist progress per student (lowest first)
             $placeholders = implode(',', array_fill(0, $totalSteps, '?'));
             $q = $pdo->prepare("
@@ -1956,9 +2205,9 @@ $page = 'messages';
                 ORDER BY done_count ASC, s.full_name
             ");
             $q->execute([...$dashSteps, $adviser_id]);
-            $dashReqAll      = $q->fetchAll(PDO::FETCH_ASSOC);
+            $dashReqAll = $q->fetchAll(PDO::FETCH_ASSOC);
             $incompleteCount = count(array_filter($dashReqAll, fn($r) => (int) $r['done_count'] < $totalSteps));
-            $dashReq         = array_slice($dashReqAll, 0, 5);
+            $dashReq = array_slice($dashReqAll, 0, 5);
 
             // Student hours progress
             // $q = $pdo->prepare("
@@ -1988,13 +2237,13 @@ $page = 'messages';
             // $dashStudents = $q->fetchAll(PDO::FETCH_ASSOC);
             // usort($dashStudents, fn($a, $b) => strcmp($a['full_name'], $b['full_name']));
             // $dashStudents = array_slice($dashStudents, 0, 5);
-
+        
             // ^^ Student hours progress
             $q = $pdo->prepare("
                 SELECT DISTINCT ON (s.id)
                     s.id, s.full_name,
                     COALESCE(i.company, oa.company_name) AS company,
-                    COALESCE(i.required_hours, 486) AS required_hours,
+                    i.required_hours,
                     COALESCE((
                         SELECT ROUND(SUM(
                             GREATEST(0, EXTRACT(EPOCH FROM (h.m_out - h.m_in)) / 3600) +
@@ -2006,18 +2255,21 @@ $page = 'messages';
                         AND h.a_in IS NOT NULL AND h.a_out IS NOT NULL
                     ), 0) AS total_hours
                 FROM students s
-                LEFT JOIN student_internships si ON si.student_id = s.id
-                LEFT JOIN internships i ON i.id = si.internship_id
-                LEFT JOIN ojt_applications oa ON oa.student_id = s.id
+                LEFT JOIN ojt_applications oa
+                    ON oa.student_id = s.id
+                    AND oa.status <> 'rejected'
+                LEFT JOIN internships i ON i.id = oa.internship_id
                 WHERE s.id IN ($myStudentsSql)
-                ORDER BY s.id
+                ORDER BY s.id, oa.id DESC
             ");
             $q->execute([$adviser_id]);
             $dashStudents = $q->fetchAll(PDO::FETCH_ASSOC);
 
             // Companies with at least one document available (loaded at the top of the file)
-            $docsAvailableCount = count(array_filter($docAvailability, fn($d) =>
-                !empty($d['mou_available']) || !empty($d['recommendation_letter_available']) || !empty($d['waiver_available'])
+            $docsAvailableCount = count(array_filter(
+                $docAvailability,
+                fn($d) =>
+                    !empty($d['mou_available']) || !empty($d['recommendation_letter_available']) || !empty($d['waiver_available'])
             ));
             $docsCompanyCount = count($docAvailability);
             // ── CHART DATA (added) ──
@@ -2039,7 +2291,7 @@ $page = 'messages';
             // $attStmt->execute([$dashRoomId]);
             // $attStmt->execute([$dashRoomId]);
             // $attRows = $attStmt->fetchAll(PDO::FETCH_ASSOC);
-
+        
             // ^^ ── CHART DATA (added) ──
             $attStmt = $pdo->prepare("
                 SELECT
@@ -2089,11 +2341,12 @@ $page = 'messages';
                     <div class="home-card accent-orange">
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <div>
-                                <h5 class="fw-bold mb-0"><i class="fa-solid fa-bullhorn me-2" style="color:#ff6b2c;"></i>Announcements</h5>
+                                <h5 class="fw-bold mb-0"><i class="fa-solid fa-bullhorn me-2"
+                                        style="color:#ff6b2c;"></i>Announcements</h5>
                                 <small class="text-muted">Latest updates and important notices for your room.</small>
                             </div>
-                            <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=announcements"
-                            class="btn btn-sm" style="background:#eef1fb;color:#272f54;border-radius:20px;font-weight:600;">
+                            <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=announcements" class="btn btn-sm"
+                                style="background:#eef1fb;color:#272f54;border-radius:20px;font-weight:600;">
                                 View All <i class="fa-solid fa-arrow-right ms-1"></i>
                             </a>
                         </div>
@@ -2154,10 +2407,12 @@ $page = 'messages';
                     <div class="home-card accent-blue" style="margin-top:16px;">
                         <div class="dash-head">
                             <div>
-                                <h5 class="fw-bold mb-0"><i class="fa-solid fa-calendar-check me-2" style="color:#ff6b2c;"></i>Student Progress</h5>
+                                <h5 class="fw-bold mb-0"><i class="fa-solid fa-calendar-check me-2"
+                                        style="color:#ff6b2c;"></i>Student Progress</h5>
                                 <small class="text-muted">OJT hours rendered by your interns.</small>
                             </div>
-                            <a href="<?= $dashUrl ?>status" class="btn btn-sm" style="background:#eef1fb;color:#272f54;border-radius:20px;font-weight:600;">
+                            <a href="<?= $dashUrl ?>status" class="btn btn-sm"
+                                style="background:#eef1fb;color:#272f54;border-radius:20px;font-weight:600;">
                                 View All <i class="fa-solid fa-arrow-right ms-1"></i>
                             </a>
                         </div>
@@ -2181,7 +2436,9 @@ $page = 'messages';
                                             <div class="dash-row-sub"><?= htmlspecialchars($ds['company'] ?: 'No company') ?></div>
                                         </div>
                                         <div class="dash-hours"><strong><?= round($hrs, 1) ?></strong> / <?= $req ?> hrs</div>
-                                        <div class="dash-bar"><div style="width:<?= $pct ?>%"></div></div>
+                                        <div class="dash-bar">
+                                            <div style="width:<?= $pct ?>%"></div>
+                                        </div>
                                         <span class="dash-pct"><?= $pct ?>%</span>
                                     </div>
                                 <?php endforeach; ?>
@@ -2196,26 +2453,32 @@ $page = 'messages';
                     <div class="dash-side">
                         <a href="<?= $dashUrl ?>ojt_applications" class="dash-side-card">
                             <div class="dash-side-top">
-                                <div class="quick-card-icon" style="background:#dbeafe;color:#1e40af;"><i class="fa-solid fa-file-lines"></i></div>
-                                <div class="quick-card-text"><strong>Requirements</strong><small>Check student requirements</small></div>
+                                <div class="quick-card-icon" style="background:#dbeafe;color:#1e40af;"><i
+                                        class="fa-solid fa-file-lines"></i></div>
+                                <div class="quick-card-text"><strong>Requirements</strong><small>Check student
+                                        requirements</small></div>
                                 <i class="fa-solid fa-chevron-right quick-card-arrow"></i>
                             </div>
                             <div class="dash-side-meta">
                                 <i class="fa-solid fa-list-check"></i>
-                                <?= $incompleteCount ?> of <?= $totalStudents ?> student<?= $totalStudents === 1 ? '' : 's' ?> still incomplete
+                                <?= $incompleteCount ?> of <?= $totalStudents ?>
+                                student<?= $totalStudents === 1 ? '' : 's' ?> still incomplete
                             </div>
                         </a>
 
                         <a href="<?= $dashUrl ?>weekly_reports" class="dash-side-card">
                             <div class="dash-side-top">
-                                <div class="quick-card-icon" style="background:#ffe7b3;color:#7a5200;"><i class="fa-solid fa-calendar-days"></i></div>
-                                <div class="quick-card-text"><strong>Weekly Reports</strong><small>View submitted reports</small></div>
+                                <div class="quick-card-icon" style="background:#ffe7b3;color:#7a5200;"><i
+                                        class="fa-solid fa-calendar-days"></i></div>
+                                <div class="quick-card-text"><strong>Weekly Reports</strong><small>View submitted
+                                        reports</small></div>
                                 <i class="fa-solid fa-chevron-right quick-card-arrow"></i>
                             </div>
                             <div class="dash-side-meta">
                                 <i class="fa-solid fa-clock"></i>
                                 <?php if (!empty($dashReports)): ?>
-                                    Latest: <?= htmlspecialchars($dashReports[0]['full_name']) ?> &middot; Week <?= (int) $dashReports[0]['week_number'] ?>
+                                    Latest: <?= htmlspecialchars($dashReports[0]['full_name']) ?> &middot; Week
+                                    <?= (int) $dashReports[0]['week_number'] ?>
                                 <?php else: ?>
                                     No reports submitted yet
                                 <?php endif; ?>
@@ -2224,25 +2487,31 @@ $page = 'messages';
 
                         <a href="<?= $dashUrl ?>chats" class="dash-side-card">
                             <div class="dash-side-top">
-                                <div class="quick-card-icon" style="background:#dbeafe;color:#272f54;"><i class="fa-solid fa-comments"></i></div>
-                                <div class="quick-card-text"><strong>Chats</strong><small>Communicate with your team</small></div>
+                                <div class="quick-card-icon" style="background:#dbeafe;color:#272f54;"><i
+                                        class="fa-solid fa-comments"></i></div>
+                                <div class="quick-card-text"><strong>Chats</strong><small>Communicate with your team</small>
+                                </div>
                                 <i class="fa-solid fa-chevron-right quick-card-arrow"></i>
                             </div>
                             <div class="dash-side-meta">
                                 <i class="fa-solid fa-user-group"></i>
-                                <?= count($chattableUsers) ?> <?= count($chattableUsers) === 1 ? 'person' : 'people' ?> you can message
+                                <?= count($chattableUsers) ?>     <?= count($chattableUsers) === 1 ? 'person' : 'people' ?> you
+                                can message
                             </div>
                         </a>
 
                         <a href="<?= $dashUrl ?>announcements" class="dash-side-card">
                             <div class="dash-side-top">
-                                <div class="quick-card-icon" style="background:#ffe5d9;color:#ff6b2c;"><i class="fa-solid fa-folder-open"></i></div>
-                                <div class="quick-card-text"><strong>Documents</strong><small>Partner company documents</small></div>
+                                <div class="quick-card-icon" style="background:#ffe5d9;color:#ff6b2c;"><i
+                                        class="fa-solid fa-folder-open"></i></div>
+                                <div class="quick-card-text"><strong>Documents</strong><small>Partner company
+                                        documents</small></div>
                                 <i class="fa-solid fa-chevron-right quick-card-arrow"></i>
                             </div>
                             <div class="dash-side-meta">
                                 <i class="fa-solid fa-building"></i>
-                                <?= $docsAvailableCount ?> of <?= $docsCompanyCount ?> compan<?= $docsCompanyCount === 1 ? 'y' : 'ies' ?> have documents ready
+                                <?= $docsAvailableCount ?> of <?= $docsCompanyCount ?>
+                                compan<?= $docsCompanyCount === 1 ? 'y' : 'ies' ?> have documents ready
                             </div>
                         </a>
                     </div>
@@ -2251,14 +2520,16 @@ $page = 'messages';
             </div>
 
             <!-- addtl s -->
-                         <div class="dash-bottom">
+            <div class="dash-bottom">
                 <div class="home-card accent-green">
                     <div class="dash-head">
                         <div>
-                            <h5 class="fw-bold mb-0"><i class="fa-solid fa-list-check me-2" style="color:#ff6b2c;"></i>Requirements Progress</h5>
+                            <h5 class="fw-bold mb-0"><i class="fa-solid fa-list-check me-2"
+                                    style="color:#ff6b2c;"></i>Requirements Progress</h5>
                             <small class="text-muted">Students with the fewest requirements done.</small>
                         </div>
-                        <a href="<?= $dashUrl ?>ojt_applications" class="btn btn-sm" style="background:#eef1fb;color:#272f54;border-radius:20px;font-weight:600;">
+                        <a href="<?= $dashUrl ?>ojt_applications" class="btn btn-sm"
+                            style="background:#eef1fb;color:#272f54;border-radius:20px;font-weight:600;">
                             View All <i class="fa-solid fa-arrow-right ms-1"></i>
                         </a>
                     </div>
@@ -2268,8 +2539,8 @@ $page = 'messages';
                         <div class="dash-list">
                             <?php foreach ($dashReq as $r):
                                 $done = (int) $r['done_count'];
-                                $pct  = (int) round(($done / $totalSteps) * 100);
-                                $col  = $avatarColors[crc32($r['full_name']) % count($avatarColors)];
+                                $pct = (int) round(($done / $totalSteps) * 100);
+                                $col = $avatarColors[crc32($r['full_name']) % count($avatarColors)];
                                 ?>
                                 <div class="dash-row">
                                     <div class="avatar" style="background:<?= $col ?>;">
@@ -2279,7 +2550,9 @@ $page = 'messages';
                                         <div class="dash-row-name"><?= htmlspecialchars($r['full_name']) ?></div>
                                     </div>
                                     <div class="dash-hours"><strong><?= $done ?></strong> / <?= $totalSteps ?></div>
-                                    <div class="dash-bar"><div style="width:<?= $pct ?>%"></div></div>
+                                    <div class="dash-bar">
+                                        <div style="width:<?= $pct ?>%"></div>
+                                    </div>
                                 </div>
                             <?php endforeach; ?>
                         </div>
@@ -2289,10 +2562,12 @@ $page = 'messages';
                 <div class="home-card accent-amber">
                     <div class="dash-head">
                         <div>
-                            <h5 class="fw-bold mb-0"><i class="fa-solid fa-calendar-days me-2" style="color:#ff6b2c;"></i>Latest Weekly Reports</h5>
+                            <h5 class="fw-bold mb-0"><i class="fa-solid fa-calendar-days me-2"
+                                    style="color:#ff6b2c;"></i>Latest Weekly Reports</h5>
                             <small class="text-muted">Most recent submissions from your interns.</small>
                         </div>
-                        <a href="<?= $dashUrl ?>weekly_reports" class="btn btn-sm" style="background:#eef1fb;color:#272f54;border-radius:20px;font-weight:600;">
+                        <a href="<?= $dashUrl ?>weekly_reports" class="btn btn-sm"
+                            style="background:#eef1fb;color:#272f54;border-radius:20px;font-weight:600;">
                             View All <i class="fa-solid fa-arrow-right ms-1"></i>
                         </a>
                     </div>
@@ -2318,12 +2593,13 @@ $page = 'messages';
                     <?php endif; ?>
                 </div>
             </div>
-            
+
             <div class="dash-bottom">
                 <div class="home-card accent-blue">
                     <div class="dash-head">
                         <div>
-                            <h5 class="fw-bold mb-0"><i class="fa-solid fa-chart-line me-2" style="color:#ff6b2c;"></i>Attendance Trend</h5>
+                            <h5 class="fw-bold mb-0"><i class="fa-solid fa-chart-line me-2"
+                                    style="color:#ff6b2c;"></i>Attendance Trend</h5>
                             <small class="text-muted">Total hours logged per day, last 14 days.</small>
                         </div>
                     </div>
@@ -2333,18 +2609,19 @@ $page = 'messages';
                 <div class="home-card accent-orange">
                     <div class="dash-head">
                         <div>
-                            <h5 class="fw-bold mb-0"><i class="fa-solid fa-chart-pie me-2" style="color:#ff6b2c;"></i>Requirements Completion</h5>
+                            <h5 class="fw-bold mb-0"><i class="fa-solid fa-chart-pie me-2"
+                                    style="color:#ff6b2c;"></i>Requirements Completion</h5>
                             <small class="text-muted">Share of students who finished all requirements.</small>
                         </div>
                     </div>
                     <canvas id="completionChart" height="180"></canvas>
                 </div>
             </div>
-             <!-- addtl e -->
+            <!-- addtl e -->
         <?php elseif ($section === 'room'): ?>
-                    <?php if ($current_room_id): ?>
-                        <?php include 'chat-room-content.php'; ?>
-                    <?php endif; ?>
+            <?php if ($current_room_id): ?>
+                <?php include 'chat-room-content.php'; ?>
+            <?php endif; ?>
         <?php elseif ($section === 'announcements'): ?>
             <?php
             $docAvailStmt = $pdo->query("
@@ -2421,7 +2698,8 @@ $page = 'messages';
                                         <tr>
                                             <td>
                                                 <div class="student-cell">
-                                                    <div class="avatar" style="background:<?= $avatarColors[crc32($d['company']) % count($avatarColors)] ?? '#2c6fff' ?>;">
+                                                    <div class="avatar"
+                                                        style="background:<?= $avatarColors[crc32($d['company']) % count($avatarColors)] ?? '#2c6fff' ?>;">
                                                         <strong><?= strtoupper(substr($d['company'], 0, 1)) ?></strong>
                                                     </div>
                                                     <span><?= htmlspecialchars($d['company']) ?></span>
@@ -2440,14 +2718,14 @@ $page = 'messages';
             </div>
 
             <script>
-            function filterDocsTable() {
-                const q = document.getElementById('docsSearchInput').value.toLowerCase();
-                document.querySelectorAll('#docs-availability-tbody tr').forEach(row => {
-                    // skip the empty-state row (single cell with colspan)
-                    if (row.children.length < 2) return;
-                    row.style.display = row.children[0].textContent.toLowerCase().includes(q) ? '' : 'none';
-                });
-            }
+                function filterDocsTable() {
+                    const q = document.getElementById('docsSearchInput').value.toLowerCase();
+                    document.querySelectorAll('#docs-availability-tbody tr').forEach(row => {
+                        // skip the empty-state row (single cell with colspan)
+                        if (row.children.length < 2) return;
+                        row.style.display = row.children[0].textContent.toLowerCase().includes(q) ? '' : 'none';
+                    });
+                }
             </script>
 
         <?php elseif ($section === 'status'): ?>
@@ -3256,8 +3534,8 @@ $page = 'messages';
             });
         }
     </script>
-<!-- addtl e -->
-    
+    <!-- addtl e -->
+
     <script>
         // Flash alert auto-dismiss
         setTimeout(() => {
