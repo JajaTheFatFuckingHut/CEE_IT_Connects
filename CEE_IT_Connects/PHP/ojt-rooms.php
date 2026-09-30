@@ -2872,7 +2872,27 @@ $page = 'messages';
                 'vicinity_map' => 'Vicinity Map',
                 'oath' => 'Oath',
             ];
+
+            $reqData = [];
+            foreach ($ojtApplications as $app) {
+                $checklist = json_decode($app['checklist'] ?? '{}', true) ?: [];
+                $docs = [];
+                foreach ($stepLabels as $key => $label) {
+                    $entry = $checklist[$key] ?? null;
+                    if (!empty($entry['done'])) {
+                        $docs[] = [
+                            'label' => $label,
+                            'file' => $entry['file_path'] ?? '',
+                        ];
+                    }
+                }
+                $reqData[(int) $app['application_id']] = [
+                    'name' => $app['full_name'],
+                    'docs' => $docs,
+                ];
+            }
             ?>
+
 
             <!-- REQUIREMENTS -->
             <div id="status" class="section-panel section sysAdm-section">
@@ -2909,138 +2929,116 @@ $page = 'messages';
                     </select>
                 </div>
 
-                <?php if (empty($ojtApplications)): ?>
-                    <div class="text-center text-muted py-5">
-                        <i class="fa fa-inbox fa-2x mb-2 d-block"></i>
-                        No OJT applications yet.
-                    </div>
-                <?php else: ?>
-
-                    <!-- Application Cards -->
-                    <div style="display:flex; flex-direction:column; gap:12px;" id="apps-list">
-                        <?php foreach ($ojtApplications as $app):
-                            $avatarColors = ['#ff2c8f', '#2c6fff', '#1abc9c', '#9b59b6', '#e67e22'];
-                            $avatarColor = $avatarColors[crc32($app['full_name']) % count($avatarColors)];
-                            $checklist = json_decode($app['checklist'] ?? '{}', true) ?: [];
-                            $doneCount = count(array_filter($checklist, fn($v) => !empty($v['done'])));
-                            $totalCount = count($stepLabels);
-                            $progressPct = $totalCount > 0 ? round(($doneCount / $totalCount) * 100) : 0;
-                            ?>
-                            <div class="app-card" data-name="<?= strtolower(htmlspecialchars($app['full_name'])) ?>"
-                                data-student="<?= strtolower(htmlspecialchars($app['student_no'])) ?>"
-                                data-company="<?= strtolower(htmlspecialchars($app['company_name'] ?? '')) ?>"
-                                data-progress="<?= $progressPct ?>" style="background:white; border:1px solid #eee; border-radius:12px; padding:18px 20px;
-                            box-shadow:0 1px 4px rgba(0,0,0,0.04); transition:box-shadow .2s;">
-
-                                <!-- Top row: avatar + student info + company + date + status badge -->
-                                <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
-
-                                    <!-- Avatar + Name -->
-                                    <div style="display:flex; align-items:center; gap:10px; flex:1; min-width:200px;">
-                                        <div style="width:42px;height:42px;border-radius:50%;background:<?= $avatarColor ?>;
-                        color:white;display:flex;align-items:center;justify-content:center;
-                        font-weight:700;font-size:16px;flex-shrink:0;">
-                                            <?= strtoupper(substr($app['full_name'], 0, 1)) ?>
-                                        </div>
-                                        <div>
-                                            <div style="font-weight:600;font-size:14px;display:flex;align-items:center;gap:8px;">
-                                                <?= htmlspecialchars($app['full_name']) ?>
-                                                <span
-                                                    style=" background: <?= $progressPct === 100 ? '#d1fae5' : ($progressPct >= 50 ? '#dbeafe' : '#fef3c7') ?>;
-                                                color: <?= $progressPct === 100 ? '#065f46' : ($progressPct >= 50 ? '#1e40af' : '#92400e') ?>;
-                                                border: 1px solid <?= $progressPct === 100 ? '#6ee7b7' : ($progressPct >= 50 ? '#93c5fd' : '#fde68a') ?>;
-                                                font-size:11px; font-weight:600; padding:2px 8px;border-radius:99px; white-space:nowrap;">
-                                                    <?= $progressPct ?>%
-                                                </span>
+                <div class="ojt-table-wrapper">
+                    <table class="ojt-status-table">
+                        <thead style="background:#f8f9fa;">
+                            <tr>
+                                <th>Student</th>
+                                <th>Company</th>
+                                <th>Requirements</th>
+                                <th>Last Submitted</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="apps-list">
+                            <?php if (empty($ojtApplications)): ?>
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted py-4">No OJT applications yet.</td>
+                                </tr>
+                            <?php else: ?>
+                                <?php foreach ($ojtApplications as $app):
+                                    $avatarColors = ['#ff2c8f', '#2c6fff', '#1abc9c', '#9b59b6', '#e67e22'];
+                                    $avatarColor = $avatarColors[crc32($app['full_name']) % count($avatarColors)];
+                                    $checklist = json_decode($app['checklist'] ?? '{}', true) ?: [];
+                                    $doneCount = count(array_filter($checklist, fn($v) => !empty($v['done'])));
+                                    $totalCount = count($stepLabels);
+                                    $progressPct = $totalCount > 0 ? (int) round(($doneCount / $totalCount) * 100) : 0;
+                                    $bg = $progressPct === 100 ? '#d1fae5' : ($progressPct >= 50 ? '#dbeafe' : '#fef3c7');
+                                    $fg = $progressPct === 100 ? '#065f46' : ($progressPct >= 50 ? '#1e40af' : '#92400e');
+                                    $bd = $progressPct === 100 ? '#6ee7b7' : ($progressPct >= 50 ? '#93c5fd' : '#fde68a');
+                                    ?>
+                                    <tr class="app-card" data-name="<?= strtolower(htmlspecialchars($app['full_name'])) ?>"
+                                        data-student="<?= strtolower(htmlspecialchars($app['student_no'])) ?>"
+                                        data-company="<?= strtolower(htmlspecialchars($app['company_name'] ?? '')) ?>"
+                                        data-progress="<?= $progressPct ?>">
+                                        <td>
+                                            <div class="student-cell">
+                                                <div class="avatar" style="background:<?= $avatarColor ?>;">
+                                                    <strong><?= strtoupper(substr($app['full_name'], 0, 1)) ?></strong>
+                                                </div>
+                                                <div>
+                                                    <div><?= htmlspecialchars($app['full_name']) ?></div>
+                                                    <small style="color:#888;">
+                                                        <?= htmlspecialchars($app['student_no']) ?> &middot;
+                                                        <?= htmlspecialchars($app['program']) ?>
+                                                    </small>
+                                                </div>
                                             </div>
-                                            <div style="font-size:12px;color:#888;">
-                                                <?= htmlspecialchars($app['student_no']) ?> &middot;
-                                                <?= htmlspecialchars($app['program']) ?>
-                                            </div>
-                                        </div>
-                                    </div>
+                                        </td>
+                                        <td><?= htmlspecialchars($app['company_name'] ?? '—') ?></td>
+                                        <td>
+                                            <span
+                                                style="background:<?= $bg ?>; color:<?= $fg ?>; border:1px solid <?= $bd ?>;
+                                  font-size:11px; font-weight:600; padding:2px 8px; border-radius:99px; white-space:nowrap;">
+                                                <?= $doneCount ?>/<?= $totalCount ?> &middot; <?= $progressPct ?>%
+                                            </span>
+                                        </td>
+                                        <td><?= date('M d, Y', strtotime($app['submitted_at'])) ?></td>
+                                        <td>
+                                            <button type="button" onclick="openRequirements(<?= (int) $app['application_id'] ?>)"
+                                                style="display:inline-flex; align-items:center; gap:5px; padding:5px 10px;
+                                background:#dbeafe; color:#1e40af; border-radius:6px; font-size:11px;
+                                font-weight:600; border:1px solid #93c5fd; cursor:pointer; white-space:nowrap;">
+                                                <i class="fa fa-eye"></i> View
+                                            </button>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
+                <div id="reqModal" onclick="if(event.target===this) closeRequirements()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:2000;
+            align-items:center; justify-content:center; padding:16px;">
+                    <div style="background:#fff; border-radius:14px; width:100%; max-width:1000px; height:85vh;
+                display:flex; flex-direction:column; overflow:hidden;">
 
-                                    <!-- Company -->
-                                    <div style="flex:1; min-width:150px;">
-                                        <div style="font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:.5px;">Company
-                                        </div>
-                                        <div style="font-size:13px;font-weight:500;">
-                                            <?= htmlspecialchars($app['company_name'] ?? '—') ?>
-                                        </div>
-                                        <?php if (!empty($app['location'])): ?>
-                                            <div style="font-size:11px;color:#888;">
-                                                <i class="fa fa-location-dot me-1"></i>
-                                                <?= htmlspecialchars($app['location']) ?>
-                                            </div>
-                                        <?php endif; ?>
-                                    </div>
+                        <div style="display:flex; justify-content:space-between; align-items:center;
+                    padding:14px 18px; border-bottom:1px solid #e5e7eb;">
+                            <h5 id="reqModalTitle" style="margin:0; color:#272f54;"></h5>
+                            <button type="button" onclick="closeRequirements()"
+                                style="border:none; background:none; font-size:24px; cursor:pointer;">&times;</button>
+                        </div>
 
-                                    <!-- Submitted date -->
-                                    <div style="min-width:100px;">
-                                        <div style="font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:.5px;">
-                                            Last Submitted</div>
-                                        <div style="font-size:13px;">
-                                            <?= date('M d, Y', strtotime($app['submitted_at'])) ?>
-                                        </div>
-                                    </div>
+                        <div style="display:flex; flex:1; min-height:0; flex-wrap:wrap;">
+                            <!-- completed documents -->
+                            <div id="reqList" style="width:230px; max-width:100%; overflow:auto; padding:12px;
+                                     border-right:1px solid #e5e7eb; background:#f8f9fa;"></div>
 
-                                    <!-- Status badge -->
+                            <!-- preview -->
+                            <div style="flex:1; min-width:280px; display:flex; flex-direction:column;">
+                                <div style="display:flex; justify-content:space-between; align-items:center;
+                            padding:8px 14px; border-bottom:1px solid #e5e7eb; gap:8px;">
+                                    <strong id="reqCurrent" style="font-size:14px;"></strong>
+                                    <span>
+                                        <a id="reqOpen" href="#" target="_blank" rel="noopener"
+                                            class="btn btn-sm btn-outline-primary">
+                                            <i class="fa fa-up-right-from-square"></i> Open</a>
+                                        <a id="reqDl" href="#" class="btn btn-sm btn-outline-secondary">
+                                            <i class="fa fa-download"></i> Download</a>
+                                    </span>
                                 </div>
-
-                                <!-- Checklist Pills -->
-                                <div class="checklist-grid">
-                                    <?php foreach ($stepLabels as $key => $label):
-                                        $entry = $checklist[$key] ?? null;
-                                        $done = !empty($entry['done']);
-                                        $file_path = $entry['file_path'] ?? null;
-                                        ?>
-
-                                        <?php if ($done && $file_path):
-                                            $url = htmlspecialchars($file_path);
-                                            $safeLabel = htmlspecialchars($label);
-                                            // download link: view-proof.php streams inline, so add a flag for it (see note below)
-                                            $dlUrl = strpos($file_path, 'view-proof.php') !== false
-                                                ? $url . '&download=1'
-                                                : $url;
-                                            ?>
-                                            <span class="checklist-pill done" style="display:inline-flex; align-items:center; gap:6px;">
-                                                <i class="fa fa-circle-check" style="font-size:10px;"></i>
-                                                <?= $label ?>
-
-                                                <a href="<?= $url ?>" target="_blank" rel="noopener" title="Preview <?= $safeLabel ?>"
-                                                    style="color:inherit; text-decoration:none; opacity:.8;">
-                                                    <i class="fa fa-eye" style="font-size:10px;"></i>
-                                                </a>
-
-                                                <a href="<?= $dlUrl ?>" download title="Download <?= $safeLabel ?>"
-                                                    style="color:inherit; text-decoration:none; opacity:.8;">
-                                                    <i class="fa fa-download" style="font-size:10px;"></i>
-                                                </a>
-                                            </span>
-
-                                        <?php elseif ($done): ?>
-                                            <span class="checklist-pill done" title="Marked done — no file attached"
-                                                style="display:inline-flex; align-items:center; gap:4px;">
-                                                <i class="fa fa-circle-check" style="font-size:10px;"></i>
-                                                <?= $label ?>
-                                            </span>
-
-                                        <?php else: ?>
-                                            <span class="checklist-pill pending" style="display:inline-flex; align-items:center; gap:4px;">
-                                                <i class="fa fa-circle" style="font-size:10px;"></i>
-                                                <?= $label ?>
-                                            </span>
-
-                                        <?php endif; ?>
-
-                                    <?php endforeach; ?>
+                                <iframe id="reqFrame" style="flex:1; border:0; width:100%;"></iframe>
+                                <img id="reqImg" alt=""
+                                    style="display:none; flex:1; min-height:0; object-fit:contain; width:100%;">
+                                <div id="reqNoPreview" style="display:none; flex:1; align-items:center; justify-content:center;
+                                              text-align:center; color:#6b7280; padding:20px;">
+                                    Nothing to preview for this document.
                                 </div>
-
                             </div>
-                        <?php endforeach; ?>
+                        </div>
                     </div>
-
-                <?php endif; ?>
+                </div>
             </div>
 
             <!-- start of weekly reports logic -->
@@ -3244,11 +3242,6 @@ $page = 'messages';
                     </div>
                 </div>
             </div>
-
-
-        <?php elseif ($section === 'remarks'): ?>
-
-            <!-- end of weekly reports logic -->
 
         <?php elseif ($section === 'chats'): ?>
             <?php
@@ -3838,6 +3831,107 @@ $page = 'messages';
         function closeReports() {
             document.getElementById('reportsModal').style.display = 'none';
             document.getElementById('reportsFrame').src = 'about:blank';
+        }
+
+
+        const requirementsData = <?= json_encode($reqData, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
+        let currentDocs = [];
+
+        function openRequirements(appId) {
+            const st = requirementsData[appId];
+            if (!st) return;
+
+            currentDocs = st.docs;
+            document.getElementById('reqModalTitle').textContent = st.name + ' — Requirements';
+
+            document.getElementById('reqList').innerHTML = currentDocs.length
+                ? currentDocs.map((d, i) => `
+            <button type="button" data-i="${i}" ${d.file ? '' : 'disabled'} onclick="selectRequirement(${i})"
+                style="display:block; width:100%; text-align:left; padding:10px 12px; margin-bottom:6px;
+                       border:1px solid #e5e7eb; border-radius:10px; background:#fff;
+                       cursor:${d.file ? 'pointer' : 'not-allowed'}; opacity:${d.file ? 1 : 0.6};">
+                <i class="fa fa-circle-check" style="color:#059669; font-size:11px;"></i>
+                <strong>${escH(d.label)}</strong>
+                ${d.file ? '' : '<br><small style="color:#6b7280;">No file attached</small>'}
+            </button>`).join('')
+                : '<div style="color:#6b7280; font-size:13px;">No completed documents yet.</div>';
+
+            document.getElementById('reqModal').style.display = 'flex';
+
+            const first = currentDocs.findIndex(d => d.file);
+            if (first >= 0) selectRequirement(first);
+            else clearRequirementPreview();
+        }
+
+        function clearRequirementPreview() {
+            document.getElementById('reqCurrent').textContent = '';
+            document.getElementById('reqOpen').href = '#';
+            document.getElementById('reqDl').href = '#';
+            document.getElementById('reqFrame').style.display = 'none';
+            document.getElementById('reqFrame').src = 'about:blank';
+            document.getElementById('reqImg').style.display = 'none';
+            document.getElementById('reqNoPreview').style.display = 'flex';
+        }
+
+        function selectRequirement(i) {
+            const d = currentDocs[i];
+            if (!d || !d.file) return;
+
+            document.querySelectorAll('#reqList button').forEach(b => {
+                const on = Number(b.dataset.i) === i;
+                b.style.background = on ? '#dbeafe' : '#fff';
+                b.style.borderColor = on ? '#93c5fd' : '#e5e7eb';
+            });
+
+            const isProxy = d.file.includes('view-proof.php');
+            const dl = isProxy ? d.file + '&download=1' : d.file;
+            const isImg = /\.(png|jpe?g|gif|webp)($|\?)/i.test(d.file);
+
+            document.getElementById('reqCurrent').textContent = d.label;
+            document.getElementById('reqOpen').href = d.file;
+            document.getElementById('reqDl').href = dl;
+
+            const frame = document.getElementById('reqFrame');
+            const img = document.getElementById('reqImg');
+            const none = document.getElementById('reqNoPreview');
+            none.style.display = 'none';
+
+            if (isImg) {
+                frame.style.display = 'none';
+                frame.src = 'about:blank';
+                img.src = d.file;
+                img.style.display = 'block';
+            } else {
+                img.style.display = 'none';
+                frame.style.display = 'block';
+                frame.src = d.file;      // PDFs and view-proof.php stream inline
+            }
+        }
+
+        function closeRequirements() {
+            document.getElementById('reqModal').style.display = 'none';
+            document.getElementById('reqFrame').src = 'about:blank';
+            document.getElementById('reqImg').src = '';
+        }
+
+        // works on table rows now
+        function filterApps() {
+            const q = document.getElementById('search-input').value.trim().toLowerCase();
+            const f = document.getElementById('progress-filter').value;
+
+            document.querySelectorAll('#apps-list tr.app-card').forEach(row => {
+                const p = Number(row.dataset.progress);
+                const textOk = !q || row.dataset.name.includes(q)
+                    || row.dataset.student.includes(q)
+                    || row.dataset.company.includes(q);
+                let progOk = true;
+                if (f === '0') progOk = p === 0;
+                if (f === '1') progOk = p >= 1 && p <= 49;
+                if (f === '50') progOk = p >= 50 && p <= 74;
+                if (f === '75') progOk = p >= 75 && p <= 99;
+                if (f === '100') progOk = p === 100;
+                row.style.display = (textOk && progOk) ? '' : 'none';
+            });
         }
     </script>
 </body>
