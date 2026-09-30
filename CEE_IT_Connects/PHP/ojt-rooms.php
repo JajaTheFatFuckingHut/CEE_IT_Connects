@@ -2997,43 +2997,43 @@ $page = 'messages';
                             <?php endif; ?>
                         </tbody>
                     </table>
-                </div>
-                <div id="reqModal" onclick="if(event.target===this) closeRequirements()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:2000;
+                    <div id="reqModal" onclick="if(event.target===this) closeRequirements()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:2000;
             align-items:center; justify-content:center; padding:16px;">
-                    <div style="background:#fff; border-radius:14px; width:100%; max-width:1000px; height:85vh;
+                        <div style="background:#fff; border-radius:14px; width:100%; max-width:1000px; height:85vh;
                 display:flex; flex-direction:column; overflow:hidden;">
 
-                        <div style="display:flex; justify-content:space-between; align-items:center;
+                            <div style="display:flex; justify-content:space-between; align-items:center;
                     padding:14px 18px; border-bottom:1px solid #e5e7eb;">
-                            <h5 id="reqModalTitle" style="margin:0; color:#272f54;"></h5>
-                            <button type="button" onclick="closeRequirements()"
-                                style="border:none; background:none; font-size:24px; cursor:pointer;">&times;</button>
-                        </div>
+                                <h5 id="reqModalTitle" style="margin:0; color:#272f54;"></h5>
+                                <button type="button" onclick="closeRequirements()"
+                                    style="border:none; background:none; font-size:24px; cursor:pointer;">&times;</button>
+                            </div>
 
-                        <div style="display:flex; flex:1; min-height:0; flex-wrap:wrap;">
-                            <!-- completed documents -->
-                            <div id="reqList" style="width:230px; max-width:100%; overflow:auto; padding:12px;
+                            <div style="display:flex; flex:1; min-height:0; flex-wrap:wrap;">
+                                <!-- completed documents -->
+                                <div id="reqList" style="width:230px; max-width:100%; overflow:auto; padding:12px;
                                      border-right:1px solid #e5e7eb; background:#f8f9fa;"></div>
 
-                            <!-- preview -->
-                            <div style="flex:1; min-width:280px; display:flex; flex-direction:column;">
-                                <div style="display:flex; justify-content:space-between; align-items:center;
+                                <!-- preview -->
+                                <div style="flex:1; min-width:280px; display:flex; flex-direction:column;">
+                                    <div style="display:flex; justify-content:space-between; align-items:center;
                             padding:8px 14px; border-bottom:1px solid #e5e7eb; gap:8px;">
-                                    <strong id="reqCurrent" style="font-size:14px;"></strong>
-                                    <span>
-                                        <a id="reqOpen" href="#" target="_blank" rel="noopener"
-                                            class="btn btn-sm btn-outline-primary">
-                                            <i class="fa fa-up-right-from-square"></i> Open</a>
-                                        <a id="reqDl" href="#" class="btn btn-sm btn-outline-secondary">
-                                            <i class="fa fa-download"></i> Download</a>
-                                    </span>
-                                </div>
-                                <iframe id="reqFrame" style="flex:1; border:0; width:100%;"></iframe>
-                                <img id="reqImg" alt=""
-                                    style="display:none; flex:1; min-height:0; object-fit:contain; width:100%;">
-                                <div id="reqNoPreview" style="display:none; flex:1; align-items:center; justify-content:center;
+                                        <strong id="reqCurrent" style="font-size:14px;"></strong>
+                                        <span>
+                                            <a id="reqOpen" href="#" target="_blank" rel="noopener"
+                                                class="btn btn-sm btn-outline-primary">
+                                                <i class="fa fa-up-right-from-square"></i> Open</a>
+                                            <a id="reqDl" href="#" class="btn btn-sm btn-outline-secondary">
+                                                <i class="fa fa-download"></i> Download</a>
+                                        </span>
+                                    </div>
+                                    <iframe id="reqFrame" style="flex:1; border:0; width:100%;"></iframe>
+                                    <img id="reqImg" alt=""
+                                        style="display:none; flex:1; min-height:0; object-fit:contain; width:100%;">
+                                    <div id="reqNoPreview" style="display:none; flex:1; align-items:center; justify-content:center;
                                               text-align:center; color:#6b7280; padding:20px;">
-                                    Nothing to preview for this document.
+                                        Nothing to preview for this document.
+                                    </div>
                                 </div>
                             </div>
                         </div>
