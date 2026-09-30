@@ -17,7 +17,7 @@ $stmt = $pdo->prepare("
         oa.internship_id,
         i.company AS company_name,
         a.id AS supervisor_id,
-        a.full_name AS supervisor_name
+        a.full_name AS supervisor_name,
         a.email as contact_details
     FROM students s
     JOIN ojt_applications oa ON s.id = oa.student_id
