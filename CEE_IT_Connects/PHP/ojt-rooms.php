@@ -3122,7 +3122,6 @@ $page = 'messages';
 
                 // one entry per student, holding all of their reports
                 $byStudent = [];
-                $byStudent = [];
                 foreach ($reportsStmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
                     $sid = (int) $r['student_id'];
                     $byStudent[$sid]['name'] = $r['student_name'];
@@ -3769,7 +3768,7 @@ $page = 'messages';
             });
         }
 
-        const studentReports = <?= json_encode($byStudent, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
+        const studentReports = <?= json_encode((object) ($byStudent ?? []), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
         let currentReports = [];
 
         function escH(s) {
@@ -3834,7 +3833,7 @@ $page = 'messages';
         }
 
 
-        const requirementsData = <?= json_encode($reqData, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
+        const requirementsData = <?= json_encode((object) ($reqData ?? []), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
         let currentDocs = [];
 
         function openRequirements(appId) {
