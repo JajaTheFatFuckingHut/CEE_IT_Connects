@@ -3836,7 +3836,8 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
             ojtShowEvalModal();
         }
         function ojtIsComplete() {
-            const req = OJT_REQUIRED_HOURS * 60;   // minutes, same as your existing code
+            if (typeof ojtWeeks === 'undefined' || !Array.isArray(ojtWeeks)) return false;
+            const req = OJT_REQUIRED_HOURS * 60;
             let grand = 0;
             ojtWeeks.forEach(w => w.rows.forEach(r => { grand += (r.daily || 0); }));
             return grand >= req;
@@ -3846,10 +3847,13 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
             const btn = document.getElementById('ojtEvalBtn');
             const lock = document.getElementById('ojtEvalLock');
             if (!btn) return;
+
             const done = ojtIsComplete();
-            btn.disabled = !done;
-            if (lock) lock.style.display = done ? 'none' : 'inline';
+            btn.classList.toggle('ojt-locked', !done);
+            btn.setAttribute('aria-disabled', String(!done));
+            btn.tabIndex = done ? 0 : -1;
             btn.title = done ? '' : 'Complete your required OJT hours to unlock';
+            if (lock) lock.style.display = done ? 'none' : 'inline';
         }
         const _origShowEvalModal = ojtShowEvalModal;
         ojtShowEvalModal = function () {
@@ -3860,6 +3864,7 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
         document.addEventListener('DOMContentLoaded', ojtUpdateEvalButton);
 
         function ojtShowEvalModal() {
+            if (!ojtIsComplete()) return;
             const modal = new bootstrap.Modal(document.getElementById('ojtEvalModal'), {
                 backdrop: 'static',
                 keyboard: false
