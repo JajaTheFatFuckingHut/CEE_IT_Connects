@@ -1534,6 +1534,12 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
             pointer-events: none;
         }
 
+        #ojtEvalBtn.ojt-locked {
+            opacity: 0.4;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
         /* ── mobile tweaks ── */
         @media (max-width: 768px) {
             .rc-wrap {
@@ -2134,14 +2140,15 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
                 </span>
             </a>
         <?php endif; ?>
-        <button id="ojtEvalBtn" type="button" class="ojt-eval-btn" onclick="ojtShowEvalModal();" disabled
+        <a href="#" id="ojtEvalBtn" class="ojt-locked" aria-disabled="true" tabindex="-1"
+            onclick="event.preventDefault(); if (this.classList.contains('ojt-locked')) return false; ojtShowEvalModal();"
             title="Complete your required OJT hours to unlock">
             <i class="fa-solid fa-file m-1"></i>
             <span class="sidebar-text">
                 Evaluation
                 <i class="fa-solid fa-lock" id="ojtEvalLock" style="font-size:10px;"></i>
             </span>
-        </button>
+        </a>
         <div class="rooms-list">
             <hr><br>
             <h6>ROOMS</h6>
