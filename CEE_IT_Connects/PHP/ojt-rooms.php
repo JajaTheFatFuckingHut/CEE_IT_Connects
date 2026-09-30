@@ -2246,13 +2246,11 @@ $page = 'messages';
                     i.required_hours,
                     COALESCE((
                         SELECT ROUND(SUM(
-                            GREATEST(0, EXTRACT(EPOCH FROM (h.m_out - h.m_in)) / 3600) +
-                            GREATEST(0, EXTRACT(EPOCH FROM (h.a_out - h.a_in)) / 3600)
+                            COALESCE(GREATEST(0, EXTRACT(EPOCH FROM (h.m_out - h.m_in)) / 3600), 0) +
+                            COALESCE(GREATEST(0, EXTRACT(EPOCH FROM (h.a_out - h.a_in)) / 3600), 0)
                         )::numeric, 2)
                         FROM ojt_hours h
                         WHERE h.user_id = s.id AND h.user_type = 'student'
-                        AND h.m_in IS NOT NULL AND h.m_out IS NOT NULL
-                        AND h.a_in IS NOT NULL AND h.a_out IS NOT NULL
                     ), 0) AS total_hours
                 FROM students s
                 LEFT JOIN ojt_applications oa
