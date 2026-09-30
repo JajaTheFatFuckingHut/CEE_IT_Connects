@@ -1,5 +1,5 @@
 <?php
-require 'db.php'; // your $pdo connection
+require 'db.php';
 
 $studentId = $_GET['student_id'] ?? null;
 if (!$studentId) {
@@ -18,6 +18,7 @@ $stmt = $pdo->prepare("
         i.company AS company_name,
         a.id AS supervisor_id,
         a.full_name AS supervisor_name
+        a.email as contact_details
     FROM students s
     JOIN ojt_applications oa ON s.id = oa.student_id
     JOIN internships i ON oa.internship_id = i.id

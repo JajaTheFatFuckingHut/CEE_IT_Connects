@@ -2331,27 +2331,27 @@ foreach ($roomStatuses as $s) {
                                     style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;">Name
                                     of Intern</label>
                                 <input type="text" name="intern_name" class="form-control form-control-sm mt-1"
-                                    placeholder="Full name of intern" required>
+                                    placeholder="Full name of intern" required readonly>
                             </div>
                             <div>
                                 <label style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;">
                                     Course / Student No.</label>
                                 <input type="text" name="student_no" class="form-control form-control-sm mt-1"
-                                    placeholder="e.g. BSIT / 2021-00001">
+                                    placeholder="e.g. BSIT / 2021-00001" readonly>
                             </div>
                             <div>
                                 <label
                                     style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;">Name
                                     of Company</label>
                                 <input type="text" name="company_name" class="form-control form-control-sm mt-1"
-                                    placeholder="Company / organization name" required>
+                                    placeholder="Company / organization name" required readonly>
                             </div>
                             <div>
                                 <label
                                     style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;">Site
                                     Internship Supervisor</label>
                                 <input type="text" name="supervisor_name" class="form-control form-control-sm mt-1"
-                                    placeholder="Supervisor's full name" required>
+                                    placeholder="Supervisor's full name" required readonly>
                             </div>
                         </div>
 
@@ -2601,7 +2601,7 @@ foreach ($roomStatuses as $s) {
                                     style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;">Contact
                                     Details</label>
                                 <input type="text" name="contact_details" class="form-control form-control-sm mt-1"
-                                    placeholder="Email / phone" required>
+                                    placeholder="Email / phone" required readonly>
                             </div>
                             <div>
                                 <label
@@ -3110,6 +3110,7 @@ foreach ($roomStatuses as $s) {
                     form.querySelector('[name="student_no"]').value = data.student_id || '';
                     form.querySelector('[name="company_name"]').value = data.company_name || '';
                     form.querySelector('[name="supervisor_name"]').value = data.supervisor_name || '';
+                    form.querySelector('[name="contact_details"]').value = data.contact_details || '';
 
                     bootstrap.Modal.getOrCreateInstance(modalEl, {
                         backdrop: 'static',
