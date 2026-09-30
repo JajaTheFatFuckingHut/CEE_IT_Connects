@@ -1516,6 +1516,24 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
             color: #dc2626;
         }
 
+        .ojt-eval-btn {
+            background: none;
+            border: 0;
+            padding: 0;
+            width: 100%;
+            text-align: left;
+            font: inherit;
+            color: inherit;
+            cursor: pointer;
+            display: block;
+        }
+
+        .ojt-eval-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
         /* ── mobile tweaks ── */
         @media (max-width: 768px) {
             .rc-wrap {
@@ -1567,6 +1585,7 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
         .rc-mobile-back {
             display: none;
         }
+
 
         @media (max-width: 768px) {
 
@@ -2115,8 +2134,13 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
                 </span>
             </a>
         <?php endif; ?>
-        <button onclick="ojtShowEvalModal();">
-            This is a test
+        <button id="ojtEvalBtn" type="button" class="ojt-eval-btn" onclick="ojtShowEvalModal();" disabled
+            title="Complete your required OJT hours to unlock">
+            <i class="fa-solid fa-file m-1"></i>
+            <span class="sidebar-text">
+                Evaluation
+                <i class="fa-solid fa-lock" id="ojtEvalLock" style="font-size:10px;"></i>
+            </span>
         </button>
         <div class="rooms-list">
             <hr><br>
@@ -3738,11 +3762,8 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
                     setTimeout(() => { ojtHideSaveBar(); btn.innerHTML = '<i class="fa-solid fa-floppy-disk me-1"></i>Save Changes'; }, 2000);
 
                     // Check completion after save
-                    const req = OJT_REQUIRED_HOURS * 60;
-                    let grand = 0;
-                    ojtWeeks.forEach(w => w.rows.forEach(r => { grand += (r.daily || 0); }));
-                    const pct = Math.min(100, Math.round((grand / req) * 100));
-                    if (pct >= 100 && !window.ojtCompletionNotified) {
+                    ojtUpdateEvalButton();
+                    if (ojtIsComplete() && !window.ojtCompletionNotified) {
                         window.ojtCompletionNotified = true;
                         ojtTriggerCompletion();
                     }
@@ -3807,6 +3828,29 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
         function ojtTriggerCompletion() {
             ojtShowEvalModal();
         }
+        function ojtIsComplete() {
+            const req = OJT_REQUIRED_HOURS * 60;   // minutes, same as your existing code
+            let grand = 0;
+            ojtWeeks.forEach(w => w.rows.forEach(r => { grand += (r.daily || 0); }));
+            return grand >= req;
+        }
+
+        function ojtUpdateEvalButton() {
+            const btn = document.getElementById('ojtEvalBtn');
+            const lock = document.getElementById('ojtEvalLock');
+            if (!btn) return;
+            const done = ojtIsComplete();
+            btn.disabled = !done;
+            if (lock) lock.style.display = done ? 'none' : 'inline';
+            btn.title = done ? '' : 'Complete your required OJT hours to unlock';
+        }
+        const _origShowEvalModal = ojtShowEvalModal;
+        ojtShowEvalModal = function () {
+            if (!ojtIsComplete()) return;
+            _origShowEvalModal.apply(this, arguments);
+        };
+
+        document.addEventListener('DOMContentLoaded', ojtUpdateEvalButton);
 
         function ojtShowEvalModal() {
             const modal = new bootstrap.Modal(document.getElementById('ojtEvalModal'), {
