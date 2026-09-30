@@ -2115,6 +2115,9 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
                 </span>
             </a>
         <?php endif; ?>
+        <button onclick="ojtShowEvalModal();">
+            This is a test
+        </button>
         <div class="rooms-list">
             <hr><br>
             <h6>ROOMS</h6>
@@ -2970,7 +2973,7 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
                                 <div style="font-weight:600;color:#1e293b;">
                                     <input type="text" name="intern_name" class="form-control form-control-sm mt-1"
                                         placeholder="Name..."
-                                        value="<?= htmlspecialchars($student['intern_name'] ?? '') ?>">
+                                        value="<?= htmlspecialchars($student['intern_name'] ?? '') ?>" readonly>
                                 </div>
                             </div>
                             <div>
@@ -2980,7 +2983,7 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
                                 <div style="font-weight:600;color:#1e293b;">
                                     <input type="text" name="course_student_no"
                                         class="form-control form-control-sm mt-1" placeholder="Course / Student No."
-                                        value="<?= htmlspecialchars($student['course_student_no'] ?? '') ?>">
+                                        value="<?= htmlspecialchars($student['course_student_no'] ?? '') ?>" readonly>
                                 </div>
                             </div>
                             <div>
@@ -2989,7 +2992,7 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
                                     of Company</label>
                                 <input type="text" name="company_name" class="form-control form-control-sm mt-1"
                                     placeholder="Enter company name"
-                                    value="<?= htmlspecialchars($student['company_name'] ?? '') ?>">
+                                    value="<?= htmlspecialchars($student['company_name'] ?? '') ?>" readonly>
                             </div>
                             <div>
                                 <label
@@ -2997,7 +3000,7 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
                                     Internship Supervisor</label>
                                 <input type="text" name="supervisor_name" class="form-control form-control-sm mt-1"
                                     placeholder="Enter supervisor name"
-                                    value="<?= htmlspecialchars($student['supervisor_name'] ?? '') ?>">
+                                    value="<?= htmlspecialchars($student['supervisor_name'] ?? '') ?>" readonly>
                             </div>
                         </div>
                         <?= var_dump($current_room_id) ?>
