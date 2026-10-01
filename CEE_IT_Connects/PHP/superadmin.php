@@ -474,14 +474,14 @@ function deptCode($department)
             overflow-y: auto;
         } */
         .sidebar {
-            width: 260px;
+            width: 240px;
             background: #272f54;
             color: white;
             padding: 25px;
             display: flex;
             flex-direction: column;
             position: fixed;
-            top: 10px;
+            top: 20px;
             bottom: 0;
             left: 0;
             overflow-y: auto;
@@ -556,7 +556,7 @@ function deptCode($department)
             flex: 1;
             padding: 40px;
             background: #f5f7ff;
-            margin-left: 220px;
+            margin-left: 240px;
             min-width: 0;
             overflow-y: auto;
         }
