@@ -474,7 +474,7 @@ function deptCode($department)
             overflow-y: auto;
         } */
         .sidebar {
-            width: 240px;
+            width: 260px;
             background: #272f54;
             color: white;
             padding: 25px;
