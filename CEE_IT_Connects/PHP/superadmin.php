@@ -481,7 +481,7 @@ function deptCode($department)
             display: flex;
             flex-direction: column;
             position: fixed;
-            top: 20px;
+            top: 15px;
             bottom: 0;
             left: 0;
             overflow-y: auto;
