@@ -14,6 +14,84 @@ function formatSection(?string $key): string
     [$p, $y, $s] = array_pad(explode('|', $key), 3, '');
     return ucwords($p) . " {$y}-{$s}";
 }
+function sendBrevoEmail(string $toEmail, string $toName, string $subject, string $htmlContent): bool
+{
+    $payload = json_encode([
+        'sender' => [
+            'name' => 'CEE IT Connects',
+            'email' => 'jamesherold25@gmail.com',
+        ],
+        'to' => [
+            ['email' => $toEmail, 'name' => $toName],
+        ],
+        'subject' => $subject,
+        'htmlContent' => $htmlContent,
+    ]);
+
+    $ch = curl_init('https://api.brevo.com/v3/smtp/email');
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_POST => true,
+        CURLOPT_TIMEOUT => 15,
+        CURLOPT_HTTPHEADER => [
+            'api-key: ' . getenv('BREVO_API_KEY'),
+            'Content-Type: application/json',
+            'accept: application/json',
+        ],
+        CURLOPT_POSTFIELDS => $payload,
+    ]);
+
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curlError = curl_error($ch);
+    curl_close($ch);
+
+    if ($curlError) {
+        error_log("Brevo cURL error: " . $curlError);
+        return false;
+    }
+
+    if ($httpCode >= 200 && $httpCode < 300) {
+        error_log("Email sent to: {$toEmail}");
+        return true;
+    }
+
+    error_log("Brevo API error ({$httpCode}) for {$toEmail}: " . $response);
+    return false;
+}
+
+function sendAdviserCredentials(
+    string $email,
+    string $full_name,
+    string $role,
+    string $department,
+    string $temporaryPassword
+): bool {
+    $roleLabel = $role === 'HTE_adviser' ? 'HTE Adviser' : 'Internship Adviser';
+
+    $html = "
+        <h2>Welcome to CEE IT Connects!</h2>
+
+        <p>Hello <strong>" . htmlspecialchars($full_name) . "</strong>,</p>
+
+        <p>Your adviser account has been successfully created.</p>
+
+        <h3>Your Login Credentials</h3>
+
+        <p><strong>Role:</strong> " . htmlspecialchars($roleLabel) . "</p>
+        <p><strong>Department:</strong> " . htmlspecialchars($department) . "</p>
+        <p><strong>Email:</strong> " . htmlspecialchars($email) . "</p>
+        <p><strong>Temporary Password:</strong> " . htmlspecialchars($temporaryPassword) . "</p>
+
+        <p>Please log in and change your password after your first successful login.</p>
+
+        <p>Regards,<br><strong>CEE IT Connects</strong></p>
+    ";
+
+    return sendBrevoEmail($email, $full_name, 'Your CEE IT Connects Adviser Account', $html);
+}
+
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // for assigning a section to an adviser
 
@@ -295,8 +373,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $stmt = $pdo->prepare("
-        INSERT INTO admins (name, email, password, role)
-        VALUES (:name, :email, :password, :role)
+        INSERT INTO admins (name, email, password, role, is_archived)
+        VALUES (:name, :email, :password, :role, FALSE)
         ");
 
         $stmt->execute([
@@ -349,9 +427,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $internship_id = null;
 
+        $chars = 'abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+        $temporaryPassword = '';
+        for ($i = 0; $i < 12; $i++) {
+            $temporaryPassword .= $chars[random_int(0, strlen($chars) - 1)];
+        }
+
+        // DEFAULT PASSWORD
+        $password = password_hash(
+            $temporaryPassword,
+            PASSWORD_DEFAULT
+        );
+
         $name = $_POST['name'];
         $email = $_POST['email'];
-        $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
         $department = $_POST['department'];
         $role = $_POST['role'];
         // $title = $_POST['title'];
@@ -372,8 +461,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $stmt = $pdo->prepare("
-        INSERT INTO advisers (full_name, email, password_hash, role, created_at, department)
-        VALUES (:name, :email, :password, :role, NOW(), :department)
+        INSERT INTO advisers (full_name, email, password_hash, role, created_at, department, is_archived)
+        VALUES (:name, :email, :password, :role, NOW(), :department, FALSE)
         ");
 
         $stmt->execute([
@@ -437,8 +526,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ':activity' => 'Created new adviser: ' . $name
         ]);
 
-        $_SESSION['success'] = "Adviser successfully created!";
+        $stmtActivity->execute([
+            ':user_id' => $_SESSION['user_id'],
+            ':roles' => $_SESSION['role'],
+            ':activity' => 'Created new adviser: ' . $name
+        ]);
+
+        // Send credentials email
+        $emailSent = sendAdviserCredentials($email, $name, $role, $department, $temporaryPassword);
+
+        if ($emailSent) {
+            $_SESSION['success'] = "Adviser successfully created! Login credentials were emailed to {$email}.";
+        } else {
+            $_SESSION['success'] = "Adviser created, but the credentials email could not be sent. Please share the temporary password manually or reset it.";
+        }
+
         header("Location: superadmin.php?success=1");
+        exit();
+
         exit();
     }
 
@@ -544,8 +649,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Change 'hte_supervisor' below to match your actual adviser_role enum value
             $insertStmt = $pdo->prepare("
                 INSERT INTO advisers
-                    (full_name, email, password_hash, role, internship_id, created_at)
-                VALUES (?, ?, ?, 'HTE_adviser', ?, NOW())
+                    (full_name, email, password_hash, role, internship_id, created_at, is_archived)
+                VALUES (?, ?, ?, 'HTE_adviser', ?, NOW(), FALSE)
             ");
             $insertStmt->execute([
                 $sub['full_name'],

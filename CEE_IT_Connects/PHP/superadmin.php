@@ -1752,7 +1752,7 @@ function deptCode($department)
                 <form method="POST" action="superadmin-db.php" class="admin-form">
                     <input type="text" name="name" placeholder="Full Name" required>
                     <input type="email" name="email" placeholder="Email Address" required>
-                    <input type="password" name="password" placeholder="Password" required>
+                    <!-- <input type="password" name="password" placeholder="Password" required> -->
                     <div style="color: #888; font-size: 10px;">Password must be at least 8 characters long, contains an
                         uppercase and lowercase letter, a number, and a special character.</div>
                     <label>Department</label>
