@@ -1733,7 +1733,8 @@ foreach ($roomStatuses as $s) {
         <a href="#" onclick="showSection('status', event)" id="nav-status" tooltip="Status" title="Status">
             <i class="fa-solid fa-calendar-check me-2"></i><span class="sidebar-text">Status</span>
         </a>
-        <a href="#" onclick="showSection('information', event)" id="nav-information" tooltip="DTR" title="DTR">
+        <a href="#" onclick="showSection('information', event)" id="nav-information" tooltip="Information"
+            title="Information">
             <i class="fa-solid fa-inbox"></i><span class="sidebar-text">Information</span>
         </a>
         <a href="#" onclick="showSection('dtr_summary', event)" id="nav-dtr_summary" tooltip="DTR" title="DTR">
