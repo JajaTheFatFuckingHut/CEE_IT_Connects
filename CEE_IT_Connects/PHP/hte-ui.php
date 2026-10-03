@@ -1733,6 +1733,9 @@ foreach ($roomStatuses as $s) {
         <a href="#" onclick="showSection('status', event)" id="nav-status" tooltip="Status" title="Status">
             <i class="fa-solid fa-calendar-check me-2"></i><span class="sidebar-text">Status</span>
         </a>
+        <a href="#" onclick="showSection('information', event)" id="nav-information" tooltip="DTR" title="DTR">
+            <i class="fa-solid fa-clock me-2"></i><span class="sidebar-text">Information</span>
+        </a>
         <a href="#" onclick="showSection('dtr_summary', event)" id="nav-dtr_summary" tooltip="DTR" title="DTR">
             <i class="fa-solid fa-clock me-2"></i><span class="sidebar-text">DTR</span>
         </a>
@@ -2138,7 +2141,70 @@ foreach ($roomStatuses as $s) {
             <?php endif; ?>
         </div>
 
-        <div id="chats" class="section-panel <?= $section === 'chats' ? 'active' : '' ?>">
+        <div id="information">
+            <?php
+            $stdntInfoStmt = $pdo->prepare("
+        SELECT
+            s.id,
+            s.student_id,
+            s.full_name       AS student_name,
+            s.email,
+            s.program,
+            s.year_level,
+            s.section,
+            s.contact_number,
+            i.company,
+            a.full_name       AS adviser_name
+        FROM students s
+        LEFT JOIN ojt_applications oa ON oa.student_id = s.id
+        LEFT JOIN internships i       ON i.id = oa.internship_id
+        LEFT JOIN advisers a          ON a.id = i.adviser_id
+        WHERE s.is_archived = false
+        ORDER BY s.full_name
+    ");
+            $stdntInfoStmt->execute();
+            $students = $stdntInfoStmt->fetchAll(PDO::FETCH_ASSOC);
+            ?>
+
+            <div class="ojt-table-wrapper">
+                <table class="ojt-status-table">
+                    <thead style="background:#f8f9fa;">
+                        <tr>
+                            <th>Student No.</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Program</th>
+                            <th>Year &amp; Section</th>
+                            <th>Contact</th>
+                            <th>Company</th>
+                            <th>Adviser</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (empty($students)): ?>
+                            <tr>
+                                <td colspan="8" class="text-center text-muted py-4">No students found.</td>
+                            </tr>
+                        <?php else: ?>
+                            <?php foreach ($students as $s): ?>
+                                <tr>
+                                    <td><?= htmlspecialchars($s['student_id']) ?></td>
+                                    <td><?= htmlspecialchars($s['student_name']) ?></td>
+                                    <td><?= htmlspecialchars($s['email']) ?></td>
+                                    <td><?= htmlspecialchars(ucwords($s['program'])) ?></td>
+                                    <td><?= htmlspecialchars($s['year_level'] . '-' . $s['section']) ?></td>
+                                    <td><?= htmlspecialchars($s['contact_number'] ?? '') ?></td>
+                                    <td><?= htmlspecialchars($s['company'] ?? '—') ?></td>
+                                    <td><?= htmlspecialchars($s['adviser_name'] ?? '—') ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <divid="chats" class="section-panel <?= $section === 'chats' ? 'active' : '' ?>">
             <?php
             $chatLookup = [];
             foreach ($adviserChats as $ac) {
@@ -2296,7 +2362,7 @@ foreach ($roomStatuses as $s) {
                     <?php endif; ?>
                 </div>
             </div>
-        </div>
+            </divid=>
     </div><!-- /.main -->
 
     <!-- Supervisor Evaluation Modal -->
