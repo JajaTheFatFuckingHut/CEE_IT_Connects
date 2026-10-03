@@ -68,6 +68,8 @@ foreach ($alreadyexisting as $e) {
     $alreadyExistingMap[$e['user_type'] . '_' . $e['user_id']] = true;
 }
 
+$isAdviser = in_array($_SESSION['role'] ?? '', ['internship_adviser', 'HTE_adviser'], true);
+
 $stmt = $pdo->prepare("
     SELECT 
         s.id,
@@ -1531,16 +1533,18 @@ $rmFmtTime = function ($ts): string {
                                 </div>
                                 <span class="rm-pill <?= $rmBadge[1] ?>"><?= $rmBadge[0] ?></span>
 
-                                <form method="POST" action="superadmin-db.php" class="rm-remove-form"
-                                    onsubmit="return confirm('Remove <?= htmlspecialchars($rmName, ENT_QUOTES) ?> from this room?')">
-                                    <input type="hidden" name="room_id" value="<?= (int) $roomId ?>">
-                                    <input type="hidden" name="user_id" value="<?= (int) $rmId ?>">
-                                    <input type="hidden" name="user_type" value="<?= htmlspecialchars($rmType) ?>">
-                                    <button type="submit" name="remove-member" class="rm-remove-btn" title="Remove member"
-                                        aria-label="Remove <?= htmlspecialchars($rmName) ?>">
-                                        <i class="fa-solid fa-xmark"></i>
-                                    </button>
-                                </form>
+                                <?php if ($isAdviser): ?>
+                                    <form method="POST" action="superadmin-db.php" class="rm-remove-form"
+                                        onsubmit="return confirm('Remove this member from the room?')">
+                                        <input type="hidden" name="room_id" value="<?= (int) $roomId ?>">
+                                        <input type="hidden" name="user_id" value="<?= (int) $rmId ?>">
+                                        <input type="hidden" name="user_type" value="<?= htmlspecialchars($rmType) ?>">
+                                        <button type="submit" name="remove-member" class="rm-remove-btn" title="Remove member"
+                                            aria-label="Remove member">
+                                            <i class="fa-solid fa-xmark"></i>
+                                        </button>
+                                    </form>
+                                <?php endif; ?>
                             </div>
                         <?php endforeach; ?>
                     </div>
