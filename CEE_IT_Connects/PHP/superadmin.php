@@ -153,7 +153,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_role'])) {
 $adviserList = $pdo->query("
     SELECT id, full_name, email, department
     FROM advisers
-    WHERE role = 'internship_adviser'
+    WHERE role = 'internship_adviser' AND is_archived = FALSE
     ORDER BY full_name
 ")->fetchAll(PDO::FETCH_ASSOC);
 
@@ -486,6 +486,7 @@ function deptCode($department)
             left: 0;
             overflow-y: auto;
         }
+
         .sidebar-user {
             margin-top: auto;
             margin-left: -25px;
@@ -500,6 +501,7 @@ function deptCode($department)
             background: #1f2744;
             flex-shrink: 0;
         }
+
         .sidebar-user-avatar {
             width: 36px;
             height: 36px;
@@ -512,7 +514,12 @@ function deptCode($department)
             font-size: 15px;
             flex-shrink: 0;
         }
-        .sidebar-user-info { flex: 1; min-width: 0; }
+
+        .sidebar-user-info {
+            flex: 1;
+            min-width: 0;
+        }
+
         .sidebar-user-name {
             font-size: 13.5px;
             font-weight: 700;
@@ -521,7 +528,12 @@ function deptCode($department)
             overflow: hidden;
             text-overflow: ellipsis;
         }
-        .sidebar-user-role { font-size: 11px; color: #9aa3c7; }
+
+        .sidebar-user-role {
+            font-size: 11px;
+            color: #9aa3c7;
+        }
+
         /* . */
 
         .sidebar h3 {
@@ -940,6 +952,7 @@ function deptCode($department)
             .sidebar a:hover::after {
                 opacity: 1;
             }
+
             .sidebar-user {
                 flex-direction: column;
                 gap: 4px;
@@ -947,7 +960,10 @@ function deptCode($department)
                 margin: auto 0 0 0;
                 width: 100%;
             }
-            .sidebar-user-info { display: none; }
+
+            .sidebar-user-info {
+                display: none;
+            }
 
             .main-content {
                 margin-left: 60px !important;
@@ -1207,7 +1223,7 @@ function deptCode($department)
                 <span class="nav-label">Archives</span>
             </a>
         </div> -->
-                    <a href="#" onclick="showSection(event, 'restore')" data-tooltip="Settings">
+            <a href="#" onclick="showSection(event, 'restore')" data-tooltip="Settings">
                 <i class="bi bi-archive me-2"></i>
                 <span class="nav-label">Archives</span>
             </a>
