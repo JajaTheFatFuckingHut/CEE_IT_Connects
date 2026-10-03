@@ -1543,14 +1543,14 @@ $rmFmtTime = function ($ts): string {
                                 <?php if ($isAdviser): ?>
                                     <form method="POST" action="chat-room-content-db.php" class="rm-remove-form"
                                         onsubmit="return confirm('Remove this member from the room?')">
-                                        <input type="hidden" name="room_id" value="<?= (int) $roomId ?>">
+                                        <input type="hidden" name="room_id" value="<?= (int) $room_id ?>">
                                         <input type="hidden" name="user_id" value="<?= (int) $rmId ?>">
                                         <input type="hidden" name="user_type" value="<?= htmlspecialchars($rmType) ?>">
 
                                         <?php
                                         var_dump($rmId);
                                         var_dump($rmType);
-                                        var_dump($roomId);
+                                        var_dump($room_id);
                                         ?>
                                         <button type="submit" name="remove-member" class="rm-remove-btn" title="Remove member"
                                             aria-label="Remove member">
