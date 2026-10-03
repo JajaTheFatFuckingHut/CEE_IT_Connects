@@ -569,6 +569,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $fetchStmt = $pdo->prepare("SELECT name, role FROM admins WHERE id = ?");
         } elseif ($source === 'advisers') {
             $fetchStmt = $pdo->prepare("SELECT full_name AS name, role FROM advisers WHERE id = ?");
+            $cleanMembersStmt = $pdo->prepare("
+                DELETE FROM room_members
+                WHERE room_id IN (SELECT id FROM rooms WHERE adviser_id = ?)
+                ");
+            $cleanMembersStmt->execute([$id]);
+
+            $cleanRoomStmt = $pdo->prepare("DELETE FROM rooms WHERE adviser_id = ?");
+            $cleanRoomStmt->execute([$id]);
         } elseif ($source === 'students') {
             $fetchStmt = $pdo->prepare("SELECT full_name AS name, 'student' AS role FROM students WHERE id = ?");
             $cleanStmt = $pdo->prepare("DELETE FROM room_members WHERE user_id = ?");
