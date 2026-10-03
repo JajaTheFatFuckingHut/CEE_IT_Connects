@@ -176,12 +176,14 @@ $schoolYear = $_GET['sy'] ?? $currentSY;
 if (!in_array($schoolYear, $schoolYearOptions, true))
     $schoolYear = $currentSY;
 
-// school year choices: previous, current, next
 $startY = (int) substr($currentSY, 0, 4);
-$schoolYearOptions = [];
 for ($i = -1; $i <= 1; $i++) {
-    $schoolYearOptions[] = ($startY + $i) . '-' . ($startY + $i + 1);
+    $sy = ($startY + $i) . '-' . ($startY + $i + 1);
+    if (!in_array($sy, $schoolYearOptions, true)) {
+        $schoolYearOptions[] = $sy;
+    }
 }
+sort($schoolYearOptions);
 
 // saved counts for the selected school year, keyed by year level
 $stmt = $pdo->prepare("SELECT year_level, section_count FROM section_settings WHERE school_year = ?");
