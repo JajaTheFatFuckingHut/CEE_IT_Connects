@@ -2141,7 +2141,8 @@ foreach ($roomStatuses as $s) {
             <?php endif; ?>
         </div>
 
-        <div id="information">
+        <div id="information"
+            class="section-panel section sysAdm-section <?= $section === 'information' ? 'active' : '' ?>">
             <?php
             $stdntInfoStmt = $pdo->prepare("
         SELECT
@@ -2166,6 +2167,17 @@ foreach ($roomStatuses as $s) {
             $students = $stdntInfoStmt->fetchAll(PDO::FETCH_ASSOC);
             ?>
 
+            <div class="sysAdm-header--danger sysAdm-header--blue mb-4">
+                <div class="sysAdm-header-left">
+                    <div class="sysAdm-header-icon">
+                        <i class="bi bi-pencil-fill"></i>
+                    </div>
+                    <div class="sysAdm-header-text">
+                        <h2>Student Basic Information</h2>
+                        <p>Overview of student details</p>
+                    </div>
+                </div>
+            </div>
             <div class="ojt-table-wrapper">
                 <table class="ojt-status-table">
                     <thead style="background:#f8f9fa;">
