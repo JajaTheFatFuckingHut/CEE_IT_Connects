@@ -74,7 +74,7 @@ foreach ($alreadyexisting as $e) {
     $alreadyExistingMap[$e['user_type'] . '_' . $e['user_id']] = true;
 }
 
-$isAdviser = in_array($_SESSION['role'] ?? '', ['internship_adviser', 'HTE_adviser'], true);
+$isAllowed = in_array($_SESSION['role'] ?? '', ['internship_adviser', 'superadmin', 'internship_admin'], true);
 
 $stmt = $pdo->prepare("
     SELECT 
@@ -1540,7 +1540,7 @@ $rmFmtTime = function ($ts): string {
                                 </div>
                                 <span class="rm-pill <?= $rmBadge[1] ?>"><?= $rmBadge[0] ?></span>
 
-                                <?php if ($isAdviser): ?>
+                                <?php if ($isAllowed): ?>
                                     <form method="POST" action="chat-room-content-db.php" class="rm-remove-form"
                                         onsubmit="return confirm('Remove this member from the room?')">
                                         <input type="hidden" name="room_id" value="<?= (int) $room_id ?>">
