@@ -733,116 +733,576 @@ $backLink = getDashboardByRole($_SESSION['role']);
                 flex: 1 1 auto;
             }
         }
+
         /* addtl s */
         /* ── ROOM PAGE REDESIGN ── */
-        .rm-hero { background:#272f54; color:#fff; border-radius:12px; padding:20px 24px; border-left:4px solid #FFB62F;
-            display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap; }
-        .rm-hero h5 { font-size:22px; font-weight:700; margin:0 0 10px; }
-        .rm-chips { display:flex; gap:8px; flex-wrap:wrap; }
-        .rm-chip { display:inline-flex; align-items:center; gap:6px; font-size:13px; padding:4px 12px; border-radius:999px; background:rgba(255,255,255,.14); }
-        .rm-hero-right { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
-        .rm-count { background:rgba(255,255,255,.12); border-radius:10px; padding:8px 16px; text-align:center; min-width:76px; }
-        .rm-count b { display:block; font-size:20px; line-height:1.2; }
-        .rm-count small { font-size:11px; opacity:.8; }
-
-        .rm-tabs { display:flex; gap:24px; border-bottom:1px solid #e5e7eb; margin:16px 0; }
-        .rm-tab { display:inline-flex; align-items:center; gap:8px; padding-bottom:10px; font-weight:700; font-size:14px; color:#1e293b; text-decoration:none; }
-        .rm-tab:hover { color:#ff6b2c; }
-        .rm-tab.on { color:#ff6b2c; box-shadow:inset 0 -2px 0 #ff6b2c; }
-        .rm-cnt { font-size:11px; font-weight:600; padding:1px 8px; border-radius:999px; background:#eef1fb; color:#64748b; }
-        .rm-tab.on .rm-cnt { background:#ffe5d9; color:#a13d1f; }
-
-        .rm-grid { display:grid; grid-template-columns:minmax(0,2fr) minmax(0,1fr); gap:16px; align-items:start; }
-        .rm-col { display:flex; flex-direction:column; gap:16px; }
-        .rm-card { background:#fff; border-radius:12px; padding:16px 18px; box-shadow:0 2px 10px rgba(0,0,0,.05); }
-        .rm-avatar { width:38px; height:38px; min-width:38px; border-radius:50%; display:flex; align-items:center; justify-content:center;
-            color:#fff; font-weight:700; font-size:14px; }
-
-        .rm-composer-row { display:flex; gap:12px; align-items:flex-start; }
-        .rm-composer textarea { flex:1; border:1.5px solid #ffe0cc; border-radius:10px; padding:10px 14px; font-size:14px; font-family:inherit;
-            resize:none; outline:none; background:#fafbfc; transition:border-color .2s; }
-        .rm-composer textarea:focus { border-color:#ff6b2c; background:#fff; }
-        .rm-composer-foot { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-top:12px; padding-left:50px; flex-wrap:wrap; }
-        .rm-hint { font-size:12px; color:#94a3b8; }
-        .rm-post-btn { background:#272f54; color:#fff; border:none; border-radius:8px; padding:8px 16px; font-size:14px; font-weight:600; cursor:pointer; transition:background .15s; }
-        .rm-post-btn:hover { background:#e4572e; }
-
-        .rm-post-head { display:flex; align-items:center; gap:12px; margin-bottom:10px; }
-        .rm-post-who strong { font-size:15px; color:#272f54; margin-right:6px; }
-        .rm-post-who small { display:block; color:#94a3b8; font-size:12px; }
-        .rm-post-body { margin:0; font-size:14px; line-height:1.6; color:#334155; white-space:pre-line; word-break:break-word; }
-        .rm-pill { font-size:11px; font-weight:600; padding:2px 8px; border-radius:6px; vertical-align:middle; white-space:nowrap; }
-        .rm-pill-adviser { background:#dbeafe; color:#1e40af; }
-        .rm-pill-hte     { background:#d1fae5; color:#065f46; }
-        .rm-pill-admin   { background:#fff4d6; color:#7a5200; }
-        .rm-pill-student { background:#eef1fb; color:#272f54; }
-
-        .rm-empty { text-align:center; padding:36px 20px; color:#64748b; }
-        .rm-empty-ic { width:56px; height:56px; border-radius:14px; background:#ffe5d9; color:#ff6b2c; display:flex;
-            align-items:center; justify-content:center; font-size:22px; margin:0 auto 12px; }
-        .rm-empty strong { display:block; color:#272f54; font-size:15px; margin-bottom:4px; }
-        .rm-empty p { margin:0; font-size:13px; }
-
-        .rm-side-title { font-weight:700; font-size:14px; color:#272f54; margin:0 0 6px; }
-        .rm-dr { display:flex; justify-content:space-between; gap:12px; padding:9px 0; border-top:1px solid #f0f2f7; font-size:13px; }
-        .rm-dl .rm-dr:first-child { border-top:none; }
-        .rm-dr span:first-child { color:#94a3b8; }
-        .rm-dr span:last-child { color:#272f54; font-weight:600; text-align:right; }
-        .rm-side-sub { display:flex; align-items:center; gap:8px; margin:14px 0 8px; padding-top:12px; border-top:1px solid #f0f2f7;
-            font-weight:700; font-size:13px; color:#272f54; }
-        .rm-admin-row { display:flex; align-items:center; gap:10px; padding:5px 0; font-size:13px; color:#272f54; }
-        .rm-admin-row .rm-avatar { width:28px; height:28px; min-width:28px; font-size:11px; }
-        .rm-stack { display:flex; }
-        .rm-stack .rm-avatar { width:32px; height:32px; min-width:32px; font-size:12px; border:2px solid #fff; margin-left:-8px; }
-        .rm-stack .rm-avatar:first-child { margin-left:0; }
-        .rm-stack .rm-more { background:#eef1fb; color:#64748b; }
-        .rm-link { font-size:12px; font-weight:600; color:#ff6b2c; text-decoration:none; }
-
-        .rm-toolbar { display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:14px; }
-        .rm-search { position:relative; flex:1; min-width:200px; max-width:340px; }
-        .rm-search i { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:#f97316; font-size:13px; }
-        .rm-search input { width:100%; padding:8px 12px 8px 34px; border:1.5px solid #aeaeae; border-radius:22px; font-size:13px; outline:none; font-family:inherit; }
-        .rm-search input:focus { border-color:#f97316; }
-        .rm-filters { display:flex; gap:6px; flex-wrap:wrap; }
-        .rm-filter { border:1px solid #e5e7eb; background:#fff; color:#475569; border-radius:999px; padding:5px 12px; font-size:12px; font-weight:600; cursor:pointer; }
-        .rm-filter.on { background:#272f54; border-color:#272f54; color:#fff; }
-        .rm-group { margin-bottom:20px; }
-        .rm-group-title { display:flex; align-items:center; gap:8px; font-size:12px; font-weight:700; letter-spacing:.06em;
-            text-transform:uppercase; color:#64748b; margin-bottom:10px; }
-        .rm-mgrid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:12px; }
-        .rm-mcard { display:flex; align-items:center; gap:12px; background:#fff; border-radius:12px; padding:12px 14px; box-shadow:0 2px 10px rgba(0,0,0,.05); }
-        .rm-minfo { flex:1; min-width:0; }
-        .rm-minfo strong { display:block; font-size:14px; color:#272f54; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-        .rm-minfo small { display:block; font-size:12px; color:#94a3b8; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-
-        @media (max-width: 992px) { .rm-grid { grid-template-columns:1fr; } }
-        @media (max-width: 768px) {
-            .rm-hero { flex-direction:column; align-items:flex-start; }
-            .rm-hero-right { width:100%; }
-            .rm-composer-foot { padding-left:0; }
+        .rm-hero {
+            background: #272f54;
+            color: #fff;
+            border-radius: 12px;
+            padding: 20px 24px;
+            border-left: 4px solid #FFB62F;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
         }
+
+        .rm-hero h5 {
+            font-size: 22px;
+            font-weight: 700;
+            margin: 0 0 10px;
+        }
+
+        .rm-chips {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .rm-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            padding: 4px 12px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, .14);
+        }
+
+        .rm-hero-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .rm-count {
+            background: rgba(255, 255, 255, .12);
+            border-radius: 10px;
+            padding: 8px 16px;
+            text-align: center;
+            min-width: 76px;
+        }
+
+        .rm-count b {
+            display: block;
+            font-size: 20px;
+            line-height: 1.2;
+        }
+
+        .rm-count small {
+            font-size: 11px;
+            opacity: .8;
+        }
+
+        .rm-tabs {
+            display: flex;
+            gap: 24px;
+            border-bottom: 1px solid #e5e7eb;
+            margin: 16px 0;
+        }
+
+        .rm-tab {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding-bottom: 10px;
+            font-weight: 700;
+            font-size: 14px;
+            color: #1e293b;
+            text-decoration: none;
+        }
+
+        .rm-tab:hover {
+            color: #ff6b2c;
+        }
+
+        .rm-tab.on {
+            color: #ff6b2c;
+            box-shadow: inset 0 -2px 0 #ff6b2c;
+        }
+
+        .rm-cnt {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 1px 8px;
+            border-radius: 999px;
+            background: #eef1fb;
+            color: #64748b;
+        }
+
+        .rm-tab.on .rm-cnt {
+            background: #ffe5d9;
+            color: #a13d1f;
+        }
+
+        .rm-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+            gap: 16px;
+            align-items: start;
+        }
+
+        .rm-col {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .rm-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 16px 18px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, .05);
+        }
+
+        .rm-avatar {
+            width: 38px;
+            height: 38px;
+            min-width: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .rm-composer-row {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .rm-composer textarea {
+            flex: 1;
+            border: 1.5px solid #ffe0cc;
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 14px;
+            font-family: inherit;
+            resize: none;
+            outline: none;
+            background: #fafbfc;
+            transition: border-color .2s;
+        }
+
+        .rm-composer textarea:focus {
+            border-color: #ff6b2c;
+            background: #fff;
+        }
+
+        .rm-composer-foot {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-top: 12px;
+            padding-left: 50px;
+            flex-wrap: wrap;
+        }
+
+        .rm-hint {
+            font-size: 12px;
+            color: #94a3b8;
+        }
+
+        .rm-post-btn {
+            background: #272f54;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background .15s;
+        }
+
+        .rm-post-btn:hover {
+            background: #e4572e;
+        }
+
+        .rm-post-head {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .rm-post-who strong {
+            font-size: 15px;
+            color: #272f54;
+            margin-right: 6px;
+        }
+
+        .rm-post-who small {
+            display: block;
+            color: #94a3b8;
+            font-size: 12px;
+        }
+
+        .rm-post-body {
+            margin: 0;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #334155;
+            white-space: pre-line;
+            word-break: break-word;
+        }
+
+        .rm-pill {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 6px;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        .rm-pill-adviser {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .rm-pill-hte {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .rm-pill-admin {
+            background: #fff4d6;
+            color: #7a5200;
+        }
+
+        .rm-pill-student {
+            background: #eef1fb;
+            color: #272f54;
+        }
+
+        .rm-empty {
+            text-align: center;
+            padding: 36px 20px;
+            color: #64748b;
+        }
+
+        .rm-empty-ic {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            background: #ffe5d9;
+            color: #ff6b2c;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            margin: 0 auto 12px;
+        }
+
+        .rm-empty strong {
+            display: block;
+            color: #272f54;
+            font-size: 15px;
+            margin-bottom: 4px;
+        }
+
+        .rm-empty p {
+            margin: 0;
+            font-size: 13px;
+        }
+
+        .rm-side-title {
+            font-weight: 700;
+            font-size: 14px;
+            color: #272f54;
+            margin: 0 0 6px;
+        }
+
+        .rm-dr {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 9px 0;
+            border-top: 1px solid #f0f2f7;
+            font-size: 13px;
+        }
+
+        .rm-dl .rm-dr:first-child {
+            border-top: none;
+        }
+
+        .rm-dr span:first-child {
+            color: #94a3b8;
+        }
+
+        .rm-dr span:last-child {
+            color: #272f54;
+            font-weight: 600;
+            text-align: right;
+        }
+
+        .rm-side-sub {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 14px 0 8px;
+            padding-top: 12px;
+            border-top: 1px solid #f0f2f7;
+            font-weight: 700;
+            font-size: 13px;
+            color: #272f54;
+        }
+
+        .rm-admin-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 5px 0;
+            font-size: 13px;
+            color: #272f54;
+        }
+
+        .rm-admin-row .rm-avatar {
+            width: 28px;
+            height: 28px;
+            min-width: 28px;
+            font-size: 11px;
+        }
+
+        .rm-stack {
+            display: flex;
+        }
+
+        .rm-stack .rm-avatar {
+            width: 32px;
+            height: 32px;
+            min-width: 32px;
+            font-size: 12px;
+            border: 2px solid #fff;
+            margin-left: -8px;
+        }
+
+        .rm-stack .rm-avatar:first-child {
+            margin-left: 0;
+        }
+
+        .rm-stack .rm-more {
+            background: #eef1fb;
+            color: #64748b;
+        }
+
+        .rm-link {
+            font-size: 12px;
+            font-weight: 600;
+            color: #ff6b2c;
+            text-decoration: none;
+        }
+
+        .rm-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 14px;
+        }
+
+        .rm-search {
+            position: relative;
+            flex: 1;
+            min-width: 200px;
+            max-width: 340px;
+        }
+
+        .rm-search i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #f97316;
+            font-size: 13px;
+        }
+
+        .rm-search input {
+            width: 100%;
+            padding: 8px 12px 8px 34px;
+            border: 1.5px solid #aeaeae;
+            border-radius: 22px;
+            font-size: 13px;
+            outline: none;
+            font-family: inherit;
+        }
+
+        .rm-search input:focus {
+            border-color: #f97316;
+        }
+
+        .rm-filters {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .rm-filter {
+            border: 1px solid #e5e7eb;
+            background: #fff;
+            color: #475569;
+            border-radius: 999px;
+            padding: 5px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .rm-filter.on {
+            background: #272f54;
+            border-color: #272f54;
+            color: #fff;
+        }
+
+        .rm-group {
+            margin-bottom: 20px;
+        }
+
+        .rm-group-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            color: #64748b;
+            margin-bottom: 10px;
+        }
+
+        .rm-mgrid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 12px;
+        }
+
+        .rm-mcard {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #fff;
+            border-radius: 12px;
+            padding: 12px 14px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, .05);
+            position: relative;
+        }
+
+        .rm-remove-form {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            margin: 0;
+        }
+
+        .rm-remove-btn {
+            width: 22px;
+            height: 22px;
+            border: none;
+            border-radius: 50%;
+            background: #f1f1f1;
+            color: #777;
+            font-size: 12px;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity .15s, background .15s, color .15s;
+        }
+
+        /* show on card hover, or when keyboard-focused */
+        .rm-mcard:hover .rm-remove-btn,
+        .rm-remove-btn:focus-visible {
+            opacity: 1;
+        }
+
+        .rm-remove-btn:hover {
+            background: #dc3545;
+            color: #fff;
+        }
+
+        /* touch screens have no hover, so keep it visible */
+        @media (hover: none) {
+            .rm-remove-btn {
+                opacity: 1;
+            }
+        }
+
+        .rm-minfo {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .rm-minfo strong {
+            display: block;
+            font-size: 14px;
+            color: #272f54;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .rm-minfo small {
+            display: block;
+            font-size: 12px;
+            color: #94a3b8;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        @media (max-width: 992px) {
+            .rm-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .rm-hero {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .rm-hero-right {
+                width: 100%;
+            }
+
+            .rm-composer-foot {
+                padding-left: 0;
+            }
+        }
+
         /* addtl e */
     </style>
 </head>
 
 <?php
 // ═══ UI-ONLY additions: read-only queries and display helpers ═══
-$rmColors   = ['#ff2c8f', '#2c6fff', '#1abc9c', '#9b59b6', '#e67e22', '#e74c3c', '#16a085'];
-$rmColor    = fn($name) => $rmColors[crc32((string) $name) % count($rmColors)];
+$rmColors = ['#ff2c8f', '#2c6fff', '#1abc9c', '#9b59b6', '#e67e22', '#e74c3c', '#16a085'];
+$rmColor = fn($name) => $rmColors[crc32((string) $name) % count($rmColors)];
 $rmInitials = function ($name): string {
     $i = strtoupper(substr(trim((string) $name), 0, 1));
     return $i !== '' ? $i : '?';
 };
-$rmMeName  = $userFullName ?? 'You';
+$rmMeName = $userFullName ?? 'You';
 $rmCanPost = in_array($_SESSION['role'] ?? '', ['internship_adviser', 'hte_adviser', 'superadmin', 'internship_admin'], true);
 
 // Role label + pill color for a post's sender_role
 $rmPostRole = function (string $role): array {
     $map = [
-        'superadmin'         => ['System Admin', 'rm-pill-admin'],
-        'internship_admin'   => ['Internship Admin', 'rm-pill-admin'],
+        'superadmin' => ['System Admin', 'rm-pill-admin'],
+        'internship_admin' => ['Internship Admin', 'rm-pill-admin'],
         'internship_adviser' => ['OJT Adviser', 'rm-pill-adviser'],
-        'hte_adviser'        => ['HTE Adviser', 'rm-pill-hte'],
+        'hte_adviser' => ['HTE Adviser', 'rm-pill-hte'],
     ];
     return $map[$role] ?? [ucfirst(str_replace('_', ' ', $role)), 'rm-pill-adviser'];
 };
@@ -899,11 +1359,11 @@ foreach ($members as $rmMember) {
 }
 $rmGroupMeta = [
     'adviser' => ['Advisers', 'fa-user-tie'],
-    'admin'   => ['Admins', 'fa-shield-halved'],
+    'admin' => ['Admins', 'fa-shield-halved'],
     'student' => ['Students', 'fa-user-graduate'],
 ];
 $rmMemberCount = count($members);
-$rmPostCount   = count($posts);
+$rmPostCount = count($posts);
 
 // Show stored timestamps in Philippine time
 $rmFmtTime = function ($ts): string {
@@ -927,14 +1387,18 @@ $rmFmtTime = function ($ts): string {
         <h5><?= htmlspecialchars($room['room_name']) ?></h5>
         <div class="rm-chips">
             <?php if (!empty($room['department'])): ?>
-                <span class="rm-chip"><i class="fa-solid fa-building-columns"></i> <?= htmlspecialchars(ucwords($room['department'])) ?></span>
+                <span class="rm-chip"><i class="fa-solid fa-building-columns"></i>
+                    <?= htmlspecialchars(ucwords($room['department'])) ?></span>
                 <?php if (!empty($room['school_year'])): ?>
-                    <span class="rm-chip"><i class="fa-solid fa-calendar"></i> S.Y. <?= htmlspecialchars($room['school_year']) ?></span>
+                    <span class="rm-chip"><i class="fa-solid fa-calendar"></i> S.Y.
+                        <?= htmlspecialchars($room['school_year']) ?></span>
                 <?php endif; ?>
             <?php elseif (!empty($room['section'])): ?>
-                <span class="rm-chip"><i class="fa-solid fa-graduation-cap"></i> <?= htmlspecialchars($rmClassLabel) ?></span>
+                <span class="rm-chip"><i class="fa-solid fa-graduation-cap"></i>
+                    <?= htmlspecialchars($rmClassLabel) ?></span>
                 <?php if (!empty($room['school_year'])): ?>
-                    <span class="rm-chip"><i class="fa-solid fa-calendar"></i> S.Y. <?= htmlspecialchars($room['school_year']) ?></span>
+                    <span class="rm-chip"><i class="fa-solid fa-calendar"></i> S.Y.
+                        <?= htmlspecialchars($room['school_year']) ?></span>
                 <?php endif; ?>
                 <?php if (!empty($room['full_name'])): ?>
                     <span class="rm-chip"><i class="fa-solid fa-user"></i> <?= htmlspecialchars($room['full_name']) ?></span>
@@ -998,16 +1462,16 @@ $rmFmtTime = function ($ts): string {
         <div class="rm-toolbar">
             <div class="rm-search">
                 <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" id="rmMemberSearch" placeholder="Search…"
-                    oninput="rmApplyMembers()">
+                <input type="text" id="rmMemberSearch" placeholder="Search…" oninput="rmApplyMembers()">
             </div>
             <div class="rm-filters">
-                <button type="button" class="rm-filter on" onclick="rmSetFilter('all', this)">All <?= $rmMemberCount ?></button>
+                <button type="button" class="rm-filter on" onclick="rmSetFilter('all', this)">All
+                    <?= $rmMemberCount ?></button>
                 <?php foreach ($rmGroupMeta as $rmType => [$rmTitle, $rmIcon]): ?>
                     <?php if (empty($rmGroups[$rmType]))
                         continue; ?>
                     <button type="button" class="rm-filter" onclick="rmSetFilter('<?= $rmType ?>', this)">
-                        <?= $rmTitle ?> <?= count($rmGroups[$rmType]) ?>
+                        <?= $rmTitle ?>         <?= count($rmGroups[$rmType]) ?>
                     </button>
                 <?php endforeach; ?>
             </div>
@@ -1059,12 +1523,24 @@ $rmFmtTime = function ($ts): string {
                             ?>
                             <div class="rm-mcard" data-type="<?= $rmType ?>"
                                 data-name="<?= htmlspecialchars(strtolower($rmName . ' ' . $rmSub), ENT_QUOTES) ?>">
-                                <div class="rm-avatar" style="background:<?= $rmColor($rmName) ?>;"><?= $rmInitials($rmName) ?></div>
+                                <div class="rm-avatar" style="background:<?= $rmColor($rmName) ?>;"><?= $rmInitials($rmName) ?>
+                                </div>
                                 <div class="rm-minfo">
                                     <strong><?= htmlspecialchars($rmName) ?></strong>
                                     <?php if ($rmSub !== ''): ?><small><?= htmlspecialchars($rmSub) ?></small><?php endif; ?>
                                 </div>
                                 <span class="rm-pill <?= $rmBadge[1] ?>"><?= $rmBadge[0] ?></span>
+
+                                <form method="POST" action="superadmin-db.php" class="rm-remove-form"
+                                    onsubmit="return confirm('Remove <?= htmlspecialchars($rmName, ENT_QUOTES) ?> from this room?')">
+                                    <input type="hidden" name="room_id" value="<?= (int) $roomId ?>">
+                                    <input type="hidden" name="user_id" value="<?= (int) $rmId ?>">
+                                    <input type="hidden" name="user_type" value="<?= htmlspecialchars($rmType) ?>">
+                                    <button type="submit" name="remove-member" class="rm-remove-btn" title="Remove member"
+                                        aria-label="Remove <?= htmlspecialchars($rmName) ?>">
+                                        <i class="fa-solid fa-xmark"></i>
+                                    </button>
+                                </form>
                             </div>
                         <?php endforeach; ?>
                     </div>
@@ -1117,10 +1593,12 @@ $rmFmtTime = function ($ts): string {
 
                             <div class="rm-composer-row">
                                 <div class="rm-avatar" style="background:#272f54;"><?= $rmInitials($rmMeName) ?></div>
-                                <textarea name="content" rows="3" placeholder="Share an update with your room…" required></textarea>
+                                <textarea name="content" rows="3" placeholder="Share an update with your room…"
+                                    required></textarea>
                             </div>
                             <div class="rm-composer-foot">
-                                <span class="rm-hint"><i class="fa-solid fa-eye me-1"></i>Visible to everyone in this room</span>
+                                <span class="rm-hint"><i class="fa-solid fa-eye me-1"></i>Visible to everyone in this
+                                    room</span>
                                 <button type="submit" class="rm-post-btn">
                                     <i class="fa-solid fa-bullhorn me-1"></i> Post Announcement
                                 </button>
@@ -1144,7 +1622,8 @@ $rmFmtTime = function ($ts): string {
                         ?>
                         <div class="rm-card">
                             <div class="rm-post-head">
-                                <div class="rm-avatar" style="background:<?= $rmColor($rmSender) ?>;"><?= $rmInitials($rmSender) ?></div>
+                                <div class="rm-avatar" style="background:<?= $rmColor($rmSender) ?>;"><?= $rmInitials($rmSender) ?>
+                                </div>
                                 <div class="rm-post-who">
                                     <div>
                                         <strong><?= htmlspecialchars($rmSender) ?></strong>
@@ -1174,13 +1653,17 @@ $rmFmtTime = function ($ts): string {
                             <div class="rm-dr"><span>Section</span><span><?= htmlspecialchars($room['section']) ?></span></div>
                         <?php endif; ?>
                         <?php if (!empty($room['department'])): ?>
-                            <div class="rm-dr"><span>Department</span><span><?= htmlspecialchars(ucwords($room['department'])) ?></span></div>
+                            <div class="rm-dr">
+                                <span>Department</span><span><?= htmlspecialchars(ucwords($room['department'])) ?></span>
+                            </div>
                         <?php endif; ?>
                         <?php if (!empty($room['school_year'])): ?>
-                            <div class="rm-dr"><span>School year</span><span><?= htmlspecialchars($room['school_year']) ?></span></div>
+                            <div class="rm-dr"><span>School
+                                    year</span><span><?= htmlspecialchars($room['school_year']) ?></span></div>
                         <?php endif; ?>
                         <?php if (!empty($room['full_name'])): ?>
-                            <div class="rm-dr"><span>Adviser</span><span><?= htmlspecialchars($room['full_name']) ?></span></div>
+                            <div class="rm-dr"><span>Adviser</span><span><?= htmlspecialchars($room['full_name']) ?></span>
+                            </div>
                         <?php endif; ?>
                         <div class="rm-dr"><span>Members</span><span><?= $rmMemberCount ?></span></div>
                     </div>
@@ -1193,7 +1676,9 @@ $rmFmtTime = function ($ts): string {
                         <?php foreach ($rmGroups['admin'] as $rmAdmin):
                             $rmAdminName = (string) ($rmAdmin['full_name'] ?? 'Unknown'); ?>
                             <div class="rm-admin-row">
-                                <div class="rm-avatar" style="background:<?= $rmColor($rmAdminName) ?>;"><?= $rmInitials($rmAdminName) ?></div>
+                                <div class="rm-avatar" style="background:<?= $rmColor($rmAdminName) ?>;">
+                                    <?= $rmInitials($rmAdminName) ?>
+                                </div>
                                 <span><?= htmlspecialchars($rmAdminName) ?></span>
                             </div>
                         <?php endforeach; ?>

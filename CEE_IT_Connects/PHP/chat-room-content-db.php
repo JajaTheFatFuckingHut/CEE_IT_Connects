@@ -132,3 +132,22 @@ if (isset($_POST['post_announcement'])) {
     }
     exit;
 }
+if (isset($_POST['remove-member'])) {
+    $roomId = (int) ($_POST['room_id'] ?? 0);
+    $userId = (int) ($_POST['user_id'] ?? 0);
+    $userType = $_POST['user_type'] ?? '';
+
+    if (!in_array($userType, ['student', 'adviser', 'admin'], true)) {
+        die("Invalid user type");
+    }
+
+    $stmt = $pdo->prepare("
+        DELETE FROM room_members
+        WHERE room_id = ? AND user_id = ? AND user_type = ?
+    ");
+    $stmt->execute([$roomId, $userId, $userType]);
+
+    $_SESSION['success'] = "Member removed from the room.";
+    header("Location: " . $_SERVER['HTTP_REFERER']);
+    exit();
+}
