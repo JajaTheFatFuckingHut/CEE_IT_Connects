@@ -17,6 +17,11 @@ if (isset($_POST['users'])) {
         exit("Invalid data");
     }
 
+    // Is this a department room (IT, CE, EE)?
+    $rt = $pdo->prepare("SELECT room_type FROM rooms WHERE id = ?");
+    $rt->execute([$room_id]);
+    $isDepartmentRoom = $rt->fetchColumn() === 'department';
+
     // Get room name for notification
     $stmtRoom = $pdo->prepare("SELECT room_name FROM rooms WHERE id = ?");
     $stmtRoom->execute([$room_id]);
@@ -40,11 +45,19 @@ if (isset($_POST['users'])) {
         VALUES (:user_id, :user_type, :title, :message, :link, FALSE, NOW())
     ");
 
+    $added = 0;
+
     foreach ($users as $user) {
+        // Department rooms don't accept students
+        if ($isDepartmentRoom && ($user['type'] ?? '') === 'student') {
+            continue;
+        }
+
         $check->execute([$room_id, $user['id'], $user['type']]);
         if (!$check->fetch()) {
             // Add to room
             $insert->execute([$room_id, $user['id'], $user['type']]);
+            $added++;
 
             // Notify the newly added participant
             $notifStmt->execute([
@@ -57,7 +70,7 @@ if (isset($_POST['users'])) {
         }
     }
 
-    echo "success";
+    echo $added > 0 ? "success" : "none_added";
     exit;
 }
 
@@ -148,6 +161,6 @@ if (isset($_POST['remove-member'])) {
     $stmt->execute([$roomId, $userId, $userType]);
 
     $_SESSION['success'] = "Member removed from the room.";
-    header("Location: " . "ojt_rooms.php?room_id={$roomId}&tab=members");
+    header("Location: " . "ojt-rooms.php?room_id={$roomId}&tab=members");
     exit();
 }

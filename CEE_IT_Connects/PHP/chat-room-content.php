@@ -5,6 +5,12 @@ require_once 'auth.php';
 $room_id = $current_room_id;
 $student_id = $_SESSION['user_id'];
 
+
+$rt = $pdo->prepare("SELECT room_type FROM rooms WHERE id = ?");
+$rt->execute([$room_id]);
+$isDepartmentRoom = $rt->fetchColumn() === 'department';
+
+
 // ROOM INFO
 $stmt = $pdo->prepare("
     SELECT r.*, a.full_name, a.role
@@ -122,6 +128,7 @@ $rhStmt->execute([$_SESSION['user_id']]);
 $requiredHours = $rhStmt->fetchColumn() ?: 486;
 
 $backLink = getDashboardByRole($_SESSION['role']);
+
 ?>
 
 <head>
@@ -1737,6 +1744,8 @@ $rmFmtTime = function ($ts): string {
                 <?php foreach ($users as $user): ?>
                     <?php $key = $user['role'] . '_' . $user['id']; ?>
                     <?php if (isset($alreadyExistingMap[$key]))
+                        continue;
+                    if ($isDepartmentRoom && $user['role'] === 'student')
                         continue; ?>
                     <div class="participant-item" data-id="<?= htmlspecialchars($user['id']) ?>"
                         data-type="<?= $user['role'] ?>" data-name="<?= htmlspecialchars($user['full_name']) ?>"
@@ -1754,56 +1763,6 @@ $rmFmtTime = function ($ts): string {
                         </div>
                     </div>
                 <?php endforeach; ?>
-                <!--
-                <div class="participant-item" data-name="Ben Torres" onclick="toggleCheck(this)">
-                    <input type="checkbox">
-                    <div class="participant-avatar">BT</div>
-                    <div class="participant-info">
-                        <strong>Ben Torres</strong>
-                        <small>torres.ben28@student.edu · Student</small>
-                    </div>
-                </div>
-                <div class="participant-item" data-name="Carla Mendoza" onclick="toggleCheck(this)">
-                    <input type="checkbox">
-                    <div class="participant-avatar">CM</div>
-                    <div class="participant-info">
-                        <strong>Carla Mendoza</strong>
-                        <small>carlamendoza05@student.edu · Student</small>
-                    </div>
-                </div>
-                <div class="participant-item" data-name="Diego Flores" onclick="toggleCheck(this)">
-                    <input type="checkbox">
-                    <div class="participant-avatar">DF</div>
-                    <div class="participant-info">
-                        <strong>Diego Flores</strong>
-                        <small>diego.flores@student.edu · Student</small>
-                    </div>
-                </div>
-                <div class="participant-item" data-name="Engr. Linda Cruz" onclick="toggleCheck(this)">
-                    <input type="checkbox">
-                    <div class="participant-avatar" style="background:#d0deff;color:#2756c2;">LC</div>
-                    <div class="participant-info">
-                        <strong>Engr. Linda Cruz</strong>
-                        <small>l.cruz@techcorp.com · HTE Adviser</small>
-                    </div>
-                </div>
-                <div class="participant-item" data-name="Mr. Ryan Go" onclick="toggleCheck(this)">
-                    <input type="checkbox">
-                    <div class="participant-avatar" style="background:#d0deff;color:#2756c2;">RG</div>
-                    <div class="participant-info">
-                        <strong>Mr. Ryan Go</strong>
-                        <small>r.go@innovate.ph · HTE Adviser</small>
-                    </div>
-                </div>
-                <div class="participant-item" data-name="Ms. Patricia Tan" onclick="toggleCheck(this)">
-                    <input type="checkbox">
-                    <div class="participant-avatar" style="background:#d0deff;color:#2756c2;">PT</div>
-                    <div class="participant-info">
-                        <strong>Ms. Patricia Tan</strong>
-                        <small>p.tan@globalfirm.com · HTE Adviser</small>
-                    </div>
-                </div>
-                -->
             </div>
         </div>
 
@@ -1877,11 +1836,10 @@ $rmFmtTime = function ($ts): string {
         })
             .then(res => res.text())
             .then(res => {
-                if (res === "success") {
-                    location.reload(); // refresh members list
-                } else {
-                    alert("Failed to add members");
-                }
+                res = res.trim();
+                if (res === "success") location.reload();
+                else if (res === "none_added") alert("No eligible participants were added.");
+                else alert("Failed to add members");
             });
     }
 
