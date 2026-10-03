@@ -1734,7 +1734,7 @@ foreach ($roomStatuses as $s) {
             <i class="fa-solid fa-calendar-check me-2"></i><span class="sidebar-text">Status</span>
         </a>
         <a href="#" onclick="showSection('information', event)" id="nav-information" tooltip="DTR" title="DTR">
-            <i class="fa-solid fa-clock me-2"></i><span class="sidebar-text">Information</span>
+            <i class="fa-solid fa-inbox"></i><span class="sidebar-text">Information</span>
         </a>
         <a href="#" onclick="showSection('dtr_summary', event)" id="nav-dtr_summary" tooltip="DTR" title="DTR">
             <i class="fa-solid fa-clock me-2"></i><span class="sidebar-text">DTR</span>
@@ -2170,7 +2170,7 @@ foreach ($roomStatuses as $s) {
             <div class="sysAdm-header--danger sysAdm-header--blue mb-4">
                 <div class="sysAdm-header-left">
                     <div class="sysAdm-header-icon">
-                        <i class="bi bi-pencil-fill"></i>
+                        <i class="fa-solid fa-inbox"></i>
                     </div>
                     <div class="sysAdm-header-text">
                         <h2>Student Basic Information</h2>
