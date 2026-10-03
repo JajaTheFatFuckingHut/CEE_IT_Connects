@@ -161,6 +161,6 @@ if (isset($_POST['remove-member'])) {
     $stmt->execute([$roomId, $userId, $userType]);
 
     $_SESSION['success'] = "Member removed from the room.";
-    header("Location: " . "ojt-rooms.php?room_id={$roomId}&section=home");
+    header("Location: " . "ojt-rooms.php?room_id={$roomId}&tab=members");
     exit();
 }
