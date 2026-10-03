@@ -148,6 +148,6 @@ if (isset($_POST['remove-member'])) {
     $stmt->execute([$roomId, $userId, $userType]);
 
     $_SESSION['success'] = "Member removed from the room.";
-    header("Location: " . $_SERVER['HTTP_REFERER']);
+    header("Location: " . "ojt_rooms.php?room_id={$roomId}&tab=members");
     exit();
 }

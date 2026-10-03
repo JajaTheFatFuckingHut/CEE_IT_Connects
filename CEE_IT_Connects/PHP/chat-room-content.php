@@ -1534,7 +1534,7 @@ $rmFmtTime = function ($ts): string {
                                 <span class="rm-pill <?= $rmBadge[1] ?>"><?= $rmBadge[0] ?></span>
 
                                 <?php if ($isAdviser): ?>
-                                    <form method="POST" action="superadmin-db.php" class="rm-remove-form"
+                                    <form method="POST" action="chat-room-content-db.php" class="rm-remove-form"
                                         onsubmit="return confirm('Remove this member from the room?')">
                                         <input type="hidden" name="room_id" value="<?= (int) $roomId ?>">
                                         <input type="hidden" name="user_id" value="<?= (int) $rmId ?>">
