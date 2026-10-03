@@ -2215,9 +2215,9 @@ foreach ($roomStatuses as $s) {
                                     <td>
                                         <div class="student-cell">
                                             <span class="avatar" style="background:#ff6b2c;">
-                                                <?= strtoupper(substr(trim($s['full_name']), 0, 1)) ?>
+                                                <?= strtoupper(substr(trim($s['student_name']), 0, 1)) ?>
                                             </span>
-                                            <?= htmlspecialchars($s['full_name']) ?>
+                                            <?= htmlspecialchars($s['student_name']) ?>
                                         </div>
                                     </td>
                                     <td><?= htmlspecialchars($s['email']) ?></td>
