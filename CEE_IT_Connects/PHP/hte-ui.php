@@ -2214,10 +2214,8 @@ foreach ($roomStatuses as $s) {
                                     <td><?= htmlspecialchars($s['student_id']) ?></td>
                                     <td>
                                         <div class="student-cell">
-                                            <span class="avatar" style="background:#ff6b2c;">
-                                                <?= strtoupper(substr(trim($s['student_name']), 0, 1)) ?>
-                                            </span>
-                                            <?= htmlspecialchars($s['student_name']) ?>
+                                            <p> <?= htmlspecialchars($s['student_name']) ?> </p>
+
                                         </div>
                                     </td>
                                     <td><?= htmlspecialchars($s['email']) ?></td>
@@ -3142,7 +3140,7 @@ foreach ($roomStatuses as $s) {
         function filterInfo() {
             const search = document.getElementById('searchInfo')?.value.toLowerCase() ?? '';
             document.querySelectorAll('#info-student tr').forEach(row => {
-                const name = row.querySelector('.student-cell span')?.textContent.toLowerCase() ?? '';
+                const name = row.querySelector('.student-cell p')?.textContent.toLowerCase() ?? '';
                 row.style.display = name.includes(search) ? '' : 'none';
             });
         }
