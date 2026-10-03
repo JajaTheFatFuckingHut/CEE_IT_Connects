@@ -2145,24 +2145,24 @@ foreach ($roomStatuses as $s) {
             class="section-panel section sysAdm-section <?= $section === 'information' ? 'active' : '' ?>">
             <?php
             $stdntInfoStmt = $pdo->prepare("
-        SELECT
-            s.id,
-            s.student_id,
-            s.full_name       AS student_name,
-            s.email,
-            s.program,
-            s.year_level,
-            s.section,
-            s.contact_number,
-            i.company,
-            a.full_name       AS adviser_name
-        FROM students s
-        LEFT JOIN ojt_applications oa ON oa.student_id = s.id
-        LEFT JOIN internships i       ON i.id = oa.internship_id
-        LEFT JOIN advisers a          ON a.id = i.adviser_id
-        WHERE s.is_archived = false
-        ORDER BY s.full_name
-    ");
+                SELECT
+                    s.id,
+                    s.student_id,
+                    s.full_name       AS student_name,
+                    s.email,
+                    s.program,
+                    s.year_level,
+                    s.section,
+                    s.contact_number,
+                    i.company,
+                    a.full_name       AS adviser_name
+                FROM students s
+                LEFT JOIN ojt_applications oa ON oa.student_id = s.id
+                LEFT JOIN internships i       ON i.id = oa.internship_id
+                LEFT JOIN advisers a          ON a.id = i.adviser_id
+                WHERE s.is_archived = false
+                ORDER BY s.full_name
+            ");
             $stdntInfoStmt->execute();
             $students = $stdntInfoStmt->fetchAll(PDO::FETCH_ASSOC);
             ?>
@@ -2176,6 +2176,17 @@ foreach ($roomStatuses as $s) {
                         <h2>Student Basic Information</h2>
                         <p>Overview of student details</p>
                     </div>
+                </div>
+            </div>
+            <div
+                style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
+                <div style="position:relative; flex:1; min-width:200px;">
+                    <i class="fa fa-search"
+                        style="position:absolute; color: #f97316; left:10px; top:50%; transform:translateY(-50%); font-size:13px;"></i>
+                    <input type="text" id="searchInfo" placeholder="Search student or company..." oninput="filterInfo()"
+                        style="width:25%; padding:8px 12px 8px 32px; border:1.5px solid #aeaeae; border-radius:22px;
+                            font-size:13px; font-family:inherit; outline:none; transition:border-color .2s;"
+                        onfocus="this.style.borderColor='#f97316'" onblur="this.style.borderColor='#e5e7eb'">
                 </div>
             </div>
             <div class="ojt-table-wrapper">
@@ -2192,7 +2203,7 @@ foreach ($roomStatuses as $s) {
                             <th>Adviser</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="info-student">
                         <?php if (empty($students)): ?>
                             <tr>
                                 <td colspan="8" class="text-center text-muted py-4">No students found.</td>
@@ -2201,7 +2212,14 @@ foreach ($roomStatuses as $s) {
                             <?php foreach ($students as $s): ?>
                                 <tr>
                                     <td><?= htmlspecialchars($s['student_id']) ?></td>
-                                    <td><?= htmlspecialchars($s['student_name']) ?></td>
+                                    <td>
+                                        <div class="student-cell">
+                                            <span class="avatar" style="background:#ff6b2c;">
+                                                <?= strtoupper(substr(trim($s['full_name']), 0, 1)) ?>
+                                            </span>
+                                            <?= htmlspecialchars($s['full_name']) ?>
+                                        </div>
+                                    </td>
                                     <td><?= htmlspecialchars($s['email']) ?></td>
                                     <td><?= htmlspecialchars(ucwords($s['program'])) ?></td>
                                     <td><?= htmlspecialchars($s['year_level'] . '-' . $s['section']) ?></td>
@@ -3116,6 +3134,14 @@ foreach ($roomStatuses as $s) {
         function filterTable() {
             const search = document.getElementById('searchInput')?.value.toLowerCase() ?? '';
             document.querySelectorAll('#all-students-tbody tr').forEach(row => {
+                const name = row.querySelector('.student-cell span')?.textContent.toLowerCase() ?? '';
+                row.style.display = name.includes(search) ? '' : 'none';
+            });
+        }
+
+        function filterInfo() {
+            const search = document.getElementById('searchInfo')?.value.toLowerCase() ?? '';
+            document.querySelectorAll('#info-student tr').forEach(row => {
                 const name = row.querySelector('.student-cell span')?.textContent.toLowerCase() ?? '';
                 row.style.display = name.includes(search) ? '' : 'none';
             });
