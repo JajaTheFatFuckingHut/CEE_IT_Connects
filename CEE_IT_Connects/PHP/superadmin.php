@@ -10,6 +10,12 @@ if ($role !== 'superadmin') {
     header("Location: index.php");
     exit();
 }
+// addtl s — admin credentials for sidebar account box
+$adminInfoStmt = $pdo->prepare("SELECT name FROM admins WHERE id = ?");
+$adminInfoStmt->execute([$_SESSION['user_id']]);
+$adminFullName = $adminInfoStmt->fetchColumn() ?: 'Admin';
+// addtl e
+
 $statePath = __DIR__ . '/register_toggle.txt';
 $registerVisible = file_exists($statePath) ? trim(file_get_contents($statePath)) : 'show';
 
@@ -453,10 +459,9 @@ function deptCode($department)
             width: 100vw;
         }
 
-        .sidebar {
+        /* .sidebar {
             width: 220px;
             margin-top: 10px;
-            /* background: #2c3e67; */
             background: #272f54;
             color: white;
             padding: 25px;
@@ -467,7 +472,57 @@ function deptCode($department)
             top: 0;
             left: 0;
             overflow-y: auto;
+        } */
+        .sidebar {
+            width: 240px;
+            background: #272f54;
+            color: white;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 15px;
+            bottom: 0;
+            left: 0;
+            overflow-y: auto;
         }
+        .sidebar-user {
+            margin-top: auto;
+            margin-left: -25px;
+            margin-right: -25px;
+            margin-bottom: -25px;
+            width: calc(100% + 50px);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 25px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            background: #1f2744;
+            flex-shrink: 0;
+        }
+        .sidebar-user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #3a4374;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            flex-shrink: 0;
+        }
+        .sidebar-user-info { flex: 1; min-width: 0; }
+        .sidebar-user-name {
+            font-size: 13.5px;
+            font-weight: 700;
+            color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .sidebar-user-role { font-size: 11px; color: #9aa3c7; }
+        /* . */
 
         .sidebar h3 {
             margin-bottom: 20px;
@@ -501,7 +556,7 @@ function deptCode($department)
             flex: 1;
             padding: 40px;
             background: #f5f7ff;
-            margin-left: 220px;
+            margin-left: 240px;
             min-width: 0;
             overflow-y: auto;
         }
@@ -885,6 +940,14 @@ function deptCode($department)
             .sidebar a:hover::after {
                 opacity: 1;
             }
+            .sidebar-user {
+                flex-direction: column;
+                gap: 4px;
+                padding: 10px 0;
+                margin: auto 0 0 0;
+                width: 100%;
+            }
+            .sidebar-user-info { display: none; }
 
             .main-content {
                 margin-left: 60px !important;
@@ -1139,10 +1202,23 @@ function deptCode($department)
                 <i class="bi bi-ui-checks me-2"></i>
                 <span class="nav-label">Section</span>
             </a>
-            <a href="#" onclick="showSection(event, 'restore')" data-tooltip="Settings">
+            <!-- <a href="#" onclick="showSection(event, 'restore')" data-tooltip="Settings">
                 <i class="bi bi-archive me-2"></i>
                 <span class="nav-label">Archives</span>
             </a>
+        </div> -->
+                    <a href="#" onclick="showSection(event, 'restore')" data-tooltip="Settings">
+                <i class="bi bi-archive me-2"></i>
+                <span class="nav-label">Archives</span>
+            </a>
+
+            <div class="sidebar-user">
+                <div class="sidebar-user-avatar"><?= strtoupper(substr($adminFullName, 0, 1)) ?></div>
+                <div class="sidebar-user-info">
+                    <div class="sidebar-user-name"><?= htmlspecialchars($adminFullName) ?></div>
+                    <div class="sidebar-user-role">System Admin</div>
+                </div>
+            </div>
         </div>
 
         <div class="main-content">
