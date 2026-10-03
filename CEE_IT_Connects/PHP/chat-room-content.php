@@ -1546,6 +1546,12 @@ $rmFmtTime = function ($ts): string {
                                         <input type="hidden" name="room_id" value="<?= (int) $roomId ?>">
                                         <input type="hidden" name="user_id" value="<?= (int) $rmId ?>">
                                         <input type="hidden" name="user_type" value="<?= htmlspecialchars($rmType) ?>">
+
+                                        <?php
+                                        var_dump($rmId);
+                                        var_dump($rmType);
+                                        var_dump($roomId);
+                                        ?>
                                         <button type="submit" name="remove-member" class="rm-remove-btn" title="Remove member"
                                             aria-label="Remove member">
                                             <i class="fa-solid fa-xmark"></i>
