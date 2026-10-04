@@ -1255,10 +1255,7 @@ function deptCode($department)
                     </div>
                 </div>
 
-                <!-- ADDED: scoped styles for this dashboard section only. Nothing below overrides
-                     other pages; classes are prefixed ojtc- to avoid collisions with existing CSS. -->
                 <style>
-                    /* ADDED: subtle blue "tab" indicator on table column headers */
                     .ojtc-th-tab {
                         background: rgba(39, 111, 255, 0.08) !important;
                         color: #272f54 !important;
@@ -1266,7 +1263,6 @@ function deptCode($department)
                         border-radius: 6px 6px 0 0;
                     }
 
-                    /* ADDED: hover state for Recent Account Activity rows */
                     .ojtc-activity-row {
                         padding: 8px;
                         border-radius: 10px;
@@ -1277,7 +1273,6 @@ function deptCode($department)
                         background: #f5f7ff;
                     }
 
-                    /* ADDED: hover state for OJT Hours by Program rows */
                     .ojtc-hours-row {
                         padding: 6px 8px;
                         border-radius: 10px;
@@ -1334,17 +1329,15 @@ function deptCode($department)
                 </style>
 
                 <div class="row g-3 mb-4">
-                    <!-- CHANGED LAYOUT: Internship Postings card restyled to match new design —
-                         light tint background, colored icon box on the left -->
                     <div class="col-md-4">
                         <div class="card border-0 rounded-4 h-100 ojtc-stat-card" style="background:#EEF3FF;">
                             <div class="card-body p-4">
-                                <div class="d-flex align-items-center gap-3">
+                                <div class="d-flex flex-wrap align-items-center gap-3">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0"
                                         style="width:44px;height:44px;background:#272f54;">
                                         <i class="bi bi-briefcase-fill text-white fs-5"></i>
                                     </div>
-                                    <div class="flex-grow-1" style="min-width:0; overflow: hidden;">
+                                    <div class="flex-grow-1" style="min-width:90px;">
                                         <p class="small mb-1 fw-semibold text-uppercase"
                                             style="letter-spacing:.05em; font-size:11px; color:#272f54;">Internships</p>
                                         <h2 class="fw-bold mb-0" style="color:#272f54;"><?= (int) $totalInternships ?>
@@ -1355,16 +1348,15 @@ function deptCode($department)
                         </div>
                     </div>
 
-                    <!-- CHANGED LAYOUT: Active Accounts card restyled to match new design (same pattern as above). -->
                     <div class="col-md-4">
                         <div class="card border-0 rounded-4 h-100 ojtc-stat-card" style="background:#FFF6E3;">
                             <div class="card-body p-4">
-                                <div class="d-flex align-items-center gap-3">
+                                <div class="d-flex flex-wrap align-items-center gap-3">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0"
                                         style="width:44px;height:44px;background:#FFB62F;">
                                         <i class="bi bi-person-badge-fill fs-5" style="color:#3b2600;"></i>
                                     </div>
-                                    <div class="flex-grow-1" style="min-width:0; overflow: hidden;">
+                                    <div class="flex-grow-1" style="min-width:90px;">
                                         <p class="small mb-1 fw-semibold text-uppercase"
                                             style="letter-spacing:.05em;font-size:11px;color:#7a5200;">Accounts
                                         </p>
@@ -1376,16 +1368,15 @@ function deptCode($department)
                         </div>
                     </div>
 
-                    <!-- CHANGED LAYOUT: Programs Tracked card restyled to match new design (same pattern as above). -->
                     <div class="col-md-4">
                         <div class="card border-0 rounded-4 h-100 ojtc-stat-card" style="background:#FDEEE8;">
                             <div class="card-body p-4">
-                                <div class="d-flex align-items-center gap-3">
+                                <div class="d-flex flex-wrap align-items-center gap-3">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0"
                                         style="width:44px;height:44px;background:#E4572E;">
                                         <i class="bi bi-clock-history text-white fs-5"></i>
                                     </div>
-                                    <div class="flex-grow-1" style="min-width:0; overflow: hidden;">
+                                    <div class="flex-grow-1" style="min-width:90px;">
                                         <p class="small mb-1 fw-semibold text-uppercase"
                                             style="letter-spacing:.05em;font-size:11px;color:#a13d1f;">Programs</p>
                                         <h2 class="fw-bold mb-0" style="color:#a13d1f;"><?= (int) $totalPrograms ?></h2>
