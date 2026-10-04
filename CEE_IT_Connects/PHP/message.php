@@ -2165,7 +2165,6 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
                 class="sidebar-link <?= $current_section === 'progress_report' ? 'active' : '' ?>">
                 <i class="fa-solid fa-file m-1"></i> <span class="sidebar-text">Progress Report</span>
             </a>
-            </a>
         <?php else: ?>
             <a href="#" onclick="return false;" title="Upload at Mou, Recomendation Letter and Waiver
             documents to unlock" style="opacity:0.4; cursor:not-allowed;" data-tooltip="Progress Report">
