@@ -2094,32 +2094,32 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
     <!-- SIDEBAR -->
     <div class="sidebar">
         <a href="?section=home<?php if ($current_room_id)
-            echo "&room_id=$current_room_id"; ?>"
+            echo "&room_id=$current_room_id"; ?>" data-tooltip="Home"
             class="sidebar-link <?= $current_section === 'home' ? 'active' : '' ?>">
             <i class="fa-solid fa-house"></i> <span class="sidebar-text">Home</span>
         </a>
 
         <a href="?section=chats<?php if ($current_room_id)
-            echo "&room_id=$current_room_id"; ?>"
+            echo "&room_id=$current_room_id"; ?>" data-tooltip="Chats"
             class="sidebar-link <?= $current_section === 'chats' ? 'active' : '' ?>">
             <i class="fa-solid fa-comments"></i> <span class="sidebar-text">Chats</span>
         </a>
 
         <a href="?section=application<?php if ($current_room_id)
-            echo "&room_id=$current_room_id"; ?>"
+            echo "&room_id=$current_room_id"; ?>" data-tooltip="Checklist"
             class="sidebar-link <?= $current_section === 'application' ? 'active' : '' ?>">
             <i class="fa-solid fa-user-group"></i> <span class="sidebar-text">Checklist</span>
         </a>
 
         <?php if ($hasActiveProgress): ?>
             <a href="?section=hours<?php if ($current_room_id)
-                echo "&room_id=$current_room_id"; ?>"
+                echo "&room_id=$current_room_id"; ?>" data-tooltip="Hours"
                 class="sidebar-link <?= $current_section === 'hours' ? 'active' : '' ?>">
                 <i class="fa-solid fa-clock m-1"></i> <span class="sidebar-text">Hours</span>
             </a>
         <?php else: ?>
             <a href="#" onclick="return false;" title="Upload at Mou, Recomendation Letter and Waiver
-            documents to unlock" style="opacity:0.4; cursor:not-allowed; pointer-events:none;">
+            documents to unlock" style="opacity:0.4; cursor:not-allowed; pointer-events:none;" data-tooltip="Hours">
                 <i class="fa-solid fa-clock m-1"></i>
                 <span class="sidebar-text">Hours <i class="fa-solid fa-lock" style="font-size:10px;"></i></span>
             </a>
