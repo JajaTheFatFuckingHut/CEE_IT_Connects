@@ -1586,6 +1586,27 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
                 font-weight: 700;
                 font-size: 14px;
             }
+            .sidebar a::after {
+                content: attr(data-tooltip);
+                position: absolute;
+                left: 56px;
+                top: 50%;
+                transform: translateY(-50%);
+                background: #1a1a2e;
+                color: #fff;
+                font-size: 12px;
+                font-weight: 500;
+                padding: 5px 10px;
+                border-radius: 6px;
+                white-space: nowrap;
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity 0.2s ease;
+            }
+
+            .sidebar a:hover::after {
+                opacity: 1;
+            }
         }
 
         .rc-mobile-back {
@@ -1817,28 +1838,6 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
                 cursor: pointer;
             }
         }
-
-        .sidebar a::after {
-                content: attr(data-tooltip);
-                position: absolute;
-                left: 56px;
-                top: 50%;
-                transform: translateY(-50%);
-                background: #1a1a2e;
-                color: #fff;
-                font-size: 12px;
-                font-weight: 500;
-                padding: 5px 10px;
-                border-radius: 6px;
-                white-space: nowrap;
-                opacity: 0;
-                pointer-events: none;
-                transition: opacity 0.2s ease;
-            }
-
-            .sidebar a:hover::after {
-                opacity: 1;
-            }
 
         /* =========================
         TABLET LAYOUT
