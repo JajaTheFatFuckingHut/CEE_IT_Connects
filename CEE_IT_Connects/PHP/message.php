@@ -1537,7 +1537,7 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
         #ojtEvalBtn.ojt-locked {
             opacity: 0.4;
             cursor: not-allowed;
-            pointer-events: none;
+            /* pointer-events: none; */
         }
 
         /* ── mobile tweaks ── */
@@ -1585,27 +1585,6 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
             .rc-mobile-back span {
                 font-weight: 700;
                 font-size: 14px;
-            }
-            .sidebar a::after {
-                content: attr(data-tooltip);
-                position: absolute;
-                left: 56px;
-                top: 50%;
-                transform: translateY(-50%);
-                background: #1a1a2e;
-                color: #fff;
-                font-size: 12px;
-                font-weight: 500;
-                padding: 5px 10px;
-                border-radius: 6px;
-                white-space: nowrap;
-                opacity: 0;
-                pointer-events: none;
-                transition: opacity 0.2s ease;
-            }
-
-            .sidebar a:hover::after {
-                opacity: 1;
             }
         }
 
@@ -2105,6 +2084,40 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
             cursor: pointer;
             z-index: 999;
         }
+
+        @media (max-width: 1024px) {
+    .sidebar {
+        overflow: visible !important;
+        z-index: 200;
+    }
+
+    .sidebar a {
+        position: relative;
+    }
+
+    .sidebar a::after {
+        content: attr(data-tooltip);
+        position: absolute;
+        left: 56px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: #1a1a2e;
+        color: #fff;
+        font-size: 12px;
+        font-weight: 500;
+        padding: 5px 10px;
+        border-radius: 6px;
+        white-space: nowrap;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s ease;
+        z-index: 300;
+    }
+
+    .sidebar a:hover::after {
+        opacity: 1;
+    }
+}
     </style>
 </head>
 
@@ -2140,7 +2153,7 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
             </a>
         <?php else: ?>
             <a href="#" onclick="return false;" title="Upload at Mou, Recomendation Letter and Waiver
-            documents to unlock" style="opacity:0.4; cursor:not-allowed; pointer-events:none;" data-tooltip="Hours">
+            documents to unlock" style="opacity:0.4; cursor:not-allowed;" data-tooltip="Hours">
                 <i class="fa-solid fa-clock m-1"></i>
                 <span class="sidebar-text">Hours <i class="fa-solid fa-lock" style="font-size:10px;"></i></span>
             </a>
@@ -2148,20 +2161,20 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
 
         <?php if ($hasActiveProgress): ?>
             <a href="?section=progress_report<?php if ($current_room_id)
-                echo "&room_id=$current_room_id"; ?>"
+                echo "&room_id=$current_room_id"; ?>" data-tooltip="Progress Report"
                 class="sidebar-link <?= $current_section === 'progress_report' ? 'active' : '' ?>">
                 <i class="fa-solid fa-file m-1"></i> <span class="sidebar-text">Progress Report</span>
             </a>
             </a>
         <?php else: ?>
             <a href="#" onclick="return false;" title="Upload at Mou, Recomendation Letter and Waiver
-            documents to unlock" style="opacity:0.4; cursor:not-allowed; pointer-events:none;">
+            documents to unlock" style="opacity:0.4; cursor:not-allowed;">
                 <i class="fa-solid fa-file m-1"></i> <span class="sidebar-text">Progress Report
                     <i class="fa-solid fa-lock" style="font-size:10px;"></i>
                 </span>
             </a>
         <?php endif; ?>
-        <a href="#" id="ojtEvalBtn" class="ojt-locked" aria-disabled="true" tabindex="-1"
+        <a href="#" id="ojtEvalBtn" class="ojt-locked" aria-disabled="true" tabindex="-1" data-tooltip="Evaluation"
             onclick="event.preventDefault(); if (this.classList.contains('ojt-locked')) return false; ojtShowEvalModal();"
             title="Complete your required OJT hours to unlock">
             <i class="fa-solid fa-file m-1"></i>
