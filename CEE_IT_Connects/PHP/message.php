@@ -2192,7 +2192,7 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
                         <span class="sidebar-text"><?= $room['room_name'] ?></span>
                     </div>
                 <?php else: ?>
-                    <a href="?room_id=<?= $room['id'] ?>" class="room-link">
+                    <a href="?room_id=<?= $room['id'] ?>" class="room-link" data-tooltip="<?= htmlspecialchars($room['room_name']) ?>">
                         <div class="room-item">
                             <span class="room-initial"><?= strtoupper(substr(trim($room['room_name']), 0, 1)) ?></span>
                             <span class="sidebar-text"><?= $room['room_name'] ?></span>
