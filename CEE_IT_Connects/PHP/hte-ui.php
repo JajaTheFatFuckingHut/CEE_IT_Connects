@@ -1769,7 +1769,7 @@ foreach ($roomStatuses as $s) {
             <i class="fa-solid fa-house me-2"></i> <span class="sidebar-text">Home</span>
         </a>
         <a href="#" onclick="showSection('status', event)" id="nav-status" data-tooltip="OJT Status">
-            <i class="fa-solid fa-arrows-rotate me-2"></i><span class="sidebar-text">OJT Status</span>
+            <i class="fa-solid fa-calendar-check me-2"></i><span class="sidebar-text">OJT Status</span>
         </a>
         <a href="#" onclick="showSection('information', event)" id="nav-information" data-tooltip="Information">
             <i class="fa-solid fa-inbox"></i><span class="sidebar-text">Information</span>
@@ -1811,7 +1811,7 @@ foreach ($roomStatuses as $s) {
             <div class="sysAdm-header--danger sysAdm-header--blue mb-4">
                 <div class="sysAdm-header-left">
                     <div class="sysAdm-header-icon">
-                        <i class="fa-solid fa-arrows-rotate"></i>
+                        <i class="fa-solid fa-calendar-check"></i>
                     </div>
                     <div class="sysAdm-header-text">
                         <h2>OJT Status</h2>
@@ -1975,7 +1975,7 @@ foreach ($roomStatuses as $s) {
                                                 </div>
                                                 <?php if ($sup['eval_sent_at']): ?>
                                                     <span style="font-size:10px;color:#6b7280;">
-                                                        <i class="fa fa-clock" style="margin-right:2px;"></i>
+                                                        <i class="fa-solid fa-calendar-check" style="margin-right:2px;"></i>
                                                         Sent <?= date('M d, g:i A', strtotime($sup['eval_sent_at'])) ?>
                                                     </span>
                                                 <?php endif; ?>
