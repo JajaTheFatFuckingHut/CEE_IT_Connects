@@ -1331,10 +1331,16 @@ if ($rmProgram === '') {
     $rmProgStmt->execute([$room_id]);
     $rmProgram = (string) $rmProgStmt->fetchColumn();
 }
+$rmProgramCodes = [
+    'information technology' => 'BSIT',
+    'electrical engineering' => 'BSEE',
+    'civil engineering' => 'BSCE',
+];
+$rmProgramLabel = $rmProgramCodes[strtolower($rmProgram)] ?? $rmProgram;
 $rmYearSection = (!empty($room['year_level']) && !empty($room['section']))
     ? (int) $room['year_level'] . '-' . $room['section'] : '';
 $rmClassLabel = ($rmProgram !== '' && $rmYearSection !== '')
-    ? $rmProgram . ' ' . $rmYearSection
+    ? $rmProgramLabel . ' ' . $rmYearSection
     : 'Year ' . (int) ($room['year_level'] ?? 0) . ' - Section ' . ($room['section'] ?? '');
 
 // Extra details for member cards (student no. + program, adviser role + title)
