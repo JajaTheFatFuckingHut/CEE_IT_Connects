@@ -2073,8 +2073,8 @@ $page = 'messages';
                 <i class="fa-solid fa-bullhorn me-2"></i> <span class="sidebar-text">Announcements</span>
             </a> -->
             <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=announcements"
-                class="<?= $section === 'announcements' ? 'active' : '' ?>" data-tooltip="Announcements">
-                <i class="fa-solid fa-bullhorn me-2"></i> <span class="sidebar-text">Announcements</span>
+                class="<?= $section === 'announcements' ? 'active' : '' ?>" data-tooltip="Documents Available">
+                <i class="fa-solid fa-folder-open me-2"></i> <span class="sidebar-text">Documents Available</span>
             </a>
             <!-- addtl e -->
             <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=status" data-tooltip="Status"
@@ -2372,7 +2372,7 @@ $page = 'messages';
                                         style="color:#ff6b2c;"></i>Announcements</h5>
                                 <small class="text-muted">Latest updates and important notices for your room.</small>
                             </div>
-                            <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=announcements" class="btn btn-sm"
+                            <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>" class="btn btn-sm"
                                 style="background:#eef1fb;color:#272f54;border-radius:20px;font-weight:600;">
                                 View All <i class="fa-solid fa-arrow-right ms-1"></i>
                             </a>
@@ -2434,7 +2434,7 @@ $page = 'messages';
                     <div class="home-card accent-blue" style="margin-top:16px;">
                         <div class="dash-head">
                             <div>
-                                <h5 class="fw-bold mb-0"><i class="fa-solid fa-calendar-check me-2"
+                                <h5 class="fw-bold mb-0"><i class="fa-solid fa-clock me-2"
                                         style="color:#ff6b2c;"></i>Student Progress</h5>
                                 <small class="text-muted">OJT hours rendered by your interns.</small>
                             </div>
@@ -2481,7 +2481,7 @@ $page = 'messages';
                         <a href="<?= $dashUrl ?>ojt_applications" class="dash-side-card">
                             <div class="dash-side-top">
                                 <div class="quick-card-icon" style="background:#dbeafe;color:#1e40af;"><i
-                                        class="fa-solid fa-file-lines"></i></div>
+                                        class="fa fa-list-ul"></i></div>
                                 <div class="quick-card-text"><strong>Requirements</strong><small>Check student
                                         requirements</small></div>
                                 <i class="fa-solid fa-chevron-right quick-card-arrow"></i>
@@ -2496,8 +2496,8 @@ $page = 'messages';
                         <a href="<?= $dashUrl ?>weekly_reports" class="dash-side-card">
                             <div class="dash-side-top">
                                 <div class="quick-card-icon" style="background:#ffe7b3;color:#7a5200;"><i
-                                        class="fa-solid fa-calendar-days"></i></div>
-                                <div class="quick-card-text"><strong>Weekly Reports</strong><small>View submitted
+                                        class="fa-solid fa-file-lines"></i></div>
+                                <div class="quick-card-text"><strong>Progress Reports</strong><small>View submitted
                                         reports</small></div>
                                 <i class="fa-solid fa-chevron-right quick-card-arrow"></i>
                             </div>
