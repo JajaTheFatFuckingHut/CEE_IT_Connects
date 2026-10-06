@@ -2020,7 +2020,7 @@ $page = 'messages';
             <?php foreach ($myRooms as $room): ?>
                 <a href="ojt-rooms.php?room_id=<?= $room['id'] ?>&section=room"
                     class="<?= ((int) $current_room_id === (int) $room['id']) ? 'active' : '' ?>"
-                    title="<?= htmlspecialchars($room['room_name']) ?>">
+                    data-tooltip="<?= htmlspecialchars($room['room_name']) ?>">
                     <i class="bi bi-people-fill me-2"></i>
                     <span class="sidebar-text">
                         <?= htmlspecialchars($room['room_name']) ?>
@@ -2034,25 +2034,25 @@ $page = 'messages';
         <div style="display:flex; flex-direction:column; width:100%;">
             <!-- addtl s -->
             <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=home"
-                class="<?= ($section === 'home') ? 'active' : '' ?>" title="Home">
+                class="<?= ($section === 'home') ? 'active' : '' ?>" data-tooltip="Home">
                 <i class="fa-solid fa-house me-2"></i> <span class="sidebar-text">Home</span>
             </a>
             <!-- <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>" class="<?= $section === '' ? 'active' : '' ?>"
-                title="Announcements">
+                data-tooltip="Announcements">
                 <i class="fa-solid fa-bullhorn me-2"></i> <span class="sidebar-text">Announcements</span>
             </a> -->
             <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=announcements"
-                class="<?= $section === 'announcements' ? 'active' : '' ?>" title="Announcements">
+                class="<?= $section === 'announcements' ? 'active' : '' ?>" data-tooltip="Announcements">
                 <i class="fa-solid fa-bullhorn me-2"></i> <span class="sidebar-text">Announcements</span>
             </a>
             <!-- addtl e -->
-            <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=status" tooltip="Status"
+            <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=status" data-tooltip="Status"
                 class="<?= $section === 'status' ? 'active' : '' ?>" title="Status">
                 <i class="fa-solid fa-calendar-check me-2"></i> <span class="sidebar-text">Status</span>
             </a>
 
             <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=ojt_applications"
-                class="<?= $section === 'ojt_applications' ? 'active' : '' ?>" tooltip="Requirements"
+                class="<?= $section === 'ojt_applications' ? 'active' : '' ?>" data-tooltip="Requirements"
                 title="Requirements">
                 <i class="bi bi-file-earmark-fill me-2"></i> <span class="sidebar-text">Requirements</span>
                 <?php
@@ -2071,13 +2071,14 @@ $page = 'messages';
             </a>
 
             <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=weekly_reports"
-                class="<?= $section === 'weekly_reports' ? 'active' : '' ?>" tooltip="Weekly Reports"
+                class="<?= $section === 'weekly_reports' ? 'active' : '' ?>" data-tooltip="Weekly Reports"
                 title="Weekly Reports">
                 <i class="fa-solid fa-file-lines me-2"></i> <span class="sidebar-text">Weekly Reports</span>
             </a>
 
             <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=chats"
-                class="<?= $section === 'chats' ? 'active' : '' ?>" title="Chats">
+                class="<?= $section === 'chats' ? 'active' : '' ?>" data-tooltip="Chats"
+                title="Chats">
                 <i class="fa-solid fa-comments me-2"></i> <span class="sidebar-text">Chats</span>
             </a>
             <hr style="border-top: 2px solid rgba(255,255,255,0.59); margin: 16px auto; width: calc(100% - 32px);">
