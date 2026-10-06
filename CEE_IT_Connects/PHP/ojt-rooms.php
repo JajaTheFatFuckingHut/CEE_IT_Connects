@@ -2079,7 +2079,7 @@ $page = 'messages';
             <!-- addtl e -->
             <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=status" data-tooltip="Status"
                 class="<?= $section === 'status' ? 'active' : '' ?>">
-                <i class="fa-solid fa-clock me-2"></i> <span class="sidebar-text">Status</span>
+                <i class="fa-solid fa-clock me-2"></i> <span class="sidebar-text">OJT Status</span>
             </a>
 
             <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=ojt_applications"
@@ -2664,11 +2664,11 @@ $page = 'messages';
                 <div class="sysAdm-header--danger sysAdm-header--blue mb-4">
                     <div class="sysAdm-header-left">
                         <div class="sysAdm-header-icon">
-                            <i class="bi bi-file-earmark-text-fill"></i>
+                            <i class="fa fa-folder-open"></i>
                         </div>
                         <div class="sysAdm-header-text">
-                            <h2>Documents Now Available</h2>
-                            <p>Check which documents are available for each partner company</p>
+                            <h2>Documents Available</h2>
+                            <p>Check which documents are available for each partner company, ready to be picked up by the student</p>
                         </div>
                     </div>
                 </div>
@@ -2761,7 +2761,7 @@ $page = 'messages';
                 <div class="sysAdm-header--danger sysAdm-header--blue mb-4">
                     <div class="sysAdm-header-left">
                         <div class="sysAdm-header-icon">
-                            <i class="bi bi-calendar-fill"></i>
+                            <i class="fa-solid fa-clock"></i>
                         </div>
                         <div class="sysAdm-header-text">
                             <h2>OJT Status</h2>
@@ -2928,7 +2928,7 @@ $page = 'messages';
                 <div class="sysAdm-header--danger sysAdm-header--blue mb-4">
                     <div class="sysAdm-header-left">
                         <div class="sysAdm-header-icon">
-                            <i class="bi bi-file-earmark-fill"></i>
+                            <i class="fa fa-list-ul"></i>
                         </div>
                         <div class="sysAdm-header-text">
                             <h2>Requirements</h2>
