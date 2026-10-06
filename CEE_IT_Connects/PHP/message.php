@@ -2105,7 +2105,9 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
         font-weight: 500;
         padding: 5px 10px;
         border-radius: 6px;
-        white-space: nowrap;
+        white-space: normal;
+        width: max-content;
+        max-width: 220px;
         opacity: 0;
         pointer-events: none;
         transition: opacity 0.2s ease;
@@ -2150,8 +2152,7 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
                 <i class="fa-solid fa-clock m-1"></i> <span class="sidebar-text">Hours</span>
             </a>
         <?php else: ?>
-            <a href="#" onclick="return false;" data-tooltip="Upload at Mou, Recomendation Letter and Waiver
-            documents to unlock" style="opacity:0.4; cursor:not-allowed;">
+            <a href="#" onclick="return false;" data-tooltip="Upload MOU, Recommendation Letter, and Waiver documents to unlock" style="opacity:0.4; cursor:not-allowed;">
                 <i class="fa-solid fa-clock m-1"></i>
                 <span class="sidebar-text">Hours <i class="fa-solid fa-lock" style="font-size:10px;"></i></span>
             </a>
@@ -2164,8 +2165,7 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
                 <i class="fa-solid fa-file m-1"></i> <span class="sidebar-text">Progress Report</span>
             </a>
         <?php else: ?>
-            <a href="#" onclick="return false;" data-tooltip="Upload at Mou, Recomendation Letter and Waiver
-            documents to unlock" style="opacity:0.4; cursor:not-allowed;">
+            <a href="#" onclick="return false;" data-tooltip="Upload MOU, Recommendation Letter, and Waiver documents to unlock" style="opacity:0.4; cursor:not-allowed;">
                 <i class="fa-solid fa-file-lines m-1"></i> <span class="sidebar-text">Progress Report
                     <i class="fa-solid fa-lock" style="font-size:10px;"></i>
                 </span>
@@ -3883,7 +3883,7 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
             btn.classList.toggle('ojt-locked', !done);
             btn.setAttribute('aria-disabled', String(!done));
             btn.tabIndex = done ? 0 : -1;
-            btn.title = done ? '';
+            btn.dataset.tooltip = done ? 'Evaluation' : 'Complete your required OJT hours to unlock';
             if (lock) lock.style.display = done ? 'none' : 'inline';
         }
         const _origShowEvalModal = ojtShowEvalModal;
