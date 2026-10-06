@@ -2352,6 +2352,11 @@ $page = 'messages';
 
             // Completion pie: complete vs incomplete, using the same totals already computed above
             $completeCount = max(0, $totalStudents - $incompleteCount);
+            $barStudents = $dashStudents ?? [];
+            usort($barStudents, fn($a, $b) => (float) $b['total_hours'] <=> (float) $a['total_hours']);
+            $barStudents = array_slice($barStudents, 0, 6);
+            $barLabels = array_map(fn($s) => $s['full_name'], $barStudents);
+            $barData = array_map(fn($s) => round((float) $s['total_hours'], 1), $barStudents);
             // addtl e
             ?>
 
@@ -2621,27 +2626,50 @@ $page = 'messages';
                 </div>
             </div>
 
-            <div class="dash-bottom">
-                <div class="home-card accent-blue">
-                    <div class="dash-head">
-                        <div>
-                            <h5 class="fw-bold mb-0"><i class="fa-solid fa-chart-line me-2"
-                                    style="color:#ff6b2c;"></i>Attendance Trend</h5>
-                            <small class="text-muted">Total hours logged per day, last 14 days.</small>
+            <div class="row g-3 mt-1">
+                <div class="col-lg-5">
+                    <div class="home-card accent-blue h-100">
+                        <div class="dash-head">
+                            <div>
+                                <h5 class="fw-bold mb-0"><i class="fa-solid fa-chart-line me-2"
+                                        style="color:#ff6b2c;"></i>Attendance Trend</h5>
+                                <small class="text-muted">Total hours logged per day, last 14 days.</small>
+                            </div>
+                        </div>
+                        <div style="position:relative; height:220px;">
+                            <canvas id="attendanceChart"></canvas>
                         </div>
                     </div>
-                    <canvas id="attendanceChart" height="180"></canvas>
                 </div>
 
-                <div class="home-card accent-orange">
-                    <div class="dash-head">
-                        <div>
-                            <h5 class="fw-bold mb-0"><i class="fa-solid fa-chart-pie me-2"
-                                    style="color:#ff6b2c;"></i>Requirements Completion</h5>
-                            <small class="text-muted">Share of students who finished all requirements.</small>
+                <div class="col-lg-4">
+                    <div class="home-card accent-green h-100">
+                        <div class="dash-head">
+                            <div>
+                                <h5 class="fw-bold mb-0"><i class="fa-solid fa-chart-bar me-2"
+                                        style="color:#ff6b2c;"></i>Hours Rendered</h5>
+                                <small class="text-muted">Top students by OJT hours.</small>
+                            </div>
+                        </div>
+                        <div style="position:relative; height:220px;">
+                            <canvas id="hoursBarChart"></canvas>
                         </div>
                     </div>
-                    <canvas id="completionChart" height="180"></canvas>
+                </div>
+
+                <div class="col-lg-3">
+                    <div class="home-card accent-orange h-100">
+                        <div class="dash-head">
+                            <div>
+                                <h5 class="fw-bold mb-0"><i class="fa-solid fa-chart-pie me-2"
+                                        style="color:#ff6b2c;"></i>Requirements</h5>
+                                <small class="text-muted">Students who finished all.</small>
+                            </div>
+                        </div>
+                        <div style="position:relative; height:220px;">
+                            <canvas id="completionChart"></canvas>
+                        </div>
+                    </div>
                 </div>
             </div>
             <!-- addtl e -->
@@ -3529,8 +3557,12 @@ $page = 'messages';
                 },
                 options: {
                     responsive: true,
+                    maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
-                    scales: { y: { beginAtZero: true } }
+                    scales: {
+                        y: { beginAtZero: true },
+                        x: { ticks: { maxTicksLimit: 7 } }
+                    }
                 }
             });
         }
@@ -3547,8 +3579,31 @@ $page = 'messages';
                     }]
                 },
                 options: {
+                    maintainAspectRatio: false,
+                    cutout: '62%',
+                    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12 } } }
+                }
+            });
+        }
+
+        if (document.getElementById('hoursBarChart')) {
+            new Chart(document.getElementById('hoursBarChart'), {
+                type: 'bar',
+                data: {
+                    labels: <?= json_encode($barLabels ?? []) ?>,
+                    datasets: [{
+                        label: 'Hours',
+                        data: <?= json_encode($barData ?? []) ?>,
+                        backgroundColor: '#1abc9c',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
                     responsive: true,
-                    plugins: { legend: { position: 'bottom' } }
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { x: { beginAtZero: true } }
                 }
             });
         }
