@@ -1616,11 +1616,6 @@ $page = 'messages';
             color: #7a5200;
         }
 
-        .tone-green {
-            background: #eaf3de;
-            color: #27500a;
-        }
-
         .tone-orange {
             background: #ffe5d9;
             color: #a13d1f;
@@ -1761,10 +1756,6 @@ $page = 'messages';
 
         .home-card.accent-blue {
             box-shadow: inset 0 4px 0 #2c6fff, 0 2px 10px rgba(0, 0, 0, 0.08);
-        }
-
-        .home-card.accent-green {
-            box-shadow: inset 0 4px 0 #1abc9c, 0 2px 10px rgba(0, 0, 0, 0.08);
         }
 
         .home-card.accent-amber {
@@ -2419,7 +2410,7 @@ $page = 'messages';
                                 <p class="dash-stat-value"><?= $incompleteCount ?></p>
                             </div>
                         </a>
-                        <a href="<?= $dashUrl ?>weekly_reports" class="dash-stat tone-green">
+                        <a href="<?= $dashUrl ?>weekly_reports" class="dash-stat tone-amber">
                             <div class="dash-stat-icon"><i class="fa-solid fa-file-lines"></i></div>
                             <div>
                                 <p class="dash-stat-label">Weekly reports</p>
@@ -2553,7 +2544,7 @@ $page = 'messages';
 
             <!-- addtl s -->
             <div class="dash-bottom">
-                <div class="home-card accent-green">
+                <div class="home-card accent-orange">
                     <div class="dash-head">
                         <div>
                             <h5 class="fw-bold mb-0"><i class="fa-solid fa-list-check me-2"
@@ -2643,7 +2634,7 @@ $page = 'messages';
                 </div>
 
                 <div class="col-lg-4">
-                    <div class="home-card accent-green h-100">
+                    <div class="home-card accent-amber h-100">
                         <div class="dash-head">
                             <div>
                                 <h5 class="fw-bold mb-0"><i class="fa-solid fa-chart-bar me-2"
