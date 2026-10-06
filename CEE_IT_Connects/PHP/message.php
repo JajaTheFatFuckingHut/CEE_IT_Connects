@@ -2091,11 +2091,9 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
         z-index: 200;
     }
 
-    .sidebar a {
-        position: relative;
-    }
+    .sidebar a, .sidebar .active-room { position: relative; }
 
-    .sidebar a::after {
+    .sidebar a::after, .sidebar .active-room::after {
         content: attr(data-tooltip);
         position: absolute;
         left: 56px;
@@ -2114,7 +2112,7 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
         z-index: 300;
     }
 
-    .sidebar a:hover::after {
+    .sidebar a:hover::after, .sidebar .active-room:hover::after {
         opacity: 1;
     }
 }
@@ -2187,7 +2185,7 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
             <h6>ROOMS</h6>
             <?php foreach ($rooms as $room): ?>
                 <?php if ($current_room_id == $room['id']): ?>
-                    <div class="room-item active-room">
+                    <div class="room-item active-room" data-tooltip="<?= htmlspecialchars($room['room_name']) ?>">
                         <span class="room-initial"><?= strtoupper(substr(trim($room['room_name']), 0, 1)) ?></span>
                         <span class="sidebar-text"><?= $room['room_name'] ?></span>
                     </div>
@@ -3540,21 +3538,21 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
             if (track) track.classList.remove('show-profile');
         }
 
-        function truncateRoomItems() {
-            if (window.innerWidth <= 768) {
-                document.querySelectorAll('.room-link .room-item, .active-room').forEach(el => {
-                    if (!el.dataset.original) el.dataset.original = el.textContent.trim();
-                    el.textContent = el.dataset.original.trim().charAt(0).toUpperCase();
-                });
-            } else {
-                document.querySelectorAll('.room-link .room-item, .active-room').forEach(el => {
-                    if (el.dataset.original) el.textContent = el.dataset.original;
-                });
-            }
-        }
+        // function truncateRoomItems() {
+        //     if (window.innerWidth <= 768) {
+        //         document.querySelectorAll('.room-link .room-item, .active-room').forEach(el => {
+        //             if (!el.dataset.original) el.dataset.original = el.textContent.trim();
+        //             el.textContent = el.dataset.original.trim().charAt(0).toUpperCase();
+        //         });
+        //     } else {
+        //         document.querySelectorAll('.room-link .room-item, .active-room').forEach(el => {
+        //             if (el.dataset.original) el.textContent = el.dataset.original;
+        //         });
+        //     }
+        // }
 
-        window.addEventListener('resize', truncateRoomItems);
-        document.addEventListener('DOMContentLoaded', truncateRoomItems);
+        // window.addEventListener('resize', truncateRoomItems);
+        // document.addEventListener('DOMContentLoaded', truncateRoomItems);
 
         // TRACK RENDERED HOURS
         const OJT_REQUIRED_HOURS = <?= (int) $requiredHours ?>;
