@@ -101,14 +101,14 @@ $now = new DateTime();
             width: 100%;
         }
 
-        .panel {
+        /* .panel {
             width: 40%;
         }
 
         #map {
             width: 60%;
             height: 542px;
-        }
+        } */
 
         .phone-wrap {
             position: relative;
