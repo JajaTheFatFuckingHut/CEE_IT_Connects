@@ -2270,7 +2270,7 @@ foreach ($roomStatuses as $s) {
             </div>
         </div>
 
-        <divid="chats" class="section-panel <?= $section === 'chats' ? 'active' : '' ?>">
+        <div id="chats" class="section-panel <?= $section === 'chats' ? 'active' : '' ?>">
             <?php
             $chatLookup = [];
             foreach ($adviserChats as $ac) {
@@ -2428,7 +2428,7 @@ foreach ($roomStatuses as $s) {
                     <?php endif; ?>
                 </div>
             </div>
-            </divid=>
+            </div>
     </div><!-- /.main -->
 
     <!-- Supervisor Evaluation Modal -->
