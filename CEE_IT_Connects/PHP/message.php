@@ -2174,10 +2174,10 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
         <a href="#" id="ojtEvalBtn" class="ojt-locked" aria-disabled="true" tabindex="-1"
             onclick="event.preventDefault(); if (this.classList.contains('ojt-locked')) return false; ojtShowEvalModal();"
             data-tooltip="Complete your required OJT hours to unlock">
-            <i class="fa-check-square-o m-1"></i>
+            <i class="fa-solid fa-clipboard-check m-1"></i>
             <span class="sidebar-text">
                 Evaluation
-                <i class="fa-check-square-o" id="ojtEvalLock" style="font-size:10px;"></i>
+                <i class="fa-solid fa-clipboard-check" id="ojtEvalLock" style="font-size:10px;"></i>
             </span>
         </a>
         <div class="rooms-list">
