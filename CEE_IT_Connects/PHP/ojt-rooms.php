@@ -1971,6 +1971,37 @@ $page = 'messages';
                 padding: 5px 10px;
                 width: 65%;
             }
+            .sidebar,
+            .sidebar .rooms-list {
+                overflow: visible !important;
+            }
+
+            .sidebar a {
+                position: relative;
+            }
+
+            .sidebar a::after {
+                content: attr(data-tooltip);
+                position: absolute;
+                left: 56px;
+                top: 50%;
+                transform: translateY(-50%);
+                background: #1a1a2e;
+                color: #fff;
+                font-size: 12px;
+                font-weight: 500;
+                padding: 5px 10px;
+                border-radius: 6px;
+                white-space: nowrap;
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity 0.2s ease;
+                z-index: 300;
+            }
+
+            .sidebar a:hover::after {
+                opacity: 1;
+            }
         }
     </style>
 </head>
@@ -2047,13 +2078,12 @@ $page = 'messages';
             </a>
             <!-- addtl e -->
             <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=status" data-tooltip="Status"
-                class="<?= $section === 'status' ? 'active' : '' ?>" title="Status">
+                class="<?= $section === 'status' ? 'active' : '' ?>">
                 <i class="fa-solid fa-calendar-check me-2"></i> <span class="sidebar-text">Status</span>
             </a>
 
             <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=ojt_applications"
-                class="<?= $section === 'ojt_applications' ? 'active' : '' ?>" data-tooltip="Requirements"
-                title="Requirements">
+                class="<?= $section === 'ojt_applications' ? 'active' : '' ?>" data-tooltip="Requirements">
                 <i class="bi bi-file-earmark-fill me-2"></i> <span class="sidebar-text">Requirements</span>
                 <?php
                 $pendingStmt = $pdo->prepare("
@@ -2071,20 +2101,18 @@ $page = 'messages';
             </a>
 
             <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=weekly_reports"
-                class="<?= $section === 'weekly_reports' ? 'active' : '' ?>" data-tooltip="Weekly Reports"
-                title="Weekly Reports">
+                class="<?= $section === 'weekly_reports' ? 'active' : '' ?>" data-tooltip="Weekly Reports">
                 <i class="fa-solid fa-file-lines me-2"></i> <span class="sidebar-text">Weekly Reports</span>
             </a>
 
             <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=chats"
-                class="<?= $section === 'chats' ? 'active' : '' ?>" data-tooltip="Chats"
-                title="Chats">
+                class="<?= $section === 'chats' ? 'active' : '' ?>" data-tooltip="Chats">
                 <i class="fa-solid fa-comments me-2"></i> <span class="sidebar-text">Chats</span>
             </a>
             <hr style="border-top: 2px solid rgba(255,255,255,0.59); margin: 16px auto; width: calc(100% - 32px);">
 
             <?php if ($isAdviser): ?>
-                <!-- <button class="sidebar-action-btn" data-bs-toggle="modal" data-bs-target="#csvUploadModal" title="Import Students">
+                <!-- <button class="sidebar-action-btn" data-bs-toggle="modal" data-bs-target="#csvUploadModal">
                     <i class="fa fa-file-csv me-2"></i> <span class="sidebar-text">Import Students</span>
                 </button> -->
             <?php endif; ?>
