@@ -1650,13 +1650,12 @@ $rmFmtTime = function ($ts): string {
                 <?php endif; ?>
             </div>
 
-            <!-- RIGHT: room details + members preview -->
             <div class="rm-col">
                 <div class="rm-card">
                     <h6 class="rm-side-title">Room details</h6>
                     <div class="rm-dl">
                         <?php if ($rmProgram !== ''): ?>
-                            <div class="rm-dr"><span>Program</span><span><?= htmlspecialchars($rmProgram) ?></span></div>
+                            <div class="rm-dr"><span>Program</span><span><?= htmlspecialchars(ucwords(str_replace('_', ' ', $rmProgram))) ?></span></div>
                         <?php endif; ?>
                         <?php if (!empty($room['year_level'])): ?>
                             <div class="rm-dr"><span>Year level</span><span><?= (int) $room['year_level'] ?></span></div>
