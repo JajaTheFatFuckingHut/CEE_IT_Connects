@@ -3565,7 +3565,7 @@ $page = 'messages';
                     labels: ['Completed', 'Incomplete'],
                     datasets: [{
                         data: [<?= (int) $completeCount ?>, <?= (int) $incompleteCount ?>],
-                        backgroundColor: ['#1abc9c', '#ffe7b3'],
+                        backgroundColor: ['#3d55b3d3', '#e7bd63'],
                         borderWidth: 0
                     }]
                 },
@@ -3585,7 +3585,7 @@ $page = 'messages';
                     datasets: [{
                         label: 'Hours',
                         data: <?= json_encode($barData ?? []) ?>,
-                        backgroundColor: '#1abc9c',
+                        backgroundColor: '#ff8652fe',
                         borderRadius: 6
                     }]
                 },
