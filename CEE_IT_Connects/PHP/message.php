@@ -2177,7 +2177,7 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
             <i class="fa-solid fa-file m-1"></i>
             <span class="sidebar-text">
                 Evaluation
-                <i class="fa-check-square-o" id="ojtEvalLock" style="font-size:10px;"></i>
+                <i class="fa fa-check-square-o" id="ojtEvalLock" style="font-size:10px;"></i>
             </span>
         </a>
         <div class="rooms-list">
