@@ -1761,8 +1761,15 @@ foreach ($roomStatuses as $s) {
 
         <hr style="border-top: 2px solid rgba(255,255,255,0.59); margin: 16px auto; width: calc(100% - 32px);">
 
-        <a href="#" onclick="showSection('status', event)" id="nav-status" data-tooltip="Status">
-            <i class="fa-solid fa-calendar-check me-2"></i><span class="sidebar-text">Status</span>
+        <!-- <a href="#" onclick="showSection('home', event)" id="nav-home" data-tooltip="Home">
+            <i class="fa-solid fa-calendar-check me-2"></i><span class="sidebar-text">Home</span>
+        </a> -->
+        <a href="hte-ui.php?room_id=<?= $current_room_id ?>&section=home"
+            class="<?= ($section === 'home') ? 'active' : '' ?>" data-tooltip="Home">
+            <i class="fa-solid fa-house me-2"></i> <span class="sidebar-text">Home</span>
+        </a>
+        <a href="#" onclick="showSection('status', event)" id="nav-status" data-tooltip="OJT Status">
+            <i class="fa-solid fa-arrows-rotate me-2"></i><span class="sidebar-text">OJT Status</span>
         </a>
         <a href="#" onclick="showSection('information', event)" id="nav-information" data-tooltip="Information">
             <i class="fa-solid fa-inbox"></i><span class="sidebar-text">Information</span>
@@ -1804,7 +1811,7 @@ foreach ($roomStatuses as $s) {
             <div class="sysAdm-header--danger sysAdm-header--blue mb-4">
                 <div class="sysAdm-header-left">
                     <div class="sysAdm-header-icon">
-                        <i class="bi bi-calendar-fill"></i>
+                        <i class="fa-solid fa-arrows-rotate"></i>
                     </div>
                     <div class="sysAdm-header-text">
                         <h2>OJT Status</h2>

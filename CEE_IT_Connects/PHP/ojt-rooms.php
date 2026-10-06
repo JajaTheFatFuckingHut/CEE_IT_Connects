@@ -2077,9 +2077,9 @@ $page = 'messages';
                 <i class="fa-solid fa-folder-open me-2"></i> <span class="sidebar-text">Documents Available</span>
             </a>
             <!-- addtl e -->
-            <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=status" data-tooltip="Status"
+            <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=status" data-tooltip="OJT Status"
                 class="<?= $section === 'status' ? 'active' : '' ?>">
-                <i class="fa-solid fa-clock me-2"></i> <span class="sidebar-text">OJT Status</span>
+                <i class="fa-solid fa-arrows-rotate me-2"></i> <span class="sidebar-text">OJT Status</span>
             </a>
 
             <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=ojt_applications"
@@ -2434,7 +2434,7 @@ $page = 'messages';
                     <div class="home-card accent-blue" style="margin-top:16px;">
                         <div class="dash-head">
                             <div>
-                                <h5 class="fw-bold mb-0"><i class="fa-solid fa-clock me-2"
+                                <h5 class="fw-bold mb-0"><i class="fa-solid fa-arrows-rotate me-2"
                                         style="color:#ff6b2c;"></i>Student Progress</h5>
                                 <small class="text-muted">OJT hours rendered by your interns.</small>
                             </div>
@@ -2761,7 +2761,7 @@ $page = 'messages';
                 <div class="sysAdm-header--danger sysAdm-header--blue mb-4">
                     <div class="sysAdm-header-left">
                         <div class="sysAdm-header-icon">
-                            <i class="fa-solid fa-clock"></i>
+                            <i class="fa-solid fa-arrows-rotate"></i>
                         </div>
                         <div class="sysAdm-header-text">
                             <h2>OJT Status</h2>
