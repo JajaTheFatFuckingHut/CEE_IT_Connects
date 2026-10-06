@@ -3883,7 +3883,7 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
             btn.classList.toggle('ojt-locked', !done);
             btn.setAttribute('aria-disabled', String(!done));
             btn.tabIndex = done ? 0 : -1;
-            btn.title = done ? '' : 'Complete your required OJT hours to unlock';
+            btn.title = done ? '';
             if (lock) lock.style.display = done ? 'none' : 'inline';
         }
         const _origShowEvalModal = ojtShowEvalModal;
