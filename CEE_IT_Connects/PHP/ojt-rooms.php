@@ -2079,12 +2079,12 @@ $page = 'messages';
             <!-- addtl e -->
             <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=status" data-tooltip="Status"
                 class="<?= $section === 'status' ? 'active' : '' ?>">
-                <i class="fa-solid fa-calendar-check me-2"></i> <span class="sidebar-text">Status</span>
+                <i class="fa-solid fa-clock me-2"></i> <span class="sidebar-text">Status</span>
             </a>
 
             <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=ojt_applications"
                 class="<?= $section === 'ojt_applications' ? 'active' : '' ?>" data-tooltip="Requirements">
-                <i class="bi bi-file-earmark-fill me-2"></i> <span class="sidebar-text">Requirements</span>
+                <i class="fa-solid fa-calendar-check me-2"></i> <span class="sidebar-text">Requirements</span>
                 <?php
                 $pendingStmt = $pdo->prepare("
                 SELECT COUNT(*) FROM ojt_applications oa 
@@ -2101,8 +2101,8 @@ $page = 'messages';
             </a>
 
             <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=weekly_reports"
-                class="<?= $section === 'weekly_reports' ? 'active' : '' ?>" data-tooltip="Weekly Reports">
-                <i class="fa-solid fa-file-lines me-2"></i> <span class="sidebar-text">Weekly Reports</span>
+                class="<?= $section === 'weekly_reports' ? 'active' : '' ?>" data-tooltip="Progress Reports">
+                <i class="fa-solid fa-file-lines me-2"></i> <span class="sidebar-text">Progress Reports</span>
             </a>
 
             <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=chats"

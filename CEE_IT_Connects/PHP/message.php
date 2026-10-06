@@ -2140,7 +2140,7 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
         <a href="?section=application<?php if ($current_room_id)
             echo "&room_id=$current_room_id"; ?>" data-tooltip="Checklist"
             class="sidebar-link <?= $current_section === 'application' ? 'active' : '' ?>">
-            <i class="fa-solid fa-user-group"></i> <span class="sidebar-text">Checklist</span>
+            <i class="fa-solid fa-calendar-check"></i> <span class="sidebar-text">Checklist</span>
         </a>
 
         <?php if ($hasActiveProgress): ?>
@@ -2150,8 +2150,8 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
                 <i class="fa-solid fa-clock m-1"></i> <span class="sidebar-text">Hours</span>
             </a>
         <?php else: ?>
-            <a href="#" onclick="return false;" title="Upload at Mou, Recomendation Letter and Waiver
-            documents to unlock" style="opacity:0.4; cursor:not-allowed;" data-tooltip="Hours">
+            <a href="#" onclick="return false;" data-tooltip="Upload at Mou, Recomendation Letter and Waiver
+            documents to unlock" style="opacity:0.4; cursor:not-allowed;">
                 <i class="fa-solid fa-clock m-1"></i>
                 <span class="sidebar-text">Hours <i class="fa-solid fa-lock" style="font-size:10px;"></i></span>
             </a>
@@ -2164,16 +2164,16 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
                 <i class="fa-solid fa-file m-1"></i> <span class="sidebar-text">Progress Report</span>
             </a>
         <?php else: ?>
-            <a href="#" onclick="return false;" title="Upload at Mou, Recomendation Letter and Waiver
-            documents to unlock" style="opacity:0.4; cursor:not-allowed;" data-tooltip="Progress Report">
-                <i class="fa-solid fa-file m-1"></i> <span class="sidebar-text">Progress Report
+            <a href="#" onclick="return false;" data-tooltip="Upload at Mou, Recomendation Letter and Waiver
+            documents to unlock" style="opacity:0.4; cursor:not-allowed;">
+                <i class="fa-solid fa-file-lines m-1"></i> <span class="sidebar-text">Progress Report
                     <i class="fa-solid fa-lock" style="font-size:10px;"></i>
                 </span>
             </a>
         <?php endif; ?>
-        <a href="#" id="ojtEvalBtn" class="ojt-locked" aria-disabled="true" tabindex="-1" data-tooltip="Evaluation"
+        <a href="#" id="ojtEvalBtn" class="ojt-locked" aria-disabled="true" tabindex="-1"
             onclick="event.preventDefault(); if (this.classList.contains('ojt-locked')) return false; ojtShowEvalModal();"
-            title="Complete your required OJT hours to unlock">
+            data-tooltip="Complete your required OJT hours to unlock">
             <i class="fa-solid fa-file m-1"></i>
             <span class="sidebar-text">
                 Evaluation
