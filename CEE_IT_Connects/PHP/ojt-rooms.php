@@ -2084,7 +2084,7 @@ $page = 'messages';
 
             <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=ojt_applications"
                 class="<?= $section === 'ojt_applications' ? 'active' : '' ?>" data-tooltip="Requirements">
-                <i class="fa-solid fa-calendar-check me-2"></i> <span class="sidebar-text">Requirements</span>
+                <i class="fa fa-list-ul me-2"></i> <span class="sidebar-text">Requirements</span>
                 <?php
                 $pendingStmt = $pdo->prepare("
                 SELECT COUNT(*) FROM ojt_applications oa 

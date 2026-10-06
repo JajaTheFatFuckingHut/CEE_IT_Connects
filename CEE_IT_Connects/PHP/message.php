@@ -2142,7 +2142,7 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
         <a href="?section=application<?php if ($current_room_id)
             echo "&room_id=$current_room_id"; ?>" data-tooltip="Checklist"
             class="sidebar-link <?= $current_section === 'application' ? 'active' : '' ?>">
-            <i class="fa-solid fa-calendar-check"></i> <span class="sidebar-text">Checklist</span>
+            <i class="fa fa-list-ul"></i> <span class="sidebar-text">Checklist</span>
         </a>
 
         <?php if ($hasActiveProgress): ?>
@@ -2177,7 +2177,7 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
             <i class="fa-solid fa-file m-1"></i>
             <span class="sidebar-text">
                 Evaluation
-                <i class="fa-solid fa-lock" id="ojtEvalLock" style="font-size:10px;"></i>
+                <i class="fa-check-square-o" id="ojtEvalLock" style="font-size:10px;"></i>
             </span>
         </a>
         <div class="rooms-list">
