@@ -1691,6 +1691,37 @@ foreach ($roomStatuses as $s) {
             .btn-submit {
                 margin-left: auto !important;
             }
+            .sidebar,
+            .sidebar .rooms-list {
+                overflow: visible !important;
+            }
+
+            .sidebar a {
+                position: relative;
+            }
+
+            .sidebar a::after {
+                content: attr(data-tooltip);
+                position: absolute;
+                left: 56px;
+                top: 50%;
+                transform: translateY(-50%);
+                background: #1a1a2e;
+                color: #fff;
+                font-size: 12px;
+                font-weight: 500;
+                padding: 5px 10px;
+                border-radius: 6px;
+                white-space: nowrap;
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity 0.2s ease;
+                z-index: 300;
+            }
+
+            .sidebar a:hover::after {
+                opacity: 1;
+            }
         }
     </style>
 </head>
@@ -1718,7 +1749,7 @@ foreach ($roomStatuses as $s) {
             <?php endforeach; ?> -->
 
             <?php foreach ($rooms as $room): ?>
-                <a href="?room_id=<?= $room['id'] ?>" title="<?= htmlspecialchars($room['room_name']) ?>"
+                <a href="?room_id=<?= $room['id'] ?>" data-tooltip="<?= htmlspecialchars($room['room_name']) ?>"
                     class="room-link <?= $current_room_id == $room['id'] ? 'active-room-link' : '' ?>">
                     <div class="room-item <?= $current_room_id == $room['id'] ? 'active-room' : '' ?>">
                         <span class="room-initial"><?= strtoupper(substr(trim($room['room_name']), 0, 1)) ?></span>
@@ -1730,17 +1761,16 @@ foreach ($roomStatuses as $s) {
 
         <hr style="border-top: 2px solid rgba(255,255,255,0.59); margin: 16px auto; width: calc(100% - 32px);">
 
-        <a href="#" onclick="showSection('status', event)" id="nav-status" tooltip="Status" title="Status">
+        <a href="#" onclick="showSection('status', event)" id="nav-status" data-tooltip="Status">
             <i class="fa-solid fa-calendar-check me-2"></i><span class="sidebar-text">Status</span>
         </a>
-        <a href="#" onclick="showSection('information', event)" id="nav-information" tooltip="Information"
-            title="Information">
+        <a href="#" onclick="showSection('information', event)" id="nav-information" data-tooltip="Information">
             <i class="fa-solid fa-inbox"></i><span class="sidebar-text">Information</span>
         </a>
-        <a href="#" onclick="showSection('dtr_summary', event)" id="nav-dtr_summary" tooltip="DTR" title="DTR">
+        <a href="#" onclick="showSection('dtr_summary', event)" id="nav-dtr_summary" data-tooltip="DTR">
             <i class="fa-solid fa-clock me-2"></i><span class="sidebar-text">DTR</span>
         </a>
-        <a href="#" onclick="showSection('chats', event)" id="nav-chats" tooltip="Chats" title="Chats">
+        <a href="#" onclick="showSection('chats', event)" id="nav-chats" data-tooltip="Chats">
             <i class="fa-solid fa-comments me-2"></i><span class="sidebar-text">Chats</span>
         </a>
 
@@ -1899,7 +1929,7 @@ foreach ($roomStatuses as $s) {
                                                     style="font-size:10px;color:#6b7280;padding:2px 6px;background:#f9fafb;
                                                             border:1px solid #e5e7eb;border-radius:4px;white-space:nowrap;
                                                             overflow:hidden;text-overflow:ellipsis;max-width:160px;display:inline-block;"
-                                                    title="<?= htmlspecialchars($sup['supervisor_email']) ?>">
+                                                    data-tooltip="<?= htmlspecialchars($sup['supervisor_email']) ?>">
                                                     <?= htmlspecialchars($sup['supervisor_email']) ?>
                                                 </span>
                                             <?php endif; ?>
@@ -1948,7 +1978,7 @@ foreach ($roomStatuses as $s) {
                                                     style="display:inline-flex;align-items:center;gap:5px;padding:5px 10px;
                                                             background:#f3f4f6;color:#9ca3af;border-radius:6px;font-size:11px;
                                                             font-weight:600;white-space:nowrap;border:1px solid #e5e7eb;"
-                                                    title="Assign a supervisor first">
+                                                    data-tooltip="Assign a supervisor first">
                                                     <i class="fa fa-file-pen"></i> Supervisor Eval
                                                 </span>
                                             <?php endif; ?>
