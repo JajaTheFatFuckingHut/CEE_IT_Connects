@@ -1640,7 +1640,7 @@ foreach ($roomStatuses as $s) {
         .tone-blue {
             /* background: #acbae8; */
             color: #3a4679;
-            background: #b9cfeb;
+            background: #c3d6ef;
         }
 
         .tone-amber {
@@ -1796,7 +1796,7 @@ foreach ($roomStatuses as $s) {
 
         @media (max-width: 1200px) {
             .dash-stats {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
+                grid-template-columns: repeat(3, minmax(0, 1fr));
             }
         }
 
