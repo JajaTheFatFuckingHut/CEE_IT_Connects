@@ -2124,8 +2124,8 @@ foreach ($roomStatuses as $s) {
         <a href="#" onclick="showSection('information', event)" id="nav-information" data-tooltip="Information">
             <i class="fa-solid fa-inbox me-2"></i><span class="sidebar-text">Information</span>
         </a>
-        <a href="#" onclick="showSection('dtr_summary', event)" id="nav-dtr_summary" data-tooltip="DTR">
-            <i class="fa-solid fa-clock me-2"></i><span class="sidebar-text">DTR</span>
+        <a href="#" onclick="showSection('dtr_summary', event)" id="nav-dtr_summary" data-tooltip="Timesheet">
+            <i class="fa-solid fa-clock me-2"></i><span class="sidebar-text">Timesheet</span>
         </a>
         <a href="#" onclick="showSection('chats', event)" id="nav-chats" data-tooltip="Chats">
             <i class="fa-solid fa-comments me-2"></i><span class="sidebar-text">Chats</span>
@@ -2243,7 +2243,7 @@ foreach ($roomStatuses as $s) {
             <div class="home-hero">
                 <div class="home-hero-bar">
                     <h2>Welcome back, <?= htmlspecialchars($userFullName) ?></h2>
-                    <p>Monitor your interns' OJT hours, review their DTR, and stay connected — all in one place.</p>
+                    <p>Monitor your interns' OJT hours, review their DTR or timesheet, and stay connected — all in one place.</p>
                 </div>
             </div>
 
@@ -2330,7 +2330,7 @@ foreach ($roomStatuses as $s) {
                         <div class="dash-head">
                             <div>
                                 <h5 class="fw-bold mb-0"><i class="fa-solid fa-clock me-2"
-                                        style="color:#ff6b2c;"></i>Latest DTR</h5>
+                                        style="color:#ff6b2c;"></i>Latest Timesheet Log</h5>
                                 <small class="text-muted">Most recent time records from your interns.</small>
                             </div>
                             <a href="<?= $dashUrl ?>dtr_summary" class="btn btn-sm"
@@ -2344,7 +2344,7 @@ foreach ($roomStatuses as $s) {
                                 <div class="d-flex align-items-center gap-3">
                                     <i class="fa-solid fa-clock fa-2x" style="color:#ff6b2c;"></i>
                                     <div>
-                                        <strong style="color:#475569;">No DTR records yet</strong>
+                                        <strong style="color:#475569;">No timesheet records yet</strong>
                                         <div style="font-size:13px;">When interns log their time, it will appear here.</div>
                                     </div>
                                 </div>
@@ -2406,7 +2406,7 @@ foreach ($roomStatuses as $s) {
                             <div class="dash-side-top">
                                 <div class="quick-card-icon" style="background:#ffe7b3;color:#7a5200;"><i
                                         class="fa-solid fa-clock"></i></div>
-                                <div class="quick-card-text"><strong>DTR</strong><small>Review daily time records</small></div>
+                                <div class="quick-card-text"><strong>Timesheet</strong><small>Review daily time records</small></div>
                                 <i class="fa-solid fa-chevron-right quick-card-arrow"></i>
                             </div>
                             <div class="dash-side-meta">
@@ -2780,7 +2780,7 @@ foreach ($roomStatuses as $s) {
                         <i class="bi bi-pencil-fill"></i>
                     </div>
                     <div class="sysAdm-header-text">
-                        <h2>Student DTR Summary</h2>
+                        <h2>Student Daily Time Record Summary</h2>
                         <p>Overview of rendered OJT hours per student</p>
                     </div>
                 </div>
@@ -2849,8 +2849,8 @@ foreach ($roomStatuses as $s) {
                                     </button> -->
 
                                         <button class="btn-update" onclick="viewStudentDtr(<?= $row['student_id'] ?>)"
-                                            target="_blank" target="_blank" class="btn-update" tooltip="View DTR"
-                                            title="View DTR"
+                                            target="_blank" target="_blank" class="btn-update" data-tooltip="View Timesheet"
+                                            title="View Timesheet"
                                             style="text-decoration: none; background: #FFE7B3;
                                             color: #7a5200; border:2px solid #7a5200; background-color: #FFE7B3; transition: background-color 0.2s ease;"
                                             onmouseover="this.style.backgroundColor='#dbbe83';"
@@ -3569,7 +3569,7 @@ foreach ($roomStatuses as $s) {
         <div class="modal-dialog modal-xl modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="dtr-view-modal-title">Student DTR</h5>
+                    <h5 class="modal-title" id="dtr-view-modal-title">Student Timesheet</h5>
                     <button type="button" class="btn-close" onclick="closeDtrModal()"></button>
                 </div>
                 <div class="modal-body">
@@ -3692,7 +3692,7 @@ foreach ($roomStatuses as $s) {
                 summaryEl.innerHTML = renderDtrSummary(data);
 
                 if (data.weeks.length === 0) {
-                    body.innerHTML = '<p class="text-muted">No DTR entries logged yet.</p>';
+                    body.innerHTML = '<p class="text-muted">No timesheet entries logged yet.</p>';
                     return;
                 }
 
@@ -3701,7 +3701,7 @@ foreach ($roomStatuses as $s) {
             } catch (err) {
                 console.error('DTR ERROR:', err);
                 body.innerHTML = `
-            <p class="text-danger">Failed to load DTR.</p>
+            <p class="text-danger">Failed to load timesheet.</p>
             <p class="small text-muted">${err.message}</p>
         `;
             }
