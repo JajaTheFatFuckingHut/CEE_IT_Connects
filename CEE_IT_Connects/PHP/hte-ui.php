@@ -1638,8 +1638,9 @@ foreach ($roomStatuses as $s) {
         }
 
         .tone-blue {
-            background: #6d7fb8;
+            /* background: #acbae8; */
             color: #272f54;
+            box-shadow: inset 0 4px 0 #2c6fff, 0 2px 10px rgba(0, 0, 0, 0.08);
         }
 
         .tone-amber {
