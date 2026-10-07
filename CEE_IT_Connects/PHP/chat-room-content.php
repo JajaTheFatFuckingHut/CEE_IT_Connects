@@ -1304,6 +1304,9 @@ $rmInitials = function ($name): string {
 };
 $rmMeName = $userFullName ?? 'You';
 $rmCanPost = in_array($_SESSION['role'] ?? '', ['internship_adviser', 'hte_adviser', 'superadmin', 'internship_admin'], true);
+// addtl s
+$rmSec = (($_SESSION['role'] ?? '') === 'student') ? 'home' : 'rooms';
+// addtl e
 
 // Role label + pill color for a post's sender_role
 $rmPostRole = function (string $role): array {
@@ -1461,10 +1464,11 @@ $rmFmtTime = function ($ts): string {
 
 <!-- TABS -->
 <div class="rm-tabs">
-    <a href="?room_id=<?= $room_id ?>&tab=updates" class="rm-tab <?= $tab === 'updates' ? 'on' : '' ?>">
+    <!-- addtl s / e &section=<?= $rmSec ?> -->
+    <a href="?room_id=<?= $room_id ?>&tab=updates&section=<?= $rmSec ?>" class="rm-tab <?= $tab === 'updates' ? 'on' : '' ?>">
         <i class="fa-solid fa-bullhorn"></i> Updates <span class="rm-cnt"><?= $rmPostCount ?></span>
     </a>
-    <a href="?room_id=<?= $room_id ?>&tab=members" class="rm-tab <?= $tab === 'members' ? 'on' : '' ?>">
+    <a href="?room_id=<?= $room_id ?>&tab=members&section=<?= $rmSec ?>" class="rm-tab <?= $tab === 'members' ? 'on' : '' ?>">
         <i class="fa-solid fa-users"></i> Members <span class="rm-cnt"><?= $rmMemberCount ?></span>
     </a>
 </div>
@@ -1705,7 +1709,7 @@ $rmFmtTime = function ($ts): string {
                 <div class="rm-card">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h6 class="rm-side-title mb-0">Members</h6>
-                        <a href="?room_id=<?= $room_id ?>&tab=members" class="rm-link">View all</a>
+                        <a href="?room_id=<?= $room_id ?>&tab=members&section=<?= $rmSec ?>" class="rm-link">View all</a>
                     </div>
                     <?php if (empty($members)): ?>
                         <div class="text-muted" style="font-size:13px;">No members yet.</div>
