@@ -2122,7 +2122,7 @@ foreach ($roomStatuses as $s) {
             <i class="fa-solid fa-calendar-check me-2"></i><span class="sidebar-text">OJT Status</span>
         </a>
         <a href="#" onclick="showSection('information', event)" id="nav-information" data-tooltip="Information">
-            <i class="fa-solid fa-inbox"></i><span class="sidebar-text">Information</span>
+            <i class="fa-solid fa-inbox me-2"></i><span class="sidebar-text">Information</span>
         </a>
         <a href="#" onclick="showSection('dtr_summary', event)" id="nav-dtr_summary" data-tooltip="DTR">
             <i class="fa-solid fa-clock me-2"></i><span class="sidebar-text">DTR</span>
