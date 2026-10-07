@@ -1639,8 +1639,8 @@ foreach ($roomStatuses as $s) {
 
         .tone-blue {
             /* background: #acbae8; */
-            color: #272f54;
-            background: #dbeafe;
+            color: #3a4679;
+            background: #b9cfeb;
         }
 
         .tone-amber {
