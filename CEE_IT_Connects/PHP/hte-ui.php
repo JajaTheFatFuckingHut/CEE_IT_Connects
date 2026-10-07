@@ -1638,7 +1638,7 @@ foreach ($roomStatuses as $s) {
         }
 
         .tone-blue {
-            background: #eef1fb;
+            background: #6d7fb8;
             color: #272f54;
         }
 
@@ -2265,13 +2265,13 @@ foreach ($roomStatuses as $s) {
                                 <p class="dash-stat-value"><?= $presentToday ?></p>
                             </div>
                         </a>
-                        <a href="<?= $dashUrl ?>status" class="dash-stat tone-amber">
+                        <!-- <a href="<?= $dashUrl ?>status" class="dash-stat tone-amber">
                             <div class="dash-stat-icon"><i class="fa-solid fa-user-plus"></i></div>
                             <div>
                                 <p class="dash-stat-label">No supervisor yet</p>
                                 <p class="dash-stat-value"><?= $noSupervisorCount ?></p>
                             </div>
-                        </a>
+                        </a> -->
                         <a href="<?= $dashUrl ?>status" class="dash-stat tone-blue">
                             <div class="dash-stat-icon"><i class="fa-solid fa-circle-check"></i></div>
                             <div>
