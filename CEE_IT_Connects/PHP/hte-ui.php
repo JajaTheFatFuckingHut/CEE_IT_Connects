@@ -1587,7 +1587,7 @@ foreach ($roomStatuses as $s) {
         /* ── HOME DASHBOARD ── */
         .dash-stats {
             display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
+            grid-template-columns: repeat(3, minmax(0, 1fr));
             gap: 16px;
             margin-bottom: 16px;
             margin-top: 16px;
@@ -1640,7 +1640,7 @@ foreach ($roomStatuses as $s) {
         .tone-blue {
             /* background: #acbae8; */
             color: #272f54;
-            box-shadow: inset 0 4px 0 #2c6fff, 0 2px 10px rgba(0, 0, 0, 0.08);
+            background: #dbeafe;
         }
 
         .tone-amber {
