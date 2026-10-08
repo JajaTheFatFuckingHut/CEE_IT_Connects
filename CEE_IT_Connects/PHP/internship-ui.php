@@ -184,7 +184,53 @@ $docAvailStmt = $pdo->query("
 ");
 $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
 
+// addtl s
+// ── DASHBOARD ANALYTICS (percentages + charts) ──
+$totalApplicants = count($applicants);
+$phaseCounts     = ['Internship Confirmed' => 0, 'In Progress' => 0, 'No Progress' => 0];
+$reqComplete     = 0;
+$programCounts   = [];
+$companyCounts   = [];
+$appsByDay       = [];
 
+foreach ($applicants as $ap) {
+    if (isset($phaseCounts[$ap['current_phase']])) {
+        $phaseCounts[$ap['current_phase']]++;
+    }
+    if ($ap['requirements'] === 'Complete') {
+        $reqComplete++;
+    }
+    $prog = ucwords(strtolower($ap['program'] ?: 'Unspecified'));
+    $programCounts[$prog] = ($programCounts[$prog] ?? 0) + 1;
+
+    $comp = $ap['company'] ?: 'Unknown';
+    $companyCounts[$comp] = ($companyCounts[$comp] ?? 0) + 1;
+
+    if (!empty($ap['submitted_at'])) {
+        $day = date('Y-m-d', strtotime($ap['submitted_at']));
+        $appsByDay[$day] = ($appsByDay[$day] ?? 0) + 1;
+    }
+}
+$reqIncomplete = $totalApplicants - $reqComplete;
+
+$pctOf = fn($n) => $totalApplicants > 0 ? (int) round(($n / $totalApplicants) * 100) : 0;
+$confirmedPct  = $pctOf($phaseCounts['Internship Confirmed']);
+$inProgressPct = $pctOf($phaseCounts['In Progress']);
+$noProgressPct = $pctOf($phaseCounts['No Progress']);
+$reqCompletePct = $pctOf($reqComplete);
+
+arsort($companyCounts);
+$companyCounts = array_slice($companyCounts, 0, 6, true);
+
+// Applications per day, last 14 days
+$trendLabels = [];
+$trendData   = [];
+for ($t = 13; $t >= 0; $t--) {
+    $dKey = date('Y-m-d', strtotime("-{$t} days"));
+    $trendLabels[] = date('M j', strtotime($dKey));
+    $trendData[]   = $appsByDay[$dKey] ?? 0;
+}
+// addtl e
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -899,6 +945,7 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
 </head>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
     function showSection(sectionID) {
         document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
@@ -1080,6 +1127,115 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
 
                 <div class="row g-4">
                     <!-- Application List -->
+                    <!-- addtl s -->
+                     <!-- PERCENTAGE CARDS -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-lg-3 col-md-6">
+                            <div class="ojtc-stat-card card-tint-announcements">
+                                <div class="ojtc-stat-icon icon-announcements"><i class="bi bi-patch-check-fill"></i></div>
+                                <div>
+                                    <p class="small mb-1 fw-semibold text-uppercase" style="letter-spacing:.05em; font-size:11px; color:#27500a;">Confirmed Rate</p>
+                                    <h2 class="fw-bold mb-0" style="color:#27500a;"><?= $confirmedPct ?>%</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <div class="ojtc-stat-card card-tint-internships">
+                                <div class="ojtc-stat-icon icon-internships"><i class="bi bi-clipboard-check-fill"></i></div>
+                                <div>
+                                    <p class="small mb-1 fw-semibold text-uppercase" style="letter-spacing:.05em; font-size:11px; color:#272f54;">Requirements Complete</p>
+                                    <h2 class="fw-bold mb-0" style="color:#272f54;"><?= $reqCompletePct ?>%</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <div class="ojtc-stat-card card-tint-applications">
+                                <div class="ojtc-stat-icon icon-applications"><i class="bi bi-hourglass-split"></i></div>
+                                <div>
+                                    <p class="small mb-1 fw-semibold text-uppercase" style="letter-spacing:.05em; font-size:11px; color:#7a5200;">In Progress</p>
+                                    <h2 class="fw-bold mb-0" style="color:#3b2600;"><?= $inProgressPct ?>%</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <div class="ojtc-stat-card card-tint-documents">
+                                <div class="ojtc-stat-icon icon-documents"><i class="bi bi-dash-circle-fill"></i></div>
+                                <div>
+                                    <p class="small mb-1 fw-semibold text-uppercase" style="letter-spacing:.05em; font-size:11px; color:#a13d1f;">No Progress</p>
+                                    <h2 class="fw-bold mb-0" style="color:#a13d1f;"><?= $noProgressPct ?>%</h2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ANALYTICS CHARTS -->
+                    <div class="row g-4 mb-4">
+                        <div class="col-lg-4">
+                            <div class="card border-0 shadow-sm h-100 ojtc-panel-card">
+                                <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
+                                    <i class="bi bi-pie-chart" style="color:#272f54;"></i>
+                                    <h6 class="fw-bold mb-0" style="color:#272f54;">Intern Phase</h6>
+                                </div>
+                                <div class="card-body px-4 pb-4 pt-2">
+                                    <p class="text-muted small mb-3">Confirmed vs. in progress vs. not started.</p>
+                                    <div style="position:relative; height:220px;"><canvas id="phaseChart"></canvas></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4">
+                            <div class="card border-0 shadow-sm h-100 ojtc-panel-card">
+                                <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
+                                    <i class="bi bi-clipboard-check" style="color:#272f54;"></i>
+                                    <h6 class="fw-bold mb-0" style="color:#272f54;">Requirements</h6>
+                                </div>
+                                <div class="card-body px-4 pb-4 pt-2">
+                                    <p class="text-muted small mb-3">Interns with complete documents.</p>
+                                    <div style="position:relative; height:220px;"><canvas id="reqChart"></canvas></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4">
+                            <div class="card border-0 shadow-sm h-100 ojtc-panel-card">
+                                <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
+                                    <i class="bi bi-bar-chart" style="color:#272f54;"></i>
+                                    <h6 class="fw-bold mb-0" style="color:#272f54;">Applicants per Program</h6>
+                                </div>
+                                <div class="card-body px-4 pb-4 pt-2">
+                                    <p class="text-muted small mb-3">Number of applicants by program.</p>
+                                    <div style="position:relative; height:220px;"><canvas id="programChart"></canvas></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-7">
+                            <div class="card border-0 shadow-sm h-100 ojtc-panel-card">
+                                <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
+                                    <i class="bi bi-graph-up" style="color:#272f54;"></i>
+                                    <h6 class="fw-bold mb-0" style="color:#272f54;">Application Trend</h6>
+                                </div>
+                                <div class="card-body px-4 pb-4 pt-2">
+                                    <p class="text-muted small mb-3">Applications submitted per day, last 14 days.</p>
+                                    <div style="position:relative; height:220px;"><canvas id="trendChart"></canvas></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-5">
+                            <div class="card border-0 shadow-sm h-100 ojtc-panel-card">
+                                <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
+                                    <i class="bi bi-buildings" style="color:#272f54;"></i>
+                                    <h6 class="fw-bold mb-0" style="color:#272f54;">Top Companies</h6>
+                                </div>
+                                <div class="card-body px-4 pb-4 pt-2">
+                                    <p class="text-muted small mb-3">Companies with the most applicants.</p>
+                                    <div style="position:relative; height:220px;"><canvas id="companyChart"></canvas></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                     <!-- addtl e -->
                     <div class="col-lg-7">
                         <!-- CHANGED: added ojtc-panel-card for rounded corners + hover-lift. -->
                         <div class="card border-0 shadow-sm h-100 ojtc-panel-card">
@@ -2830,6 +2986,117 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
     <script src="../JS/script.js"></script>
 
+    <script>
+        (function () {
+            const make = (id, cfg) => {
+                const el = document.getElementById(id);
+                if (el) new Chart(el, cfg);
+            };
+
+            // Phase doughnut
+            make('phaseChart', {
+                type: 'doughnut',
+                data: {
+                    labels: ['Internship Confirmed', 'In Progress', 'No Progress'],
+                    datasets: [{
+                        data: <?= json_encode(array_values($phaseCounts)) ?>,
+                        backgroundColor: ['#3E8E58', '#FFB62F', '#cbd5e1'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    cutout: '62%',
+                    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12 } } }
+                }
+            });
+
+            // Requirements doughnut
+            make('reqChart', {
+                type: 'doughnut',
+                data: {
+                    labels: ['Complete', 'Incomplete'],
+                    datasets: [{
+                        data: [<?= (int) $reqComplete ?>, <?= (int) $reqIncomplete ?>],
+                        backgroundColor: ['#3d55b3d3', '#e7bd63'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    cutout: '62%',
+                    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12 } } }
+                }
+            });
+
+            // Applicants per program
+            make('programChart', {
+                type: 'bar',
+                data: {
+                    labels: <?= json_encode(array_keys($programCounts)) ?>,
+                    datasets: [{
+                        label: 'Applicants',
+                        data: <?= json_encode(array_values($programCounts)) ?>,
+                        backgroundColor: '#ff8652fe',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+                }
+            });
+
+            // Application trend (14 days)
+            make('trendChart', {
+                type: 'line',
+                data: {
+                    labels: <?= json_encode($trendLabels) ?>,
+                    datasets: [{
+                        label: 'Applications',
+                        data: <?= json_encode($trendData) ?>,
+                        borderColor: '#ff6b2c',
+                        backgroundColor: 'rgba(255,107,44,0.1)',
+                        tension: 0.3,
+                        fill: true,
+                        pointRadius: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { precision: 0 } },
+                        x: { ticks: { maxTicksLimit: 7 } }
+                    }
+                }
+            });
+
+            // Top companies (horizontal bar)
+            make('companyChart', {
+                type: 'bar',
+                data: {
+                    labels: <?= json_encode(array_keys($companyCounts)) ?>,
+                    datasets: [{
+                        label: 'Applicants',
+                        data: <?= json_encode(array_values($companyCounts)) ?>,
+                        backgroundColor: '#272F54',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { x: { beginAtZero: true, ticks: { precision: 0 } } }
+                }
+            });
+        })();
+    </script>
 </body>
 
 </html>
