@@ -699,6 +699,60 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
             display: block;
         }
 
+        /* addtl s */
+        /* ── PAGE HEADER CARD (matches superadmin) ── */
+        .pg-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+            background: linear-gradient(135deg, #dce2ef 0%, #dde3f0 50%, #c0cfef 100%);
+            border-radius: 14px;
+            padding: 22px 28px;
+            margin-bottom: 20px;
+        }
+
+        .pg-header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            min-width: 0;
+        }
+
+        .pg-header-icon {
+            background: #c7d2e8;
+            color: #272f54;
+            width: 64px;
+            height: 64px;
+            min-width: 64px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+        }
+
+        .pg-header h2 {
+            font-size: 26px;
+            font-weight: 700;
+            color: #1e293b;
+            margin: 0 0 4px;
+        }
+
+        .pg-header p {
+            color: #64748b;
+            font-size: 14px;
+            margin: 0;
+        }
+
+        @media (max-width: 768px) {
+            .pg-header { padding: 16px 18px; }
+            .pg-header-icon { width: 48px; height: 48px; min-width: 48px; font-size: 1.1rem; }
+            .pg-header h2 { font-size: 20px; }
+        }
+        /* addtl e */
+
         /* CHAT DESIGN */
         .chat-container {
             margin: -20px;
@@ -2472,14 +2526,28 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
     <!-- APPLICATION SECTION -->
     <div id="application" class="section <?= $current_section === 'application' ? 'active' : '' ?>">
         <div class="main">
-            <?php if ($application_internship_id): ?>
+            <!-- addtl s -->
+            <div id="application" class="section <?= $current_section === 'application' ? 'active' : '' ?>">
+                <div class="main">
+                    <div class="pg-header">
+                        <div class="pg-header-left">
+                            <div class="pg-header-icon"><i class="fa fa-list-ul"></i></div>
+                            <div>
+                                <h2>OJT Requirements Checklist</h2>
+                                <p>Complete each item below. Following the order is recommended, but you may work on them in any sequence.</p>
+                            </div>
+                        </div>
+                    </div>
 
-                <?php
-                $internship_id = $application_internship_id;
-                include 'application-progress.php';
-                ?>
+                <!-- addtl e -->
+                <?php if ($application_internship_id): ?>
 
-            <?php else: ?>
+                    <?php
+                    $internship_id = $application_internship_id;
+                    include 'application-progress.php';
+                    ?>
+
+                <?php else: ?>
 
                 <!-- HTE NOTICE -->
                 <div class="card border-0 shadow-sm rounded-4 mb-3">
@@ -2608,7 +2676,7 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
                 </div>
             <?php else: ?>
                 <!-- Header -->
-                <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                <!-- <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
                     <div>
                         <h3>Rendered Hours</h3>
                         <p class="text-muted mb-0">OJT Daily Time Record</p>
@@ -2618,6 +2686,20 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
                         <span style="font-size:16px; font-weight:600; color:#29335C;">
                             <?= $requiredHours ?> hrs
                         </span>
+                    </div>
+                </div> -->
+                <!-- Header -->
+                <div class="pg-header">
+                    <div class="pg-header-left">
+                        <div class="pg-header-icon"><i class="fa-solid fa-clock"></i></div>
+                        <div>
+                            <h2>Rendered Hours</h2>
+                            <p>OJT Daily Time Record</p>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <label style="font-size:15px; color:#555; font-weight:500; margin:0;">OJT Hours Required:</label>
+                        <span style="font-size:16px; font-weight:700; color:#272f54;"><?= $requiredHours ?> hrs</span>
                     </div>
                 </div>
 
@@ -2884,11 +2966,22 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
     <!-- PROGRESS REPORT SECTION -->
 
     <div class="section <?= $current_section === 'progress_report' ? 'active' : '' ?>">
-        <div class="main" style="padding-bottom:60px;">
+        <!-- <div class="main" style="padding-bottom:60px;">
             <h3 class="fw-bold mb-1">Weekly Progress Report</h3>
-            <p class="text-muted mb-4">Upload your filled-out weekly report, or download the blank template below.</p>
+            <p class="text-muted mb-4">Upload your filled-out weekly report, or download the blank template below.</p> -->
 
-            <!-- TEMPLATE DOWNLOAD -->
+        <div class="main" style="padding-bottom:60px;">
+            <div class="pg-header">
+                <div class="pg-header-left">
+                    <div class="pg-header-icon"><i class="fa-solid fa-file-lines"></i></div>
+                    <div>
+                        <h2>Weekly Progress Report</h2>
+                        <p>Upload your filled-out weekly report, or download the blank template below.</p>
+                    </div>
+                </div>
+            </div>
+
+           <!-- TEMPLATE DOWNLOAD -->
             <div class="card shadow-sm rounded-3 p-3 mb-3 d-flex flex-row align-items-center justify-content-between"
                 style="border:1px solid #e5e7eb;">
                 <div class="d-flex align-items-center gap-3">

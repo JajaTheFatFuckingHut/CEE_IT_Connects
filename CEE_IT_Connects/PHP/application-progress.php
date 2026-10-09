@@ -730,11 +730,11 @@ function uploadBlock(string $step_key, string $label, array $progress, ?int $int
             </div>
         <?php endif; ?>
 
-        <div class="page-header">
+        <!-- <div class="page-header">
             <h1>OJT Requirements Checklist</h1>
             <p>Complete each item below. Following the order is recommended, but you may work on them in any sequence.
             </p>
-        </div>
+        </div> -->
 
         <!-- Progress summary -->
         <div class="progress-summary">
