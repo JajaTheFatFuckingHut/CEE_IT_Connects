@@ -2927,7 +2927,7 @@ for ($t = 13; $t >= 0; $t--) {
                     labels: ['Complete', 'Incomplete'],
                     datasets: [{
                         data: [<?= (int) $reqComplete ?>, <?= (int) $reqIncomplete ?>],
-                        backgroundColor: ['#3d55b3d3', '#E4572E'],
+                        backgroundColor: ['#3E8E58', '#E4572E'],
                         borderWidth: 0
                     }]
                 },
