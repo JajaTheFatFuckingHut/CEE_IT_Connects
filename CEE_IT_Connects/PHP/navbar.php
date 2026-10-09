@@ -548,7 +548,7 @@ function timeAgo($datetime)
             }
         }
     </style>
-
+<!-- 
     <?php if ($userType === 'student'): ?>
     <style>
         @media (max-width: 768px) {
@@ -557,7 +557,7 @@ function timeAgo($datetime)
             }
         }
     </style>
-    <?php endif; ?>
+    <?php endif; ?> -->
 </head>
 
 <nav class="navbar navbar-expand-lg navbar-custom fixed-top">
@@ -626,7 +626,7 @@ function timeAgo($datetime)
                         echo 'message.php';
 
                     } ?>" class="navbar-icon-btn" data-tip="Rooms">
-                        <i class="fa-solid fa-calendar-users"></i>
+                        <i class="fa-solid fa-users-rectangle"></i>
                     </a>
                 </div>
             <?php endif; ?>
