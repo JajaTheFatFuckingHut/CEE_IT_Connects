@@ -626,7 +626,7 @@ function timeAgo($datetime)
                         echo 'message.php';
 
                     } ?>" class="navbar-icon-btn" data-tip="Rooms">
-                        <i class="fa-chalkboard-user"></i>
+                        <i class="fa-users"></i>
                     </a>
                 </div>
             <?php endif; ?>
