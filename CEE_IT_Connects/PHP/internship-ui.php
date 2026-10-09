@@ -561,8 +561,6 @@ for ($t = 13; $t >= 0; $t--) {
             box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
         }
 
-        /* ADDED: solid colored icon box (icon left of label/count), same pattern as the
-                       System Admin dashboard's Internships/Accounts/Programs cards. */
         .ojtc-stat-icon {
             width: 44px;
             height: 44px;
@@ -574,9 +572,7 @@ for ($t = 13; $t >= 0; $t--) {
             font-size: 18px;
             color: #fff;
         }
-
-        /* ADDED: one tint (card bg) + one solid accent (icon bg) per stat, matching the
-                       System Admin dashboard's navy/amber/red-orange palette. */
+        
         .card-tint-applications {
             background: #FFF6E3;
         }
@@ -609,8 +605,6 @@ for ($t = 13; $t >= 0; $t--) {
             background: #E4572E;
         }
 
-        /* ADDED: panel card hover-lift + rounded corners, reused by Application List,
-                       Announcements, Internship Postings, and Documents cards below. */
         .ojtc-panel-card {
             border-radius: 16px !important;
             transition: transform .15s ease, box-shadow .15s ease;
@@ -621,23 +615,16 @@ for ($t = 13; $t >= 0; $t--) {
             box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
         }
 
-        /* ADDED: subtle blue "tab" header background for the plain <table> headers —
-                       same class name/style as the System Admin dashboard table, for consistency. */
         .ojtc-th-tab th {
             background: rgba(39, 111, 255, 0.08) !important;
             color: #272f54 !important;
         }
 
-        /* ADDED: row hover highlight — works for <tr> rows and the flex-row divs used in
-                       Announcements / Documents. */
         .ojtc-row-hover:hover {
             background: #f8f9ff;
             border-radius: 8px;
         }
 
-        /* ADDED: same button style used on the System Admin dashboard — subtle yellow by
-                       default, solid orange on hover. Reuse this class on any button added to this
-                       tab or others (Add/Import/Save/etc.) for consistency. */
         .btn-update {
             background: #FFE7B3 !important;
             color: #7a5200 !important;
@@ -1018,11 +1005,6 @@ for ($t = 13; $t >= 0; $t--) {
 
             <!-- ── DASHBOARD ── -->
             <div id="dashboard" class="section active sysAdm-section">
-
-                <!-- CHANGED: header now uses the same .card/.card-header banner as the System Admin
-                     dashboard, reusing the sysAdm-header--danger/sysAdm-header--blue/sysAdm-header-icon/
-                     sysAdm-header-text classes so it looks identical. Original "sysAdm-header" class
-                     kept alongside in case other rules still target it. -->
                 <div class="mb-4 sysAdm-header--danger sysAdm-header--blue">
                     <div class="sysAdm-header-left">
                         <div class="sysAdm-header-icon">
@@ -1035,22 +1017,6 @@ for ($t = 13; $t >= 0; $t--) {
                         </div>
                     </div>
                 </div>
-
-                <!-- <div id="dashboard" class="section active sysAdm-section">
-                <div class="sysAdm-header--danger sysAdm-header--blue mb-4">
-                    <div class="sysAdm-header-left">
-                        <div class="sysAdm-header-icon">
-                            <i class="bi bi-speedometer2"></i>
-                        </div>
-                        <div class="sysAdm-header-text">
-                            <h2>System Admin Overview</h2>
-                            <p>Live summary from the internship admin panel</p>
-                        </div>
-                    </div>
-                </div> -->
-
-
-
 
                 <!-- SUMMARY CARDS -->
                 <div class="row g-3 mb-4">
@@ -1197,8 +1163,8 @@ for ($t = 13; $t >= 0; $t--) {
                         </div>
                     </div>
                      <!-- addtl e -->
+                      <div class="row g-4">
                     <div class="col-lg-7">
-                        <!-- CHANGED: added ojtc-panel-card for rounded corners + hover-lift. -->
                         <div class="card border-0 shadow-sm h-100 ojtc-panel-card">
                             <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
                                 <i class="bi bi-file-earmark-text" style="color:#272f54;"></i>
@@ -1210,8 +1176,6 @@ for ($t = 13; $t >= 0; $t--) {
                                 <?php else: ?>
                                     <table style="width:100%; border-collapse:collapse; font-size:13px;">
                                         <thead>
-                                            <!-- CHANGED: renamed to ojtc-th-tab so this table header matches
-                                                 the System Admin dashboard table header class/style exactly. -->
                                             <tr class="ojtc-th-tab"
                                                 style="color:#aaa; font-size:12px; text-transform:uppercase; letter-spacing:.04em;">
                                                 <th
@@ -1230,7 +1194,6 @@ for ($t = 13; $t >= 0; $t--) {
                                         </thead>
                                         <tbody>
                                             <?php foreach ($recentInterested as $ri): ?>
-                                                <!-- CHANGED: renamed to ojtc-row-hover (same rename, no behavior change). -->
                                                 <tr class="ojtc-row-hover">
                                                     <td style="padding:10px; border-bottom:1px solid #f0f2f7;">
                                                         <div style="display:flex; align-items:center; gap:8px;">
@@ -1265,7 +1228,6 @@ for ($t = 13; $t >= 0; $t--) {
 
                     <!-- Recent Announcements -->
                     <div class="col-lg-5">
-                        <!-- CHANGED: added ojtc-panel-card for rounded corners + hover-lift. -->
                         <div class="card border-0 shadow-sm h-100 ojtc-panel-card">
                             <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
                                 <i class="bi bi-bell" style="color:#272f54;"></i>
@@ -1284,7 +1246,6 @@ for ($t = 13; $t >= 0; $t--) {
                                             ];
                                             $c = $catColors[$a['category']] ?? ['bg' => '#f0f0f0', 'color' => '#444'];
                                             ?>
-                                            <!-- CHANGED: renamed to ojtc-row-hover (same rename, no behavior change). -->
                                             <div class="d-flex align-items-start gap-3 ojtc-row-hover" style="padding:6px;">
 
                                                 <div style="flex:1;min-width:0;">
@@ -1310,7 +1271,6 @@ for ($t = 13; $t >= 0; $t--) {
 
                     <!-- Recent Internship Postings -->
                     <div class="col-lg-7">
-                        <!-- CHANGED: added ojtc-panel-card for rounded corners + hover-lift. -->
                         <div class="card border-0 shadow-sm h-100 ojtc-panel-card">
                             <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
                                 <i class="bi bi-briefcase" style="color:#272f54;"></i>
@@ -1322,7 +1282,6 @@ for ($t = 13; $t >= 0; $t--) {
                                 <?php else: ?>
                                     <table style="width:100%; border-collapse:collapse; font-size:13px;">
                                         <thead>
-                                            <!-- CHANGED: renamed to ojtc-th-tab (same rename as above). -->
                                             <tr class="ojtc-th-tab"
                                                 style="color:#aaa; font-size:12px; text-transform:uppercase; letter-spacing:.04em;">
                                                 <th
@@ -1341,7 +1300,6 @@ for ($t = 13; $t >= 0; $t--) {
                                         </thead>
                                         <tbody>
                                             <?php foreach ($recentInternships as $ri): ?>
-                                                <!-- CHANGED: renamed to ojtc-row-hover (same rename, no behavior change). -->
                                                 <tr class="ojtc-row-hover">
                                                     <td
                                                         style="padding:10px; border-bottom:1px solid #f0f2f7; font-weight:500; color:#272f54;">
@@ -1392,15 +1350,6 @@ for ($t = 13; $t >= 0; $t--) {
                                             'color' => '#27500A'
                                         ];
                                     }
-                                    // foreach ($credentials as $c) {
-                                    //     $allDocs[] = [
-                                    //         'name' => $c['full_name'],
-                                    //         'type' => 'Credential',
-                                    //         'date' => $c['uploaded_at'],
-                                    //         'bg' => '#E6F1FB',
-                                    //         'color' => '#0C447C'
-                                    //     ];
-                                    // }
                                     usort($allDocs, fn($a, $b) => strtotime($b['date']) - strtotime($a['date']));
                                     $recentDocs = array_slice($allDocs, 0, 3);
                                     ?>
@@ -1408,7 +1357,6 @@ for ($t = 13; $t >= 0; $t--) {
                                         <p class="text-muted small">No documents uploaded yet.</p>
                                     <?php else: ?>
                                         <?php foreach ($recentDocs as $doc): ?>
-                                            <!-- CHANGED: renamed to ojtc-row-hover (same rename, no behavior change). -->
                                             <div class="ojtc-row-hover"
                                                 style="display:flex;align-items:center;gap:10px;padding:6px 6px 12px 6px;border-bottom:1px solid #f0f2f7;">
                                                 <div
