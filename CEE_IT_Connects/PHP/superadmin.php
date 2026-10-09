@@ -1503,29 +1503,8 @@ function deptCode($department)
 
                 <!-- Recent Internship Postings -->
                 <!-- ADMIN SUMMARY CARDS -->
-                <div class="row g-3 mb-4">
-                    <div class="col-md-4">
-                        <div class="card border-0 rounded-4 h-100 ojtc-stat-card" data-go="supervisor_requests"
-                            style="background:#FFF6E3;">
-                            <div class="card-body p-4">
-                                <div class="d-flex flex-wrap align-items-center gap-3">
-                                    <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0"
-                                        style="width:44px;height:44px;background:#FFB62F;">
-                                        <i class="bi bi-person-exclamation fs-5" style="color:#3b2600;"></i>
-                                    </div>
-                                    <div class="flex-grow-1" style="min-width:90px;">
-                                        <p class="small mb-1 fw-semibold text-uppercase"
-                                            style="letter-spacing:.05em;font-size:11px;color:#7a5200;">Pending Requests</p>
-                                        <h2 class="fw-bold mb-0" style="color:#3b2600;"><?= (int) $saPending ?></h2>
-                                        <p class="mb-0 mt-1 d-none d-md-block" style="font-size:11px;color:#7a5200;">
-                                            HTE supervisors to review</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-4">
+                <div class="row g-3 mb-4 sa-summary-row">
+                    <div class="col-md-6">
                         <div class="card border-0 rounded-4 h-100 ojtc-stat-card" data-go="restore"
                             style="background:#FDEEE8;">
                             <div class="card-body p-4">
@@ -1546,7 +1525,7 @@ function deptCode($department)
                         </div>
                     </div>
 
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <div class="card border-0 rounded-4 h-100 ojtc-stat-card" data-go="roles"
                             style="background:#EEF3FF;">
                             <div class="card-body p-4">
@@ -1570,7 +1549,7 @@ function deptCode($department)
 
                 <!-- ANALYTICS CHARTS -->
                 <div class="row g-4 mb-4">
-                    <div class="col-12 col-md-6 col-xl-4">
+                    <div class="col-12 col-md-6 col-xl-6">
                         <div class="card border-0 rounded-4 shadow-sm h-100 ojtc-stat-card" data-go="roles">
                             <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
                                 <i class="bi bi-pie-chart" style="color:#272f54;"></i>
@@ -1583,7 +1562,7 @@ function deptCode($department)
                         </div>
                     </div>
 
-                    <div class="col-12 col-md-6 col-xl-4">
+                    <!-- <div class="col-12 col-md-6 col-xl-4">
                         <div class="card border-0 rounded-4 shadow-sm h-100 ojtc-stat-card" data-go="supervisor_requests">
                             <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
                                 <i class="bi bi-person-check" style="color:#272f54;"></i>
@@ -1594,9 +1573,9 @@ function deptCode($department)
                                 <div style="position:relative; height:220px;"><canvas id="saReqChart"></canvas></div>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
 
-                    <div class="col-12 col-xl-4">
+                    <div class="col-12 col-md-6 col-xl-6">
                         <div class="card border-0 rounded-4 shadow-sm h-100 ojtc-stat-card" data-go="student_register">
                             <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
                                 <i class="bi bi-bar-chart" style="color:#272f54;"></i>
@@ -3321,18 +3300,18 @@ function deptCode($department)
             });
 
             // Supervisor requests by status (solid pie)
-            make('saReqChart', {
-                type: 'pie',
-                data: {
-                    labels: <?= json_encode(array_keys($saReq)) ?>,
-                    datasets: [{
-                        data: <?= json_encode(array_values($saReq)) ?>,
-                        backgroundColor: ['#FFB62F', '#3E8E58', '#E4572E'],
-                        borderWidth: 0
-                    }]
-                },
-                options: { maintainAspectRatio: false, plugins: { legend } }
-            });
+            // make('saReqChart', {
+            //     type: 'pie',
+            //     data: {
+            //         labels: <?= json_encode(array_keys($saReq)) ?>,
+            //         datasets: [{
+            //             data: <?= json_encode(array_values($saReq)) ?>,
+            //             backgroundColor: ['#FFB62F', '#3E8E58', '#E4572E'],
+            //             borderWidth: 0
+            //         }]
+            //     },
+            //     options: { maintainAspectRatio: false, plugins: { legend } }
+            // });
 
             // Students by program
             make('saProgramChart', {
