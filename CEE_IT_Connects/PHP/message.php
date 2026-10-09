@@ -2527,8 +2527,7 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
     <div id="application" class="section <?= $current_section === 'application' ? 'active' : '' ?>">
         <div class="main">
             <!-- addtl s -->
-            <div id="application" class="section <?= $current_section === 'application' ? 'active' : '' ?>">
-                <div class="main">
+            
                     <div class="pg-header">
                         <div class="pg-header-left">
                             <div class="pg-header-icon"><i class="fa fa-list-ul"></i></div>
