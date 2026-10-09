@@ -1291,6 +1291,125 @@ $backLink = getDashboardByRole($_SESSION['role']);
         }
 
         /* addtl e */
+
+        /* ── ADD PARTICIPANT (spacing fix) ── */
+        #addParticipantModal .modal-box {
+            display: flex;
+            flex-direction: column;
+            width: calc(100% - 32px);
+            max-width: 460px;
+            max-height: 85vh;
+            background: #fff;
+            border-radius: 14px;
+            overflow: hidden;
+        }
+
+        #addParticipantModal .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            background: #fff;
+            border-bottom: 1px solid #eef0f6;
+            flex-shrink: 0;
+        }
+
+        #addParticipantModal .modal-header h6 {
+            margin: 0;
+            font-size: 15px;
+            font-weight: 700;
+            color: #272f54;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #addParticipantModal .modal-header h6 i {
+            margin: 0 !important;
+        }
+
+        #addParticipantModal .modal-close {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #f1f3f8;
+            color: #64748b;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #addParticipantModal .modal-close:hover {
+            background: #e4572e;
+            color: #fff;
+        }
+
+        #addParticipantModal .modal-body {
+            flex: 1 1 auto;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            padding: 16px 20px 8px;
+        }
+
+        #addParticipantModal .search-input-wrap {
+            margin-bottom: 12px;
+            flex-shrink: 0;
+        }
+
+        #addParticipantModal .search-input-wrap input {
+            padding: 10px 14px 10px 36px;
+            border-radius: 10px;
+        }
+
+        #addParticipantModal .participant-list {
+            flex: 1 1 auto;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-right: -8px;
+            padding-right: 8px;
+        }
+
+        #addParticipantModal .participant-item {
+            padding: 10px 8px;
+            gap: 12px;
+        }
+
+        #addParticipantModal .participant-avatar {
+            width: 38px;
+            height: 38px;
+            min-width: 38px;
+        }
+
+        #addParticipantModal .participant-info strong {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 2px;
+            color: #1e293b;
+        }
+
+        #addParticipantModal .participant-info small {
+            font-size: 13px;
+        }
+
+        #addParticipantModal .modal-footer {
+            padding: 14px 20px;
+            border-top: 1px solid #eef0f6;
+            background: #fff;
+            flex-shrink: 0;
+            gap: 10px;
+        }
+
+        #addParticipantModal .btn-add-confirm {
+            padding: 8px 18px;
+            border-radius: 8px;
+        }
+
+        #addParticipantModal .modal-footer .btn-light {
+            padding: 8px 16px;
+            border-radius: 8px;
+        }
     </style>
 </head>
 
