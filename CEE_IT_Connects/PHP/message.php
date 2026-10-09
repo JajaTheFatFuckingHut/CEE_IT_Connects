@@ -2630,13 +2630,7 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
         <div class="main">
             <?php if ($current_room_id): ?>
                 <?php include 'chat-room-content.php'; ?>
-            <!-- <?php else: ?>
-                <div class="text-center mt-5">
-                    <i class="fa fa-clock fa-3x text-muted mb-3 d-block"></i>
-                    <h5 class="fw-bold">You haven't been assigned to a room yet.</h5>
-                    <p class="text-muted">Please wait for your adviser to be assigned.</p>
-                </div>
-            <?php endif; ?> -->
+            
             <!-- addtl s dashboard ni student -->
             <?php else: ?>
                 <div class="pg-header">
