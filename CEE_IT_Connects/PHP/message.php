@@ -609,7 +609,8 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
         }
 
         body {
-            background: #f5f6fa;
+            /* background: #f5f6fa; */
+            background: #f8f6f3;
             margin: 0;
             padding-top: 70px;
             height: 100vh;
@@ -682,10 +683,11 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
 
         /* MAIN */
         .main {
-            margin-left: 260px;
+            margin-left: 240px;
             padding: 20px;
-            background-color: #fff;
-            height: 100%;
+            /* background-color: #fff; */
+            background: #f8f6f3;
+            min-height: calc(100vh - 70px);
         }
 
         /* SECTION */
@@ -1013,7 +1015,7 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
         .rc-wrap {
             display: flex;
             height: calc(100vh - 70px);
-            margin: -24px;
+            margin: -20px;
             /* cancel .main padding */
             overflow: hidden;
             background: #f5f6fa;
@@ -1682,7 +1684,7 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
             }
 
             .main {
-                margin-left: 70px;
+                margin-left: 60px;
                 padding: 15px;
             }
 
