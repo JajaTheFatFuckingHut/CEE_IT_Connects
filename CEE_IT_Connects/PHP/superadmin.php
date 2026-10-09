@@ -381,17 +381,17 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
 // All variables are prefixed "sa" so they can't clash with names used further down the page.
 
 // Supervisor requests by status (already loaded in $supervisorRequests)
-$saReq = ['Pending' => 0, 'Approved' => 0, 'Returned' => 0];
-foreach ($supervisorRequests as $saRq) {
-    if ($saRq['status'] === 'pending') {
-        $saReq['Pending']++;
-    } elseif ($saRq['status'] === 'approved') {
-        $saReq['Approved']++;
-    } elseif ($saRq['status'] === 'rejected') {
-        $saReq['Returned']++;
-    }
-}
-$saPending = $saReq['Pending'];
+// $saReq = ['Pending' => 0, 'Approved' => 0, 'Returned' => 0];
+// foreach ($supervisorRequests as $saRq) {
+//     if ($saRq['status'] === 'pending') {
+//         $saReq['Pending']++;
+//     } elseif ($saRq['status'] === 'approved') {
+//         $saReq['Approved']++;
+//     } elseif ($saRq['status'] === 'rejected') {
+//         $saReq['Returned']++;
+//     }
+// }
+// $saPending = $saReq['Pending'];
 
 // Active vs. archived accounts
 $saAcc = $pdo->query("
@@ -1442,6 +1442,7 @@ function deptCode($department)
                     }
                 </style>
 
+                                <!-- SUMMARY CARDS -->
                 <div class="row g-3 mb-4">
                     <div class="col-md-4">
                         <div class="card border-0 rounded-4 h-100 ojtc-stat-card" style="background:#EEF3FF;">
@@ -1454,8 +1455,7 @@ function deptCode($department)
                                     <div class="flex-grow-1" style="min-width:90px;">
                                         <p class="small mb-1 fw-semibold text-uppercase"
                                             style="letter-spacing:.05em; font-size:11px; color:#272f54;">Internships</p>
-                                        <h2 class="fw-bold mb-0" style="color:#272f54;"><?= (int) $totalInternships ?>
-                                        </h2>
+                                        <h2 class="fw-bold mb-0" style="color:#272f54;"><?= (int) $totalInternships ?></h2>
                                     </div>
                                 </div>
                             </div>
@@ -1472,10 +1472,10 @@ function deptCode($department)
                                     </div>
                                     <div class="flex-grow-1" style="min-width:90px;">
                                         <p class="small mb-1 fw-semibold text-uppercase"
-                                            style="letter-spacing:.05em;font-size:11px;color:#7a5200;">Accounts
-                                        </p>
+                                            style="letter-spacing:.05em;font-size:11px;color:#7a5200;">Accounts</p>
                                         <h2 class="fw-bold mb-0" style="color:#3b2600;"><?= (int) $totalAccounts ?></h2>
-
+                                        <p class="mb-0 mt-1 d-none d-md-block" style="font-size:11px;color:#7a5200;">
+                                            <?= $saActivePct ?>% active &middot; <?= (int) $saArchived ?> archived</p>
                                     </div>
                                 </div>
                             </div>
@@ -1483,19 +1483,80 @@ function deptCode($department)
                     </div>
 
                     <div class="col-md-4">
-                        <div class="card border-0 rounded-4 h-100 ojtc-stat-card" style="background:#FDEEE8;">
+                        <div class="card border-0 rounded-4 h-100 ojtc-stat-card" data-go="roles"
+                            style="background:#FDEEE8;">
                             <div class="card-body p-4">
                                 <div class="d-flex flex-wrap align-items-center gap-3">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0"
                                         style="width:44px;height:44px;background:#E4572E;">
-                                        <i class="bi bi-clock-history text-white fs-5"></i>
+                                        <i class="bi bi-shield-lock-fill text-white fs-5"></i>
                                     </div>
                                     <div class="flex-grow-1" style="min-width:90px;">
                                         <p class="small mb-1 fw-semibold text-uppercase"
-                                            style="letter-spacing:.05em;font-size:11px;color:#a13d1f;">Programs</p>
-                                        <h2 class="fw-bold mb-0" style="color:#a13d1f;"><?= (int) $totalPrograms ?></h2>
+                                            style="letter-spacing:.05em;font-size:11px;color:#a13d1f;">System Admin Seats</p>
+                                        <h2 class="fw-bold mb-0" style="color:#a13d1f;"><?= (int) $saSeatsUsed ?> of <?= (int) $saSeatMax ?></h2>
+                                        <p class="mb-0 mt-1 d-none d-md-block" style="font-size:11px;color:#a13d1f;">
+                                            <?= (int) $saSeatsOpen ?> open</p>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ANALYTICS CHARTS: row 1 (three small cards) -->
+                <div class="row g-4 mb-4">
+                    <div class="col-12 col-md-6 col-xl-4">
+                        <div class="card border-0 rounded-4 shadow-sm h-100 ojtc-stat-card" data-go="roles">
+                            <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
+                                <i class="bi bi-pie-chart" style="color:#272f54;"></i>
+                                <h6 class="fw-bold mb-0" style="color:#272f54;">Accounts by Role</h6>
+                            </div>
+                            <div class="card-body px-4 pb-4 pt-2">
+                                <p class="text-muted small mb-3">Active students, advisers, and admins.</p>
+                                <div style="position:relative; height:220px;"><canvas id="saRoleChart"></canvas></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-6 col-xl-4">
+                        <div class="card border-0 rounded-4 shadow-sm h-100 ojtc-stat-card" data-go="student_register">
+                            <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
+                                <i class="bi bi-bar-chart" style="color:#272f54;"></i>
+                                <h6 class="fw-bold mb-0" style="color:#272f54;">Students by Program</h6>
+                            </div>
+                            <div class="card-body px-4 pb-4 pt-2">
+                                <p class="text-muted small mb-3">Active students per program.</p>
+                                <div style="position:relative; height:220px;"><canvas id="saProgramChart"></canvas></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-xl-4">
+                        <div class="card border-0 rounded-4 shadow-sm h-100 ojtc-stat-card" data-go="monitor">
+                            <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
+                                <i class="bi bi-people" style="color:#272f54;"></i>
+                                <h6 class="fw-bold mb-0" style="color:#272f54;">Activity by Role</h6>
+                            </div>
+                            <div class="card-body px-4 pb-4 pt-2">
+                                <p class="text-muted small mb-3">Who is using the system, last 14 days.</p>
+                                <div style="position:relative; height:220px;"><canvas id="saRoleActChart"></canvas></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ANALYTICS CHARTS: row 2 (full width) -->
+                <div class="row g-4 mb-4">
+                    <div class="col-12">
+                        <div class="card border-0 rounded-4 shadow-sm h-100 ojtc-stat-card" data-go="monitor">
+                            <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
+                                <i class="bi bi-graph-up" style="color:#272f54;"></i>
+                                <h6 class="fw-bold mb-0" style="color:#272f54;">System Activity</h6>
+                            </div>
+                            <div class="card-body px-4 pb-4 pt-2">
+                                <p class="text-muted small mb-3">Logged actions per day, last 14 days.</p>
+                                <div style="position:relative; height:260px;"><canvas id="saActivityChart"></canvas></div>
                             </div>
                         </div>
                     </div>
@@ -3321,18 +3382,18 @@ function deptCode($department)
             });
 
             // Supervisor requests by status (solid pie)
-            make('saReqChart', {
-                type: 'pie',
-                data: {
-                    labels: <?= json_encode(array_keys($saReq)) ?>,
-                    datasets: [{
-                        data: <?= json_encode(array_values($saReq)) ?>,
-                        backgroundColor: ['#FFB62F', '#3E8E58', '#E4572E'],
-                        borderWidth: 0
-                    }]
-                },
-                options: { maintainAspectRatio: false, plugins: { legend } }
-            });
+            // make('saReqChart', {
+            //     type: 'pie',
+            //     data: {
+            //         labels: <?= json_encode(array_keys($saReq)) ?>,
+            //         datasets: [{
+            //             data: <?= json_encode(array_values($saReq)) ?>,
+            //             backgroundColor: ['#FFB62F', '#3E8E58', '#E4572E'],
+            //             borderWidth: 0
+            //         }]
+            //     },
+            //     options: { maintainAspectRatio: false, plugins: { legend } }
+            // });
 
             // Students by program
             make('saProgramChart', {
