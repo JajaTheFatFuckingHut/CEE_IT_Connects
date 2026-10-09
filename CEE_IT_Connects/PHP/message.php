@@ -14,6 +14,11 @@ if ($current_room_id !== null && $current_room_id !== '' && ctype_digit((string)
     $current_room_id = null;
 }
 
+// If no room was picked by URL or auto-load, fall back to the student's first room
+// if ($current_room_id === null && !empty($rooms)) {
+//     $current_room_id = (int) $rooms[0]['id'];
+// }
+
 $stmt = $pdo->prepare("
     SELECT *
     FROM ojt_evaluations_student
@@ -2475,6 +2480,68 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
         .ojt-status-badge[style*="rgb(220, 53, 69)"]  { background: #fde8e8; }
         .ojt-status-badge[style*="rgb(25, 135, 84)"]  { background: #e3f6ec; }
         .ojt-status-badge[style*="rgb(13, 110, 253)"] { background: #e5eeff; }
+
+        /* addtl s dashboard ni student */
+        /* ── HOME EMPTY STATE ── */
+        .hm-card {
+            background: #fff;
+            border: 1px solid #eef0f6;
+            border-radius: 14px;
+            box-shadow: 0 1px 3px rgba(20, 30, 70, .04);
+            padding: 20px 24px;
+        }
+
+        .hm-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #1f2a55;
+            margin-bottom: 8px;
+        }
+
+        .hm-step {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 14px 0;
+            border-top: 1px solid #eef0f6;
+        }
+
+        .hm-step:first-of-type { border-top: none; }
+
+        .hm-dot {
+            width: 38px;
+            height: 38px;
+            min-width: 38px;
+            border-radius: 50%;
+            background: #eef2f9;
+            color: #6b7390;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hm-step.done .hm-dot { background: #e1f6ec; color: #16a36a; }
+
+        .hm-text { flex: 1; min-width: 0; }
+        .hm-text strong { display: block; font-size: 14px; color: #1f2a55; }
+        .hm-text span   { font-size: 13px; color: #6b7390; }
+
+        .hm-btn {
+            background: #fdeee6;
+            color: #f26b3a;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 7px 16px;
+            border-radius: 10px;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .hm-btn:hover { background: #f26b3a; color: #fff; }
+
+        .hm-wait { font-size: 13px; color: #8b93ab; white-space: nowrap; }
+        /* addtl e dashboard ni student */
     </style>
 </head>
 
@@ -2563,13 +2630,61 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
         <div class="main">
             <?php if ($current_room_id): ?>
                 <?php include 'chat-room-content.php'; ?>
-            <?php else: ?>
+            <!-- <?php else: ?>
                 <div class="text-center mt-5">
                     <i class="fa fa-clock fa-3x text-muted mb-3 d-block"></i>
                     <h5 class="fw-bold">You haven't been assigned to a room yet.</h5>
                     <p class="text-muted">Please wait for your adviser to be assigned.</p>
                 </div>
+            <?php endif; ?> -->
+            <!-- addtl s dashboard ni student -->
+            <?php else: ?>
+                <div class="pg-header">
+                    <div class="pg-header-left">
+                        <div class="pg-header-icon"><i class="fa-solid fa-house"></i></div>
+                        <div>
+                            <h2>Welcome, <?= htmlspecialchars(explode(' ', trim($displayName))[0]) ?></h2>
+                            <p>You haven't been assigned to a room yet. Here is where you stand.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hm-card">
+                    <div class="hm-title">Getting started</div>
+
+                    <div class="hm-step <?= $application_internship_id ? 'done' : '' ?>">
+                        <div class="hm-dot"><i class="fa-solid <?= $application_internship_id ? 'fa-check' : 'fa-1' ?>"></i></div>
+                        <div class="hm-text">
+                            <strong>Choose an internship</strong>
+                            <span>Pick your host company so your checklist can open.</span>
+                        </div>
+                        <?php if (!$application_internship_id): ?>
+                            <a href="?section=application" class="hm-btn">Choose</a>
+                        <?php endif; ?>
+                    </div>
+
+                    <div class="hm-step <?= $hasActiveProgress ? 'done' : '' ?>">
+                        <div class="hm-dot"><i class="fa-solid <?= $hasActiveProgress ? 'fa-check' : 'fa-2' ?>"></i></div>
+                        <div class="hm-text">
+                            <strong>Submit your required documents</strong>
+                            <span>MOU, Recommendation Letter and Waiver unlock Hours and Progress Report.</span>
+                        </div>
+                        <?php if ($application_internship_id && !$hasActiveProgress): ?>
+                            <a href="?section=application" class="hm-btn">Open checklist</a>
+                        <?php endif; ?>
+                    </div>
+
+                    <div class="hm-step">
+                        <div class="hm-dot"><i class="fa-solid fa-3"></i></div>
+                        <div class="hm-text">
+                            <strong>Get assigned to a room</strong>
+                            <span>Your adviser will add you to a room. It will appear in the sidebar and here.</span>
+                        </div>
+                        <span class="hm-wait"><i class="fa-regular fa-clock me-1"></i>Waiting</span>
+                    </div>
+                </div>
             <?php endif; ?>
+            <!-- addtl e dashboard ni student -->
         </div>
     </div>
 
