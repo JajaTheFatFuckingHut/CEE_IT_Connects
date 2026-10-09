@@ -2904,7 +2904,7 @@ for ($t = 13; $t >= 0; $t--) {
 
             // Phase doughnut
             make('phaseChart', {
-                type: 'doughnut',
+                type: 'pie',
                 data: {
                     labels: ['Internship Confirmed', 'In Progress', 'No Progress'],
                     datasets: [{
@@ -2915,14 +2915,13 @@ for ($t = 13; $t >= 0; $t--) {
                 },
                 options: {
                     maintainAspectRatio: false,
-                    cutout: '62%',
                     plugins: { legend: { position: 'bottom', labels: { boxWidth: 12 } } }
                 }
             });
 
             // Requirements doughnut
             make('reqChart', {
-                type: 'doughnut',
+                type: 'pie',
                 data: {
                     labels: ['Complete', 'Incomplete'],
                     datasets: [{
@@ -2933,7 +2932,6 @@ for ($t = 13; $t >= 0; $t--) {
                 },
                 options: {
                     maintainAspectRatio: false,
-                    cutout: '62%',
                     plugins: { legend: { position: 'bottom', labels: { boxWidth: 12 } } }
                 }
             });

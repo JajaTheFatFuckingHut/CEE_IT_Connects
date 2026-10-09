@@ -377,7 +377,121 @@ $programHoursStmt = $pdo->query("
     ORDER BY program ASC
 ");
 $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
+// ── DASHBOARD ANALYTICS (cards + charts) ──
+// All variables are prefixed "sa" so they can't clash with names used further down the page.
 
+// Supervisor requests by status (already loaded in $supervisorRequests)
+$saReq = ['Pending' => 0, 'Approved' => 0, 'Returned' => 0];
+foreach ($supervisorRequests as $saRq) {
+    if ($saRq['status'] === 'pending') {
+        $saReq['Pending']++;
+    } elseif ($saRq['status'] === 'approved') {
+        $saReq['Approved']++;
+    } elseif ($saRq['status'] === 'rejected') {
+        $saReq['Returned']++;
+    }
+}
+$saPending = $saReq['Pending'];
+
+// Active vs. archived accounts
+$saAcc = $pdo->query("
+    SELECT
+        (SELECT COUNT(*) FROM students) + (SELECT COUNT(*) FROM advisers) + (SELECT COUNT(*) FROM admins) AS total,
+        (SELECT COUNT(*) FROM students WHERE is_archived = TRUE)
+      + (SELECT COUNT(*) FROM advisers WHERE is_archived = TRUE)
+      + (SELECT COUNT(*) FROM admins   WHERE is_archived = TRUE) AS archived
+")->fetch(PDO::FETCH_ASSOC);
+$saAccTotal  = (int) $saAcc['total'];
+$saArchived  = (int) $saAcc['archived'];
+$saActivePct = $saAccTotal > 0 ? (int) round((($saAccTotal - $saArchived) / $saAccTotal) * 100) : 0;
+
+// System admin seats (the 3-admin limit is the same one enforced in the role-update form above)
+$saSeatMax   = 3;
+$saSeatsUsed = count(array_filter($admins, fn($a) => $a['role'] === 'superadmin'));
+$saSeatsOpen = max(0, $saSeatMax - $saSeatsUsed);
+
+// Accounts by role (active accounts only)
+$saRoleRows = $pdo->query("
+    SELECT 'Students' AS label, COUNT(*) AS total FROM students
+        WHERE COALESCE(is_archived, FALSE) = FALSE
+    UNION ALL
+    SELECT 'HTE Advisers', COUNT(*) FROM advisers
+        WHERE LOWER(role::text) = 'hte_adviser' AND COALESCE(is_archived, FALSE) = FALSE
+    UNION ALL
+    SELECT 'Internship Advisers', COUNT(*) FROM advisers
+        WHERE LOWER(role::text) = 'internship_adviser' AND COALESCE(is_archived, FALSE) = FALSE
+    UNION ALL
+    SELECT 'Admins', COUNT(*) FROM admins
+        WHERE COALESCE(is_archived, FALSE) = FALSE
+")->fetchAll(PDO::FETCH_KEY_PAIR);
+$saRoleCounts = [
+    'Students'            => (int) ($saRoleRows['Students'] ?? 0),
+    'HTE Advisers'        => (int) ($saRoleRows['HTE Advisers'] ?? 0),
+    'Internship Advisers' => (int) ($saRoleRows['Internship Advisers'] ?? 0),
+    'Admins'              => (int) ($saRoleRows['Admins'] ?? 0),
+];
+
+// Students by program (active students only)
+$saProgRows = $pdo->query("
+    SELECT LOWER(TRIM(program)) AS program, COUNT(*) AS total
+    FROM students
+    WHERE program IS NOT NULL AND TRIM(program) <> '' AND COALESCE(is_archived, FALSE) = FALSE
+    GROUP BY LOWER(TRIM(program))
+    ORDER BY total DESC
+")->fetchAll(PDO::FETCH_ASSOC);
+$saProgColorMap = [
+    'information technology' => '#e0483e',
+    'civil engineering'      => '#4f51a8',
+    'electrical engineering' => '#f2b705',
+];
+$saProgLabels = [];
+$saProgData   = [];
+$saProgColors = [];
+foreach ($saProgRows as $saP) {
+    $saProgLabels[] = deptCode($saP['program']);
+    $saProgData[]   = (int) $saP['total'];
+    $saProgColors[] = $saProgColorMap[$saP['program']] ?? '#6b7280';
+}
+
+// System activity per day, last 14 days
+$saActStmt = $pdo->query("
+    SELECT activity_date::date AS day, COUNT(*) AS total
+    FROM audits
+    WHERE activity_date >= (CURRENT_DATE - INTERVAL '13 days')
+    GROUP BY activity_date::date
+");
+$saActByDay = [];
+foreach ($saActStmt->fetchAll(PDO::FETCH_ASSOC) as $saR) {
+    $saActByDay[$saR['day']] = (int) $saR['total'];
+}
+$saTrendLabels = [];
+$saTrendData   = [];
+for ($saT = 13; $saT >= 0; $saT--) {
+    $saKey = date('Y-m-d', strtotime("-{$saT} days"));
+    $saTrendLabels[] = date('M j', strtotime($saKey));
+    $saTrendData[]   = $saActByDay[$saKey] ?? 0;
+}
+
+// Activity by role, last 14 days
+$saRoleActRows = $pdo->query("
+    SELECT LOWER(roles) AS role, COUNT(*) AS total
+    FROM audits
+    WHERE activity_date >= (CURRENT_DATE - INTERVAL '13 days')
+    GROUP BY LOWER(roles)
+    ORDER BY total DESC
+")->fetchAll(PDO::FETCH_ASSOC);
+$saRoleActLabels = [];
+$saRoleActData   = [];
+foreach ($saRoleActRows as $saRa) {
+    if ($saRa['role'] === 'superadmin') {
+        $saRoleActLabels[] = 'System Admin';
+    } elseif ($saRa['role'] === 'hte_adviser') {
+        $saRoleActLabels[] = 'HTE Adviser';
+    } else {
+        $saRoleActLabels[] = ucwords(str_replace('_', ' ', $saRa['role']));
+    }
+    $saRoleActData[] = (int) $saRa['total'];
+}
 function deptCode($department)
 {
     $department = strtolower(trim($department));
@@ -1216,7 +1330,7 @@ function deptCode($department)
                 <i class="bi bi-clock-history me-2"></i>
                 <span class="nav-label">OJT Hours</span>
             </a>
-            <a href="#" onclick="showSection(event, 'section_settings')" data-tooltip="Settings">
+            <a href="#" onclick="showSection(event, 'section_settings')" data-tooltip="Section">
                 <i class="bi bi-ui-checks me-2"></i>
                 <span class="nav-label">Section</span>
             </a>
@@ -1225,7 +1339,7 @@ function deptCode($department)
                 <span class="nav-label">Archives</span>
             </a>
         </div> -->
-            <a href="#" onclick="showSection(event, 'restore')" data-tooltip="Settings">
+            <a href="#" onclick="showSection(event, 'restore')" data-tooltip="Archives">
                 <i class="bi bi-archive me-2"></i>
                 <span class="nav-label">Archives</span>
             </a>
@@ -1388,6 +1502,139 @@ function deptCode($department)
                 </div>
 
                 <!-- Recent Internship Postings -->
+                <!-- ADMIN SUMMARY CARDS -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <div class="card border-0 rounded-4 h-100 ojtc-stat-card" data-go="supervisor_requests"
+                            style="background:#FFF6E3;">
+                            <div class="card-body p-4">
+                                <div class="d-flex flex-wrap align-items-center gap-3">
+                                    <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0"
+                                        style="width:44px;height:44px;background:#FFB62F;">
+                                        <i class="bi bi-person-exclamation fs-5" style="color:#3b2600;"></i>
+                                    </div>
+                                    <div class="flex-grow-1" style="min-width:90px;">
+                                        <p class="small mb-1 fw-semibold text-uppercase"
+                                            style="letter-spacing:.05em;font-size:11px;color:#7a5200;">Pending Requests</p>
+                                        <h2 class="fw-bold mb-0" style="color:#3b2600;"><?= (int) $saPending ?></h2>
+                                        <p class="mb-0 mt-1 d-none d-md-block" style="font-size:11px;color:#7a5200;">
+                                            HTE supervisors to review</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="card border-0 rounded-4 h-100 ojtc-stat-card" data-go="restore"
+                            style="background:#FDEEE8;">
+                            <div class="card-body p-4">
+                                <div class="d-flex flex-wrap align-items-center gap-3">
+                                    <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0"
+                                        style="width:44px;height:44px;background:#E4572E;">
+                                        <i class="bi bi-people-fill text-white fs-5"></i>
+                                    </div>
+                                    <div class="flex-grow-1" style="min-width:90px;">
+                                        <p class="small mb-1 fw-semibold text-uppercase"
+                                            style="letter-spacing:.05em;font-size:11px;color:#a13d1f;">Active Accounts</p>
+                                        <h2 class="fw-bold mb-0" style="color:#a13d1f;"><?= $saActivePct ?>%</h2>
+                                        <p class="mb-0 mt-1 d-none d-md-block" style="font-size:11px;color:#a13d1f;">
+                                            <?= (int) $saArchived ?> archived</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="card border-0 rounded-4 h-100 ojtc-stat-card" data-go="roles"
+                            style="background:#EEF3FF;">
+                            <div class="card-body p-4">
+                                <div class="d-flex flex-wrap align-items-center gap-3">
+                                    <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0"
+                                        style="width:44px;height:44px;background:#272f54;">
+                                        <i class="bi bi-shield-lock-fill text-white fs-5"></i>
+                                    </div>
+                                    <div class="flex-grow-1" style="min-width:90px;">
+                                        <p class="small mb-1 fw-semibold text-uppercase"
+                                            style="letter-spacing:.05em;font-size:11px;color:#272f54;">System Admin Seats</p>
+                                        <h2 class="fw-bold mb-0" style="color:#272f54;"><?= (int) $saSeatsUsed ?> of <?= (int) $saSeatMax ?></h2>
+                                        <p class="mb-0 mt-1 d-none d-md-block" style="font-size:11px;color:#272f54;">
+                                            <?= (int) $saSeatsOpen ?> open</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ANALYTICS CHARTS -->
+                <div class="row g-4 mb-4">
+                    <div class="col-12 col-md-6 col-xl-4">
+                        <div class="card border-0 rounded-4 shadow-sm h-100 ojtc-stat-card" data-go="roles">
+                            <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
+                                <i class="bi bi-pie-chart" style="color:#272f54;"></i>
+                                <h6 class="fw-bold mb-0" style="color:#272f54;">Accounts by Role</h6>
+                            </div>
+                            <div class="card-body px-4 pb-4 pt-2">
+                                <p class="text-muted small mb-3">Active students, advisers, and admins.</p>
+                                <div style="position:relative; height:220px;"><canvas id="saRoleChart"></canvas></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-6 col-xl-4">
+                        <div class="card border-0 rounded-4 shadow-sm h-100 ojtc-stat-card" data-go="supervisor_requests">
+                            <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
+                                <i class="bi bi-person-check" style="color:#272f54;"></i>
+                                <h6 class="fw-bold mb-0" style="color:#272f54;">Supervisor Requests</h6>
+                            </div>
+                            <div class="card-body px-4 pb-4 pt-2">
+                                <p class="text-muted small mb-3">Pending, approved, and returned.</p>
+                                <div style="position:relative; height:220px;"><canvas id="saReqChart"></canvas></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-xl-4">
+                        <div class="card border-0 rounded-4 shadow-sm h-100 ojtc-stat-card" data-go="student_register">
+                            <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
+                                <i class="bi bi-bar-chart" style="color:#272f54;"></i>
+                                <h6 class="fw-bold mb-0" style="color:#272f54;">Students by Program</h6>
+                            </div>
+                            <div class="card-body px-4 pb-4 pt-2">
+                                <p class="text-muted small mb-3">Active students per program.</p>
+                                <div style="position:relative; height:220px;"><canvas id="saProgramChart"></canvas></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-xl-8">
+                        <div class="card border-0 rounded-4 shadow-sm h-100 ojtc-stat-card" data-go="monitor">
+                            <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
+                                <i class="bi bi-graph-up" style="color:#272f54;"></i>
+                                <h6 class="fw-bold mb-0" style="color:#272f54;">System Activity</h6>
+                            </div>
+                            <div class="card-body px-4 pb-4 pt-2">
+                                <p class="text-muted small mb-3">Logged actions per day, last 14 days.</p>
+                                <div style="position:relative; height:220px;"><canvas id="saActivityChart"></canvas></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-xl-4">
+                        <div class="card border-0 rounded-4 shadow-sm h-100 ojtc-stat-card" data-go="monitor">
+                            <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
+                                <i class="bi bi-people" style="color:#272f54;"></i>
+                                <h6 class="fw-bold mb-0" style="color:#272f54;">Activity by Role</h6>
+                            </div>
+                            <div class="card-body px-4 pb-4 pt-2">
+                                <p class="text-muted small mb-3">Who is using the system, last 14 days.</p>
+                                <div style="position:relative; height:220px;"><canvas id="saRoleActChart"></canvas></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div class="card border-0 rounded-4 shadow-sm mb-4">
                     <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
                         <i class="bi bi-briefcase" style="color:#272f54;"></i>
@@ -3050,6 +3297,126 @@ function deptCode($department)
         }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script>
+        (function () {
+            const make = (id, cfg) => {
+                const el = document.getElementById(id);
+                if (el) new Chart(el, cfg);
+            };
+            const legend = { position: 'bottom', labels: { boxWidth: 12 } };
+
+            // Accounts by role (solid pie)
+            make('saRoleChart', {
+                type: 'pie',
+                data: {
+                    labels: <?= json_encode(array_keys($saRoleCounts)) ?>,
+                    datasets: [{
+                        data: <?= json_encode(array_values($saRoleCounts)) ?>,
+                        backgroundColor: ['#272F54', '#FFB62F', '#E4572E', '#3d55b3d3'],
+                        borderWidth: 0
+                    }]
+                },
+                options: { maintainAspectRatio: false, plugins: { legend } }
+            });
+
+            // Supervisor requests by status (solid pie)
+            make('saReqChart', {
+                type: 'pie',
+                data: {
+                    labels: <?= json_encode(array_keys($saReq)) ?>,
+                    datasets: [{
+                        data: <?= json_encode(array_values($saReq)) ?>,
+                        backgroundColor: ['#FFB62F', '#3E8E58', '#E4572E'],
+                        borderWidth: 0
+                    }]
+                },
+                options: { maintainAspectRatio: false, plugins: { legend } }
+            });
+
+            // Students by program
+            make('saProgramChart', {
+                type: 'bar',
+                data: {
+                    labels: <?= json_encode($saProgLabels) ?>,
+                    datasets: [{
+                        label: 'Students',
+                        data: <?= json_encode($saProgData) ?>,
+                        backgroundColor: <?= json_encode($saProgColors) ?>,
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+                }
+            });
+
+            // System activity (14 days)
+            make('saActivityChart', {
+                type: 'line',
+                data: {
+                    labels: <?= json_encode($saTrendLabels) ?>,
+                    datasets: [{
+                        label: 'Actions',
+                        data: <?= json_encode($saTrendData) ?>,
+                        borderColor: '#E4572E',
+                        backgroundColor: 'rgba(228,87,46,0.1)',
+                        tension: 0.3,
+                        fill: true,
+                        pointRadius: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { precision: 0 } },
+                        x: { ticks: { maxTicksLimit: 7 } }
+                    }
+                }
+            });
+
+            // Activity by role (horizontal bar)
+            make('saRoleActChart', {
+                type: 'bar',
+                data: {
+                    labels: <?= json_encode($saRoleActLabels) ?>,
+                    datasets: [{
+                        label: 'Actions',
+                        data: <?= json_encode($saRoleActData) ?>,
+                        backgroundColor: '#272F54',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { x: { beginAtZero: true, ticks: { precision: 0 } } }
+                }
+            });
+        })();
+
+        // Click any card to jump to the section with the full details
+        function goToSection(id) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(id)?.classList.add('active');
+            document.querySelectorAll('.sidebar a').forEach(l => l.classList.remove('active'));
+            document.querySelector(`.sidebar a[onclick*="'${id}'"]`)?.classList.add('active');
+            window.scrollTo({ top: 0 });
+        }
+
+        document.querySelectorAll('#dashboard [data-go]').forEach(card => {
+            card.style.cursor = 'pointer';
+            card.title = 'Click to view full details';
+            card.addEventListener('click', () => goToSection(card.dataset.go));
+        });
+    </script>
 </body>
 
 </html>

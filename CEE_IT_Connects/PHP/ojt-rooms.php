@@ -3571,7 +3571,6 @@ $page = 'messages';
                 },
                 options: {
                     maintainAspectRatio: false,
-                    cutout: '62%',
                     plugins: { legend: { position: 'bottom', labels: { boxWidth: 12 } } }
                 }
             });

@@ -3625,7 +3625,6 @@ foreach ($roomStatuses as $s) {
                 },
                 options: {
                     maintainAspectRatio: false,
-                    cutout: '62%',
                     plugins: { legend: { position: 'bottom', labels: { boxWidth: 12 } } }
                 }
             });
