@@ -548,6 +548,16 @@ function timeAgo($datetime)
             }
         }
     </style>
+
+    <?php if ($userType === 'student'): ?>
+    <style>
+        @media (max-width: 768px) {
+            .navbar-custom .nav-logo {
+                height: 46px;
+            }
+        }
+    </style>
+    <?php endif; ?>
 </head>
 
 <nav class="navbar navbar-expand-lg navbar-custom fixed-top">

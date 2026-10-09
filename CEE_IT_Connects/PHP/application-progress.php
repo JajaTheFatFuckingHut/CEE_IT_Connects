@@ -708,17 +708,7 @@ function uploadBlock(string $step_key, string $label, array $progress, ?int $int
                 display: none;
             }
         }
-    </style>
-
-    <?php if ($userType === 'student'): ?>
-    <style>
-        @media (max-width: 768px) {
-            .navbar-custom .nav-logo {
-                height: 46px;
-            }
-        }
-    </style>
-    <?php endif; ?>
+    </style>    
 </head>
 
 <body>
