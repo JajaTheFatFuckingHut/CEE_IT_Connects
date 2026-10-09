@@ -2626,61 +2626,116 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
     </div>
 
     <!-- HOME SECTION -->
+     <!-- addtl s dashboard ni student -->
     <div id="home" class="section <?= $current_section === 'home' ? 'active' : '' ?>">
         <div class="main">
             <?php if ($current_room_id): ?>
                 <?php include 'chat-room-content.php'; ?>
-            
-            <!-- addtl s dashboard ni student -->
             <?php else: ?>
+                <?php
+                $hmFirst   = explode(' ', trim($displayName ?? 'there'))[0];
+                $hmHasRoom = !empty($rooms);
+                $hmSteps   = [
+                    [
+                        'done'  => !empty($application_internship_id),
+                        'title' => 'Pick your host company',
+                        'desc'  => 'Choose the company where you will do your OJT.',
+                        'link'  => '?section=application',
+                        'cta'   => 'Choose company',
+                    ],
+                    [
+                        'done'  => !empty($hasActiveProgress),
+                        'title' => 'Complete your requirements',
+                        'desc'  => 'Once your MOU, Recommendation Letter and Waiver are marked done, Hours and Progress Report unlock.',
+                        'link'  => '?section=application',
+                        'cta'   => 'Open checklist',
+                    ],
+                    [
+                        'done'  => $hmHasRoom,
+                        'title' => 'Join your OJT room',
+                        'desc'  => $hmHasRoom
+                            ? 'You are in a room. Open it to see updates from your adviser.'
+                            : 'Your adviser will add you to a room. It will show up in the sidebar once you are added.',
+                        'link'  => null,
+                        'cta'   => null,
+                    ],
+                ];
+                $hmDone    = count(array_filter($hmSteps, fn($s) => $s['done']));
+                $hmCurrent = null;
+                foreach ($hmSteps as $i => $s) {
+                    if (!$s['done']) { $hmCurrent = $i; break; }
+                }
+                ?>
+
                 <div class="pg-header">
                     <div class="pg-header-left">
                         <div class="pg-header-icon"><i class="fa-solid fa-house"></i></div>
                         <div>
-                            <h2>Welcome, <?= htmlspecialchars(explode(' ', trim($displayName))[0]) ?></h2>
-                            <p>You haven't been assigned to a room yet. Here is where you stand.</p>
+                            <h2>Welcome, <?= htmlspecialchars($hmFirst) ?></h2>
+                            <p><?= $hmDone === 3
+                                ? 'Everything is set up. Open your room from the sidebar.'
+                                : 'Here is what you need to do to get started with your OJT.' ?></p>
+                        </div>
+                    </div>
+                    <div class="hm-meter">
+                        <div class="hm-meter-top">
+                            <span>Setup progress</span><b><?= $hmDone ?> of 3</b>
+                        </div>
+                        <div class="hm-meter-track">
+                            <div class="hm-meter-fill" style="width:<?= round($hmDone / 3 * 100) ?>%;"></div>
                         </div>
                     </div>
                 </div>
 
                 <div class="hm-card">
-                    <div class="hm-title">Getting started</div>
+                    <div class="hm-title">Your OJT checklist</div>
 
-                    <div class="hm-step <?= $application_internship_id ? 'done' : '' ?>">
-                        <div class="hm-dot"><i class="fa-solid <?= $application_internship_id ? 'fa-check' : 'fa-1' ?>"></i></div>
-                        <div class="hm-text">
-                            <strong>Choose an internship</strong>
-                            <span>Pick your host company so your checklist can open.</span>
+                    <?php foreach ($hmSteps as $i => $s):
+                        $state = $s['done'] ? 'done' : ($i === $hmCurrent ? 'current' : 'todo'); ?>
+                        <div class="hm-step <?= $state ?>">
+                            <div class="hm-dot">
+                                <?= $s['done'] ? '<i class="fa-solid fa-check"></i>' : ($i + 1) ?>
+                            </div>
+                            <div class="hm-text">
+                                <strong><?= htmlspecialchars($s['title']) ?></strong>
+                                <span><?= htmlspecialchars($s['desc']) ?></span>
+                            </div>
+                            <?php if ($s['done']): ?>
+                                <span class="hm-tag ok">Done</span>
+                            <?php elseif ($s['link'] && $i === $hmCurrent): ?>
+                                <a href="<?= $s['link'] ?>" class="hm-btn"><?= htmlspecialchars($s['cta']) ?></a>
+                            <?php elseif ($s['link']): ?>
+                                <span class="hm-tag">Up next</span>
+                            <?php else: ?>
+                                <span class="hm-tag">In progress</span>
+                            <?php endif; ?>
                         </div>
-                        <?php if (!$application_internship_id): ?>
-                            <a href="?section=application" class="hm-btn">Choose</a>
-                        <?php endif; ?>
-                    </div>
-
-                    <div class="hm-step <?= $hasActiveProgress ? 'done' : '' ?>">
-                        <div class="hm-dot"><i class="fa-solid <?= $hasActiveProgress ? 'fa-check' : 'fa-2' ?>"></i></div>
-                        <div class="hm-text">
-                            <strong>Submit your required documents</strong>
-                            <span>MOU, Recommendation Letter and Waiver unlock Hours and Progress Report.</span>
-                        </div>
-                        <?php if ($application_internship_id && !$hasActiveProgress): ?>
-                            <a href="?section=application" class="hm-btn">Open checklist</a>
-                        <?php endif; ?>
-                    </div>
-
-                    <div class="hm-step">
-                        <div class="hm-dot"><i class="fa-solid fa-3"></i></div>
-                        <div class="hm-text">
-                            <strong>Get assigned to a room</strong>
-                            <span>Your adviser will add you to a room. It will appear in the sidebar and here.</span>
-                        </div>
-                        <span class="hm-wait"><i class="fa-regular fa-clock me-1"></i>Waiting</span>
-                    </div>
+                    <?php endforeach; ?>
                 </div>
+
+                <?php if ($hmHasRoom): ?>
+                    <div class="hm-title mt-4 mb-2" style="padding:0 4px;">Your rooms</div>
+                    <div class="hm-rooms">
+                        <?php foreach ($rooms as $hmRoom): ?>
+                            <a href="?room_id=<?= (int) $hmRoom['id'] ?>" class="hm-room">
+                                <div class="hm-room-ic"><i class="fa-solid fa-users"></i></div>
+                                <div class="hm-room-info">
+                                    <strong><?= htmlspecialchars($hmRoom['room_name']) ?></strong>
+                                    <?php if (!empty($hmRoom['full_name'])): ?>
+                                        <small>Adviser: <?= htmlspecialchars($hmRoom['full_name']) ?></small>
+                                    <?php elseif (!empty($hmRoom['school_year'])): ?>
+                                        <small>S.Y. <?= htmlspecialchars($hmRoom['school_year']) ?></small>
+                                    <?php endif; ?>
+                                </div>
+                                <i class="fa-solid fa-chevron-right hm-room-go"></i>
+                            </a>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
             <?php endif; ?>
-            <!-- addtl e dashboard ni student -->
         </div>
     </div>
+    <!-- addtl e dashboard ni student -->
 
     <!-- CHATS SECTION -->
     <div id="chats" class="section <?= $current_section === 'chats' ? 'active' : '' ?>">
