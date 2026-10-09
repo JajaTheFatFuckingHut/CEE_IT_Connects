@@ -523,6 +523,58 @@ function timeAgo($datetime)
             text-decoration: underline;
         }
 
+        /* addtl s */
+        /* ── MOBILE MENU ── */
+        #mobileMenu {
+            display: none;
+            position: absolute;
+            top: 78px;
+            right: 12px;
+            width: 230px;
+            background: #272f54;
+            border: 1px solid #1b1f32;
+            border-radius: 14px;
+            padding: 8px;
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
+            z-index: 999;
+        }
+
+        #mobileMenu.open {
+            display: block;
+        }
+
+        #mobileMenu a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 11px 14px;
+            color: #fff;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            border-radius: 10px;
+        }
+
+        #mobileMenu a i {
+            width: 18px;
+            text-align: center;
+        }
+
+        #mobileMenu a:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        #mobileMenu a.active {
+            background: #ff6b2c;
+        }
+
+        @media (min-width: 992px) {
+            #mobileMenu {
+                display: none !important;
+            }
+        }
+        /* addtl e */
+
         @media (max-width: 768px) {
             .brand-text {
                 font-size: 20px;
@@ -1202,7 +1254,7 @@ function timeAgo($datetime)
     </div>
 
     <!-- MOBILE DROPDOWN MENU -->
-    <?php if (!$hideStudentNav): ?>
+    <!-- <?php if (!$hideStudentNav): ?>
         <div id="mobileMenu"
             style="display: none;position: absolute;top: 70px; left: 0;width: 100%;background: #2c3e67;z-index: 999;padding: 10px 0;box-shadow: 0 8px 20px rgba(0,0,0,0.3);">
             <a href=" index.php" style="display:block;padding:14px 24px;color:white;text-decoration:none;font-weight:600;
@@ -1219,10 +1271,25 @@ function timeAgo($datetime)
                 Announcements
             </a>
         </div>
+    <?php endif; ?> -->
+
+    <!-- MOBILE DROPDOWN MENU -->
+    <?php if (!$hideStudentNav): ?>
+        <div id="mobileMenu">
+            <a href="index.php" class="<?= ($page == 'home') ? 'active' : '' ?>">
+                <i class="fa-solid fa-house"></i> Home
+            </a>
+            <a href="applied-Internship-programs.php" class="<?= ($page == 'opportunity') ? 'active' : '' ?>">
+                <i class="fa-solid fa-briefcase"></i> Internships
+            </a>
+            <a href="announcement.php" class="<?= ($page == 'announcements') ? 'active' : '' ?>">
+                <i class="fa-solid fa-bullhorn"></i> Announcements
+            </a>
+        </div>
     <?php endif; ?>
 </nav>
 
-<script>
+<!-- <script>
     // Notification Elements
     const bell = document.getElementById("notifBell");
     const popup = document.getElementById("notifPopup");
@@ -1289,6 +1356,90 @@ function timeAgo($datetime)
         document.body.style.overflow = 'hidden';
         var pd = document.getElementById('profileDrop');
         if (pd) pd.classList.remove('active');
+    }
+    function closeHelpModal() {
+        document.getElementById('helpModal').style.display = 'none';
+        document.body.style.overflow = '';
+    }
+    document.getElementById('helpModal').addEventListener('click', function (e) {
+        if (e.target === this) closeHelpModal();
+    });
+</script> -->
+
+<script>
+    const bell = document.getElementById("notifBell");
+    const popup = document.getElementById("notifPopup");
+    const profileBtn = document.getElementById('profileBtn');
+    const profileDrop = document.getElementById('profileDrop');
+    const mobileToggle = document.getElementById('mobileMenuToggle');
+    const mobileMenu = document.getElementById('mobileMenu');
+
+    function closeMobileMenu() {
+        if (mobileMenu) mobileMenu.classList.remove('open');
+    }
+
+    // ── Notification bell ──
+    bell.addEventListener("click", function (e) {
+        e.stopPropagation();
+        closeMobileMenu();
+        const isOpen = popup.style.display === "block";
+        popup.style.display = isOpen ? "none" : "block";
+        profileDrop.classList.remove('open');
+
+        if (!isOpen) {
+            fetch("mark-as-read.php")
+                .then(res => res.text())
+                .then(() => {
+                    const badge = document.querySelector(".notif-badge");
+                    if (badge) badge.remove();
+                    document.querySelectorAll(".dot").forEach(d => d.remove());
+                });
+        }
+    });
+
+    document.addEventListener("click", function (e) {
+        if (!popup.contains(e.target) && !bell.contains(e.target)) {
+            popup.style.display = "none";
+        }
+    });
+
+    // ── Profile dropdown ──
+    profileBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        closeMobileMenu();
+        profileDrop.classList.toggle('open');
+        popup.style.display = "none";
+    });
+
+    document.addEventListener('click', function (e) {
+        if (!profileDrop.contains(e.target) && !profileBtn.contains(e.target)) {
+            profileDrop.classList.remove('open');
+        }
+    });
+
+    // ── Mobile menu toggle ──
+    if (mobileToggle && mobileMenu) {
+        mobileToggle.addEventListener('click', function (e) {
+            e.stopPropagation();
+            popup.style.display = "none";
+            profileDrop.classList.remove('open');
+            mobileMenu.classList.toggle('open');
+        });
+
+        document.addEventListener('click', function (e) {
+            if (!mobileMenu.contains(e.target) && !mobileToggle.contains(e.target)) {
+                closeMobileMenu();
+            }
+        });
+    }
+
+    // ── Help modal ──
+    function openHelpModal() {
+        closeMobileMenu();
+        popup.style.display = "none";
+        profileDrop.classList.remove('open');
+        document.getElementById('helpModal').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
     }
     function closeHelpModal() {
         document.getElementById('helpModal').style.display = 'none';
