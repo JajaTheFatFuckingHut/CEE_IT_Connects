@@ -2497,7 +2497,7 @@ for ($t = 13; $t >= 0; $t--) {
         // Announcements filter
         function filterAnnouncements() {
             const search = document.getElementById('search-announcements').value.toLowerCase();
-            const category = document.getElementById('category-filter').value.toLowerCase();
+            const category = (document.getElementById('category-filter')?.value ?? '').toLowerCase();
             document.querySelectorAll('#manage-announcements-tbody tr').forEach(row => {
                 const rowCat = (row.dataset.category ?? '').toLowerCase();
                 const text = Array.from(row.querySelectorAll('input, select, td'))
