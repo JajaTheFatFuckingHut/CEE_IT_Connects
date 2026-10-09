@@ -1056,97 +1056,78 @@ for ($t = 13; $t >= 0; $t--) {
                 <div class="row g-3 mb-4">
                     <div class="col-12 col-md-6 col-xxl-3">
                         <div class="ojtc-stat-card card-tint-applications">
-                            <div class="ojtc-stat-icon icon-applications">
-                                <i class="bi bi-file-earmark-fill"></i>
-                            </div>
+                            <div class="ojtc-stat-icon icon-applications"><i class="bi bi-file-earmark-fill"></i></div>
                             <div>
-                                <p class="small mb-1 fw-semibold text-uppercase"
-                                    style="letter-spacing:.05em; font-size:11px; color:#7a5200;">Applications</p>
+                                <p class="small mb-1 fw-semibold text-uppercase" style="letter-spacing:.05em; font-size:11px; color:#7a5200;">Applications</p>
                                 <h2 class="fw-bold mb-0" style="color:#3b2600;"><?= $totalApplications ?></h2>
                             </div>
                         </div>
                     </div>
-
                     <div class="col-12 col-md-6 col-xxl-3">
                         <div class="ojtc-stat-card card-tint-internships">
-                            <div class="ojtc-stat-icon icon-internships">
-                                <i class="bi bi-briefcase-fill"></i>
-                            </div>
+                            <div class="ojtc-stat-icon icon-internships"><i class="bi bi-briefcase-fill"></i></div>
                             <div>
-                                <p class="small mb-1 fw-semibold text-uppercase"
-                                    style="letter-spacing:.05em; font-size:11px; color:#272f54;">Internship Postings</p>
+                                <p class="small mb-1 fw-semibold text-uppercase" style="letter-spacing:.05em; font-size:11px; color:#272f54;">Internship Postings</p>
                                 <h2 class="fw-bold mb-0" style="color:#272f54;"><?= $totalInternships ?></h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 col-xxl-3">
+                        <div class="ojtc-stat-card card-tint-announcements">
+                            <div class="ojtc-stat-icon icon-announcements"><i class="bi bi-bookmark-fill"></i></div>
+                            <div>
+                                <p class="small mb-1 fw-semibold text-uppercase" style="letter-spacing:.05em; font-size:11px; color:#27500a;">Announcements</p>
+                                <h2 class="fw-bold mb-0" style="color:#27500a;"><?= $totalAnnouncements ?></h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 col-xxl-3">
+                        <div class="ojtc-stat-card card-tint-documents">
+                            <div class="ojtc-stat-icon icon-documents"><i class="bi bi-file-earmark-text-fill"></i></div>
+                            <div>
+                                <p class="small mb-1 fw-semibold text-uppercase" style="letter-spacing:.05em; font-size:11px; color:#a13d1f;">Documents</p>
+                                <h2 class="fw-bold mb-0" style="color:#a13d1f;"><?= $totalDocuments ?></h2>
                             </div>
                         </div>
                     </div>
 
                     <div class="col-12 col-md-6 col-xxl-3">
                         <div class="ojtc-stat-card card-tint-announcements">
-                            <div class="ojtc-stat-icon icon-announcements">
-                                <i class="bi bi-bookmark-fill"></i>
-                            </div>
+                            <div class="ojtc-stat-icon icon-announcements"><i class="bi bi-patch-check-fill"></i></div>
                             <div>
-                                <p class="small mb-1 fw-semibold text-uppercase"
-                                    style="letter-spacing:.05em; font-size:11px; color:#27500a;">Announcements</p>
-                                <h2 class="fw-bold mb-0" style="color:#27500a;"><?= $totalAnnouncements ?></h2>
+                                <p class="small mb-1 fw-semibold text-uppercase" style="letter-spacing:.05em; font-size:11px; color:#27500a;">Confirmed Rate</p>
+                                <h2 class="fw-bold mb-0" style="color:#27500a;"><?= $confirmedPct ?>%</h2>
                             </div>
                         </div>
                     </div>
-
                     <div class="col-12 col-md-6 col-xxl-3">
                         <div class="ojtc-stat-card card-tint-documents">
-                            <div class="ojtc-stat-icon icon-documents">
-                                <i class="bi bi-file-earmark-text-fill"></i>
-                            </div>
+                            <div class="ojtc-stat-icon icon-documents"><i class="bi bi-clipboard-check-fill"></i></div>
                             <div>
-                                <p class="small mb-1 fw-semibold text-uppercase"
-                                    style="letter-spacing:.05em; font-size:11px; color:#a13d1f;">Documents</p>
-                                <h2 class="fw-bold mb-0" style="color:#a13d1f;"><?= $totalDocuments ?></h2>
+                                <p class="small mb-1 fw-semibold text-uppercase" style="letter-spacing:.05em; font-size:11px; color:#a13d1f;">Requirements Complete</p>
+                                <h2 class="fw-bold mb-0" style="color:#a13d1f;"><?= $reqCompletePct ?>%</h2>
                             </div>
                         </div>
                     </div>
-
-                <div class="row g-4">
-                    <!-- Application List -->
-                    <!-- addtl s -->
-                     <!-- PERCENTAGE CARDS -->
-                        <div class="col-12 col-md-6 col-xxl-3">
-                            <div class="ojtc-stat-card card-tint-announcements">
-                                <div class="ojtc-stat-icon icon-announcements"><i class="bi bi-patch-check-fill"></i></div>
-                                <div>
-                                    <p class="small mb-1 fw-semibold text-uppercase" style="letter-spacing:.05em; font-size:11px; color:#27500a;">Confirmed Rate</p>
-                                    <h2 class="fw-bold mb-0" style="color:#27500a;"><?= $confirmedPct ?>%</h2>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-12 col-md-6 col-xxl-3">
-                            <div class="ojtc-stat-card card-tint-documents">
-                                <div class="ojtc-stat-icon icon-documents"><i class="bi bi-clipboard-check-fill"></i></div>
-                                <div>
-                                    <p class="small mb-1 fw-semibold text-uppercase" style="letter-spacing:.05em; font-size:11px; color:#a13d1f;">Requirements Complete</p>
-                                    <h2 class="fw-bold mb-0" style="color:#a13d1f;"><?= $reqCompletePct ?>%</h2>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-12 col-md-6 col-xxl-3">
-                            <div class="ojtc-stat-card card-tint-applications">
-                                <div class="ojtc-stat-icon icon-applications"><i class="bi bi-hourglass-split"></i></div>
-                                <div>
-                                    <p class="small mb-1 fw-semibold text-uppercase" style="letter-spacing:.05em; font-size:11px; color:#7a5200;">In Progress</p>
-                                    <h2 class="fw-bold mb-0" style="color:#3b2600;"><?= $inProgressPct ?>%</h2>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-12 col-md-6 col-xxl-3">
-                            <div class="ojtc-stat-card card-tint-internships">
-                                <div class="ojtc-stat-icon icon-internships"><i class="bi bi-dash-circle-fill"></i></div>
-                                <div>
-                                    <p class="small mb-1 fw-semibold text-uppercase" style="letter-spacing:.05em; font-size:11px; color:#272f54;">No Progress</p>
-                                    <h2 class="fw-bold mb-0" style="color:#272f54;"><?= $noProgressPct ?>%</h2>
-                                </div>
+                    <div class="col-12 col-md-6 col-xxl-3">
+                        <div class="ojtc-stat-card card-tint-applications">
+                            <div class="ojtc-stat-icon icon-applications"><i class="bi bi-hourglass-split"></i></div>
+                            <div>
+                                <p class="small mb-1 fw-semibold text-uppercase" style="letter-spacing:.05em; font-size:11px; color:#7a5200;">In Progress</p>
+                                <h2 class="fw-bold mb-0" style="color:#3b2600;"><?= $inProgressPct ?>%</h2>
                             </div>
                         </div>
                     </div>
+                    <div class="col-12 col-md-6 col-xxl-3">
+                        <div class="ojtc-stat-card card-tint-internships">
+                            <div class="ojtc-stat-icon icon-internships"><i class="bi bi-dash-circle-fill"></i></div>
+                            <div>
+                                <p class="small mb-1 fw-semibold text-uppercase" style="letter-spacing:.05em; font-size:11px; color:#272f54;">No Progress</p>
+                                <h2 class="fw-bold mb-0" style="color:#272f54;"><?= $noProgressPct ?>%</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                     <!-- ANALYTICS CHARTS -->
                     <div class="row g-4 mb-4">
