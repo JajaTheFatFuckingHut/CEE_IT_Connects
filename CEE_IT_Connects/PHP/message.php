@@ -609,15 +609,15 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
         }
 
         body {
-            /* background: #f5f6fa; */
-            background: #f8f6f3;
+            background: #f5f7fb;
+            /* background: #f8f6f3; */
             margin: 0;
             padding-top: 70px;
             height: 100vh;
             overflow: auto;
         }
 
-        /* SIDEBAR */
+        /* SIDEBAR
         .sidebar {
             width: 240px;
             background: #fff;
@@ -679,14 +679,140 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
             color: #ff6b2c;
             font-weight: bold;
             cursor: default;
+        } */
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 240px;
+            background: #fff;
+            position: fixed;
+            top: 70px;
+            bottom: 0;
+            padding: 14px 12px;
+            border-right: 1px solid #e9ecf3;
+            overflow-y: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .sidebar a {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 14px;
+            color: #2b3a67;
+            text-decoration: none;
+            border-radius: 12px;
+            margin-bottom: 6px;
+            font-size: 15px;
+            font-weight: 500;
+            transition: background .15s, color .15s;
+        }
+
+        .sidebar a > i:first-child {
+            width: 22px;
+            text-align: center;
+            font-size: 18px;
+            color: #2b3a67;
+            margin: 0 !important;
+        }
+
+        .sidebar a:hover {
+            background: #f4f6fb;
+        }
+
+        .sidebar a.active {
+            background: #fdeee6;
+            color: #f26b3a;
+            font-weight: 600;
+        }
+
+        .sidebar a.active > i:first-child {
+            color: #f26b3a;
+        }
+
+        /* ROOMS */
+        .rooms-list {
+            font-size: 11px;
+            color: #8b93ab;
+            margin-top: 14px;
+            padding-top: 14px;
+            border-top: 1px solid #eceff5;
+        }
+
+        .rooms-list hr,
+        .rooms-list br {
+            display: none;
+        }
+
+        .rooms-list h6 {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: .08em;
+            color: #8b93ab;
+            padding: 0 14px;
+            margin: 0 0 8px;
+        }
+
+        .room-item {
+            padding: 12px 14px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 500;
+            color: #2b3a67;
+        }
+
+        .room-link {
+            text-decoration: none;
+            display: block;
+            margin: 0 0 6px;
+        }
+
+        .room-link .room-item:hover {
+            cursor: pointer;
+            background: #f4f6fb;
+        }
+
+        .active-room {
+            background: #fdeee6;
+            color: #f26b3a;
+            font-weight: 600;
+            cursor: default;
+        }
+
+        /* people icon + chevron on desktop only (tablet/mobile keep the letter bubbles) */
+        @media (min-width: 1025px) {
+            .room-item {
+                display: flex;
+                align-items: center;
+                gap: 14px;
+            }
+
+            .room-item::before {
+                content: "\f0c0";
+                font-family: "Font Awesome 6 Free";
+                font-weight: 900;
+                width: 22px;
+                text-align: center;
+                font-size: 16px;
+            }
+
+            .room-item::after {
+                content: "\f054";
+                font-family: "Font Awesome 6 Free";
+                font-weight: 900;
+                font-size: 11px;
+                margin-left: auto;
+                color: #9aa3bd;
+            }
         }
 
         /* MAIN */
         .main {
             margin-left: 240px;
             padding: 20px;
-            /* background-color: #fff; */
-            background: #f8f6f3;
+            background-color: #f5f7fb;
+            /* background: #f8f6f3; */
             min-height: calc(100vh - 70px);
         }
 
@@ -2142,38 +2268,213 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
         }
 
         @media (max-width: 1024px) {
-    .sidebar {
-        overflow: visible !important;
-        z-index: 200;
-    }
+            .sidebar {
+                overflow: visible !important;
+                z-index: 200;
+            }
 
-    .sidebar a, .sidebar .active-room { position: relative; }
+            .sidebar a, .sidebar .active-room { position: relative; }
 
-    .sidebar a::after, .sidebar .active-room::after {
-        content: attr(data-tooltip);
-        position: absolute;
-        left: 56px;
-        top: 50%;
-        transform: translateY(-50%);
-        background: #1a1a2e;
-        color: #fff;
-        font-size: 12px;
-        font-weight: 500;
-        padding: 5px 10px;
-        border-radius: 6px;
-        white-space: normal;
-        width: max-content;
-        max-width: 220px;
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.2s ease;
-        z-index: 300;
-    }
+            .sidebar a::after, .sidebar .active-room::after {
+                content: attr(data-tooltip);
+                position: absolute;
+                left: 56px;
+                top: 50%;
+                transform: translateY(-50%);
+                background: #1a1a2e;
+                color: #fff;
+                font-size: 12px;
+                font-weight: 500;
+                padding: 5px 10px;
+                border-radius: 6px;
+                white-space: normal;
+                width: max-content;
+                max-width: 220px;
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity 0.2s ease;
+                z-index: 300;
+            }
 
-    .sidebar a:hover::after, .sidebar .active-room:hover::after {
-        opacity: 1;
-    }
-}
+            .sidebar a:hover::after, .sidebar .active-room:hover::after {
+                opacity: 1;
+            }
+        }
+
+        /* ── RENDERED HOURS UI ── */
+        .hrs-card {
+            background: #fff;
+            border: 1px solid #eef0f6;
+            border-radius: 14px;
+            box-shadow: 0 1px 3px rgba(20, 30, 70, .04);
+            padding: 18px 22px;
+        }
+
+        .hrs-progress { margin-bottom: 16px; }
+
+        .hrs-progress-title { font-size: 15px; font-weight: 700; color: #1f2a55; }
+        .hrs-progress-pct   { font-size: 14px; font-weight: 700; color: #1f2a55; }
+
+        .hrs-track {
+            height: 8px;
+            background: #e9edf5;
+            border-radius: 99px;
+            overflow: hidden;
+        }
+
+        .hrs-fill {
+            height: 100%;
+            border-radius: 99px;
+            background: #f26b3a;
+        }
+
+        .hrs-stat {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            height: 100%;
+        }
+
+        .hrs-stat-icon {
+            width: 56px;
+            height: 56px;
+            min-width: 56px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .hrs-stat-icon.blue   { background: #e8efff; color: #2f5bd8; }
+        .hrs-stat-icon.green  { background: #e1f6ec; color: #16a36a; }
+        .hrs-stat-icon.orange { background: #fdeadf; color: #f26b3a; }
+
+        .hrs-stat-label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #4a5578;
+            text-transform: uppercase;
+            letter-spacing: .03em;
+            margin-bottom: 2px;
+        }
+
+        .hrs-stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1f2a55;
+            line-height: 1.2;
+        }
+
+        /* week card */
+        .ojt-week-block {
+            background: #fff;
+            border: 1px solid #eef0f6;
+            border-radius: 14px;
+            box-shadow: 0 1px 3px rgba(20, 30, 70, .04);
+            padding: 20px 22px;
+            margin: 0 0 16px;
+            text-align: left;
+        }
+
+        .ojt-week-header { margin-bottom: 14px; }
+
+        .ojt-week-label[readonly] {
+            padding: 0;
+            font-size: 20px;
+            color: #1f2a55;
+        }
+
+        .ojt-total-chip {
+            background: #eaf0ff;
+            color: #2f5bd8;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 6px 14px;
+        }
+
+        .ojt-table-scroll {
+            overflow-x: auto;
+            border: 1px solid #e8ebf3;
+            border-radius: 10px;
+        }
+
+        .ojt-table {
+            width: 100%;
+            min-width: 780px;
+            border-collapse: collapse;
+        }
+
+        /* header colors (!important beats the old inline backgrounds) */
+        .ojt-table thead th {
+            border: none !important;
+            font-size: 13px;
+            font-weight: 600;
+            color: #2b3a67;
+            text-align: center;
+            padding: 10px;
+        }
+
+        .ojt-table thead th.ojt-group  { background: #eef2f9 !important; }
+        .ojt-table thead th.th-morning { background: #fdeedd !important; }
+        .ojt-table thead th.sub-morning { background: #fef6ec !important; font-weight: 500; color: #6b7390; }
+        .ojt-table thead th.th-afternoon { background: #fbe4de !important; }
+        .ojt-table thead th.sub-afternoon { background: #fdeeea !important; font-weight: 500; color: #6b7390; }
+
+        /* body rows */
+        .ojt-table tbody td,
+        .ojt-table tbody td.td-morning,
+        .ojt-table tbody td.td-afternoon {
+            background: transparent;
+            padding: 6px 8px;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .ojt-table tbody tr:nth-child(even) { background: #f8f9fc; }
+
+        .ojt-table input[type="time"] {
+            border: 1px solid #e3e7ef;
+            border-radius: 10px;
+            background: #fff;
+            color: #2b3a67;
+            font-size: 13px;
+            text-align: left;
+        }
+
+        .ojt-table input[type="date"] {
+            border: 1px solid transparent;
+            background: transparent;
+            color: #2b3a67;
+            font-size: 13px;
+            text-align: left;
+        }
+
+        .ojt-table input[type="date"]:focus,
+        .ojt-table input[type="date"]:hover {
+            border-color: #e3e7ef;
+            background: #fff;
+        }
+
+        .ojt-day-badge,
+        .ojt-hrs-val,
+        .ojt-daily-val {
+            font-size: 13px;
+            font-weight: 500;
+            color: #2b3a67;
+        }
+
+        /* status pill: colors come from the inline color the existing JS already sets */
+        .ojt-status-badge {
+            display: inline-block;
+            padding: 3px 16px;
+            border-radius: 999px;
+            font-size: 12px;
+        }
+
+        .ojt-status-badge[style*="rgb(220, 53, 69)"]  { background: #fde8e8; }
+        .ojt-status-badge[style*="rgb(25, 135, 84)"]  { background: #e3f6ec; }
+        .ojt-status-badge[style*="rgb(13, 110, 253)"] { background: #e5eeff; }
     </style>
 </head>
 
@@ -2703,7 +3004,7 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
                 </div>
 
                 <!-- Progress Bar -->
-                <div class="card border-0 shadow-sm rounded-3 p-3 mb-2" style="background-color:#29335C; opacity:0.90;">
+                <!-- <div class="card border-0 shadow-sm rounded-3 p-3 mb-2" style="background-color:#29335C; opacity:0.90;">
                     <div class="d-flex justify-content-between" style="color:#fff; margin-bottom:6px;">
                         <span>Progress</span>
                         <span id="ojt-pct-label">0%</span>
@@ -2712,26 +3013,10 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
                         <div id="ojt-progress-fill" style="height:100%; width:0%; border-radius:99px; background:#1abc9c;">
                         </div>
                     </div>
-                </div>
-
-                <!-- <div class="card border-0 shadow-sm rounded-3 p-3 mb-2 d-flex flex-row align-items-center justify-content-between" style="background-color:#29335C;">
-                    <span style="color:#fff;">Progress</span>
-
-                    <div style="position:relative; width:64px; height:64px;">
-                        <svg width="64" height="64" viewBox="0 0 64 64">
-                            <circle cx="32" cy="32" r="27" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="6"></circle>
-                            <circle id="ojt-progress-fill" cx="32" cy="32" r="27" fill="none" stroke="#1abc9c" stroke-width="6"
-                                stroke-linecap="round" stroke-dasharray="169.6" stroke-dashoffset="169.6"
-                                transform="rotate(-90 32 32)"></circle>
-                        </svg>
-                        <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center;">
-                            <span id="ojt-pct-label" style="color:#fff; font-size:13px; font-weight:600;">0%</span>
-                        </div>
-                    </div>
                 </div> -->
 
                 <!-- Summary Cards -->
-                <div class="row g-2 mb-2" style="margin-top:4px;">
+                <!-- <div class="row g-2 mb-2" style="margin-top:4px;">
                     <div class="col-md-4">
                         <div style="border:2px solid #ababab; border-radius:8px; padding:1rem; margin-right:5px;">
                             <div style="letter-spacing:.05em; color:#29335C;">MONTHLY OJT HOURS</div>
@@ -2752,8 +3037,49 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
                             </div>
                         </div>
                     </div>
+                </div> -->
+
+                <!-- Progress Bar -->
+                <div class="hrs-card hrs-progress">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="hrs-progress-title">Progress</span>
+                        <span id="ojt-pct-label" class="hrs-progress-pct">0%</span>
+                    </div>
+                    <div class="hrs-track">
+                        <div id="ojt-progress-fill" class="hrs-fill" style="width:0%;"></div>
+                    </div>
                 </div>
 
+                <!-- Summary Cards -->
+                <div class="row g-3 mb-3">
+                    <div class="col-md-4">
+                        <div class="hrs-card hrs-stat">
+                            <div class="hrs-stat-icon blue"><i class="fa-solid fa-calendar-days"></i></div>
+                            <div>
+                                <div class="hrs-stat-label">Monthly OJT Hours</div>
+                                <div id="ojt-sum-monthly" class="hrs-stat-value">0h 0m</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="hrs-card hrs-stat">
+                            <div class="hrs-stat-icon green"><i class="fa-solid fa-circle-check"></i></div>
+                            <div>
+                                <div class="hrs-stat-label">Hours Completed</div>
+                                <div id="ojt-sum-completed" class="hrs-stat-value">0h 0m</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="hrs-card hrs-stat">
+                            <div class="hrs-stat-icon orange"><i class="fa-solid fa-hourglass-half"></i></div>
+                            <div>
+                                <div class="hrs-stat-label">Remaining Hours</div>
+                                <div id="ojt-sum-remaining" class="hrs-stat-value"><?= $requiredHours ?>h 0m</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <!-- Weeks Container -->
                 <div id="ojt-weeks-container">
                     <?php foreach ($ojtWeeks as $week): ?>
