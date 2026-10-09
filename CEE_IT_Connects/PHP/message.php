@@ -2482,65 +2482,86 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
         .ojt-status-badge[style*="rgb(13, 110, 253)"] { background: #e5eeff; }
 
         /* addtl s dashboard ni student */
-        /* ── HOME EMPTY STATE ── */
+        /* ── HOME (setup guide) ── */
+        .hm-meter { min-width: 220px; flex: 0 1 260px; }
+        .hm-meter-top { display: flex; justify-content: space-between; font-size: 13px; color: #4a5578; margin-bottom: 6px; }
+        .hm-meter-top b { color: #1f2a55; }
+        .hm-meter-track { height: 8px; background: rgba(255, 255, 255, .7); border-radius: 99px; overflow: hidden; }
+        .hm-meter-fill { height: 100%; background: #f26b3a; border-radius: 99px; }
+
         .hm-card {
             background: #fff;
             border: 1px solid #eef0f6;
             border-radius: 14px;
             box-shadow: 0 1px 3px rgba(20, 30, 70, .04);
-            padding: 20px 24px;
+            padding: 18px 24px 8px;
         }
 
-        .hm-title {
-            font-size: 15px;
-            font-weight: 700;
-            color: #1f2a55;
-            margin-bottom: 8px;
-        }
+        .hm-title { font-size: 15px; font-weight: 700; color: #1f2a55; margin-bottom: 4px; }
 
         .hm-step {
             display: flex;
             align-items: center;
             gap: 16px;
-            padding: 14px 0;
+            padding: 16px 0;
             border-top: 1px solid #eef0f6;
         }
-
-        .hm-step:first-of-type { border-top: none; }
+        .hm-card .hm-title + .hm-step { border-top: none; }
 
         .hm-dot {
-            width: 38px;
-            height: 38px;
-            min-width: 38px;
+            width: 40px; height: 40px; min-width: 40px;
             border-radius: 50%;
-            background: #eef2f9;
-            color: #6b7390;
-            font-size: 13px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            background: #eef2f9; color: #6b7390;
+            font-size: 14px; font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
         }
-
-        .hm-step.done .hm-dot { background: #e1f6ec; color: #16a36a; }
+        .hm-step.done .hm-dot    { background: #e1f6ec; color: #16a36a; }
+        .hm-step.current .hm-dot { background: #f26b3a; color: #fff; box-shadow: 0 0 0 5px #fdeee6; }
+        .hm-step.todo { opacity: .75; }
 
         .hm-text { flex: 1; min-width: 0; }
-        .hm-text strong { display: block; font-size: 14px; color: #1f2a55; }
-        .hm-text span   { font-size: 13px; color: #6b7390; }
+        .hm-text strong { display: block; font-size: 15px; color: #1f2a55; margin-bottom: 2px; }
+        .hm-text span   { font-size: 13px; color: #6b7390; line-height: 1.5; }
 
         .hm-btn {
-            background: #fdeee6;
-            color: #f26b3a;
-            font-size: 13px;
-            font-weight: 600;
-            padding: 7px 16px;
-            border-radius: 10px;
-            text-decoration: none;
-            white-space: nowrap;
+            background: #f26b3a; color: #fff;
+            font-size: 13px; font-weight: 600;
+            padding: 8px 18px; border-radius: 10px;
+            text-decoration: none; white-space: nowrap;
         }
+        .hm-btn:hover { background: #d9561f; color: #fff; }
 
-        .hm-btn:hover { background: #f26b3a; color: #fff; }
+        .hm-tag {
+            font-size: 12px; font-weight: 600;
+            padding: 4px 12px; border-radius: 999px;
+            background: #eef2f9; color: #6b7390; white-space: nowrap;
+        }
+        .hm-tag.ok { background: #e1f6ec; color: #16a36a; }
 
-        .hm-wait { font-size: 13px; color: #8b93ab; white-space: nowrap; }
+        .hm-rooms { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+        .hm-room {
+            display: flex; align-items: center; gap: 14px;
+            background: #fff; border: 1px solid #eef0f6; border-radius: 14px;
+            padding: 14px 16px; text-decoration: none;
+            box-shadow: 0 1px 3px rgba(20, 30, 70, .04);
+            transition: transform .15s, box-shadow .15s;
+        }
+        .hm-room:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(20, 30, 70, .08); }
+        .hm-room-ic {
+            width: 44px; height: 44px; min-width: 44px; border-radius: 12px;
+            background: #e8efff; color: #2f5bd8;
+            display: flex; align-items: center; justify-content: center; font-size: 17px;
+        }
+        .hm-room-info { flex: 1; min-width: 0; }
+        .hm-room-info strong { display: block; font-size: 15px; color: #1f2a55; }
+        .hm-room-info small  { font-size: 12px; color: #8b93ab; }
+        .hm-room-go { font-size: 12px; color: #9aa3bd; }
+
+        @media (max-width: 768px) {
+            .hm-meter { width: 100%; flex-basis: 100%; }
+            .hm-step { flex-wrap: wrap; }
+            .hm-text { flex-basis: calc(100% - 60px); }
+        }
         /* addtl e dashboard ni student */
     </style>
 </head>
