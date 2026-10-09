@@ -197,9 +197,8 @@ function uploadBlock(string $step_key, string $label, array $progress, ?int $int
     <title>OJT Requirements Checklist</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link
-        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Syne:wght@600;700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
     <style>
         :root {
             --brand: #f97316;
@@ -234,7 +233,7 @@ function uploadBlock(string $step_key, string $label, array $progress, ?int $int
         }
 
         body {
-            font-family: 'DM Sans', sans-serif;
+            font-family: 'Poppins', sans-serif;
             background: #f0ede9;
             color: var(--gray-800);
             min-height: 100vh;
@@ -243,15 +242,15 @@ function uploadBlock(string $step_key, string $label, array $progress, ?int $int
         .page-wrap {
             max-width: 700px;
             margin: 0 auto;
-            padding: 90px 16px 64px;
+            padding: 70px 16px 64px;
         }
 
         .page-header {
-            margin-bottom: 24px;
+            margin-bottom: 16px;
         }
 
         .page-header h1 {
-            font-family: 'Syne', sans-serif;
+            font-family: 'Poppins', sans-serif;
             font-size: 22px;
             font-weight: 700;
             letter-spacing: -.3px;
@@ -593,7 +592,7 @@ function uploadBlock(string $step_key, string $label, array $progress, ?int $int
             cursor: pointer;
             text-decoration: none;
             transition: filter .15s, transform .1s;
-            font-family: 'DM Sans', sans-serif;
+            font-family: 'Poppins', sans-serif;
         }
 
         .btn-action:hover {
@@ -732,7 +731,7 @@ function uploadBlock(string $step_key, string $label, array $progress, ?int $int
         <?php endif; ?>
 
         <div class="page-header">
-            <h1>OJT Application Checklist</h1>
+            <h1>OJT Requirements Checklist</h1>
             <p>Complete each item below. Following the order is recommended, but you may work on them in any sequence.
             </p>
         </div>
@@ -1456,7 +1455,7 @@ function uploadBlock(string $step_key, string $label, array $progress, ?int $int
     <div id="supModal" class="sup-modal-overlay">
         <div class="sup-modal-box">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                <h2 style="font-family:'Syne',sans-serif; font-size:17px; font-weight:700; margin:0;">
+                <h2 style="font-family:'Poppins',sans-serif; font-size:17px; font-weight:700; margin:0;">
                     HTE Supervisor Details
                 </h2>
                 <button onclick="closeSupModal()"
@@ -1479,7 +1478,7 @@ function uploadBlock(string $step_key, string $label, array $progress, ?int $int
                         <input type="text" name="sup_full_name" required
                             value="<?= htmlspecialchars($supSubmission['full_name'] ?? '') ?>"
                             placeholder="e.g. Juan dela Cruz" style="width:100%; padding:9px 12px; border:1.5px solid var(--gray-200);
-                                border-radius:8px; font-size:13px; font-family:'DM Sans',sans-serif;
+                                border-radius:8px; font-size:13px; font-family:'Poppins',sans-serif;
                                 outline:none; transition:border-color .2s;"
                             onfocus="this.style.borderColor='var(--brand)'"
                             onblur="this.style.borderColor='var(--gray-200)'">
@@ -1493,7 +1492,7 @@ function uploadBlock(string $step_key, string $label, array $progress, ?int $int
                         <input type="email" name="sup_email"
                             value="<?= htmlspecialchars($supSubmission['email'] ?? '') ?>"
                             placeholder="e.g. supervisor@company.com" style="width:100%; padding:9px 12px; border:1.5px solid var(--gray-200);
-                                border-radius:8px; font-size:13px; font-family:'DM Sans',sans-serif;
+                                border-radius:8px; font-size:13px; font-family:'Poppins',sans-serif;
                                 outline:none; transition:border-color .2s;"
                             onfocus="this.style.borderColor='var(--brand)'"
                             onblur="this.style.borderColor='var(--gray-200)'">
@@ -1507,7 +1506,7 @@ function uploadBlock(string $step_key, string $label, array $progress, ?int $int
                         <input type="text" name="sup_contact"
                             value="<?= htmlspecialchars($supSubmission['contact_number'] ?? '') ?>"
                             placeholder="e.g. 09XX-XXX-XXXX" style="width:100%; padding:9px 12px; border:1.5px solid var(--gray-200);
-                                border-radius:8px; font-size:13px; font-family:'DM Sans',sans-serif;
+                                border-radius:8px; font-size:13px; font-family:'Poppins',sans-serif;
                                 outline:none; transition:border-color .2s;"
                             onfocus="this.style.borderColor='var(--brand)'"
                             onblur="this.style.borderColor='var(--gray-200)'">
@@ -1520,7 +1519,7 @@ function uploadBlock(string $step_key, string $label, array $progress, ?int $int
                         </label>
                         <input type="text" name="sup_company" readonly
                             value="<?= htmlspecialchars($selectedInternship['company'] ?? '') ?>" style="width:100%; padding:9px 12px; border:1.5px solid var(--gray-200);
-                                border-radius:8px; font-size:13px; font-family:'DM Sans',sans-serif;
+                                border-radius:8px; font-size:13px; font-family:'Poppins',sans-serif;
                                 background:var(--gray-100); color:var(--gray-600); outline:none;">
                         <small style="font-size:11px; color:var(--gray-400); margin-top:3px; display:block;">
                             Auto-filled from your selected internship
