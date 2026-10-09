@@ -2562,6 +2562,20 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
             .hm-step { flex-wrap: wrap; }
             .hm-text { flex-basis: calc(100% - 60px); }
         }
+
+        /* Home polish */
+        .hm-card { padding-top: 20px; }
+        .hm-step.current {
+            background: #fff8f4;
+            margin: 0 -24px;
+            padding-left: 24px;
+            padding-right: 24px;
+            border-radius: 12px;
+            border-top-color: transparent;
+        }
+        .hm-room-ic { background: #fdeee6; color: #f26b3a; }
+        .hm-room:hover .hm-room-go { color: #f26b3a; transform: translateX(3px); }
+        .hm-room-go { transition: transform .15s, color .15s; }
         /* addtl e dashboard ni student */
     </style>
 </head>
@@ -2693,7 +2707,7 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
                         <div class="pg-header-icon"><i class="fa-solid fa-house"></i></div>
                         <div>
                             <h2>Welcome, <?= htmlspecialchars($hmFirst) ?></h2>
-                            <p><?= $hmDone === 3
+                            <p><?= date('l, F j') ?> · <?= $hmDone === 3
                                 ? 'Everything is set up. Open your room from the sidebar.'
                                 : 'Here is what you need to do to get started with your OJT.' ?></p>
                         </div>
@@ -2704,6 +2718,36 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
                         </div>
                         <div class="hm-meter-track">
                             <div class="hm-meter-fill" style="width:<?= round($hmDone / 3 * 100) ?>%;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-4">
+                        <div class="hrs-card hrs-stat">
+                            <div class="hrs-stat-icon blue"><i class="fa-solid fa-list-check"></i></div>
+                            <div>
+                                <div class="hrs-stat-label">Setup progress</div>
+                                <div class="hrs-stat-value"><?= $hmDone ?> / 3</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="hrs-card hrs-stat">
+                            <div class="hrs-stat-icon green"><i class="fa-solid fa-users"></i></div>
+                            <div>
+                                <div class="hrs-stat-label">My rooms</div>
+                                <div class="hrs-stat-value"><?= count($rooms) ?></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="hrs-card hrs-stat">
+                            <div class="hrs-stat-icon orange"><i class="fa-solid fa-hourglass-half"></i></div>
+                            <div>
+                                <div class="hrs-stat-label">OJT hours required</div>
+                                <div class="hrs-stat-value"><?= (int) $requiredHours ?> hrs</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -2735,7 +2779,7 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
                 </div>
 
                 <?php if ($hmHasRoom): ?>
-                    <div class="hm-title mt-4 mb-2" style="padding:0 4px;">Your rooms</div>
+                    <div class="hm-title mt-4 mb-2" style="padding:0 4px;">Your room</div>
                     <div class="hm-rooms">
                         <?php foreach ($rooms as $hmRoom): ?>
                             <a href="?room_id=<?= (int) $hmRoom['id'] ?>" class="hm-room">
