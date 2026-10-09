@@ -1105,13 +1105,11 @@ for ($t = 13; $t >= 0; $t--) {
                             </div>
                         </div>
                     </div>
-                </div>
 
                 <div class="row g-4">
                     <!-- Application List -->
                     <!-- addtl s -->
                      <!-- PERCENTAGE CARDS -->
-                    <div class="row g-3 mb-4">
                         <div class="col-12 col-md-6 col-xxl-3">
                             <div class="ojtc-stat-card card-tint-announcements">
                                 <div class="ojtc-stat-icon icon-announcements"><i class="bi bi-patch-check-fill"></i></div>
