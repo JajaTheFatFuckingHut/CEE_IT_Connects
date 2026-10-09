@@ -240,7 +240,7 @@ function uploadBlock(string $step_key, string $label, array $progress, ?int $int
         }
 
         .page-wrap {
-            max-width: 700px;
+            max-width: 100%;
             margin: 0 auto;
             padding: 20px 16px 64px;
         }
