@@ -242,7 +242,7 @@ function uploadBlock(string $step_key, string $label, array $progress, ?int $int
         .page-wrap {
             max-width: 700px;
             margin: 0 auto;
-            padding: 70px 16px 64px;
+            padding: 20px 16px 64px;
         }
 
         .page-header {
@@ -254,7 +254,7 @@ function uploadBlock(string $step_key, string $label, array $progress, ?int $int
             font-size: 22px;
             font-weight: 700;
             letter-spacing: -.3px;
-            color: var(--gray-800);
+            color: var(--brand-dark);
             margin-bottom: 4px;
         }
 
