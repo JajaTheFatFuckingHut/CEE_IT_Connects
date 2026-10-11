@@ -12,19 +12,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $prefix = $_POST['year_no'];
     $suffix = $_POST['id_no'];
     $email = $_POST['email'];
-    if (!preg_match('/^(20|21|22|23|24|25)$/', $prefix)) {
-        die("Invalid student year.");
-    }
 
     if (!preg_match('/^\d{4}$/', $suffix)) {
-        die("Student ID must be exactly 4 digits.");
+        $_SESSION['error'] = "Student ID must be exactly 4 digits.";
+        header("Location: ../student-register.php");
+        exit();
     }
     foreach ($students as $student) {
         if ($student['student_id'] === $prefix . '-' . $suffix) {
-            die("Student ID already exists.");
+            $_SESSION['error'] = "Student ID already exists.";
+            header("Location: ../student-register.php");
+            exit();
         }
         if ($email === $student['email']) {
-            $_SESSION['error'] = "Only three system administrators are allowed.";
+            $_SESSION['error'] = "Email already registered.";
             header("Location: ../student-register.php");
             exit();
         }
@@ -41,7 +42,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $passwordRegex = '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>_\-+=~`\[\];\'\/\\\\]).{8,16}$/';
 
     if (!preg_match($passwordRegex, $_POST['password'])) {
-        die("Password must be 8-16 characters and include an uppercase letter, a lowercase letter, a number, and a special character.");
+        $_SESSION['error'] = "Password must be 8-16 characters and include an uppercase letter, a lowercase letter, a number, and a special character.";
+        header("Location: ../student-register.php");
+        exit();
     }
 
     // HASH PASSWORD
@@ -96,6 +99,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         ':activity' => 'Student registered an account with schoold Id ' . $student_id
     ]);
     // Redirect after success
+    $_SESSION['error'] = "Successfully made your account!";
     header("Location: ../index.php");
     exit();
 }
