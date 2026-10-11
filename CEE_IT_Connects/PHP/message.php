@@ -594,6 +594,13 @@ $stmt = $pdo->prepare("
 ");
 $stmt->execute([$student_id]);
 $student = $stmt->fetch(PDO::FETCH_ASSOC);
+
+$sStmt = $pdo->query("SELECT day, month, year, reason FROM calendar_suspensions WHERE is_suspended = TRUE");
+$suspensions = [];
+foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+    $key = sprintf('%04d-%02d-%02d', $row['year'], $row['month'], $row['day']);
+    $suspensions[$key] = $row['reason'] ?? '';
+}
 ?>
 
 
@@ -2793,219 +2800,167 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
 
         /* addtl e dashboard ni student */
 
-        .cal-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 4px;
-        }
-
-        /* Calendar */
         #calendar {
-            --tc-bg: #0b1220;
-            --tc-panel: #0f1a2e;
-            --tc-line: #1d2b45;
-            --tc-text: #cfe3ff;
-            --tc-dim: #5b7399;
-            --tc-accent: #22d3ee;
-            --tc-accent-glow: rgba(34, 211, 238, .35);
+            --tc-bg: #111827;
+            --tc-line: #263041;
+            --tc-text: #e5e7eb;
+            --tc-dim: #6b7280;
+            --tc-accent: #38bdf8;
             --tc-ok: #34d399;
-            font-family: ui-monospace, "JetBrains Mono", "Cascadia Code", Consolas, monospace;
+            --tc-warn: #f87171;
+            font-family: ui-monospace, "JetBrains Mono", Consolas, monospace;
+            box-sizing: border-box;
+            max-width: 100%;
+            min-width: 0;
         }
 
-        .tc-panel {
-            position: relative;
-            background:
-                linear-gradient(var(--tc-line) 1px, transparent 1px) 0 0 / 100% 28px,
-                var(--tc-panel);
-            background-blend-mode: soft-light;
+        #calendar *,
+        #calendar *::before,
+        #calendar *::after {
+            box-sizing: border-box;
+        }
+
+        #calendar .tc-panel {
+            width: 100%;
+            background: var(--tc-bg);
             border: 1px solid var(--tc-line);
-            border-radius: 10px;
-            padding: 16px;
+            border-radius: 8px;
+            padding: 14px;
             color: var(--tc-text);
-            box-shadow: 0 0 0 1px rgba(34, 211, 238, .05), 0 10px 40px rgba(0, 0, 0, .35);
-        }
-
-        /* corner brackets */
-        .tc-panel::before,
-        .tc-panel::after {
-            content: "";
-            position: absolute;
-            width: 16px;
-            height: 16px;
-            border: 2px solid var(--tc-accent);
-            pointer-events: none;
-        }
-
-        .tc-panel::before {
-            top: -1px;
-            left: -1px;
-            border-right: 0;
-            border-bottom: 0;
-            border-top-left-radius: 10px;
-        }
-
-        .tc-panel::after {
-            bottom: -1px;
-            right: -1px;
-            border-left: 0;
-            border-top: 0;
-            border-bottom-right-radius: 10px;
+            overflow-x: auto;
         }
 
         /* toolbar */
-        .tc-toolbar {
+        #calendar .tc-toolbar {
             display: flex;
             flex-wrap: wrap;
             align-items: center;
-            gap: 8px;
-            margin-bottom: 14px;
+            gap: 6px;
+            margin-bottom: 12px;
         }
 
-        .tc-select,
-        .tc-btn {
-            background: var(--tc-bg);
+        #calendar .tc-select,
+        #calendar .tc-btn {
+            background: transparent;
             color: var(--tc-text);
             border: 1px solid var(--tc-line);
-            border-radius: 6px;
-            padding: 7px 12px;
+            border-radius: 4px;
+            padding: 6px 10px;
             font: inherit;
-            font-size: .85rem;
-            letter-spacing: .04em;
-            transition: border-color .15s, box-shadow .15s, color .15s;
-        }
-
-        .tc-select {
-            appearance: none;
-            padding-right: 28px;
+            font-size: .8rem;
             cursor: pointer;
-            background-image: linear-gradient(45deg, transparent 50%, var(--tc-accent) 50%),
-                linear-gradient(135deg, var(--tc-accent) 50%, transparent 50%);
-            background-position: calc(100% - 15px) 52%, calc(100% - 10px) 52%;
-            background-size: 5px 5px;
-            background-repeat: no-repeat;
         }
 
-        .tc-select option {
+        #calendar .tc-select option {
             background: var(--tc-bg);
             color: var(--tc-text);
         }
 
-        .tc-btn {
-            cursor: pointer;
-            min-width: 36px;
-        }
-
-        .tc-btn-wide {
-            padding: 7px 14px;
-            font-size: .75rem;
-        }
-
-        .tc-select:hover,
-        .tc-btn:hover,
-        .tc-select:focus,
-        .tc-btn:focus-visible {
+        #calendar .tc-select:hover,
+        #calendar .tc-btn:hover,
+        #calendar .tc-select:focus,
+        #calendar .tc-btn:focus-visible {
             outline: none;
             border-color: var(--tc-accent);
             color: var(--tc-accent);
-            box-shadow: 0 0 0 3px var(--tc-accent-glow);
         }
 
-        .tc-readout {
+        #calendar .tc-readout {
             margin-left: auto;
-            color: var(--tc-accent);
-            font-size: .85rem;
-            letter-spacing: .15em;
-            text-shadow: 0 0 8px var(--tc-accent-glow);
+            color: var(--tc-dim);
+            font-size: .8rem;
+            letter-spacing: .1em;
         }
 
         /* grid */
-        .tc-grid {
+        #calendar .tc-grid {
             display: grid;
             grid-template-columns: repeat(7, minmax(0, 1fr));
-            gap: 6px;
+            gap: 4px;
         }
 
-        .tc-head {
+        #calendar .tc-head {
             text-align: center;
-            padding: 6px 0;
+            padding: 4px 0;
             font-size: .7rem;
-            letter-spacing: .2em;
+            letter-spacing: .12em;
             color: var(--tc-dim);
-            border-bottom: 1px solid var(--tc-line);
         }
 
-        .tc-day {
-            position: relative;
-            min-height: 78px;
+        #calendar .tc-day {
+            min-height: 70px;
             padding: 6px 8px;
-            background: var(--tc-bg);
             border: 1px solid var(--tc-line);
-            border-radius: 6px;
-            transition: border-color .15s, box-shadow .15s, transform .15s;
+            border-radius: 4px;
         }
 
-        .tc-day.empty {
-            background: transparent;
-            border: 1px dashed rgba(29, 43, 69, .6);
+        #calendar .tc-day.empty {
+            border: none;
         }
 
-        .tc-day.weekend .tc-num {
-            color: var(--tc-dim);
-        }
-
-        .tc-day:not(.empty):hover {
+        #calendar .tc-day:not(.empty):hover {
             border-color: var(--tc-accent);
-            box-shadow: 0 0 12px var(--tc-accent-glow);
-            transform: translateY(-1px);
             cursor: pointer;
         }
 
-        .tc-num {
-            font-size: .85rem;
+        #calendar .tc-day.weekend .tc-num {
+            color: var(--tc-dim);
+        }
+
+        #calendar .tc-num {
+            font-size: .8rem;
             font-weight: 600;
         }
 
-        .tc-day.today {
+        #calendar .tc-day.today {
             border-color: var(--tc-accent);
-            box-shadow: inset 0 0 14px var(--tc-accent-glow), 0 0 12px var(--tc-accent-glow);
         }
 
-        .tc-day.today .tc-num {
+        #calendar .tc-day.today .tc-num {
             color: var(--tc-accent);
         }
 
-        .tc-day.today::after {
-            content: "";
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            background: var(--tc-accent);
-            box-shadow: 0 0 8px var(--tc-accent);
-            animation: tcPulse 1.6s infinite;
-        }
-
-        @keyframes tcPulse {
-            50% {
-                opacity: .3;
-            }
-        }
-
-        .tc-hrs {
-            margin-top: 8px;
+        #calendar .tc-hrs {
+            margin-top: 6px;
             font-size: .7rem;
             color: var(--tc-ok);
         }
 
+        /* suspended dates */
+        #calendar .tc-day.suspended {
+            border-color: var(--tc-warn);
+        }
+
+        #calendar .tc-day.suspended .tc-num {
+            color: var(--tc-warn);
+        }
+
+        #calendar .tc-susp {
+            margin-top: 4px;
+            font-size: .62rem;
+            line-height: 1.3;
+            color: var(--tc-warn);
+        }
+
+        #calendar .tc-susp b {
+            display: block;
+            letter-spacing: .1em;
+        }
+
+        #calendar .tc-susp span {
+            display: block;
+            color: var(--tc-text);
+            opacity: .75;
+            overflow-wrap: anywhere;
+        }
+
         @media (max-width: 576px) {
-            .tc-day {
-                min-height: 54px;
+            #calendar .tc-day {
+                min-height: 52px;
                 padding: 4px;
             }
 
-            .tc-readout {
+            #calendar .tc-readout {
                 width: 100%;
                 margin-left: 0;
             }
@@ -3039,7 +2994,7 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
         <a href="?section=calendar<?php if ($current_room_id)
             echo "&room_id=$current_room_id"; ?>" data-tooltip="Calendar"
             class="sidebar-link <?= $current_section === 'calendar' ? 'active' : '' ?>">
-            <i class="fa fa-list-ul"></i> <span class="sidebar-text">Calendar</span>
+            <i class="fa-solid fa-calendar"></i><span class="sidebar-text">Calendar</span>
         </a>
 
         <?php if ($hasActiveProgress): ?>
@@ -5204,8 +5159,6 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
             <?php endif; ?>
         })();
 
-
-
         const OJT_EXPECTED_TIME_IN = "<?= htmlspecialchars($ojtTimeIn ?? '') ?>";
         const OJT_EXPECTED_TIME_OUT = "<?= htmlspecialchars($ojtTimeOut ?? '') ?>";
         function timeToMinutes(t) {
@@ -5273,6 +5226,7 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
 
 
         // This is part is for the calendar part 
+        const CAL_SUSPENDED = <?= json_encode($suspensions, JSON_HEX_TAG | JSON_HEX_AMP) ?>;
         document.addEventListener('DOMContentLoaded', function () {
             const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June',
                 'July', 'August', 'September', 'October', 'November', 'December'];
