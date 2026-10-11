@@ -2799,26 +2799,216 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
             gap: 4px;
         }
 
-        .cal-head {
-            font-weight: 600;
+        /* Calendar */
+        #calendar {
+            --tc-bg: #0b1220;
+            --tc-panel: #0f1a2e;
+            --tc-line: #1d2b45;
+            --tc-text: #cfe3ff;
+            --tc-dim: #5b7399;
+            --tc-accent: #22d3ee;
+            --tc-accent-glow: rgba(34, 211, 238, .35);
+            --tc-ok: #34d399;
+            font-family: ui-monospace, "JetBrains Mono", "Cascadia Code", Consolas, monospace;
+        }
+
+        .tc-panel {
+            position: relative;
+            background:
+                linear-gradient(var(--tc-line) 1px, transparent 1px) 0 0 / 100% 28px,
+                var(--tc-panel);
+            background-blend-mode: soft-light;
+            border: 1px solid var(--tc-line);
+            border-radius: 10px;
+            padding: 16px;
+            color: var(--tc-text);
+            box-shadow: 0 0 0 1px rgba(34, 211, 238, .05), 0 10px 40px rgba(0, 0, 0, .35);
+        }
+
+        /* corner brackets */
+        .tc-panel::before,
+        .tc-panel::after {
+            content: "";
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--tc-accent);
+            pointer-events: none;
+        }
+
+        .tc-panel::before {
+            top: -1px;
+            left: -1px;
+            border-right: 0;
+            border-bottom: 0;
+            border-top-left-radius: 10px;
+        }
+
+        .tc-panel::after {
+            bottom: -1px;
+            right: -1px;
+            border-left: 0;
+            border-top: 0;
+            border-bottom-right-radius: 10px;
+        }
+
+        /* toolbar */
+        .tc-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .tc-select,
+        .tc-btn {
+            background: var(--tc-bg);
+            color: var(--tc-text);
+            border: 1px solid var(--tc-line);
+            border-radius: 6px;
+            padding: 7px 12px;
+            font: inherit;
+            font-size: .85rem;
+            letter-spacing: .04em;
+            transition: border-color .15s, box-shadow .15s, color .15s;
+        }
+
+        .tc-select {
+            appearance: none;
+            padding-right: 28px;
+            cursor: pointer;
+            background-image: linear-gradient(45deg, transparent 50%, var(--tc-accent) 50%),
+                linear-gradient(135deg, var(--tc-accent) 50%, transparent 50%);
+            background-position: calc(100% - 15px) 52%, calc(100% - 10px) 52%;
+            background-size: 5px 5px;
+            background-repeat: no-repeat;
+        }
+
+        .tc-select option {
+            background: var(--tc-bg);
+            color: var(--tc-text);
+        }
+
+        .tc-btn {
+            cursor: pointer;
+            min-width: 36px;
+        }
+
+        .tc-btn-wide {
+            padding: 7px 14px;
+            font-size: .75rem;
+        }
+
+        .tc-select:hover,
+        .tc-btn:hover,
+        .tc-select:focus,
+        .tc-btn:focus-visible {
+            outline: none;
+            border-color: var(--tc-accent);
+            color: var(--tc-accent);
+            box-shadow: 0 0 0 3px var(--tc-accent-glow);
+        }
+
+        .tc-readout {
+            margin-left: auto;
+            color: var(--tc-accent);
+            font-size: .85rem;
+            letter-spacing: .15em;
+            text-shadow: 0 0 8px var(--tc-accent-glow);
+        }
+
+        /* grid */
+        .tc-grid {
+            display: grid;
+            grid-template-columns: repeat(7, minmax(0, 1fr));
+            gap: 6px;
+        }
+
+        .tc-head {
             text-align: center;
             padding: 6px 0;
+            font-size: .7rem;
+            letter-spacing: .2em;
+            color: var(--tc-dim);
+            border-bottom: 1px solid var(--tc-line);
         }
 
-        .cal-day {
-            min-height: 70px;
-            border: 1px solid #dee2e6;
+        .tc-day {
+            position: relative;
+            min-height: 78px;
+            padding: 6px 8px;
+            background: var(--tc-bg);
+            border: 1px solid var(--tc-line);
             border-radius: 6px;
-            padding: 4px 6px;
+            transition: border-color .15s, box-shadow .15s, transform .15s;
         }
 
-        .cal-day.empty {
-            border: none;
+        .tc-day.empty {
+            background: transparent;
+            border: 1px dashed rgba(29, 43, 69, .6);
         }
 
-        .cal-day.today {
-            background: #e7f1ff;
-            border-color: #0d6efd;
+        .tc-day.weekend .tc-num {
+            color: var(--tc-dim);
+        }
+
+        .tc-day:not(.empty):hover {
+            border-color: var(--tc-accent);
+            box-shadow: 0 0 12px var(--tc-accent-glow);
+            transform: translateY(-1px);
+            cursor: pointer;
+        }
+
+        .tc-num {
+            font-size: .85rem;
+            font-weight: 600;
+        }
+
+        .tc-day.today {
+            border-color: var(--tc-accent);
+            box-shadow: inset 0 0 14px var(--tc-accent-glow), 0 0 12px var(--tc-accent-glow);
+        }
+
+        .tc-day.today .tc-num {
+            color: var(--tc-accent);
+        }
+
+        .tc-day.today::after {
+            content: "";
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--tc-accent);
+            box-shadow: 0 0 8px var(--tc-accent);
+            animation: tcPulse 1.6s infinite;
+        }
+
+        @keyframes tcPulse {
+            50% {
+                opacity: .3;
+            }
+        }
+
+        .tc-hrs {
+            margin-top: 8px;
+            font-size: .7rem;
+            color: var(--tc-ok);
+        }
+
+        @media (max-width: 576px) {
+            .tc-day {
+                min-height: 54px;
+                padding: 4px;
+            }
+
+            .tc-readout {
+                width: 100%;
+                margin-left: 0;
+            }
         }
     </style>
 </head>
@@ -2915,12 +3105,21 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
 
     <!-- Calendar Section -->
     <div id="calendar" class="section <?= $current_section === 'calendar' ? 'active' : '' ?>">
-        <div class="d-flex gap-2 mb-3">
-            <select id="calMonth" class="form-select w-auto"></select>
-            <select id="calYear" class="form-select w-auto"></select>
-        </div>
+        <div class="tc-panel">
+            <div class="tc-toolbar">
+                <button type="button" id="calPrev" class="tc-btn" aria-label="Previous month">&lsaquo;</button>
 
-        <div id="calGrid" class="cal-grid"></div>
+                <select id="calMonth" class="tc-select"></select>
+                <select id="calYear" class="tc-select"></select>
+
+                <button type="button" id="calNext" class="tc-btn" aria-label="Next month">&rsaquo;</button>
+                <button type="button" id="calToday" class="tc-btn tc-btn-wide">TODAY</button>
+
+                <div class="tc-readout" id="calReadout"></div>
+            </div>
+
+            <div id="calGrid" class="tc-grid"></div>
+        </div>
     </div>
     <!-- HOME SECTION -->
     <!-- addtl s dashboard ni student -->
@@ -5074,47 +5273,77 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
 
 
         // This is part is for the calendar part 
-        const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June',
-            'July', 'August', 'September', 'October', 'November', 'December'];
-        const DAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+        document.addEventListener('DOMContentLoaded', function () {
+            const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'];
+            const DAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 
-        const monthSel = document.getElementById('calMonth');
-        const yearSel = document.getElementById('calYear');
-        const calEl = document.getElementById('calGrid');
+            const monthSel = document.getElementById('calMonth');
+            const yearSel = document.getElementById('calYear');
+            const calEl = document.getElementById('calGrid');   // not 'calendar'
+            const readout = document.getElementById('calReadout');
+            if (!monthSel || !yearSel || !calEl) return;
 
-        const now = new Date();
+            const now = new Date();
 
-        // Fill dropdowns
-        MONTHS.forEach((m, i) => monthSel.add(new Option(m, i)));
-        for (let y = now.getFullYear() - 2; y <= now.getFullYear() + 2; y++) {
-            yearSel.add(new Option(y, y));
-        }
-        monthSel.value = now.getMonth();
-        yearSel.value = now.getFullYear();
+            // Fill dropdowns
+            MONTHS.forEach((m, i) => monthSel.add(new Option(m, i)));
+            for (let y = now.getFullYear() - 2; y <= now.getFullYear() + 2; y++) {
+                yearSel.add(new Option(y, y));
+            }
+            monthSel.value = now.getMonth();
+            yearSel.value = now.getFullYear();
 
-        function renderCalendar() {
-            const month = parseInt(monthSel.value, 10);
-            const year = parseInt(yearSel.value, 10);
+            function render() {
+                const month = parseInt(monthSel.value, 10);
+                const year = parseInt(yearSel.value, 10);
+                const firstDay = new Date(year, month, 1).getDay();
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+                const data = (typeof CAL_DATA !== 'undefined') ? CAL_DATA : {};
 
-            const firstDay = new Date(year, month, 1).getDay();      // 0 = Sunday
-            const daysInMonth = new Date(year, month + 1, 0).getDate(); // day 0 of next month = last day of this one
+                let html = DAYS.map(d => `<div class="tc-head">${d}</div>`).join('');
+                for (let i = 0; i < firstDay; i++) html += '<div class="tc-day empty"></div>';
 
-            let html = DAYS.map(d => `<div class="cal-head">${d}</div>`).join('');
+                for (let d = 1; d <= daysInMonth; d++) {
+                    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                    const dow = new Date(year, month, d).getDay();
+                    const isToday = d === now.getDate() && month === now.getMonth() && year === now.getFullYear();
+                    const hrs = data[dateStr];
 
-            // Blank cells before the 1st
-            for (let i = 0; i < firstDay; i++) html += '<div class="cal-day empty"></div>';
+                    html += `<div class="tc-day${isToday ? ' today' : ''}${dow === 0 || dow === 6 ? ' weekend' : ''}" data-date="${dateStr}">
+                        <span class="tc-num">${String(d).padStart(2, '0')}</span>
+                        ${hrs ? `<div class="tc-hrs">${hrs} HRS</div>` : ''}
+                     </div>`;
+                }
 
-            for (let d = 1; d <= daysInMonth; d++) {
-                const isToday = d === now.getDate() && month === now.getMonth() && year === now.getFullYear();
-                html += `<div class="cal-day${isToday ? ' today' : ''}" data-date="${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}">${d}</div>`;
+                calEl.innerHTML = html;
+                readout.textContent = `${MONTHS[month].slice(0, 3).toUpperCase()} // ${year}`;
             }
 
-            calEl.innerHTML = html;
-        }
+            function shift(delta) {
+                let m = parseInt(monthSel.value, 10) + delta;
+                let y = parseInt(yearSel.value, 10);
+                if (m < 0) { m = 11; y--; }
+                if (m > 11) { m = 0; y++; }
+                // keep within the year dropdown's range
+                if (![...yearSel.options].some(o => parseInt(o.value, 10) === y)) return;
+                monthSel.value = m;
+                yearSel.value = y;
+                render();
+            }
 
-        monthSel.addEventListener('change', renderCalendar);
-        yearSel.addEventListener('change', renderCalendar);
-        renderCalendar();
+            monthSel.addEventListener('change', render);
+            yearSel.addEventListener('change', render);
+            document.getElementById('calPrev').addEventListener('click', () => shift(-1));
+            document.getElementById('calNext').addEventListener('click', () => shift(1));
+            document.getElementById('calToday').addEventListener('click', () => {
+                monthSel.value = now.getMonth();
+                yearSel.value = now.getFullYear();
+                render();
+            });
+
+            render();
+        });
     </script>
 </body>
 
