@@ -2820,7 +2820,7 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
         </a>
         <a href="?section=application<?php if ($current_room_id)
             echo "&room_id=$current_room_id"; ?>" data-tooltip="Calendar"
-            class="sidebar-link <?= $current_section === 'application' ? 'active' : '' ?>">
+            class="sidebar-link <?= $current_section === 'calendar' ? 'active' : '' ?>">
             <i class="fa fa-list-ul"></i> <span class="sidebar-text">Calendar</span>
         </a>
 
@@ -2887,8 +2887,13 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
     </div>
 
     <!-- Calendar Section -->
-    <div id="calendar" class="section <?= $current_section === 'Calendar' ? 'active' : '' ?>">
+    <div id="calendar" class="section <?= $current_section === 'calendar' ? 'active' : '' ?>">
+        <div class="d-flex gap-2 mb-3">
+            <select id="calMonth" class="form-select w-auto"></select>
+            <select id="calYear" class="form-select w-auto"></select>
+        </div>
 
+        <div id="calendar" class="cal-grid"></div>
     </div>
     <!-- HOME SECTION -->
     <!-- addtl s dashboard ni student -->
