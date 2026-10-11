@@ -401,12 +401,12 @@ $saAcc = $pdo->query("
       + (SELECT COUNT(*) FROM advisers WHERE is_archived = TRUE)
       + (SELECT COUNT(*) FROM admins   WHERE is_archived = TRUE) AS archived
 ")->fetch(PDO::FETCH_ASSOC);
-$saAccTotal  = (int) $saAcc['total'];
-$saArchived  = (int) $saAcc['archived'];
+$saAccTotal = (int) $saAcc['total'];
+$saArchived = (int) $saAcc['archived'];
 $saActivePct = $saAccTotal > 0 ? (int) round((($saAccTotal - $saArchived) / $saAccTotal) * 100) : 0;
 
 // System admin seats (the 3-admin limit is the same one enforced in the role-update form above)
-$saSeatMax   = 3;
+$saSeatMax = 3;
 $saSeatsUsed = count(array_filter($admins, fn($a) => $a['role'] === 'superadmin'));
 $saSeatsOpen = max(0, $saSeatMax - $saSeatsUsed);
 
@@ -425,10 +425,10 @@ $saRoleRows = $pdo->query("
         WHERE COALESCE(is_archived, FALSE) = FALSE
 ")->fetchAll(PDO::FETCH_KEY_PAIR);
 $saRoleCounts = [
-    'Students'            => (int) ($saRoleRows['Students'] ?? 0),
-    'HTE Advisers'        => (int) ($saRoleRows['HTE Advisers'] ?? 0),
+    'Students' => (int) ($saRoleRows['Students'] ?? 0),
+    'HTE Advisers' => (int) ($saRoleRows['HTE Advisers'] ?? 0),
     'Internship Advisers' => (int) ($saRoleRows['Internship Advisers'] ?? 0),
-    'Admins'              => (int) ($saRoleRows['Admins'] ?? 0),
+    'Admins' => (int) ($saRoleRows['Admins'] ?? 0),
 ];
 
 // Students by program (active students only)
@@ -441,15 +441,15 @@ $saProgRows = $pdo->query("
 ")->fetchAll(PDO::FETCH_ASSOC);
 $saProgColorMap = [
     'information technology' => '#e0483e',
-    'civil engineering'      => '#4f51a8',
+    'civil engineering' => '#4f51a8',
     'electrical engineering' => '#f2b705',
 ];
 $saProgLabels = [];
-$saProgData   = [];
+$saProgData = [];
 $saProgColors = [];
 foreach ($saProgRows as $saP) {
     $saProgLabels[] = deptCode($saP['program']);
-    $saProgData[]   = (int) $saP['total'];
+    $saProgData[] = (int) $saP['total'];
     $saProgColors[] = $saProgColorMap[$saP['program']] ?? '#6b7280';
 }
 
@@ -465,11 +465,11 @@ foreach ($saActStmt->fetchAll(PDO::FETCH_ASSOC) as $saR) {
     $saActByDay[$saR['day']] = (int) $saR['total'];
 }
 $saTrendLabels = [];
-$saTrendData   = [];
+$saTrendData = [];
 for ($saT = 13; $saT >= 0; $saT--) {
     $saKey = date('Y-m-d', strtotime("-{$saT} days"));
     $saTrendLabels[] = date('M j', strtotime($saKey));
-    $saTrendData[]   = $saActByDay[$saKey] ?? 0;
+    $saTrendData[] = $saActByDay[$saKey] ?? 0;
 }
 
 // Activity by role, last 14 days
@@ -481,7 +481,7 @@ $saRoleActRows = $pdo->query("
     ORDER BY total DESC
 ")->fetchAll(PDO::FETCH_ASSOC);
 $saRoleActLabels = [];
-$saRoleActData   = [];
+$saRoleActData = [];
 foreach ($saRoleActRows as $saRa) {
     if ($saRa['role'] === 'superadmin') {
         $saRoleActLabels[] = 'System Admin';
@@ -510,6 +510,18 @@ function deptCode($department)
             $initials .= strtoupper($w[0]);
     }
     return $initials ?: '—';
+}
+
+// For the calendar
+if (($_SESSION['role'] ?? '') !== 'superadmin') {
+    header('Location: index.php');
+    exit;
+}
+
+$sStmt = $pdo->query("SELECT day, month, year, reason FROM calendar_suspensions WHERE is_suspended = TRUE");
+$suspensions = [];
+foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+    $suspensions[sprintf('%04d-%02d-%02d', $row['year'], $row['month'], $row['day'])] = $row['reason'] ?? '';
 }
 ?>
 <!DOCTYPE html>
@@ -1237,6 +1249,146 @@ function deptCode($department)
                 font-size: 1rem !important;
             }
         }
+
+        /* This is for the calendar */
+        #suspAdmin {
+            max-width: 100%;
+        }
+
+        #suspAdmin *,
+        #suspAdmin *::before,
+        #suspAdmin *::after {
+            box-sizing: border-box;
+        }
+
+        #suspAdmin .sa-panel {
+            background: #fff;
+            border: 1px solid #e6ebf5;
+            border-radius: 14px;
+            padding: 18px;
+            margin-bottom: 14px;
+            color: #1b2a4e;
+        }
+
+        #suspAdmin .sa-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        #suspAdmin .sa-title {
+            font-size: .8rem;
+            font-weight: 700;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            color: #7a869f;
+            margin-bottom: 12px;
+        }
+
+        #suspAdmin .sa-head .sa-title {
+            margin-bottom: 0;
+        }
+
+        #suspAdmin .sa-form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        #suspAdmin .sa-input {
+            background: #fff;
+            color: #1b2a4e;
+            border: 1px solid #e6ebf5;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font: inherit;
+            font-size: .85rem;
+        }
+
+        #suspAdmin .sa-input:focus {
+            outline: none;
+            border-color: #ff5a1f;
+        }
+
+        #suspAdmin .sa-grow {
+            flex: 1 1 220px;
+            min-width: 0;
+        }
+
+        #suspAdmin .sa-btn {
+            border: 1px solid #e6ebf5;
+            border-radius: 8px;
+            padding: 8px 16px;
+            font: inherit;
+            font-size: .85rem;
+            cursor: pointer;
+        }
+
+        #suspAdmin .sa-primary {
+            background: #ff5a1f;
+            border-color: #ff5a1f;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        #suspAdmin .sa-primary:hover {
+            background: #e84c13;
+        }
+
+        #suspAdmin .sa-list {
+            max-height: 360px;
+            overflow-y: auto;
+        }
+
+        #suspAdmin .sa-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            border: 1px solid #e6ebf5;
+            border-radius: 10px;
+            margin-bottom: 6px;
+        }
+
+        #suspAdmin .sa-item-text {
+            min-width: 0;
+        }
+
+        #suspAdmin .sa-item-text b {
+            display: block;
+            font-size: .85rem;
+        }
+
+        #suspAdmin .sa-item-text span {
+            display: block;
+            font-size: .78rem;
+            color: #7a869f;
+            overflow-wrap: anywhere;
+        }
+
+        #suspAdmin .sa-del {
+            flex: none;
+            background: #fff;
+            color: #e5484d;
+            border: 1px solid #f5c2c4;
+            border-radius: 8px;
+            padding: 5px 10px;
+            font: inherit;
+            font-size: .75rem;
+            cursor: pointer;
+        }
+
+        #suspAdmin .sa-del:hover {
+            background: #fdecec;
+        }
+
+        #suspAdmin .sa-empty {
+            font-size: .85rem;
+            color: #7a869f;
+        }
     </style>
 </head>
 
@@ -1258,7 +1410,10 @@ function deptCode($department)
             if (current === 'superadmin' && original !== 'superadmin') hasChangeToSuperadmin = true;
             if (original === 'superadmin' && current !== 'superadmin') hasRemovalFromSuperadmin = true;
         });
-        if (superadminCount > 3) { alert("Only 3 system administrators are allowed."); return false; }
+        if (superadminCount > 3) {
+            alert("Only 3 system administrators are allowed."); return false
+                ;
+        }
         if (hasRemovalFromSuperadmin) return confirm("You are removing a System administrator. Continue?");
         if (hasChangeToSuperadmin) return confirm("You are assigning a System administrator. Are you sure?");
         return true;
@@ -1333,6 +1488,10 @@ function deptCode($department)
             <a href="#" onclick="showSection(event, 'section_settings')" data-tooltip="Section">
                 <i class="bi bi-ui-checks me-2"></i>
                 <span class="nav-label">Section</span>
+            </a>
+            <a href="#" onclick="showSection(event, 'calendar')" data-tooltip="Calendar">
+                <i class="bi bi-calendar me-2"></i>
+                <span class="nav-label">Calendar</span>
             </a>
             <!-- <a href="#" onclick="showSection(event, 'restore')" data-tooltip="Settings">
                 <i class="bi bi-archive me-2"></i>
@@ -1515,10 +1674,12 @@ function deptCode($department)
                                     </div>
                                     <div class="flex-grow-1" style="min-width:90px;">
                                         <p class="small mb-1 fw-semibold text-uppercase"
-                                            style="letter-spacing:.05em;font-size:11px;color:#a13d1f;">Active Accounts</p>
+                                            style="letter-spacing:.05em;font-size:11px;color:#a13d1f;">Active Accounts
+                                        </p>
                                         <h2 class="fw-bold mb-0" style="color:#a13d1f;"><?= $saActivePct ?>%</h2>
                                         <p class="mb-0 mt-1 d-none d-md-block" style="font-size:11px;color:#a13d1f;">
-                                            <?= (int) $saArchived ?> archived</p>
+                                            <?= (int) $saArchived ?> archived
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -1536,10 +1697,14 @@ function deptCode($department)
                                     </div>
                                     <div class="flex-grow-1" style="min-width:90px;">
                                         <p class="small mb-1 fw-semibold text-uppercase"
-                                            style="letter-spacing:.05em;font-size:11px;color:#272f54;">System Admin Seats</p>
-                                        <h2 class="fw-bold mb-0" style="color:#272f54;"><?= (int) $saSeatsUsed ?> of <?= (int) $saSeatMax ?></h2>
+                                            style="letter-spacing:.05em;font-size:11px;color:#272f54;">System Admin
+                                            Seats</p>
+                                        <h2 class="fw-bold mb-0" style="color:#272f54;"><?= (int) $saSeatsUsed ?> of
+                                            <?= (int) $saSeatMax ?>
+                                        </h2>
                                         <p class="mb-0 mt-1 d-none d-md-block" style="font-size:11px;color:#272f54;">
-                                            <?= (int) $saSeatsOpen ?> open</p>
+                                            <?= (int) $saSeatsOpen ?> open
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -1583,7 +1748,8 @@ function deptCode($department)
                             </div>
                             <div class="card-body px-4 pb-4 pt-2">
                                 <p class="text-muted small mb-3">Active students per program.</p>
-                                <div style="position:relative; height:220px;"><canvas id="saProgramChart"></canvas></div>
+                                <div style="position:relative; height:220px;"><canvas id="saProgramChart"></canvas>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1596,7 +1762,8 @@ function deptCode($department)
                             </div>
                             <div class="card-body px-4 pb-4 pt-2">
                                 <p class="text-muted small mb-3">Logged actions per day, last 14 days.</p>
-                                <div style="position:relative; height:220px;"><canvas id="saActivityChart"></canvas></div>
+                                <div style="position:relative; height:220px;"><canvas id="saActivityChart"></canvas>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1609,7 +1776,8 @@ function deptCode($department)
                             </div>
                             <div class="card-body px-4 pb-4 pt-2">
                                 <p class="text-muted small mb-3">Who is using the system, last 14 days.</p>
-                                <div style="position:relative; height:220px;"><canvas id="saRoleActChart"></canvas></div>
+                                <div style="position:relative; height:220px;"><canvas id="saRoleActChart"></canvas>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -2941,6 +3109,28 @@ function deptCode($department)
 
                 <?php endif; ?>
             </div>
+
+            <div id="calendar" class="section active sysAdm-section">
+                <div id="suspAdmin">
+                    <div class="sa-panel">
+                        <div class="sa-title">Suspend a date</div>
+                        <div class="sa-form">
+                            <input type="date" id="suspDate" class="sa-input">
+                            <input type="text" id="suspReason" class="sa-input sa-grow" maxlength="255"
+                                placeholder="Reason (e.g. Typhoon signal no. 3)">
+                            <button type="button" id="suspAdd" class="sa-btn sa-primary">Add</button>
+                        </div>
+                    </div>
+
+                    <div class="sa-panel">
+                        <div class="sa-head">
+                            <div class="sa-title">Suspended dates</div>
+                            <select id="suspYear" class="sa-input"></select>
+                        </div>
+                        <div id="suspList" class="sa-list"></div>
+                    </div>
+                </div>
+            </div>
         </div><!-- /.main-content -->
     </div><!-- /.layout -->
 
@@ -3276,7 +3466,7 @@ function deptCode($department)
         }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script>
         (function () {
             const make = (id, cfg) => {
@@ -3394,6 +3584,87 @@ function deptCode($department)
             card.style.cursor = 'pointer';
             card.title = 'Click to view full details';
             card.addEventListener('click', () => goToSection(card.dataset.go));
+        });
+
+        // For the calendar
+        const CAL_SUSPENDED = <?= json_encode((object) $suspensions, JSON_HEX_TAG | JSON_HEX_AMP) ?>;
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const esc = s => String(s).replace(/[&<>"']/g, c =>
+                ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+            const dateIn = document.getElementById('suspDate');
+            const reasonIn = document.getElementById('suspReason');
+            const addBtn = document.getElementById('suspAdd');
+            const yearSel = document.getElementById('suspYear');
+            const listEl = document.getElementById('suspList');
+
+            const thisYear = new Date().getFullYear();
+            yearSel.add(new Option('All years', 'all'));
+            for (let y = thisYear - 1; y <= thisYear + 5; y++) yearSel.add(new Option(y, y));
+            yearSel.value = thisYear;
+
+            function renderList() {
+                const f = yearSel.value;
+                const items = Object.entries(CAL_SUSPENDED)
+                    .filter(([k]) => f === 'all' || k.startsWith(f + '-'))
+                    .sort(([a], [b]) => a.localeCompare(b));
+
+                if (!items.length) {
+                    listEl.innerHTML = `<div class="sa-empty">No suspended dates${f === 'all' ? '' : ' in ' + f}.</div>`;
+                    return;
+                }
+                listEl.innerHTML = items.map(([k, reason]) => {
+                    const [y, m, d] = k.split('-').map(Number);
+                    return `<div class="sa-item">
+                <div class="sa-item-text"><b>${MONTHS[m - 1]} ${d}, ${y}</b><span>${esc(reason)}</span></div>
+                <button type="button" class="sa-del" data-date="${k}">Remove</button>
+            </div>`;
+                }).join('');
+            }
+
+            async function save(dateStr, isSusp, reason) {
+                const [y, m, d] = dateStr.split('-').map(Number);
+                const body = new URLSearchParams({
+                    day: d, month: m, year: y,
+                    is_suspended: isSusp ? '1' : '0',
+                    reason: reason || ''
+                });
+                let json;
+                try {
+                    const res = await fetch('calendar-suspend.php', { method: 'POST', body });
+                    json = await res.json();
+                } catch (e) {
+                    json = { ok: false, error: 'Request failed' };
+                }
+                if (!json.ok) { alert(json.error || 'Failed to save'); return false; }
+                if (isSusp) CAL_SUSPENDED[dateStr] = reason;
+                else delete CAL_SUSPENDED[dateStr];
+                return true;
+            }
+
+            addBtn.addEventListener('click', async () => {
+                const dateStr = dateIn.value, reason = reasonIn.value.trim();
+                if (!dateStr) return alert('Pick a date.');
+                if (!reason) return alert('Enter a reason.');
+                if (await save(dateStr, true, reason)) {
+                    const y = dateStr.slice(0, 4);
+                    if ([...yearSel.options].some(o => o.value === y)) yearSel.value = y;
+                    dateIn.value = ''; reasonIn.value = '';
+                    renderList();
+                }
+            });
+
+            listEl.addEventListener('click', async e => {
+                const btn = e.target.closest('.sa-del');
+                if (!btn) return;
+                if (!confirm(`Lift the suspension on ${btn.dataset.date}?`)) return;
+                if (await save(btn.dataset.date, false, '')) renderList();
+            });
+
+            yearSel.addEventListener('change', renderList);
+            renderList();
         });
     </script>
 </body>

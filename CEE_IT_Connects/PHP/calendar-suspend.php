@@ -3,7 +3,7 @@ session_start();
 require 'db.php';
 header('Content-Type: application/json');
 
-if (($_SESSION['role'] ?? '') !== 'admin') {
+if (($_SESSION['role'] ?? '') !== 'superadmin') {
     http_response_code(403);
     echo json_encode(['ok' => false, 'error' => 'Not allowed']);
     exit;
