@@ -1,7 +1,8 @@
 <?php
 session_start();
-require 'db.php';
+var_dump($_SESSION);
 
+require 'db.php';
 $stmt = $pdo->query("SELECT * FROM students");
 $stmt->execute();
 $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
