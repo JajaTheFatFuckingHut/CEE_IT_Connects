@@ -184,7 +184,53 @@ $docAvailStmt = $pdo->query("
 ");
 $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
 
+// addtl s
+// ── DASHBOARD ANALYTICS (percentages + charts) ──
+$totalApplicants = count($applicants);
+$phaseCounts     = ['Internship Confirmed' => 0, 'In Progress' => 0, 'No Progress' => 0];
+$reqComplete     = 0;
+$programCounts   = [];
+$companyCounts   = [];
+$appsByDay       = [];
 
+foreach ($applicants as $ap) {
+    if (isset($phaseCounts[$ap['current_phase']])) {
+        $phaseCounts[$ap['current_phase']]++;
+    }
+    if ($ap['requirements'] === 'Complete') {
+        $reqComplete++;
+    }
+    $prog = ucwords(strtolower($ap['program'] ?: 'Unspecified'));
+    $programCounts[$prog] = ($programCounts[$prog] ?? 0) + 1;
+
+    $comp = $ap['company'] ?: 'Unknown';
+    $companyCounts[$comp] = ($companyCounts[$comp] ?? 0) + 1;
+
+    if (!empty($ap['submitted_at'])) {
+        $day = date('Y-m-d', strtotime($ap['submitted_at']));
+        $appsByDay[$day] = ($appsByDay[$day] ?? 0) + 1;
+    }
+}
+$reqIncomplete = $totalApplicants - $reqComplete;
+
+$pctOf = fn($n) => $totalApplicants > 0 ? (int) round(($n / $totalApplicants) * 100) : 0;
+$confirmedPct  = $pctOf($phaseCounts['Internship Confirmed']);
+$inProgressPct = $pctOf($phaseCounts['In Progress']);
+$noProgressPct = $pctOf($phaseCounts['No Progress']);
+$reqCompletePct = $pctOf($reqComplete);
+
+arsort($companyCounts);
+$companyCounts = array_slice($companyCounts, 0, 6, true);
+
+// Applications per day, last 14 days
+$trendLabels = [];
+$trendData   = [];
+for ($t = 13; $t >= 0; $t--) {
+    $dKey = date('Y-m-d', strtotime("-{$t} days"));
+    $trendLabels[] = date('M j', strtotime($dKey));
+    $trendData[]   = $appsByDay[$dKey] ?? 0;
+}
+// addtl e
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -500,9 +546,6 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
             opacity: 0.9;
         }
 
-        /* ADDED: stat card shell — rounded corners + hover lift, background set per-card
-                       below via the card-tint-* classes (kept separate from ojtc-stat-card so any
-                       stat card can reuse the shell and just swap its tint/icon color). */
         .ojtc-stat-card {
             border-radius: 16px;
             transition: transform .15s ease, box-shadow .15s ease;
@@ -510,6 +553,7 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
             display: flex;
             align-items: center;
             gap: 14px;
+            height: 100%;
         }
 
         .ojtc-stat-card:hover {
@@ -517,8 +561,6 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
             box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
         }
 
-        /* ADDED: solid colored icon box (icon left of label/count), same pattern as the
-                       System Admin dashboard's Internships/Accounts/Programs cards. */
         .ojtc-stat-icon {
             width: 44px;
             height: 44px;
@@ -530,9 +572,7 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
             font-size: 18px;
             color: #fff;
         }
-
-        /* ADDED: one tint (card bg) + one solid accent (icon bg) per stat, matching the
-                       System Admin dashboard's navy/amber/red-orange palette. */
+        
         .card-tint-applications {
             background: #FFF6E3;
         }
@@ -565,8 +605,6 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
             background: #E4572E;
         }
 
-        /* ADDED: panel card hover-lift + rounded corners, reused by Application List,
-                       Announcements, Internship Postings, and Documents cards below. */
         .ojtc-panel-card {
             border-radius: 16px !important;
             transition: transform .15s ease, box-shadow .15s ease;
@@ -577,23 +615,16 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
             box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
         }
 
-        /* ADDED: subtle blue "tab" header background for the plain <table> headers —
-                       same class name/style as the System Admin dashboard table, for consistency. */
         .ojtc-th-tab th {
             background: rgba(39, 111, 255, 0.08) !important;
             color: #272f54 !important;
         }
 
-        /* ADDED: row hover highlight — works for <tr> rows and the flex-row divs used in
-                       Announcements / Documents. */
         .ojtc-row-hover:hover {
             background: #f8f9ff;
             border-radius: 8px;
         }
 
-        /* ADDED: same button style used on the System Admin dashboard — subtle yellow by
-                       default, solid orange on hover. Reuse this class on any button added to this
-                       tab or others (Add/Import/Save/etc.) for consistency. */
         .btn-update {
             background: #FFE7B3 !important;
             color: #7a5200 !important;
@@ -744,18 +775,6 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                 padding: 10px !important;
             }
 
-            /* STAT CARDS — 1 row, 3 columns */
-            .row.g-3.mb-4 {
-                display: grid !important;
-                grid-template-columns: repeat(3, 1fr) !important;
-                gap: 4px !important;
-            }
-
-            .row.g-3.mb-4 .col-md-4 {
-                width: 100% !important;
-                padding: 0 !important;
-            }
-
             .row.g-3.mb-4 .card {
                 border-radius: 10px !important;
             }
@@ -855,10 +874,6 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
         }
 
         @media (max-width: 480px) {
-            .row.g-3.mb-4 {
-                gap: 3px !important;
-            }
-
             .row.g-3.mb-4 .card-body {
                 padding: 6px !important;
             }
@@ -899,6 +914,7 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
 </head>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
     function showSection(sectionID) {
         document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
@@ -989,11 +1005,6 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
 
             <!-- ── DASHBOARD ── -->
             <div id="dashboard" class="section active sysAdm-section">
-
-                <!-- CHANGED: header now uses the same .card/.card-header banner as the System Admin
-                     dashboard, reusing the sysAdm-header--danger/sysAdm-header--blue/sysAdm-header-icon/
-                     sysAdm-header-text classes so it looks identical. Original "sysAdm-header" class
-                     kept alongside in case other rules still target it. -->
                 <div class="mb-4 sysAdm-header--danger sysAdm-header--blue">
                     <div class="sysAdm-header-left">
                         <div class="sysAdm-header-icon">
@@ -1007,81 +1018,153 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                     </div>
                 </div>
 
-                <!-- <div id="dashboard" class="section active sysAdm-section">
-                <div class="sysAdm-header--danger sysAdm-header--blue mb-4">
-                    <div class="sysAdm-header-left">
-                        <div class="sysAdm-header-icon">
-                            <i class="bi bi-speedometer2"></i>
-                        </div>
-                        <div class="sysAdm-header-text">
-                            <h2>System Admin Overview</h2>
-                            <p>Live summary from the internship admin panel</p>
-                        </div>
-                    </div>
-                </div> -->
-
-
-
-
                 <!-- SUMMARY CARDS -->
                 <div class="row g-3 mb-4">
-                    <div class="col-lg-3 col-md-6">
+                    <div class="col-12 col-md-6 col-xxl-3">
                         <div class="ojtc-stat-card card-tint-applications">
-                            <div class="ojtc-stat-icon icon-applications">
-                                <i class="bi bi-file-earmark-fill"></i>
-                            </div>
+                            <div class="ojtc-stat-icon icon-applications"><i class="bi bi-file-earmark-fill"></i></div>
                             <div>
-                                <p class="small mb-1 fw-semibold text-uppercase"
-                                    style="letter-spacing:.05em; font-size:11px; color:#7a5200;">Applications</p>
+                                <p class="small mb-1 fw-semibold text-uppercase" style="letter-spacing:.05em; font-size:11px; color:#7a5200;">Applications</p>
                                 <h2 class="fw-bold mb-0" style="color:#3b2600;"><?= $totalApplications ?></h2>
                             </div>
                         </div>
                     </div>
-
-                    <div class="col-lg-3 col-md-6">
+                    <div class="col-12 col-md-6 col-xxl-3">
                         <div class="ojtc-stat-card card-tint-internships">
-                            <div class="ojtc-stat-icon icon-internships">
-                                <i class="bi bi-briefcase-fill"></i>
-                            </div>
+                            <div class="ojtc-stat-icon icon-internships"><i class="bi bi-briefcase-fill"></i></div>
                             <div>
-                                <p class="small mb-1 fw-semibold text-uppercase"
-                                    style="letter-spacing:.05em; font-size:11px; color:#272f54;">Internship Postings</p>
+                                <p class="small mb-1 fw-semibold text-uppercase" style="letter-spacing:.05em; font-size:11px; color:#272f54;">Internship Postings</p>
                                 <h2 class="fw-bold mb-0" style="color:#272f54;"><?= $totalInternships ?></h2>
                             </div>
                         </div>
                     </div>
-
-                    <div class="col-lg-3 col-md-6">
+                    <div class="col-12 col-md-6 col-xxl-3">
                         <div class="ojtc-stat-card card-tint-announcements">
-                            <div class="ojtc-stat-icon icon-announcements">
-                                <i class="bi bi-bookmark-fill"></i>
-                            </div>
+                            <div class="ojtc-stat-icon icon-announcements"><i class="bi bi-bookmark-fill"></i></div>
                             <div>
-                                <p class="small mb-1 fw-semibold text-uppercase"
-                                    style="letter-spacing:.05em; font-size:11px; color:#27500a;">Announcements</p>
+                                <p class="small mb-1 fw-semibold text-uppercase" style="letter-spacing:.05em; font-size:11px; color:#27500a;">Announcements</p>
                                 <h2 class="fw-bold mb-0" style="color:#27500a;"><?= $totalAnnouncements ?></h2>
                             </div>
                         </div>
                     </div>
-
-                    <div class="col-lg-3 col-md-6">
+                    <div class="col-12 col-md-6 col-xxl-3">
                         <div class="ojtc-stat-card card-tint-documents">
-                            <div class="ojtc-stat-icon icon-documents">
-                                <i class="bi bi-file-earmark-text-fill"></i>
-                            </div>
+                            <div class="ojtc-stat-icon icon-documents"><i class="bi bi-file-earmark-text-fill"></i></div>
                             <div>
-                                <p class="small mb-1 fw-semibold text-uppercase"
-                                    style="letter-spacing:.05em; font-size:11px; color:#a13d1f;">Documents</p>
+                                <p class="small mb-1 fw-semibold text-uppercase" style="letter-spacing:.05em; font-size:11px; color:#a13d1f;">Documents</p>
                                 <h2 class="fw-bold mb-0" style="color:#a13d1f;"><?= $totalDocuments ?></h2>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-6 col-xxl-3">
+                        <div class="ojtc-stat-card card-tint-announcements">
+                            <div class="ojtc-stat-icon icon-announcements"><i class="bi bi-patch-check-fill"></i></div>
+                            <div>
+                                <p class="small mb-1 fw-semibold text-uppercase" style="letter-spacing:.05em; font-size:11px; color:#27500a;">Confirmed Rate</p>
+                                <h2 class="fw-bold mb-0" style="color:#27500a;"><?= $confirmedPct ?>%</h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 col-xxl-3">
+                        <div class="ojtc-stat-card card-tint-documents">
+                            <div class="ojtc-stat-icon icon-documents"><i class="bi bi-clipboard-check-fill"></i></div>
+                            <div>
+                                <p class="small mb-1 fw-semibold text-uppercase" style="letter-spacing:.05em; font-size:11px; color:#a13d1f;">Requirements Complete</p>
+                                <h2 class="fw-bold mb-0" style="color:#a13d1f;"><?= $reqCompletePct ?>%</h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 col-xxl-3">
+                        <div class="ojtc-stat-card card-tint-applications">
+                            <div class="ojtc-stat-icon icon-applications"><i class="bi bi-hourglass-split"></i></div>
+                            <div>
+                                <p class="small mb-1 fw-semibold text-uppercase" style="letter-spacing:.05em; font-size:11px; color:#7a5200;">In Progress</p>
+                                <h2 class="fw-bold mb-0" style="color:#3b2600;"><?= $inProgressPct ?>%</h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 col-xxl-3">
+                        <div class="ojtc-stat-card card-tint-internships">
+                            <div class="ojtc-stat-icon icon-internships"><i class="bi bi-dash-circle-fill"></i></div>
+                            <div>
+                                <p class="small mb-1 fw-semibold text-uppercase" style="letter-spacing:.05em; font-size:11px; color:#272f54;">No Progress</p>
+                                <h2 class="fw-bold mb-0" style="color:#272f54;"><?= $noProgressPct ?>%</h2>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="row g-4">
-                    <!-- Application List -->
+                    <!-- ANALYTICS CHARTS -->
+                    <div class="row g-4 mb-4">
+                        <div class="col-12 col-md-6 col-xl-4">
+                            <div class="card border-0 shadow-sm h-100 ojtc-panel-card">
+                                <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
+                                    <i class="bi bi-pie-chart" style="color:#272f54;"></i>
+                                    <h6 class="fw-bold mb-0" style="color:#272f54;">Intern Phase</h6>
+                                </div>
+                                <div class="card-body px-4 pb-4 pt-2">
+                                    <p class="text-muted small mb-3">Confirmed vs. in progress vs. not started.</p>
+                                    <div style="position:relative; height:220px;"><canvas id="phaseChart"></canvas></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-6 col-xl-4">
+                            <div class="card border-0 shadow-sm h-100 ojtc-panel-card">
+                                <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
+                                    <i class="bi bi-clipboard-check" style="color:#272f54;"></i>
+                                    <h6 class="fw-bold mb-0" style="color:#272f54;">Requirements</h6>
+                                </div>
+                                <div class="card-body px-4 pb-4 pt-2">
+                                    <p class="text-muted small mb-3">Interns with complete documents.</p>
+                                    <div style="position:relative; height:220px;"><canvas id="reqChart"></canvas></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-xl-4">
+                            <div class="card border-0 shadow-sm h-100 ojtc-panel-card">
+                                <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
+                                    <i class="bi bi-bar-chart" style="color:#272f54;"></i>
+                                    <h6 class="fw-bold mb-0" style="color:#272f54;">Applicants per Program</h6>
+                                </div>
+                                <div class="card-body px-4 pb-4 pt-2">
+                                    <p class="text-muted small mb-3">Number of applicants by program.</p>
+                                    <div style="position:relative; height:220px;"><canvas id="programChart"></canvas></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-xl-7">
+                            <div class="card border-0 shadow-sm h-100 ojtc-panel-card">
+                                <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
+                                    <i class="bi bi-graph-up" style="color:#272f54;"></i>
+                                    <h6 class="fw-bold mb-0" style="color:#272f54;">Application Trend</h6>
+                                </div>
+                                <div class="card-body px-4 pb-4 pt-2">
+                                    <p class="text-muted small mb-3">Applications submitted per day, last 14 days.</p>
+                                    <div style="position:relative; height:220px;"><canvas id="trendChart"></canvas></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-xl-5">
+                            <div class="card border-0 shadow-sm h-100 ojtc-panel-card">
+                                <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
+                                    <i class="bi bi-buildings" style="color:#272f54;"></i>
+                                    <h6 class="fw-bold mb-0" style="color:#272f54;">Top Companies</h6>
+                                </div>
+                                <div class="card-body px-4 pb-4 pt-2">
+                                    <p class="text-muted small mb-3">Companies with the most applicants.</p>
+                                    <div style="position:relative; height:220px;"><canvas id="companyChart"></canvas></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                     <!-- addtl e -->
+                      <div class="row g-4">
                     <div class="col-lg-7">
-                        <!-- CHANGED: added ojtc-panel-card for rounded corners + hover-lift. -->
                         <div class="card border-0 shadow-sm h-100 ojtc-panel-card">
                             <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
                                 <i class="bi bi-file-earmark-text" style="color:#272f54;"></i>
@@ -1093,8 +1176,6 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                                 <?php else: ?>
                                     <table style="width:100%; border-collapse:collapse; font-size:13px;">
                                         <thead>
-                                            <!-- CHANGED: renamed to ojtc-th-tab so this table header matches
-                                                 the System Admin dashboard table header class/style exactly. -->
                                             <tr class="ojtc-th-tab"
                                                 style="color:#aaa; font-size:12px; text-transform:uppercase; letter-spacing:.04em;">
                                                 <th
@@ -1113,7 +1194,6 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                                         </thead>
                                         <tbody>
                                             <?php foreach ($recentInterested as $ri): ?>
-                                                <!-- CHANGED: renamed to ojtc-row-hover (same rename, no behavior change). -->
                                                 <tr class="ojtc-row-hover">
                                                     <td style="padding:10px; border-bottom:1px solid #f0f2f7;">
                                                         <div style="display:flex; align-items:center; gap:8px;">
@@ -1148,7 +1228,6 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
 
                     <!-- Recent Announcements -->
                     <div class="col-lg-5">
-                        <!-- CHANGED: added ojtc-panel-card for rounded corners + hover-lift. -->
                         <div class="card border-0 shadow-sm h-100 ojtc-panel-card">
                             <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
                                 <i class="bi bi-bell" style="color:#272f54;"></i>
@@ -1167,7 +1246,6 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                                             ];
                                             $c = $catColors[$a['category']] ?? ['bg' => '#f0f0f0', 'color' => '#444'];
                                             ?>
-                                            <!-- CHANGED: renamed to ojtc-row-hover (same rename, no behavior change). -->
                                             <div class="d-flex align-items-start gap-3 ojtc-row-hover" style="padding:6px;">
 
                                                 <div style="flex:1;min-width:0;">
@@ -1193,7 +1271,6 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
 
                     <!-- Recent Internship Postings -->
                     <div class="col-lg-7">
-                        <!-- CHANGED: added ojtc-panel-card for rounded corners + hover-lift. -->
                         <div class="card border-0 shadow-sm h-100 ojtc-panel-card">
                             <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
                                 <i class="bi bi-briefcase" style="color:#272f54;"></i>
@@ -1205,7 +1282,6 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                                 <?php else: ?>
                                     <table style="width:100%; border-collapse:collapse; font-size:13px;">
                                         <thead>
-                                            <!-- CHANGED: renamed to ojtc-th-tab (same rename as above). -->
                                             <tr class="ojtc-th-tab"
                                                 style="color:#aaa; font-size:12px; text-transform:uppercase; letter-spacing:.04em;">
                                                 <th
@@ -1224,7 +1300,6 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                                         </thead>
                                         <tbody>
                                             <?php foreach ($recentInternships as $ri): ?>
-                                                <!-- CHANGED: renamed to ojtc-row-hover (same rename, no behavior change). -->
                                                 <tr class="ojtc-row-hover">
                                                     <td
                                                         style="padding:10px; border-bottom:1px solid #f0f2f7; font-weight:500; color:#272f54;">
@@ -1275,15 +1350,6 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                                             'color' => '#27500A'
                                         ];
                                     }
-                                    // foreach ($credentials as $c) {
-                                    //     $allDocs[] = [
-                                    //         'name' => $c['full_name'],
-                                    //         'type' => 'Credential',
-                                    //         'date' => $c['uploaded_at'],
-                                    //         'bg' => '#E6F1FB',
-                                    //         'color' => '#0C447C'
-                                    //     ];
-                                    // }
                                     usort($allDocs, fn($a, $b) => strtotime($b['date']) - strtotime($a['date']));
                                     $recentDocs = array_slice($allDocs, 0, 3);
                                     ?>
@@ -1291,7 +1357,6 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                                         <p class="text-muted small">No documents uploaded yet.</p>
                                     <?php else: ?>
                                         <?php foreach ($recentDocs as $doc): ?>
-                                            <!-- CHANGED: renamed to ojtc-row-hover (same rename, no behavior change). -->
                                             <div class="ojtc-row-hover"
                                                 style="display:flex;align-items:center;gap:10px;padding:6px 6px 12px 6px;border-bottom:1px solid #f0f2f7;">
                                                 <div
@@ -2432,7 +2497,7 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
         // Announcements filter
         function filterAnnouncements() {
             const search = document.getElementById('search-announcements').value.toLowerCase();
-            const category = document.getElementById('category-filter').value.toLowerCase();
+            const category = (document.getElementById('category-filter')?.value ?? '').toLowerCase();
             document.querySelectorAll('#manage-announcements-tbody tr').forEach(row => {
                 const rowCat = (row.dataset.category ?? '').toLowerCase();
                 const text = Array.from(row.querySelectorAll('input, select, td'))
@@ -2830,6 +2895,137 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
     <script src="../JS/script.js"></script>
 
+    <script>
+        (function () {
+            const make = (id, cfg) => {
+                const el = document.getElementById(id);
+                if (el) new Chart(el, cfg);
+            };
+
+            // Phase doughnut
+            make('phaseChart', {
+                type: 'pie',
+                data: {
+                    labels: ['Internship Confirmed', 'In Progress', 'No Progress'],
+                    datasets: [{
+                        data: <?= json_encode(array_values($phaseCounts)) ?>,
+                        backgroundColor: ['#3E8E58', '#FFB62F', '#cbd5e1'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12 } } }
+                }
+            });
+
+            // Requirements doughnut
+            make('reqChart', {
+                type: 'pie',
+                data: {
+                    labels: ['Complete', 'Incomplete'],
+                    datasets: [{
+                        data: [<?= (int) $reqComplete ?>, <?= (int) $reqIncomplete ?>],
+                        backgroundColor: ['#3E8E58', '#E4572E'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12 } } }
+                }
+            });
+
+            // Applicants per program
+            make('programChart', {
+                type: 'bar',
+                data: {
+                    labels: <?= json_encode(array_keys($programCounts)) ?>,
+                    datasets: [{
+                        label: 'Applicants',
+                        data: <?= json_encode(array_values($programCounts)) ?>,
+                        backgroundColor: '#ff8652fe',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+                }
+            });
+
+            // Application trend (14 days)
+            make('trendChart', {
+                type: 'line',
+                data: {
+                    labels: <?= json_encode($trendLabels) ?>,
+                    datasets: [{
+                        label: 'Applications',
+                        data: <?= json_encode($trendData) ?>,
+                        borderColor: '#ff6b2c',
+                        backgroundColor: 'rgba(255,107,44,0.1)',
+                        tension: 0.3,
+                        fill: true,
+                        pointRadius: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { precision: 0 } },
+                        x: { ticks: { maxTicksLimit: 7 } }
+                    }
+                }
+            });
+
+            // Top companies (horizontal bar)
+            make('companyChart', {
+                type: 'bar',
+                data: {
+                    labels: <?= json_encode(array_keys($companyCounts)) ?>,
+                    datasets: [{
+                        label: 'Applicants',
+                        data: <?= json_encode(array_values($companyCounts)) ?>,
+                        backgroundColor: '#272F54',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { x: { beginAtZero: true, ticks: { precision: 0 } } }
+                }
+            });
+        })();
+
+        function goToSection(id) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.querySelectorAll('.sidebar a').forEach(l => l.classList.remove('active'));
+            document.querySelector(`.sidebar a[onclick*="'${id}'"]`)?.classList.add('active');
+            document.querySelector('.main-content').scrollTo({ top: 0 });
+        }
+
+        [
+            ['phaseChart', 'interns'],
+            ['reqChart', 'interns'],
+            ['programChart', 'interns'],
+            ['trendChart', 'interns'],
+            ['companyChart', 'postings']
+        ].forEach(([chartId, target]) => {
+            const card = document.getElementById(chartId)?.closest('.ojtc-panel-card');
+            if (!card) return;
+            card.style.cursor = 'pointer';
+            card.title = 'Click to view full details';
+            card.addEventListener('click', () => goToSection(target));
+        });
+    </script>
 </body>
 
 </html>

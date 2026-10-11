@@ -1291,6 +1291,125 @@ $backLink = getDashboardByRole($_SESSION['role']);
         }
 
         /* addtl e */
+
+        /* ── ADD PARTICIPANT (spacing fix) ── */
+        #addParticipantModal .modal-box {
+            display: flex;
+            flex-direction: column;
+            width: calc(100% - 32px);
+            max-width: 460px;
+            max-height: 85vh;
+            background: #fff;
+            border-radius: 14px;
+            overflow: hidden;
+        }
+
+        #addParticipantModal .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            background: #fff;
+            border-bottom: 1px solid #eef0f6;
+            flex-shrink: 0;
+        }
+
+        #addParticipantModal .modal-header h6 {
+            margin: 0;
+            font-size: 15px;
+            font-weight: 700;
+            color: #272f54;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #addParticipantModal .modal-header h6 i {
+            margin: 0 !important;
+        }
+
+        #addParticipantModal .modal-close {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #f1f3f8;
+            color: #64748b;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #addParticipantModal .modal-close:hover {
+            background: #e4572e;
+            color: #fff;
+        }
+
+        #addParticipantModal .modal-body {
+            flex: 1 1 auto;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            padding: 16px 20px 8px;
+        }
+
+        #addParticipantModal .search-input-wrap {
+            margin-bottom: 12px;
+            flex-shrink: 0;
+        }
+
+        #addParticipantModal .search-input-wrap input {
+            padding: 10px 14px 10px 36px;
+            border-radius: 10px;
+        }
+
+        #addParticipantModal .participant-list {
+            flex: 1 1 auto;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-right: -8px;
+            padding-right: 8px;
+        }
+
+        #addParticipantModal .participant-item {
+            padding: 10px 8px;
+            gap: 12px;
+        }
+
+        #addParticipantModal .participant-avatar {
+            width: 38px;
+            height: 38px;
+            min-width: 38px;
+        }
+
+        #addParticipantModal .participant-info strong {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 2px;
+            color: #1e293b;
+        }
+
+        #addParticipantModal .participant-info small {
+            font-size: 13px;
+        }
+
+        #addParticipantModal .modal-footer {
+            padding: 14px 20px;
+            border-top: 1px solid #eef0f6;
+            background: #fff;
+            flex-shrink: 0;
+            gap: 10px;
+        }
+
+        #addParticipantModal .btn-add-confirm {
+            padding: 8px 18px;
+            border-radius: 8px;
+        }
+
+        #addParticipantModal .modal-footer .btn-light {
+            padding: 8px 16px;
+            border-radius: 8px;
+        }
     </style>
 </head>
 
@@ -1304,6 +1423,9 @@ $rmInitials = function ($name): string {
 };
 $rmMeName = $userFullName ?? 'You';
 $rmCanPost = in_array($_SESSION['role'] ?? '', ['internship_adviser', 'hte_adviser', 'superadmin', 'internship_admin'], true);
+// addtl s
+$rmSec = (($_SESSION['role'] ?? '') === 'student') ? 'home' : 'rooms';
+// addtl e
 
 // Role label + pill color for a post's sender_role
 $rmPostRole = function (string $role): array {
@@ -1331,10 +1453,16 @@ if ($rmProgram === '') {
     $rmProgStmt->execute([$room_id]);
     $rmProgram = (string) $rmProgStmt->fetchColumn();
 }
+$rmProgramCodes = [
+    'information technology' => 'BSIT',
+    'electrical engineering' => 'BSEE',
+    'civil engineering' => 'BSCE',
+];
+$rmProgramLabel = $rmProgramCodes[strtolower($rmProgram)] ?? $rmProgram;
 $rmYearSection = (!empty($room['year_level']) && !empty($room['section']))
     ? (int) $room['year_level'] . '-' . $room['section'] : '';
 $rmClassLabel = ($rmProgram !== '' && $rmYearSection !== '')
-    ? $rmProgram . ' ' . $rmYearSection
+    ? $rmProgramLabel . ' ' . $rmYearSection
     : 'Year ' . (int) ($room['year_level'] ?? 0) . ' - Section ' . ($room['section'] ?? '');
 
 // Extra details for member cards (student no. + program, adviser role + title)
@@ -1455,10 +1583,11 @@ $rmFmtTime = function ($ts): string {
 
 <!-- TABS -->
 <div class="rm-tabs">
-    <a href="?room_id=<?= $room_id ?>&tab=updates" class="rm-tab <?= $tab === 'updates' ? 'on' : '' ?>">
+    <!-- addtl s / e &section=<?= $rmSec ?> -->
+    <a href="?room_id=<?= $room_id ?>&tab=updates&section=<?= $rmSec ?>" class="rm-tab <?= $tab === 'updates' ? 'on' : '' ?>">
         <i class="fa-solid fa-bullhorn"></i> Updates <span class="rm-cnt"><?= $rmPostCount ?></span>
     </a>
-    <a href="?room_id=<?= $room_id ?>&tab=members" class="rm-tab <?= $tab === 'members' ? 'on' : '' ?>">
+    <a href="?room_id=<?= $room_id ?>&tab=members&section=<?= $rmSec ?>" class="rm-tab <?= $tab === 'members' ? 'on' : '' ?>">
         <i class="fa-solid fa-users"></i> Members <span class="rm-cnt"><?= $rmMemberCount ?></span>
     </a>
 </div>
@@ -1650,13 +1779,12 @@ $rmFmtTime = function ($ts): string {
                 <?php endif; ?>
             </div>
 
-            <!-- RIGHT: room details + members preview -->
             <div class="rm-col">
                 <div class="rm-card">
                     <h6 class="rm-side-title">Room details</h6>
                     <div class="rm-dl">
                         <?php if ($rmProgram !== ''): ?>
-                            <div class="rm-dr"><span>Program</span><span><?= htmlspecialchars($rmProgram) ?></span></div>
+                            <div class="rm-dr"><span>Program</span><span><?= htmlspecialchars(ucwords(str_replace('_', ' ', $rmProgram))) ?></span></div>
                         <?php endif; ?>
                         <?php if (!empty($room['year_level'])): ?>
                             <div class="rm-dr"><span>Year level</span><span><?= (int) $room['year_level'] ?></span></div>
@@ -1700,7 +1828,7 @@ $rmFmtTime = function ($ts): string {
                 <div class="rm-card">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h6 class="rm-side-title mb-0">Members</h6>
-                        <a href="?room_id=<?= $room_id ?>&tab=members" class="rm-link">View all</a>
+                        <a href="?room_id=<?= $room_id ?>&tab=members&section=<?= $rmSec ?>" class="rm-link">View all</a>
                     </div>
                     <?php if (empty($members)): ?>
                         <div class="text-muted" style="font-size:13px;">No members yet.</div>

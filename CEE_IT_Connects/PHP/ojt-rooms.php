@@ -1616,11 +1616,6 @@ $page = 'messages';
             color: #7a5200;
         }
 
-        .tone-green {
-            background: #eaf3de;
-            color: #27500a;
-        }
-
         .tone-orange {
             background: #ffe5d9;
             color: #a13d1f;
@@ -1761,10 +1756,6 @@ $page = 'messages';
 
         .home-card.accent-blue {
             box-shadow: inset 0 4px 0 #2c6fff, 0 2px 10px rgba(0, 0, 0, 0.08);
-        }
-
-        .home-card.accent-green {
-            box-shadow: inset 0 4px 0 #1abc9c, 0 2px 10px rgba(0, 0, 0, 0.08);
         }
 
         .home-card.accent-amber {
@@ -1971,6 +1962,37 @@ $page = 'messages';
                 padding: 5px 10px;
                 width: 65%;
             }
+            .sidebar,
+            .sidebar .rooms-list {
+                overflow: visible !important;
+            }
+
+            .sidebar a {
+                position: relative;
+            }
+
+            .sidebar a::after {
+                content: attr(data-tooltip);
+                position: absolute;
+                left: 56px;
+                top: 50%;
+                transform: translateY(-50%);
+                background: #1a1a2e;
+                color: #fff;
+                font-size: 12px;
+                font-weight: 500;
+                padding: 5px 10px;
+                border-radius: 6px;
+                white-space: nowrap;
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity 0.2s ease;
+                z-index: 300;
+            }
+
+            .sidebar a:hover::after {
+                opacity: 1;
+            }
         }
     </style>
 </head>
@@ -2020,7 +2042,7 @@ $page = 'messages';
             <?php foreach ($myRooms as $room): ?>
                 <a href="ojt-rooms.php?room_id=<?= $room['id'] ?>&section=room"
                     class="<?= ((int) $current_room_id === (int) $room['id']) ? 'active' : '' ?>"
-                    title="<?= htmlspecialchars($room['room_name']) ?>">
+                    data-tooltip="<?= htmlspecialchars($room['room_name']) ?>">
                     <i class="bi bi-people-fill me-2"></i>
                     <span class="sidebar-text">
                         <?= htmlspecialchars($room['room_name']) ?>
@@ -2034,27 +2056,26 @@ $page = 'messages';
         <div style="display:flex; flex-direction:column; width:100%;">
             <!-- addtl s -->
             <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=home"
-                class="<?= ($section === 'home') ? 'active' : '' ?>" title="Home">
+                class="<?= ($section === 'home') ? 'active' : '' ?>" data-tooltip="Home">
                 <i class="fa-solid fa-house me-2"></i> <span class="sidebar-text">Home</span>
             </a>
             <!-- <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>" class="<?= $section === '' ? 'active' : '' ?>"
-                title="Announcements">
+                data-tooltip="Announcements">
                 <i class="fa-solid fa-bullhorn me-2"></i> <span class="sidebar-text">Announcements</span>
             </a> -->
             <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=announcements"
-                class="<?= $section === 'announcements' ? 'active' : '' ?>" title="Announcements">
-                <i class="fa-solid fa-bullhorn me-2"></i> <span class="sidebar-text">Announcements</span>
+                class="<?= $section === 'announcements' ? 'active' : '' ?>" data-tooltip="Documents Available">
+                <i class="fa-solid fa-folder-open me-2"></i> <span class="sidebar-text">Documents Available</span>
             </a>
             <!-- addtl e -->
-            <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=status" tooltip="Status"
-                class="<?= $section === 'status' ? 'active' : '' ?>" title="Status">
-                <i class="fa-solid fa-calendar-check me-2"></i> <span class="sidebar-text">Status</span>
+            <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=status" data-tooltip="OJT Status"
+                class="<?= $section === 'status' ? 'active' : '' ?>">
+                <i class="fa-solid fa-calendar-check me-2"></i> <span class="sidebar-text">OJT Status</span>
             </a>
 
             <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=ojt_applications"
-                class="<?= $section === 'ojt_applications' ? 'active' : '' ?>" tooltip="Requirements"
-                title="Requirements">
-                <i class="bi bi-file-earmark-fill me-2"></i> <span class="sidebar-text">Requirements</span>
+                class="<?= $section === 'ojt_applications' ? 'active' : '' ?>" data-tooltip="Requirements">
+                <i class="fa fa-list-ul me-2"></i> <span class="sidebar-text">Requirements</span>
                 <?php
                 $pendingStmt = $pdo->prepare("
                 SELECT COUNT(*) FROM ojt_applications oa 
@@ -2071,19 +2092,18 @@ $page = 'messages';
             </a>
 
             <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=weekly_reports"
-                class="<?= $section === 'weekly_reports' ? 'active' : '' ?>" tooltip="Weekly Reports"
-                title="Weekly Reports">
-                <i class="fa-solid fa-file-lines me-2"></i> <span class="sidebar-text">Weekly Reports</span>
+                class="<?= $section === 'weekly_reports' ? 'active' : '' ?>" data-tooltip="Progress Reports">
+                <i class="fa-solid fa-file-lines me-2"></i> <span class="sidebar-text">Progress Reports</span>
             </a>
 
             <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=chats"
-                class="<?= $section === 'chats' ? 'active' : '' ?>" title="Chats">
+                class="<?= $section === 'chats' ? 'active' : '' ?>" data-tooltip="Chats">
                 <i class="fa-solid fa-comments me-2"></i> <span class="sidebar-text">Chats</span>
             </a>
             <hr style="border-top: 2px solid rgba(255,255,255,0.59); margin: 16px auto; width: calc(100% - 32px);">
 
             <?php if ($isAdviser): ?>
-                <!-- <button class="sidebar-action-btn" data-bs-toggle="modal" data-bs-target="#csvUploadModal" title="Import Students">
+                <!-- <button class="sidebar-action-btn" data-bs-toggle="modal" data-bs-target="#csvUploadModal">
                     <i class="fa fa-file-csv me-2"></i> <span class="sidebar-text">Import Students</span>
                 </button> -->
             <?php endif; ?>
@@ -2323,6 +2343,11 @@ $page = 'messages';
 
             // Completion pie: complete vs incomplete, using the same totals already computed above
             $completeCount = max(0, $totalStudents - $incompleteCount);
+            $barStudents = $dashStudents ?? [];
+            usort($barStudents, fn($a, $b) => (float) $b['total_hours'] <=> (float) $a['total_hours']);
+            $barStudents = array_slice($barStudents, 0, 6);
+            $barLabels = array_map(fn($s) => $s['full_name'], $barStudents);
+            $barData = array_map(fn($s) => round((float) $s['total_hours'], 1), $barStudents);
             // addtl e
             ?>
 
@@ -2343,7 +2368,7 @@ $page = 'messages';
                                         style="color:#ff6b2c;"></i>Announcements</h5>
                                 <small class="text-muted">Latest updates and important notices for your room.</small>
                             </div>
-                            <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=announcements" class="btn btn-sm"
+                            <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>" class="btn btn-sm"
                                 style="background:#eef1fb;color:#272f54;border-radius:20px;font-weight:600;">
                                 View All <i class="fa-solid fa-arrow-right ms-1"></i>
                             </a>
@@ -2385,7 +2410,7 @@ $page = 'messages';
                                 <p class="dash-stat-value"><?= $incompleteCount ?></p>
                             </div>
                         </a>
-                        <a href="<?= $dashUrl ?>weekly_reports" class="dash-stat tone-green">
+                        <a href="<?= $dashUrl ?>weekly_reports" class="dash-stat tone-amber">
                             <div class="dash-stat-icon"><i class="fa-solid fa-file-lines"></i></div>
                             <div>
                                 <p class="dash-stat-label">Weekly reports</p>
@@ -2452,7 +2477,7 @@ $page = 'messages';
                         <a href="<?= $dashUrl ?>ojt_applications" class="dash-side-card">
                             <div class="dash-side-top">
                                 <div class="quick-card-icon" style="background:#dbeafe;color:#1e40af;"><i
-                                        class="fa-solid fa-file-lines"></i></div>
+                                        class="fa fa-list-ul"></i></div>
                                 <div class="quick-card-text"><strong>Requirements</strong><small>Check student
                                         requirements</small></div>
                                 <i class="fa-solid fa-chevron-right quick-card-arrow"></i>
@@ -2467,8 +2492,8 @@ $page = 'messages';
                         <a href="<?= $dashUrl ?>weekly_reports" class="dash-side-card">
                             <div class="dash-side-top">
                                 <div class="quick-card-icon" style="background:#ffe7b3;color:#7a5200;"><i
-                                        class="fa-solid fa-calendar-days"></i></div>
-                                <div class="quick-card-text"><strong>Weekly Reports</strong><small>View submitted
+                                        class="fa-solid fa-file-lines"></i></div>
+                                <div class="quick-card-text"><strong>Progress Reports</strong><small>View submitted
                                         reports</small></div>
                                 <i class="fa-solid fa-chevron-right quick-card-arrow"></i>
                             </div>
@@ -2519,7 +2544,7 @@ $page = 'messages';
 
             <!-- addtl s -->
             <div class="dash-bottom">
-                <div class="home-card accent-green">
+                <div class="home-card accent-orange">
                     <div class="dash-head">
                         <div>
                             <h5 class="fw-bold mb-0"><i class="fa-solid fa-list-check me-2"
@@ -2592,27 +2617,50 @@ $page = 'messages';
                 </div>
             </div>
 
-            <div class="dash-bottom">
-                <div class="home-card accent-blue">
-                    <div class="dash-head">
-                        <div>
-                            <h5 class="fw-bold mb-0"><i class="fa-solid fa-chart-line me-2"
-                                    style="color:#ff6b2c;"></i>Attendance Trend</h5>
-                            <small class="text-muted">Total hours logged per day, last 14 days.</small>
+            <div class="row g-3 mt-1">
+                <div class="col-lg-5">
+                    <div class="home-card accent-blue h-100">
+                        <div class="dash-head">
+                            <div>
+                                <h5 class="fw-bold mb-0"><i class="fa-solid fa-chart-line me-2"
+                                        style="color:#ff6b2c;"></i>Attendance Trend</h5>
+                                <small class="text-muted">Total hours logged per day, last 14 days.</small>
+                            </div>
+                        </div>
+                        <div style="position:relative; height:220px;">
+                            <canvas id="attendanceChart"></canvas>
                         </div>
                     </div>
-                    <canvas id="attendanceChart" height="180"></canvas>
                 </div>
 
-                <div class="home-card accent-orange">
-                    <div class="dash-head">
-                        <div>
-                            <h5 class="fw-bold mb-0"><i class="fa-solid fa-chart-pie me-2"
-                                    style="color:#ff6b2c;"></i>Requirements Completion</h5>
-                            <small class="text-muted">Share of students who finished all requirements.</small>
+                <div class="col-lg-4">
+                    <div class="home-card accent-amber h-100">
+                        <div class="dash-head">
+                            <div>
+                                <h5 class="fw-bold mb-0"><i class="fa-solid fa-chart-bar me-2"
+                                        style="color:#ff6b2c;"></i>Hours Rendered</h5>
+                                <small class="text-muted">Top students by OJT hours.</small>
+                            </div>
+                        </div>
+                        <div style="position:relative; height:220px;">
+                            <canvas id="hoursBarChart"></canvas>
                         </div>
                     </div>
-                    <canvas id="completionChart" height="180"></canvas>
+                </div>
+
+                <div class="col-lg-3">
+                    <div class="home-card accent-orange h-100">
+                        <div class="dash-head">
+                            <div>
+                                <h5 class="fw-bold mb-0"><i class="fa-solid fa-chart-pie me-2"
+                                        style="color:#ff6b2c;"></i>Requirements</h5>
+                                <small class="text-muted">Students who finished all.</small>
+                            </div>
+                        </div>
+                        <div style="position:relative; height:220px;">
+                            <canvas id="completionChart"></canvas>
+                        </div>
+                    </div>
                 </div>
             </div>
             <!-- addtl e -->
@@ -2635,11 +2683,11 @@ $page = 'messages';
                 <div class="sysAdm-header--danger sysAdm-header--blue mb-4">
                     <div class="sysAdm-header-left">
                         <div class="sysAdm-header-icon">
-                            <i class="bi bi-file-earmark-text-fill"></i>
+                            <i class="fa fa-folder-open"></i>
                         </div>
                         <div class="sysAdm-header-text">
-                            <h2>Documents Now Available</h2>
-                            <p>Check which documents are available for each partner company</p>
+                            <h2>Documents Available</h2>
+                            <p>Check which documents are available for each partner company, ready to be picked up by the student</p>
                         </div>
                     </div>
                 </div>
@@ -2732,7 +2780,7 @@ $page = 'messages';
                 <div class="sysAdm-header--danger sysAdm-header--blue mb-4">
                     <div class="sysAdm-header-left">
                         <div class="sysAdm-header-icon">
-                            <i class="bi bi-calendar-fill"></i>
+                            <i class="fa-solid fa-calendar-check"></i>
                         </div>
                         <div class="sysAdm-header-text">
                             <h2>OJT Status</h2>
@@ -2899,7 +2947,7 @@ $page = 'messages';
                 <div class="sysAdm-header--danger sysAdm-header--blue mb-4">
                     <div class="sysAdm-header-left">
                         <div class="sysAdm-header-icon">
-                            <i class="bi bi-file-earmark-fill"></i>
+                            <i class="fa fa-list-ul"></i>
                         </div>
                         <div class="sysAdm-header-text">
                             <h2>Requirements</h2>
@@ -3500,8 +3548,12 @@ $page = 'messages';
                 },
                 options: {
                     responsive: true,
+                    maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
-                    scales: { y: { beginAtZero: true } }
+                    scales: {
+                        y: { beginAtZero: true },
+                        x: { ticks: { maxTicksLimit: 7 } }
+                    }
                 }
             });
         }
@@ -3513,13 +3565,35 @@ $page = 'messages';
                     labels: ['Completed', 'Incomplete'],
                     datasets: [{
                         data: [<?= (int) $completeCount ?>, <?= (int) $incompleteCount ?>],
-                        backgroundColor: ['#1abc9c', '#ffe7b3'],
+                        backgroundColor: ['#3d55b3d3', '#e7bd63'],
                         borderWidth: 0
                     }]
                 },
                 options: {
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12 } } }
+                }
+            });
+        }
+
+        if (document.getElementById('hoursBarChart')) {
+            new Chart(document.getElementById('hoursBarChart'), {
+                type: 'bar',
+                data: {
+                    labels: <?= json_encode($barLabels ?? []) ?>,
+                    datasets: [{
+                        label: 'Hours',
+                        data: <?= json_encode($barData ?? []) ?>,
+                        backgroundColor: '#ff8652fe',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
                     responsive: true,
-                    plugins: { legend: { position: 'bottom' } }
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { x: { beginAtZero: true } }
                 }
             });
         }

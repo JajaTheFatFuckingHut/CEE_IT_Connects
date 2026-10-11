@@ -14,6 +14,11 @@ if ($current_room_id !== null && $current_room_id !== '' && ctype_digit((string)
     $current_room_id = null;
 }
 
+// If no room was picked by URL or auto-load, fall back to the student's first room
+// if ($current_room_id === null && !empty($rooms)) {
+//     $current_room_id = (int) $rooms[0]['id'];
+// }
+
 $stmt = $pdo->prepare("
     SELECT *
     FROM ojt_evaluations_student
@@ -595,7 +600,7 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Virtual Rooms</title>
+    <title>Rooms</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -609,14 +614,15 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
         }
 
         body {
-            background: #f5f6fa;
+            background: #f5f7fb;
+            /* background: #f8f6f3; */
             margin: 0;
             padding-top: 70px;
             height: 100vh;
             overflow: auto;
         }
 
-        /* SIDEBAR */
+        /* SIDEBAR
         .sidebar {
             width: 240px;
             background: #fff;
@@ -678,14 +684,141 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
             color: #ff6b2c;
             font-weight: bold;
             cursor: default;
+        } */
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 240px;
+            background: #fff;
+            position: fixed;
+            top: 70px;
+            bottom: 0;
+            padding: 14px 12px;
+            border-right: 1px solid #e9ecf3;
+            overflow-y: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .sidebar a {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 14px;
+            color: #2b3a67;
+            text-decoration: none;
+            border-radius: 12px;
+            margin-bottom: 6px;
+            font-size: 15px;
+            font-weight: 500;
+            transition: background .15s, color .15s;
+        }
+
+        .sidebar a > i:first-child {
+            width: 22px;
+            text-align: center;
+            font-size: 18px;
+            color: #2b3a67;
+            margin: 0 !important;
+        }
+
+        .sidebar a:hover {
+            background: #f4f6fb;
+        }
+
+        .sidebar a.active {
+            background: #fdeee6;
+            color: #f26b3a;
+            font-weight: 600;
+        }
+
+        .sidebar a.active > i:first-child {
+            color: #f26b3a;
+        }
+
+        /* ROOMS */
+        .rooms-list {
+            font-size: 11px;
+            color: #8b93ab;
+            margin-top: 14px;
+            padding-top: 14px;
+            border-top: 1px solid #eceff5;
+        }
+
+        .rooms-list hr,
+        .rooms-list br {
+            display: none;
+        }
+
+        .rooms-list h6 {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: .08em;
+            color: #8b93ab;
+            padding: 0 14px;
+            margin: 0 0 8px;
+        }
+
+        .room-item {
+            padding: 12px 14px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 500;
+            color: #2b3a67;
+        }
+
+        .room-link {
+            text-decoration: none;
+            display: block;
+            margin: 0 0 6px;
+        }
+
+        .room-link .room-item:hover {
+            cursor: pointer;
+            background: #f4f6fb;
+        }
+
+        .active-room {
+            background: #fdeee6;
+            color: #f26b3a;
+            font-weight: 600;
+            cursor: default;
+        }
+
+        /* people icon + chevron on desktop only (tablet/mobile keep the letter bubbles) */
+        @media (min-width: 1025px) {
+            .room-item {
+                display: flex;
+                align-items: center;
+                gap: 14px;
+            }
+
+            .room-item::before {
+                content: "\f0c0";
+                font-family: "Font Awesome 6 Free";
+                font-weight: 900;
+                width: 22px;
+                text-align: center;
+                font-size: 16px;
+            }
+
+            .room-item::after {
+                content: "\f054";
+                font-family: "Font Awesome 6 Free";
+                font-weight: 900;
+                font-size: 11px;
+                margin-left: auto;
+                color: #9aa3bd;
+            }
         }
 
         /* MAIN */
         .main {
-            margin-left: 260px;
+            margin-left: 240px;
             padding: 20px;
-            background-color: #fff;
-            height: 100%;
+            background-color: #f5f7fb;
+            /* background: #f8f6f3; */
+            min-height: calc(100vh - 70px);
         }
 
         /* SECTION */
@@ -696,6 +829,60 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
         .section.active {
             display: block;
         }
+
+        /* addtl s */
+        /* ── PAGE HEADER CARD (matches superadmin) ── */
+        .pg-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+            background: linear-gradient(135deg, #dce2ef 0%, #dde3f0 50%, #c0cfef 100%);
+            border-radius: 14px;
+            padding: 22px 28px;
+            margin-bottom: 20px;
+        }
+
+        .pg-header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            min-width: 0;
+        }
+
+        .pg-header-icon {
+            background: #c7d2e8;
+            color: #272f54;
+            width: 64px;
+            height: 64px;
+            min-width: 64px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+        }
+
+        .pg-header h2 {
+            font-size: 26px;
+            font-weight: 700;
+            color: #1e293b;
+            margin: 0 0 4px;
+        }
+
+        .pg-header p {
+            color: #64748b;
+            font-size: 14px;
+            margin: 0;
+        }
+
+        @media (max-width: 768px) {
+            .pg-header { padding: 16px 18px; }
+            .pg-header-icon { width: 48px; height: 48px; min-width: 48px; font-size: 1.1rem; }
+            .pg-header h2 { font-size: 20px; }
+        }
+        /* addtl e */
 
         /* CHAT DESIGN */
         .chat-container {
@@ -1013,7 +1200,7 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
         .rc-wrap {
             display: flex;
             height: calc(100vh - 70px);
-            margin: -24px;
+            margin: -20px;
             /* cancel .main padding */
             overflow: hidden;
             background: #f5f6fa;
@@ -1537,7 +1724,7 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
         #ojtEvalBtn.ojt-locked {
             opacity: 0.4;
             cursor: not-allowed;
-            pointer-events: none;
+            /* pointer-events: none; */
         }
 
         /* ── mobile tweaks ── */
@@ -1682,7 +1869,7 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
             }
 
             .main {
-                margin-left: 70px;
+                margin-left: 60px;
                 padding: 15px;
             }
 
@@ -2084,6 +2271,312 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
             cursor: pointer;
             z-index: 999;
         }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                overflow: visible !important;
+                z-index: 200;
+            }
+
+            .sidebar a, .sidebar .active-room { position: relative; }
+
+            .sidebar a::after, .sidebar .active-room::after {
+                content: attr(data-tooltip);
+                position: absolute;
+                left: 56px;
+                top: 50%;
+                transform: translateY(-50%);
+                background: #1a1a2e;
+                color: #fff;
+                font-size: 12px;
+                font-weight: 500;
+                padding: 5px 10px;
+                border-radius: 6px;
+                white-space: normal;
+                width: max-content;
+                max-width: 220px;
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity 0.2s ease;
+                z-index: 300;
+            }
+
+            .sidebar a:hover::after, .sidebar .active-room:hover::after {
+                opacity: 1;
+            }
+        }
+
+        /* ── RENDERED HOURS UI ── */
+        .hrs-card {
+            background: #fff;
+            border: 1px solid #eef0f6;
+            border-radius: 14px;
+            box-shadow: 0 1px 3px rgba(20, 30, 70, .04);
+            padding: 18px 22px;
+        }
+
+        .hrs-progress { margin-bottom: 16px; }
+
+        .hrs-progress-title { font-size: 15px; font-weight: 700; color: #1f2a55; }
+        .hrs-progress-pct   { font-size: 14px; font-weight: 700; color: #1f2a55; }
+
+        .hrs-track {
+            height: 8px;
+            background: #e9edf5;
+            border-radius: 99px;
+            overflow: hidden;
+        }
+
+        .hrs-fill {
+            height: 100%;
+            border-radius: 99px;
+            background: #f26b3a;
+        }
+
+        .hrs-stat {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            height: 100%;
+        }
+
+        .hrs-stat-icon {
+            width: 56px;
+            height: 56px;
+            min-width: 56px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .hrs-stat-icon.blue   { background: #e8efff; color: #2f5bd8; }
+        .hrs-stat-icon.green  { background: #e1f6ec; color: #16a36a; }
+        .hrs-stat-icon.orange { background: #fdeadf; color: #f26b3a; }
+
+        .hrs-stat-label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #4a5578;
+            text-transform: uppercase;
+            letter-spacing: .03em;
+            margin-bottom: 2px;
+        }
+
+        .hrs-stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1f2a55;
+            line-height: 1.2;
+        }
+
+        /* week card */
+        .ojt-week-block {
+            background: #fff;
+            border: 1px solid #eef0f6;
+            border-radius: 14px;
+            box-shadow: 0 1px 3px rgba(20, 30, 70, .04);
+            padding: 20px 22px;
+            margin: 0 0 16px;
+            text-align: left;
+        }
+
+        .ojt-week-header { margin-bottom: 14px; }
+
+        .ojt-week-label[readonly] {
+            padding: 0;
+            font-size: 20px;
+            color: #1f2a55;
+        }
+
+        .ojt-total-chip {
+            background: #eaf0ff;
+            color: #2f5bd8;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 6px 14px;
+        }
+
+        .ojt-table-scroll {
+            overflow-x: auto;
+            border: 1px solid #e8ebf3;
+            border-radius: 10px;
+        }
+
+        .ojt-table {
+            width: 100%;
+            min-width: 780px;
+            border-collapse: collapse;
+        }
+
+        /* header colors (!important beats the old inline backgrounds) */
+        .ojt-table thead th {
+            border: none !important;
+            font-size: 13px;
+            font-weight: 600;
+            color: #2b3a67;
+            text-align: center;
+            padding: 10px;
+        }
+
+        .ojt-table thead th.ojt-group  { background: #eef2f9 !important; }
+        .ojt-table thead th.th-morning { background: #fdeedd !important; }
+        .ojt-table thead th.sub-morning { background: #fef6ec !important; font-weight: 500; color: #6b7390; }
+        .ojt-table thead th.th-afternoon { background: #fbe4de !important; }
+        .ojt-table thead th.sub-afternoon { background: #fdeeea !important; font-weight: 500; color: #6b7390; }
+
+        /* body rows */
+        .ojt-table tbody td,
+        .ojt-table tbody td.td-morning,
+        .ojt-table tbody td.td-afternoon {
+            background: transparent;
+            padding: 6px 8px;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .ojt-table tbody tr:nth-child(even) { background: #f8f9fc; }
+
+        .ojt-table input[type="time"] {
+            border: 1px solid #e3e7ef;
+            border-radius: 10px;
+            background: #fff;
+            color: #2b3a67;
+            font-size: 13px;
+            text-align: left;
+        }
+
+        .ojt-table input[type="date"] {
+            border: 1px solid transparent;
+            background: transparent;
+            color: #2b3a67;
+            font-size: 13px;
+            text-align: left;
+        }
+
+        .ojt-table input[type="date"]:focus,
+        .ojt-table input[type="date"]:hover {
+            border-color: #e3e7ef;
+            background: #fff;
+        }
+
+        .ojt-day-badge,
+        .ojt-hrs-val,
+        .ojt-daily-val {
+            font-size: 13px;
+            font-weight: 500;
+            color: #2b3a67;
+        }
+
+        /* status pill: colors come from the inline color the existing JS already sets */
+        .ojt-status-badge {
+            display: inline-block;
+            padding: 3px 16px;
+            border-radius: 999px;
+            font-size: 12px;
+        }
+
+        .ojt-status-badge[style*="rgb(220, 53, 69)"]  { background: #fde8e8; }
+        .ojt-status-badge[style*="rgb(25, 135, 84)"]  { background: #e3f6ec; }
+        .ojt-status-badge[style*="rgb(13, 110, 253)"] { background: #e5eeff; }
+
+        /* addtl s dashboard ni student */
+        /* ── HOME (setup guide) ── */
+        .hm-meter { min-width: 220px; flex: 0 1 260px; }
+        .hm-meter-top { display: flex; justify-content: space-between; font-size: 13px; color: #4a5578; margin-bottom: 6px; }
+        .hm-meter-top b { color: #1f2a55; }
+        .hm-meter-track { height: 8px; background: rgba(255, 255, 255, .7); border-radius: 99px; overflow: hidden; }
+        .hm-meter-fill { height: 100%; background: #f26b3a; border-radius: 99px; }
+
+        .hm-card {
+            background: #fff;
+            border: 1px solid #eef0f6;
+            border-radius: 14px;
+            box-shadow: 0 1px 3px rgba(20, 30, 70, .04);
+            padding: 18px 24px 8px;
+        }
+
+        .hm-title { font-size: 15px; font-weight: 700; color: #1f2a55; margin-bottom: 4px; }
+
+        .hm-step {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 0;
+            border-top: 1px solid #eef0f6;
+        }
+        .hm-card .hm-title + .hm-step { border-top: none; }
+
+        .hm-dot {
+            width: 40px; height: 40px; min-width: 40px;
+            border-radius: 50%;
+            background: #eef2f9; color: #6b7390;
+            font-size: 14px; font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .hm-step.done .hm-dot    { background: #e1f6ec; color: #16a36a; }
+        .hm-step.current .hm-dot { background: #f26b3a; color: #fff; box-shadow: 0 0 0 5px #fdeee6; }
+        .hm-step.todo { opacity: .75; }
+
+        .hm-text { flex: 1; min-width: 0; }
+        .hm-text strong { display: block; font-size: 15px; color: #1f2a55; margin-bottom: 2px; }
+        .hm-text span   { font-size: 13px; color: #6b7390; line-height: 1.5; }
+
+        .hm-btn {
+            background: #f26b3a; color: #fff;
+            font-size: 13px; font-weight: 600;
+            padding: 8px 18px; border-radius: 10px;
+            text-decoration: none; white-space: nowrap;
+        }
+        .hm-btn:hover { background: #d9561f; color: #fff; }
+
+        .hm-tag {
+            font-size: 12px; font-weight: 600;
+            padding: 4px 12px; border-radius: 999px;
+            background: #eef2f9; color: #6b7390; white-space: nowrap;
+        }
+        .hm-tag.ok { background: #e1f6ec; color: #16a36a; }
+
+        .hm-rooms { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+        .hm-room {
+            display: flex; align-items: center; gap: 14px;
+            background: #fff; border: 1px solid #eef0f6; border-radius: 14px;
+            padding: 14px 16px; text-decoration: none;
+            box-shadow: 0 1px 3px rgba(20, 30, 70, .04);
+            transition: transform .15s, box-shadow .15s;
+        }
+        .hm-room:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(20, 30, 70, .08); }
+        .hm-room-ic {
+            width: 44px; height: 44px; min-width: 44px; border-radius: 12px;
+            background: #e8efff; color: #2f5bd8;
+            display: flex; align-items: center; justify-content: center; font-size: 17px;
+        }
+        .hm-room-info { flex: 1; min-width: 0; }
+        .hm-room-info strong { display: block; font-size: 15px; color: #1f2a55; }
+        .hm-room-info small  { font-size: 12px; color: #8b93ab; }
+        .hm-room-go { font-size: 12px; color: #9aa3bd; }
+
+        @media (max-width: 768px) {
+            .hm-meter { width: 100%; flex-basis: 100%; }
+            .hm-step { flex-wrap: wrap; }
+            .hm-text { flex-basis: calc(100% - 60px); }
+        }
+
+        /* Home polish */
+        .hm-card { padding-top: 20px; }
+        .hm-step.current {
+            background: #fff8f4;
+            margin: 0 -24px;
+            padding-left: 24px;
+            padding-right: 24px;
+            border-radius: 12px;
+            border-top-color: transparent;
+        }
+        .hm-room-ic { background: #fdeee6; color: #f26b3a; }
+        .hm-room:hover .hm-room-go { color: #f26b3a; transform: translateX(3px); }
+        .hm-room-go { transition: transform .15s, color .15s; }
+        /* addtl e dashboard ni student */
     </style>
 </head>
 
@@ -2094,32 +2587,31 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
     <!-- SIDEBAR -->
     <div class="sidebar">
         <a href="?section=home<?php if ($current_room_id)
-            echo "&room_id=$current_room_id"; ?>"
+            echo "&room_id=$current_room_id"; ?>" data-tooltip="Home"
             class="sidebar-link <?= $current_section === 'home' ? 'active' : '' ?>">
             <i class="fa-solid fa-house"></i> <span class="sidebar-text">Home</span>
         </a>
 
         <a href="?section=chats<?php if ($current_room_id)
-            echo "&room_id=$current_room_id"; ?>"
+            echo "&room_id=$current_room_id"; ?>" data-tooltip="Chats"
             class="sidebar-link <?= $current_section === 'chats' ? 'active' : '' ?>">
             <i class="fa-solid fa-comments"></i> <span class="sidebar-text">Chats</span>
         </a>
 
         <a href="?section=application<?php if ($current_room_id)
-            echo "&room_id=$current_room_id"; ?>"
+            echo "&room_id=$current_room_id"; ?>" data-tooltip="Checklist"
             class="sidebar-link <?= $current_section === 'application' ? 'active' : '' ?>">
-            <i class="fa-solid fa-user-group"></i> <span class="sidebar-text">Checklist</span>
+            <i class="fa fa-list-ul"></i> <span class="sidebar-text">Checklist</span>
         </a>
 
         <?php if ($hasActiveProgress): ?>
             <a href="?section=hours<?php if ($current_room_id)
-                echo "&room_id=$current_room_id"; ?>"
+                echo "&room_id=$current_room_id"; ?>" data-tooltip="Hours"
                 class="sidebar-link <?= $current_section === 'hours' ? 'active' : '' ?>">
                 <i class="fa-solid fa-clock m-1"></i> <span class="sidebar-text">Hours</span>
             </a>
         <?php else: ?>
-            <a href="#" onclick="return false;" title="Upload at Mou, Recomendation Letter and Waiver
-            documents to unlock" style="opacity:0.4; cursor:not-allowed; pointer-events:none;">
+            <a href="#" onclick="return false;" data-tooltip="Upload MOU, Recommendation Letter, and Waiver documents to unlock" style="opacity:0.4; cursor:not-allowed;">
                 <i class="fa-solid fa-clock m-1"></i>
                 <span class="sidebar-text">Hours <i class="fa-solid fa-lock" style="font-size:10px;"></i></span>
             </a>
@@ -2127,23 +2619,21 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
 
         <?php if ($hasActiveProgress): ?>
             <a href="?section=progress_report<?php if ($current_room_id)
-                echo "&room_id=$current_room_id"; ?>"
+                echo "&room_id=$current_room_id"; ?>" data-tooltip="Progress Report"
                 class="sidebar-link <?= $current_section === 'progress_report' ? 'active' : '' ?>">
                 <i class="fa-solid fa-file m-1"></i> <span class="sidebar-text">Progress Report</span>
             </a>
-            </a>
         <?php else: ?>
-            <a href="#" onclick="return false;" title="Upload at Mou, Recomendation Letter and Waiver
-            documents to unlock" style="opacity:0.4; cursor:not-allowed; pointer-events:none;">
-                <i class="fa-solid fa-file m-1"></i> <span class="sidebar-text">Progress Report
+            <a href="#" onclick="return false;" data-tooltip="Upload MOU, Recommendation Letter, and Waiver documents to unlock" style="opacity:0.4; cursor:not-allowed;">
+                <i class="fa-solid fa-file-lines m-1"></i> <span class="sidebar-text">Progress Report
                     <i class="fa-solid fa-lock" style="font-size:10px;"></i>
                 </span>
             </a>
         <?php endif; ?>
         <a href="#" id="ojtEvalBtn" class="ojt-locked" aria-disabled="true" tabindex="-1"
             onclick="event.preventDefault(); if (this.classList.contains('ojt-locked')) return false; ojtShowEvalModal();"
-            title="Complete your required OJT hours to unlock">
-            <i class="fa-solid fa-file m-1"></i>
+            data-tooltip="Complete your required OJT hours to unlock">
+            <i class="fa-solid fa-clipboard-check m-1"></i>
             <span class="sidebar-text">
                 Evaluation
                 <i class="fa-solid fa-lock" id="ojtEvalLock" style="font-size:10px;"></i>
@@ -2154,12 +2644,12 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
             <h6>ROOMS</h6>
             <?php foreach ($rooms as $room): ?>
                 <?php if ($current_room_id == $room['id']): ?>
-                    <div class="room-item active-room">
+                    <div class="room-item active-room" data-tooltip="<?= htmlspecialchars($room['room_name']) ?>">
                         <span class="room-initial"><?= strtoupper(substr(trim($room['room_name']), 0, 1)) ?></span>
                         <span class="sidebar-text"><?= $room['room_name'] ?></span>
                     </div>
                 <?php else: ?>
-                    <a href="?room_id=<?= $room['id'] ?>" class="room-link">
+                    <a href="?room_id=<?= $room['id'] ?>" class="room-link" data-tooltip="<?= htmlspecialchars($room['room_name']) ?>">
                         <div class="room-item">
                             <span class="room-initial"><?= strtoupper(substr(trim($room['room_name']), 0, 1)) ?></span>
                             <span class="sidebar-text"><?= $room['room_name'] ?></span>
@@ -2171,19 +2661,146 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
     </div>
 
     <!-- HOME SECTION -->
+     <!-- addtl s dashboard ni student -->
     <div id="home" class="section <?= $current_section === 'home' ? 'active' : '' ?>">
         <div class="main">
             <?php if ($current_room_id): ?>
                 <?php include 'chat-room-content.php'; ?>
             <?php else: ?>
-                <div class="text-center mt-5">
-                    <i class="fa fa-clock fa-3x text-muted mb-3 d-block"></i>
-                    <h5 class="fw-bold">You haven't been assigned to a room yet.</h5>
-                    <p class="text-muted">Please wait for your adviser to be assigned.</p>
+                <?php
+                $hmFirst   = explode(' ', trim($displayName ?? 'there'))[0];
+                $hmHasRoom = !empty($rooms);
+                $hmSteps   = [
+                    [
+                        'done'  => !empty($application_internship_id),
+                        'title' => 'Pick your host company',
+                        'desc'  => 'Choose the company where you will do your OJT.',
+                        'link'  => '?section=application',
+                        'cta'   => 'Choose company',
+                    ],
+                    [
+                        'done'  => !empty($hasActiveProgress),
+                        'title' => 'Complete your requirements',
+                        'desc'  => 'Once your MOU, Recommendation Letter and Waiver are marked done, Hours and Progress Report unlock.',
+                        'link'  => '?section=application',
+                        'cta'   => 'Open checklist',
+                    ],
+                    [
+                        'done'  => $hmHasRoom,
+                        'title' => 'Join your OJT room',
+                        'desc'  => $hmHasRoom
+                            ? 'You are in a room. Open it to see updates from your adviser.'
+                            : 'Your adviser will add you to a room. It will show up in the sidebar once you are added.',
+                        'link'  => null,
+                        'cta'   => null,
+                    ],
+                ];
+                $hmDone    = count(array_filter($hmSteps, fn($s) => $s['done']));
+                $hmCurrent = null;
+                foreach ($hmSteps as $i => $s) {
+                    if (!$s['done']) { $hmCurrent = $i; break; }
+                }
+                ?>
+
+                <div class="pg-header">
+                    <div class="pg-header-left">
+                        <div class="pg-header-icon"><i class="fa-solid fa-house"></i></div>
+                        <div>
+                            <h2>Welcome, <?= htmlspecialchars($hmFirst) ?></h2>
+                            <p><?= date('l, F j') ?> · <?= $hmDone === 3
+                                ? 'Everything is set up. Open your room from the sidebar.'
+                                : 'Here is what you need to do to get started with your OJT.' ?></p>
+                        </div>
+                    </div>
+                    <div class="hm-meter">
+                        <div class="hm-meter-top">
+                            <span>Setup progress</span><b><?= $hmDone ?> of 3</b>
+                        </div>
+                        <div class="hm-meter-track">
+                            <div class="hm-meter-fill" style="width:<?= round($hmDone / 3 * 100) ?>%;"></div>
+                        </div>
+                    </div>
                 </div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-4">
+                        <div class="hrs-card hrs-stat">
+                            <div class="hrs-stat-icon blue"><i class="fa-solid fa-list-check"></i></div>
+                            <div>
+                                <div class="hrs-stat-label">Setup progress</div>
+                                <div class="hrs-stat-value"><?= $hmDone ?> / 3</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="hrs-card hrs-stat">
+                            <div class="hrs-stat-icon green"><i class="fa-solid fa-users"></i></div>
+                            <div>
+                                <div class="hrs-stat-label">My rooms</div>
+                                <div class="hrs-stat-value"><?= count($rooms) ?></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="hrs-card hrs-stat">
+                            <div class="hrs-stat-icon orange"><i class="fa-solid fa-hourglass-half"></i></div>
+                            <div>
+                                <div class="hrs-stat-label">OJT hours required</div>
+                                <div class="hrs-stat-value"><?= (int) $requiredHours ?> hrs</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hm-card">
+                    <div class="hm-title">Your OJT checklist</div>
+
+                    <?php foreach ($hmSteps as $i => $s):
+                        $state = $s['done'] ? 'done' : ($i === $hmCurrent ? 'current' : 'todo'); ?>
+                        <div class="hm-step <?= $state ?>">
+                            <div class="hm-dot">
+                                <?= $s['done'] ? '<i class="fa-solid fa-check"></i>' : ($i + 1) ?>
+                            </div>
+                            <div class="hm-text">
+                                <strong><?= htmlspecialchars($s['title']) ?></strong>
+                                <span><?= htmlspecialchars($s['desc']) ?></span>
+                            </div>
+                            <?php if ($s['done']): ?>
+                                <span class="hm-tag ok">Done</span>
+                            <?php elseif ($s['link'] && $i === $hmCurrent): ?>
+                                <a href="<?= $s['link'] ?>" class="hm-btn"><?= htmlspecialchars($s['cta']) ?></a>
+                            <?php elseif ($s['link']): ?>
+                                <span class="hm-tag">Up next</span>
+                            <?php else: ?>
+                                <span class="hm-tag">In progress</span>
+                            <?php endif; ?>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+
+                <?php if ($hmHasRoom): ?>
+                    <div class="hm-title mt-4 mb-2" style="padding:0 4px;">Your room</div>
+                    <div class="hm-rooms">
+                        <?php foreach ($rooms as $hmRoom): ?>
+                            <a href="?room_id=<?= (int) $hmRoom['id'] ?>" class="hm-room">
+                                <div class="hm-room-ic"><i class="fa-solid fa-users"></i></div>
+                                <div class="hm-room-info">
+                                    <strong><?= htmlspecialchars($hmRoom['room_name']) ?></strong>
+                                    <?php if (!empty($hmRoom['full_name'])): ?>
+                                        <small>Adviser: <?= htmlspecialchars($hmRoom['full_name']) ?></small>
+                                    <?php elseif (!empty($hmRoom['school_year'])): ?>
+                                        <small>S.Y. <?= htmlspecialchars($hmRoom['school_year']) ?></small>
+                                    <?php endif; ?>
+                                </div>
+                                <i class="fa-solid fa-chevron-right hm-room-go"></i>
+                            </a>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
             <?php endif; ?>
         </div>
     </div>
+    <!-- addtl e dashboard ni student -->
 
     <!-- CHATS SECTION -->
     <div id="chats" class="section <?= $current_section === 'chats' ? 'active' : '' ?>">
@@ -2439,14 +3056,27 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
     <!-- APPLICATION SECTION -->
     <div id="application" class="section <?= $current_section === 'application' ? 'active' : '' ?>">
         <div class="main">
-            <?php if ($application_internship_id): ?>
+            <!-- addtl s -->
+            
+                    <div class="pg-header">
+                        <div class="pg-header-left">
+                            <div class="pg-header-icon"><i class="fa fa-list-ul"></i></div>
+                            <div>
+                                <h2>OJT Requirements Checklist</h2>
+                                <p>Complete each item below. Following the order is recommended, but you may work on them in any sequence.</p>
+                            </div>
+                        </div>
+                    </div>
 
-                <?php
-                $internship_id = $application_internship_id;
-                include 'application-progress.php';
-                ?>
+                <!-- addtl e -->
+                <?php if ($application_internship_id): ?>
 
-            <?php else: ?>
+                    <?php
+                    $internship_id = $application_internship_id;
+                    include 'application-progress.php';
+                    ?>
+
+                <?php else: ?>
 
                 <!-- HTE NOTICE -->
                 <div class="card border-0 shadow-sm rounded-4 mb-3">
@@ -2575,7 +3205,7 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
                 </div>
             <?php else: ?>
                 <!-- Header -->
-                <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                <!-- <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
                     <div>
                         <h3>Rendered Hours</h3>
                         <p class="text-muted mb-0">OJT Daily Time Record</p>
@@ -2586,10 +3216,24 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
                             <?= $requiredHours ?> hrs
                         </span>
                     </div>
+                </div> -->
+                <!-- Header -->
+                <div class="pg-header">
+                    <div class="pg-header-left">
+                        <div class="pg-header-icon"><i class="fa-solid fa-clock"></i></div>
+                        <div>
+                            <h2>Rendered Hours</h2>
+                            <p>OJT Daily Time Record</p>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <label style="font-size:15px; color:#555; font-weight:500; margin:0;">OJT Hours Required:</label>
+                        <span style="font-size:16px; font-weight:700; color:#272f54;"><?= $requiredHours ?> hrs</span>
+                    </div>
                 </div>
 
                 <!-- Progress Bar -->
-                <div class="card border-0 shadow-sm rounded-3 p-3 mb-2" style="background-color:#29335C; opacity:0.90;">
+                <!-- <div class="card border-0 shadow-sm rounded-3 p-3 mb-2" style="background-color:#29335C; opacity:0.90;">
                     <div class="d-flex justify-content-between" style="color:#fff; margin-bottom:6px;">
                         <span>Progress</span>
                         <span id="ojt-pct-label">0%</span>
@@ -2598,26 +3242,10 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
                         <div id="ojt-progress-fill" style="height:100%; width:0%; border-radius:99px; background:#1abc9c;">
                         </div>
                     </div>
-                </div>
-
-                <!-- <div class="card border-0 shadow-sm rounded-3 p-3 mb-2 d-flex flex-row align-items-center justify-content-between" style="background-color:#29335C;">
-                    <span style="color:#fff;">Progress</span>
-
-                    <div style="position:relative; width:64px; height:64px;">
-                        <svg width="64" height="64" viewBox="0 0 64 64">
-                            <circle cx="32" cy="32" r="27" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="6"></circle>
-                            <circle id="ojt-progress-fill" cx="32" cy="32" r="27" fill="none" stroke="#1abc9c" stroke-width="6"
-                                stroke-linecap="round" stroke-dasharray="169.6" stroke-dashoffset="169.6"
-                                transform="rotate(-90 32 32)"></circle>
-                        </svg>
-                        <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center;">
-                            <span id="ojt-pct-label" style="color:#fff; font-size:13px; font-weight:600;">0%</span>
-                        </div>
-                    </div>
                 </div> -->
 
                 <!-- Summary Cards -->
-                <div class="row g-2 mb-2" style="margin-top:4px;">
+                <!-- <div class="row g-2 mb-2" style="margin-top:4px;">
                     <div class="col-md-4">
                         <div style="border:2px solid #ababab; border-radius:8px; padding:1rem; margin-right:5px;">
                             <div style="letter-spacing:.05em; color:#29335C;">MONTHLY OJT HOURS</div>
@@ -2638,8 +3266,49 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
                             </div>
                         </div>
                     </div>
+                </div> -->
+
+                <!-- Progress Bar -->
+                <div class="hrs-card hrs-progress">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="hrs-progress-title">Progress</span>
+                        <span id="ojt-pct-label" class="hrs-progress-pct">0%</span>
+                    </div>
+                    <div class="hrs-track">
+                        <div id="ojt-progress-fill" class="hrs-fill" style="width:0%;"></div>
+                    </div>
                 </div>
 
+                <!-- Summary Cards -->
+                <div class="row g-3 mb-3">
+                    <div class="col-md-4">
+                        <div class="hrs-card hrs-stat">
+                            <div class="hrs-stat-icon blue"><i class="fa-solid fa-calendar-days"></i></div>
+                            <div>
+                                <div class="hrs-stat-label">Monthly OJT Hours</div>
+                                <div id="ojt-sum-monthly" class="hrs-stat-value">0h 0m</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="hrs-card hrs-stat">
+                            <div class="hrs-stat-icon green"><i class="fa-solid fa-circle-check"></i></div>
+                            <div>
+                                <div class="hrs-stat-label">Hours Completed</div>
+                                <div id="ojt-sum-completed" class="hrs-stat-value">0h 0m</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="hrs-card hrs-stat">
+                            <div class="hrs-stat-icon orange"><i class="fa-solid fa-hourglass-half"></i></div>
+                            <div>
+                                <div class="hrs-stat-label">Remaining Hours</div>
+                                <div id="ojt-sum-remaining" class="hrs-stat-value"><?= $requiredHours ?>h 0m</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <!-- Weeks Container -->
                 <div id="ojt-weeks-container">
                     <?php foreach ($ojtWeeks as $week): ?>
@@ -2851,11 +3520,22 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
     <!-- PROGRESS REPORT SECTION -->
 
     <div class="section <?= $current_section === 'progress_report' ? 'active' : '' ?>">
-        <div class="main" style="padding-bottom:60px;">
+        <!-- <div class="main" style="padding-bottom:60px;">
             <h3 class="fw-bold mb-1">Weekly Progress Report</h3>
-            <p class="text-muted mb-4">Upload your filled-out weekly report, or download the blank template below.</p>
+            <p class="text-muted mb-4">Upload your filled-out weekly report, or download the blank template below.</p> -->
 
-            <!-- TEMPLATE DOWNLOAD -->
+        <div class="main" style="padding-bottom:60px;">
+            <div class="pg-header">
+                <div class="pg-header-left">
+                    <div class="pg-header-icon"><i class="fa-solid fa-file-lines"></i></div>
+                    <div>
+                        <h2>Weekly Progress Report</h2>
+                        <p>Upload your filled-out weekly report, or download the blank template below.</p>
+                    </div>
+                </div>
+            </div>
+
+           <!-- TEMPLATE DOWNLOAD -->
             <div class="card shadow-sm rounded-3 p-3 mb-3 d-flex flex-row align-items-center justify-content-between"
                 style="border:1px solid #e5e7eb;">
                 <div class="d-flex align-items-center gap-3">
@@ -3507,21 +4187,21 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
             if (track) track.classList.remove('show-profile');
         }
 
-        function truncateRoomItems() {
-            if (window.innerWidth <= 768) {
-                document.querySelectorAll('.room-link .room-item, .active-room').forEach(el => {
-                    if (!el.dataset.original) el.dataset.original = el.textContent.trim();
-                    el.textContent = el.dataset.original.trim().charAt(0).toUpperCase();
-                });
-            } else {
-                document.querySelectorAll('.room-link .room-item, .active-room').forEach(el => {
-                    if (el.dataset.original) el.textContent = el.dataset.original;
-                });
-            }
-        }
+        // function truncateRoomItems() {
+        //     if (window.innerWidth <= 768) {
+        //         document.querySelectorAll('.room-link .room-item, .active-room').forEach(el => {
+        //             if (!el.dataset.original) el.dataset.original = el.textContent.trim();
+        //             el.textContent = el.dataset.original.trim().charAt(0).toUpperCase();
+        //         });
+        //     } else {
+        //         document.querySelectorAll('.room-link .room-item, .active-room').forEach(el => {
+        //             if (el.dataset.original) el.textContent = el.dataset.original;
+        //         });
+        //     }
+        // }
 
-        window.addEventListener('resize', truncateRoomItems);
-        document.addEventListener('DOMContentLoaded', truncateRoomItems);
+        // window.addEventListener('resize', truncateRoomItems);
+        // document.addEventListener('DOMContentLoaded', truncateRoomItems);
 
         // TRACK RENDERED HOURS
         const OJT_REQUIRED_HOURS = <?= (int) $requiredHours ?>;
@@ -3852,7 +4532,7 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
             btn.classList.toggle('ojt-locked', !done);
             btn.setAttribute('aria-disabled', String(!done));
             btn.tabIndex = done ? 0 : -1;
-            btn.title = done ? '' : 'Complete your required OJT hours to unlock';
+            btn.dataset.tooltip = done ? 'Evaluation' : 'Complete your required OJT hours to unlock';
             if (lock) lock.style.display = done ? 'none' : 'inline';
         }
         const _origShowEvalModal = ojtShowEvalModal;
