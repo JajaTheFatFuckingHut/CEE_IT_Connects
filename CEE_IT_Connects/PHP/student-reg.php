@@ -92,6 +92,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $newStudentId = $pdo->lastInsertId();
 
+    session_regenerate_id(true);
+    $_SESSION['user_id'] = $newStudentId;
+    $_SESSION['role'] = 'student';
+
     $stmt = $pdo->prepare("INSERT INTO audits (user_id, roles, activity, activity_date) VALUES (:user_id, :roles, :activity, NOW())");
     $stmt->execute([
         ':user_id' => $newStudentId,
