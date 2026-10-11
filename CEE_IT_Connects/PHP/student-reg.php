@@ -99,7 +99,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         ':activity' => 'Student registered an account with schoold Id ' . $student_id
     ]);
     // Redirect after success
-    $_SESSION['error'] = "Successfully made your account!";
+    $_SESSION['success'] = "Successfully made your account!";
     header("Location: ../index.php");
     exit();
 }
