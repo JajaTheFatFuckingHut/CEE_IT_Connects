@@ -564,13 +564,13 @@ $page = 'messages';
 
 $rhStmt = $pdo->prepare("
     SELECT COALESCE(i.required_hours, 486)
-    FROM internship_bookmarks ib
-    JOIN internships i ON i.id = ib.internship_id
-    WHERE ib.student_id = ?
+    FROM ojt_applications oa
+    JOIN internships i ON i.id = oa.internship_id
+    WHERE oa.student_id = ?
     LIMIT 1
 ");
 $rhStmt->execute([$_SESSION['user_id']]);
-$requiredHours = $rhStmt->fetchColumn() ?: 486;
+$requiredHours = $rhStmt->fetchColumn() ?: 'Not Applied';
 
 $stmt = $pdo->prepare("
     SELECT 
@@ -714,7 +714,7 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
             transition: background .15s, color .15s;
         }
 
-        .sidebar a > i:first-child {
+        .sidebar a>i:first-child {
             width: 22px;
             text-align: center;
             font-size: 18px;
@@ -732,7 +732,7 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
             font-weight: 600;
         }
 
-        .sidebar a.active > i:first-child {
+        .sidebar a.active>i:first-child {
             color: #f26b3a;
         }
 
@@ -878,10 +878,22 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
         }
 
         @media (max-width: 768px) {
-            .pg-header { padding: 16px 18px; }
-            .pg-header-icon { width: 48px; height: 48px; min-width: 48px; font-size: 1.1rem; }
-            .pg-header h2 { font-size: 20px; }
+            .pg-header {
+                padding: 16px 18px;
+            }
+
+            .pg-header-icon {
+                width: 48px;
+                height: 48px;
+                min-width: 48px;
+                font-size: 1.1rem;
+            }
+
+            .pg-header h2 {
+                font-size: 20px;
+            }
         }
+
         /* addtl e */
 
         /* CHAT DESIGN */
@@ -2278,9 +2290,13 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
                 z-index: 200;
             }
 
-            .sidebar a, .sidebar .active-room { position: relative; }
+            .sidebar a,
+            .sidebar .active-room {
+                position: relative;
+            }
 
-            .sidebar a::after, .sidebar .active-room::after {
+            .sidebar a::after,
+            .sidebar .active-room::after {
                 content: attr(data-tooltip);
                 position: absolute;
                 left: 56px;
@@ -2301,7 +2317,8 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
                 z-index: 300;
             }
 
-            .sidebar a:hover::after, .sidebar .active-room:hover::after {
+            .sidebar a:hover::after,
+            .sidebar .active-room:hover::after {
                 opacity: 1;
             }
         }
@@ -2315,10 +2332,21 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
             padding: 18px 22px;
         }
 
-        .hrs-progress { margin-bottom: 16px; }
+        .hrs-progress {
+            margin-bottom: 16px;
+        }
 
-        .hrs-progress-title { font-size: 15px; font-weight: 700; color: #1f2a55; }
-        .hrs-progress-pct   { font-size: 14px; font-weight: 700; color: #1f2a55; }
+        .hrs-progress-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #1f2a55;
+        }
+
+        .hrs-progress-pct {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1f2a55;
+        }
 
         .hrs-track {
             height: 8px;
@@ -2351,9 +2379,20 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
             font-size: 22px;
         }
 
-        .hrs-stat-icon.blue   { background: #e8efff; color: #2f5bd8; }
-        .hrs-stat-icon.green  { background: #e1f6ec; color: #16a36a; }
-        .hrs-stat-icon.orange { background: #fdeadf; color: #f26b3a; }
+        .hrs-stat-icon.blue {
+            background: #e8efff;
+            color: #2f5bd8;
+        }
+
+        .hrs-stat-icon.green {
+            background: #e1f6ec;
+            color: #16a36a;
+        }
+
+        .hrs-stat-icon.orange {
+            background: #fdeadf;
+            color: #f26b3a;
+        }
 
         .hrs-stat-label {
             font-size: 13px;
@@ -2382,7 +2421,9 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
             text-align: left;
         }
 
-        .ojt-week-header { margin-bottom: 14px; }
+        .ojt-week-header {
+            margin-bottom: 14px;
+        }
 
         .ojt-week-label[readonly] {
             padding: 0;
@@ -2420,11 +2461,29 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
             padding: 10px;
         }
 
-        .ojt-table thead th.ojt-group  { background: #eef2f9 !important; }
-        .ojt-table thead th.th-morning { background: #fdeedd !important; }
-        .ojt-table thead th.sub-morning { background: #fef6ec !important; font-weight: 500; color: #6b7390; }
-        .ojt-table thead th.th-afternoon { background: #fbe4de !important; }
-        .ojt-table thead th.sub-afternoon { background: #fdeeea !important; font-weight: 500; color: #6b7390; }
+        .ojt-table thead th.ojt-group {
+            background: #eef2f9 !important;
+        }
+
+        .ojt-table thead th.th-morning {
+            background: #fdeedd !important;
+        }
+
+        .ojt-table thead th.sub-morning {
+            background: #fef6ec !important;
+            font-weight: 500;
+            color: #6b7390;
+        }
+
+        .ojt-table thead th.th-afternoon {
+            background: #fbe4de !important;
+        }
+
+        .ojt-table thead th.sub-afternoon {
+            background: #fdeeea !important;
+            font-weight: 500;
+            color: #6b7390;
+        }
 
         /* body rows */
         .ojt-table tbody td,
@@ -2436,7 +2495,9 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
             vertical-align: middle;
         }
 
-        .ojt-table tbody tr:nth-child(even) { background: #f8f9fc; }
+        .ojt-table tbody tr:nth-child(even) {
+            background: #f8f9fc;
+        }
 
         .ojt-table input[type="time"] {
             border: 1px solid #e3e7ef;
@@ -2477,17 +2538,49 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
             font-size: 12px;
         }
 
-        .ojt-status-badge[style*="rgb(220, 53, 69)"]  { background: #fde8e8; }
-        .ojt-status-badge[style*="rgb(25, 135, 84)"]  { background: #e3f6ec; }
-        .ojt-status-badge[style*="rgb(13, 110, 253)"] { background: #e5eeff; }
+        .ojt-status-badge[style*="rgb(220, 53, 69)"] {
+            background: #fde8e8;
+        }
+
+        .ojt-status-badge[style*="rgb(25, 135, 84)"] {
+            background: #e3f6ec;
+        }
+
+        .ojt-status-badge[style*="rgb(13, 110, 253)"] {
+            background: #e5eeff;
+        }
 
         /* addtl s dashboard ni student */
         /* ── HOME (setup guide) ── */
-        .hm-meter { min-width: 220px; flex: 0 1 260px; }
-        .hm-meter-top { display: flex; justify-content: space-between; font-size: 13px; color: #4a5578; margin-bottom: 6px; }
-        .hm-meter-top b { color: #1f2a55; }
-        .hm-meter-track { height: 8px; background: rgba(255, 255, 255, .7); border-radius: 99px; overflow: hidden; }
-        .hm-meter-fill { height: 100%; background: #f26b3a; border-radius: 99px; }
+        .hm-meter {
+            min-width: 220px;
+            flex: 0 1 260px;
+        }
+
+        .hm-meter-top {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            color: #4a5578;
+            margin-bottom: 6px;
+        }
+
+        .hm-meter-top b {
+            color: #1f2a55;
+        }
+
+        .hm-meter-track {
+            height: 8px;
+            background: rgba(255, 255, 255, .7);
+            border-radius: 99px;
+            overflow: hidden;
+        }
+
+        .hm-meter-fill {
+            height: 100%;
+            background: #f26b3a;
+            border-radius: 99px;
+        }
 
         .hm-card {
             background: #fff;
@@ -2497,7 +2590,12 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
             padding: 18px 24px 8px;
         }
 
-        .hm-title { font-size: 15px; font-weight: 700; color: #1f2a55; margin-bottom: 4px; }
+        .hm-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #1f2a55;
+            margin-bottom: 4px;
+        }
 
         .hm-step {
             display: flex;
@@ -2506,65 +2604,167 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
             padding: 16px 0;
             border-top: 1px solid #eef0f6;
         }
-        .hm-card .hm-title + .hm-step { border-top: none; }
+
+        .hm-card .hm-title+.hm-step {
+            border-top: none;
+        }
 
         .hm-dot {
-            width: 40px; height: 40px; min-width: 40px;
+            width: 40px;
+            height: 40px;
+            min-width: 40px;
             border-radius: 50%;
-            background: #eef2f9; color: #6b7390;
-            font-size: 14px; font-weight: 700;
-            display: flex; align-items: center; justify-content: center;
+            background: #eef2f9;
+            color: #6b7390;
+            font-size: 14px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        .hm-step.done .hm-dot    { background: #e1f6ec; color: #16a36a; }
-        .hm-step.current .hm-dot { background: #f26b3a; color: #fff; box-shadow: 0 0 0 5px #fdeee6; }
-        .hm-step.todo { opacity: .75; }
 
-        .hm-text { flex: 1; min-width: 0; }
-        .hm-text strong { display: block; font-size: 15px; color: #1f2a55; margin-bottom: 2px; }
-        .hm-text span   { font-size: 13px; color: #6b7390; line-height: 1.5; }
+        .hm-step.done .hm-dot {
+            background: #e1f6ec;
+            color: #16a36a;
+        }
+
+        .hm-step.current .hm-dot {
+            background: #f26b3a;
+            color: #fff;
+            box-shadow: 0 0 0 5px #fdeee6;
+        }
+
+        .hm-step.todo {
+            opacity: .75;
+        }
+
+        .hm-text {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .hm-text strong {
+            display: block;
+            font-size: 15px;
+            color: #1f2a55;
+            margin-bottom: 2px;
+        }
+
+        .hm-text span {
+            font-size: 13px;
+            color: #6b7390;
+            line-height: 1.5;
+        }
 
         .hm-btn {
-            background: #f26b3a; color: #fff;
-            font-size: 13px; font-weight: 600;
-            padding: 8px 18px; border-radius: 10px;
-            text-decoration: none; white-space: nowrap;
+            background: #f26b3a;
+            color: #fff;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 8px 18px;
+            border-radius: 10px;
+            text-decoration: none;
+            white-space: nowrap;
         }
-        .hm-btn:hover { background: #d9561f; color: #fff; }
+
+        .hm-btn:hover {
+            background: #d9561f;
+            color: #fff;
+        }
 
         .hm-tag {
-            font-size: 12px; font-weight: 600;
-            padding: 4px 12px; border-radius: 999px;
-            background: #eef2f9; color: #6b7390; white-space: nowrap;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 999px;
+            background: #eef2f9;
+            color: #6b7390;
+            white-space: nowrap;
         }
-        .hm-tag.ok { background: #e1f6ec; color: #16a36a; }
 
-        .hm-rooms { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+        .hm-tag.ok {
+            background: #e1f6ec;
+            color: #16a36a;
+        }
+
+        .hm-rooms {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 12px;
+        }
+
         .hm-room {
-            display: flex; align-items: center; gap: 14px;
-            background: #fff; border: 1px solid #eef0f6; border-radius: 14px;
-            padding: 14px 16px; text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: #fff;
+            border: 1px solid #eef0f6;
+            border-radius: 14px;
+            padding: 14px 16px;
+            text-decoration: none;
             box-shadow: 0 1px 3px rgba(20, 30, 70, .04);
             transition: transform .15s, box-shadow .15s;
         }
-        .hm-room:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(20, 30, 70, .08); }
-        .hm-room-ic {
-            width: 44px; height: 44px; min-width: 44px; border-radius: 12px;
-            background: #e8efff; color: #2f5bd8;
-            display: flex; align-items: center; justify-content: center; font-size: 17px;
+
+        .hm-room:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(20, 30, 70, .08);
         }
-        .hm-room-info { flex: 1; min-width: 0; }
-        .hm-room-info strong { display: block; font-size: 15px; color: #1f2a55; }
-        .hm-room-info small  { font-size: 12px; color: #8b93ab; }
-        .hm-room-go { font-size: 12px; color: #9aa3bd; }
+
+        .hm-room-ic {
+            width: 44px;
+            height: 44px;
+            min-width: 44px;
+            border-radius: 12px;
+            background: #e8efff;
+            color: #2f5bd8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 17px;
+        }
+
+        .hm-room-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .hm-room-info strong {
+            display: block;
+            font-size: 15px;
+            color: #1f2a55;
+        }
+
+        .hm-room-info small {
+            font-size: 12px;
+            color: #8b93ab;
+        }
+
+        .hm-room-go {
+            font-size: 12px;
+            color: #9aa3bd;
+        }
 
         @media (max-width: 768px) {
-            .hm-meter { width: 100%; flex-basis: 100%; }
-            .hm-step { flex-wrap: wrap; }
-            .hm-text { flex-basis: calc(100% - 60px); }
+            .hm-meter {
+                width: 100%;
+                flex-basis: 100%;
+            }
+
+            .hm-step {
+                flex-wrap: wrap;
+            }
+
+            .hm-text {
+                flex-basis: calc(100% - 60px);
+            }
         }
 
         /* Home polish */
-        .hm-card { padding-top: 20px; }
+        .hm-card {
+            padding-top: 20px;
+        }
+
         .hm-step.current {
             background: #fff8f4;
             margin: 0 -24px;
@@ -2573,9 +2773,21 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
             border-radius: 12px;
             border-top-color: transparent;
         }
-        .hm-room-ic { background: #fdeee6; color: #f26b3a; }
-        .hm-room:hover .hm-room-go { color: #f26b3a; transform: translateX(3px); }
-        .hm-room-go { transition: transform .15s, color .15s; }
+
+        .hm-room-ic {
+            background: #fdeee6;
+            color: #f26b3a;
+        }
+
+        .hm-room:hover .hm-room-go {
+            color: #f26b3a;
+            transform: translateX(3px);
+        }
+
+        .hm-room-go {
+            transition: transform .15s, color .15s;
+        }
+
         /* addtl e dashboard ni student */
     </style>
 </head>
@@ -2611,7 +2823,9 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
                 <i class="fa-solid fa-clock m-1"></i> <span class="sidebar-text">Hours</span>
             </a>
         <?php else: ?>
-            <a href="#" onclick="return false;" data-tooltip="Upload MOU, Recommendation Letter, and Waiver documents to unlock" style="opacity:0.4; cursor:not-allowed;">
+            <a href="#" onclick="return false;"
+                data-tooltip="Upload MOU, Recommendation Letter, and Waiver documents to unlock"
+                style="opacity:0.4; cursor:not-allowed;">
                 <i class="fa-solid fa-clock m-1"></i>
                 <span class="sidebar-text">Hours <i class="fa-solid fa-lock" style="font-size:10px;"></i></span>
             </a>
@@ -2624,7 +2838,9 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
                 <i class="fa-solid fa-file m-1"></i> <span class="sidebar-text">Progress Report</span>
             </a>
         <?php else: ?>
-            <a href="#" onclick="return false;" data-tooltip="Upload MOU, Recommendation Letter, and Waiver documents to unlock" style="opacity:0.4; cursor:not-allowed;">
+            <a href="#" onclick="return false;"
+                data-tooltip="Upload MOU, Recommendation Letter, and Waiver documents to unlock"
+                style="opacity:0.4; cursor:not-allowed;">
                 <i class="fa-solid fa-file-lines m-1"></i> <span class="sidebar-text">Progress Report
                     <i class="fa-solid fa-lock" style="font-size:10px;"></i>
                 </span>
@@ -2649,7 +2865,8 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
                         <span class="sidebar-text"><?= $room['room_name'] ?></span>
                     </div>
                 <?php else: ?>
-                    <a href="?room_id=<?= $room['id'] ?>" class="room-link" data-tooltip="<?= htmlspecialchars($room['room_name']) ?>">
+                    <a href="?room_id=<?= $room['id'] ?>" class="room-link"
+                        data-tooltip="<?= htmlspecialchars($room['room_name']) ?>">
                         <div class="room-item">
                             <span class="room-initial"><?= strtoupper(substr(trim($room['room_name']), 0, 1)) ?></span>
                             <span class="sidebar-text"><?= $room['room_name'] ?></span>
@@ -2661,44 +2878,47 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
     </div>
 
     <!-- HOME SECTION -->
-     <!-- addtl s dashboard ni student -->
+    <!-- addtl s dashboard ni student -->
     <div id="home" class="section <?= $current_section === 'home' ? 'active' : '' ?>">
         <div class="main">
             <?php if ($current_room_id): ?>
                 <?php include 'chat-room-content.php'; ?>
             <?php else: ?>
                 <?php
-                $hmFirst   = explode(' ', trim($displayName ?? 'there'))[0];
+                $hmFirst = explode(' ', trim($displayName ?? 'there'))[0];
                 $hmHasRoom = !empty($rooms);
-                $hmSteps   = [
+                $hmSteps = [
                     [
-                        'done'  => !empty($application_internship_id),
+                        'done' => !empty($application_internship_id),
                         'title' => 'Pick your host company',
-                        'desc'  => 'Choose the company where you will do your OJT.',
-                        'link'  => '?section=application',
-                        'cta'   => 'Choose company',
+                        'desc' => 'Choose the company where you will do your OJT.',
+                        'link' => '?section=application',
+                        'cta' => 'Choose company',
                     ],
                     [
-                        'done'  => !empty($hasActiveProgress),
+                        'done' => !empty($hasActiveProgress),
                         'title' => 'Complete your requirements',
-                        'desc'  => 'Once your MOU, Recommendation Letter and Waiver are marked done, Hours and Progress Report unlock.',
-                        'link'  => '?section=application',
-                        'cta'   => 'Open checklist',
+                        'desc' => 'Once your MOU, Recommendation Letter and Waiver are marked done, Hours and Progress Report unlock.',
+                        'link' => '?section=application',
+                        'cta' => 'Open checklist',
                     ],
                     [
-                        'done'  => $hmHasRoom,
+                        'done' => $hmHasRoom,
                         'title' => 'Join your OJT room',
-                        'desc'  => $hmHasRoom
+                        'desc' => $hmHasRoom
                             ? 'You are in a room. Open it to see updates from your adviser.'
                             : 'Your adviser will add you to a room. It will show up in the sidebar once you are added.',
-                        'link'  => null,
-                        'cta'   => null,
+                        'link' => null,
+                        'cta' => null,
                     ],
                 ];
-                $hmDone    = count(array_filter($hmSteps, fn($s) => $s['done']));
+                $hmDone = count(array_filter($hmSteps, fn($s) => $s['done']));
                 $hmCurrent = null;
                 foreach ($hmSteps as $i => $s) {
-                    if (!$s['done']) { $hmCurrent = $i; break; }
+                    if (!$s['done']) {
+                        $hmCurrent = $i;
+                        break;
+                    }
                 }
                 ?>
 
@@ -2708,8 +2928,8 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
                         <div>
                             <h2>Welcome, <?= htmlspecialchars($hmFirst) ?></h2>
                             <p><?= date('l, F j') ?> · <?= $hmDone === 3
-                                ? 'Everything is set up. Open your room from the sidebar.'
-                                : 'Here is what you need to do to get started with your OJT.' ?></p>
+                                   ? 'Everything is set up. Open your room from the sidebar.'
+                                   : 'Here is what you need to do to get started with your OJT.' ?></p>
                         </div>
                     </div>
                     <div class="hm-meter">
@@ -3057,26 +3277,27 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
     <div id="application" class="section <?= $current_section === 'application' ? 'active' : '' ?>">
         <div class="main">
             <!-- addtl s -->
-            
-                    <div class="pg-header">
-                        <div class="pg-header-left">
-                            <div class="pg-header-icon"><i class="fa fa-list-ul"></i></div>
-                            <div>
-                                <h2>OJT Requirements Checklist</h2>
-                                <p>Complete each item below. Following the order is recommended, but you may work on them in any sequence.</p>
-                            </div>
-                        </div>
+
+            <div class="pg-header">
+                <div class="pg-header-left">
+                    <div class="pg-header-icon"><i class="fa fa-list-ul"></i></div>
+                    <div>
+                        <h2>OJT Requirements Checklist</h2>
+                        <p>Complete each item below. Following the order is recommended, but you may work on them in any
+                            sequence.</p>
                     </div>
+                </div>
+            </div>
 
-                <!-- addtl e -->
-                <?php if ($application_internship_id): ?>
+            <!-- addtl e -->
+            <?php if ($application_internship_id): ?>
 
-                    <?php
-                    $internship_id = $application_internship_id;
-                    include 'application-progress.php';
-                    ?>
+                <?php
+                $internship_id = $application_internship_id;
+                include 'application-progress.php';
+                ?>
 
-                <?php else: ?>
+            <?php else: ?>
 
                 <!-- HTE NOTICE -->
                 <div class="card border-0 shadow-sm rounded-4 mb-3">
@@ -3535,7 +3756,7 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
                 </div>
             </div>
 
-           <!-- TEMPLATE DOWNLOAD -->
+            <!-- TEMPLATE DOWNLOAD -->
             <div class="card shadow-sm rounded-3 p-3 mb-3 d-flex flex-row align-items-center justify-content-between"
                 style="border:1px solid #e5e7eb;">
                 <div class="d-flex align-items-center gap-3">

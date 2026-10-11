@@ -73,9 +73,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // INSERT INTO DATABASE
     $stmt = $pdo->prepare("
         INSERT INTO students
-        (full_name, student_id, program, year_level, section, password_hash, contact_number, email)
+        (full_name, student_id, program, year_level, section, password_hash, contact_number, email, is_archived)
         VALUES
-        (:full_name, :student_id, :program, :year_level, :section, :password_hash, :contact_number, :email)
+        (:full_name, :student_id, :program, :year_level, :section, :password_hash, :contact_number, :email, FALSE)
     ");
 
     $stmt->execute([
