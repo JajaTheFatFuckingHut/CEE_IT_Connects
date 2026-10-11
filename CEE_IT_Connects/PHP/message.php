@@ -3072,24 +3072,6 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
         </div>
     </div>
 
-    <!-- Calendar Section -->
-    <div id="calendar" class="section <?= $current_section === 'calendar' ? 'active' : '' ?>">
-        <div class="tc-panel">
-            <div class="tc-toolbar">
-                <button type="button" id="calPrev" class="tc-btn" aria-label="Previous month">&lsaquo;</button>
-
-                <select id="calMonth" class="tc-select"></select>
-                <select id="calYear" class="tc-select"></select>
-
-                <button type="button" id="calNext" class="tc-btn" aria-label="Next month">&rsaquo;</button>
-                <button type="button" id="calToday" class="tc-btn tc-btn-wide">TODAY</button>
-
-                <div class="tc-readout" id="calReadout"></div>
-            </div>
-
-            <div id="calGrid" class="tc-grid"></div>
-        </div>
-    </div>
     <!-- HOME SECTION -->
     <!-- addtl s dashboard ni student -->
     <div id="home" class="section <?= $current_section === 'home' ? 'active' : '' ?>">
@@ -3240,6 +3222,28 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
         </div>
     </div>
     <!-- addtl e dashboard ni student -->
+
+    <!-- Calendar Section -->
+    <div id="calendar" class="section <?= $current_section === 'calendar' ? 'active' : '' ?>">
+        <div class="main">
+            <div class="tc-panel">
+                <div class="tc-toolbar">
+                    <button type="button" id="calPrev" class="tc-btn" aria-label="Previous month">&lsaquo;</button>
+
+                    <select id="calMonth" class="tc-select"></select>
+                    <select id="calYear" class="tc-select"></select>
+
+                    <button type="button" id="calNext" class="tc-btn" aria-label="Next month">&rsaquo;</button>
+                    <button type="button" id="calToday" class="tc-btn tc-btn-wide">TODAY</button>
+
+                    <div class="tc-readout" id="calReadout"></div>
+                </div>
+
+                <div id="calGrid" class="tc-grid"></div>
+            </div>
+        </div>
+    </div>
+
 
     <!-- CHATS SECTION -->
     <div id="chats" class="section <?= $current_section === 'chats' ? 'active' : '' ?>">
