@@ -2920,7 +2920,7 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
             <select id="calYear" class="form-select w-auto"></select>
         </div>
 
-        <div id="calendar" class="cal-grid"></div>
+        <div id="calGrid" class="cal-grid"></div>
     </div>
     <!-- HOME SECTION -->
     <!-- addtl s dashboard ni student -->
@@ -5080,7 +5080,7 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
 
         const monthSel = document.getElementById('calMonth');
         const yearSel = document.getElementById('calYear');
-        const calEl = document.getElementById('calendar');
+        const calEl = document.getElementById('calGrid');
 
         const now = new Date();
 
