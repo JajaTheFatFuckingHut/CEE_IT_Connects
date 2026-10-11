@@ -513,16 +513,21 @@ function deptCode($department)
 }
 
 // For the calendar
-if (($_SESSION['role'] ?? '') !== 'superadmin') {
-    header('Location: index.php');
-    exit;
-}
+$filterYear = $_GET['year'] ?? date('Y');
 
-$sStmt = $pdo->query("SELECT day, month, year, reason FROM calendar_suspensions WHERE is_suspended = TRUE");
-$suspensions = [];
-foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
-    $suspensions[sprintf('%04d-%02d-%02d', $row['year'], $row['month'], $row['day'])] = $row['reason'] ?? '';
+if ($filterYear === 'all') {
+    $lStmt = $pdo->query("
+        SELECT day, month, year, reason FROM calendar_suspensions
+        WHERE is_suspended = TRUE ORDER BY year, month, day
+    ");
+} else {
+    $lStmt = $pdo->prepare("
+        SELECT day, month, year, reason FROM calendar_suspensions
+        WHERE is_suspended = TRUE AND year = :y ORDER BY year, month, day
+    ");
+    $lStmt->execute([':y' => (int) $filterYear]);
 }
+$suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -3112,23 +3117,63 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
 
             <div id="calendar" class="section active sysAdm-section">
                 <div id="suspAdmin">
+
                     <div class="sa-panel">
                         <div class="sa-title">Suspend a date</div>
-                        <div class="sa-form">
-                            <input type="date" id="suspDate" class="sa-input">
-                            <input type="text" id="suspReason" class="sa-input sa-grow" maxlength="255"
+                        <form method="POST" action="calendar-suspend.php" class="sa-form">
+                            <input type="hidden" name="action" value="add">
+                            <input type="date" name="date" class="sa-input" required>
+                            <input type="text" name="reason" class="sa-input sa-grow" maxlength="255" required
                                 placeholder="Reason (e.g. Typhoon signal no. 3)">
-                            <button type="button" id="suspAdd" class="sa-btn sa-primary">Add</button>
-                        </div>
+                            <button type="submit" class="sa-btn sa-primary">Add</button>
+                        </form>
                     </div>
 
                     <div class="sa-panel">
                         <div class="sa-head">
                             <div class="sa-title">Suspended dates</div>
-                            <select id="suspYear" class="sa-input"></select>
+                            <form method="GET" action="superadmin.php">
+                                <select name="year" class="sa-input" onchange="this.form.submit()">
+                                    <option value="all" <?= $filterYear === 'all' ? 'selected' : '' ?>>All years</option>
+                                    <?php for ($y = (int) date('Y') - 1; $y <= (int) date('Y') + 5; $y++): ?>
+                                        <option value="<?= $y ?>" <?= (string) $y === (string) $filterYear ? 'selected' : '' ?>
+                                            >
+                                            <?= $y ?>
+                                        </option>
+                                    <?php endfor; ?>
+                                </select>
+                            </form>
                         </div>
-                        <div id="suspList" class="sa-list"></div>
+
+                        <div class="sa-list">
+                            <?php if (!$suspendedList): ?>
+                                <div class="sa-empty">No suspended dates.</div>
+                            <?php endif; ?>
+
+                            <?php foreach ($suspendedList as $row):
+                                $dateStr = sprintf('%04d-%02d-%02d', $row['year'], $row['month'], $row['day']);
+                                $label = date('M j, Y', strtotime($dateStr));
+                                ?>
+                                <div class="sa-item">
+                                    <div class="sa-item-text">
+                                        <b>
+                                            <?= htmlspecialchars($label) ?>
+                                        </b>
+                                        <span>
+                                            <?= htmlspecialchars($row['reason'] ?? '') ?>
+                                        </span>
+                                    </div>
+                                    <form method="POST" action="calendar-suspend.php"
+                                        onsubmit="return confirm('Lift the suspension on <?= $label ?>?');">
+                                        <input type="hidden" name="action" value="remove">
+                                        <input type="hidden" name="date" value="<?= $dateStr ?>">
+                                        <button type="submit" class="sa-del">Remove</button>
+                                    </form>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
                     </div>
+
                 </div>
             </div>
         </div><!-- /.main-content -->
