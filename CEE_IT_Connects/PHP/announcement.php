@@ -25,6 +25,33 @@ $docAvailStmt = $pdo->query("
     ORDER BY ida.updated_at DESC
 ");
 $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
+
+$stmt = $pdo->prepare("
+    SELECT 
+        s.id AS student_id,
+        s.student_id AS course_student_no,
+        s.full_name AS intern_name,
+        s.student_id,
+        s.program,
+        oa.internship_id,
+        i.company AS company_name,
+        a.id AS supervisor_id,
+        a.full_name AS supervisor_name
+    FROM students s
+    JOIN ojt_applications oa ON s.id = oa.student_id
+    JOIN internships i ON oa.internship_id = i.id
+    LEFT JOIN advisers a ON a.internship_id = i.id AND a.role = 'HTE_adviser' AND a.department = s.program
+    WHERE s.id = ?
+");
+$stmt->execute([$student_id]);
+$student = $stmt->fetch(PDO::FETCH_ASSOC);
+
+$sStmt = $pdo->query("SELECT day, month, year, reason FROM calendar_suspensions WHERE is_suspended = TRUE");
+$suspensions = [];
+foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+    $key = sprintf('%04d-%02d-%02d', $row['year'], $row['month'], $row['day']);
+    $suspensions[$key] = $row['reason'] ?? '';
+}
 ?>
 
 <!DOCTYPE html>
@@ -494,18 +521,203 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                 margin-top: 24px;
                 gap: 12px;
             }
+
             .page-banner-icon {
                 width: 38px;
                 height: 38px;
             }
+
             .page-banner-icon i {
                 font-size: 20px;
             }
+
             .page-banner-text h2 {
                 font-size: 1.2rem;
             }
+
             .page-banner-text p {
                 font-size: 14px;
+            }
+        }
+
+        /* Calendar */
+        #calendar {
+            --c-card: #ffffff;
+            --c-line: #e6ebf5;
+            --c-text: #1b2a4e;
+            --c-dim: #7a869f;
+            --c-accent: #ff5a1f;
+            --c-accent-soft: #ffece4;
+            --c-ok: #10a37f;
+            --c-warn: #e5484d;
+            --c-warn-soft: #fdecec;
+            box-sizing: border-box;
+            max-width: 100%;
+            min-width: 0;
+        }
+
+        #calendar *,
+        #calendar *::before,
+        #calendar *::after {
+            box-sizing: border-box;
+        }
+
+        #calendar .tc-panel {
+            width: 100%;
+            background: var(--c-card);
+            border: 1px solid var(--c-line);
+            border-radius: 14px;
+            padding: 18px;
+            color: var(--c-text);
+            overflow-x: auto;
+        }
+
+        /* toolbar */
+        #calendar .tc-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        #calendar .tc-select,
+        #calendar .tc-btn {
+            background: #fff;
+            color: var(--c-text);
+            border: 1px solid var(--c-line);
+            border-radius: 8px;
+            padding: 7px 12px;
+            font: inherit;
+            font-size: .85rem;
+            cursor: pointer;
+            transition: border-color .15s, color .15s, background .15s;
+        }
+
+        #calendar .tc-btn-wide {
+            font-weight: 600;
+        }
+
+        #calendar .tc-select:hover,
+        #calendar .tc-btn:hover,
+        #calendar .tc-select:focus,
+        #calendar .tc-btn:focus-visible {
+            outline: none;
+            border-color: var(--c-accent);
+            color: var(--c-accent);
+        }
+
+        #calendar .tc-readout {
+            margin-left: auto;
+            font-size: .8rem;
+            font-weight: 600;
+            letter-spacing: .08em;
+            color: var(--c-dim);
+        }
+
+        /* grid */
+        #calendar .tc-grid {
+            display: grid;
+            grid-template-columns: repeat(7, minmax(0, 1fr));
+            gap: 6px;
+        }
+
+        #calendar .tc-head {
+            text-align: center;
+            padding: 6px 0;
+            font-size: .7rem;
+            font-weight: 600;
+            letter-spacing: .1em;
+            color: var(--c-dim);
+        }
+
+        #calendar .tc-day {
+            min-height: 76px;
+            padding: 8px 10px;
+            background: #fff;
+            border: 1px solid var(--c-line);
+            border-radius: 10px;
+            transition: border-color .15s, background .15s;
+        }
+
+        #calendar .tc-day.empty {
+            background: transparent;
+            border: none;
+        }
+
+        #calendar .tc-day:not(.empty):hover {
+            border-color: var(--c-accent);
+            background: #fffaf7;
+            cursor: pointer;
+        }
+
+        #calendar .tc-day.weekend {
+            background: #f8faff;
+        }
+
+        #calendar .tc-day.weekend .tc-num {
+            color: var(--c-dim);
+        }
+
+        #calendar .tc-num {
+            font-size: .85rem;
+            font-weight: 600;
+        }
+
+        #calendar .tc-day.today {
+            background: var(--c-accent-soft);
+            border-color: var(--c-accent);
+        }
+
+        #calendar .tc-day.today .tc-num {
+            color: var(--c-accent);
+        }
+
+        #calendar .tc-hrs {
+            margin-top: 6px;
+            font-size: .72rem;
+            font-weight: 600;
+            color: var(--c-ok);
+        }
+
+        /* suspended dates */
+        #calendar .tc-day.suspended {
+            background: var(--c-warn-soft);
+            border-color: #f5c2c4;
+        }
+
+        #calendar .tc-day.suspended .tc-num {
+            color: var(--c-warn);
+        }
+
+        #calendar .tc-susp {
+            margin-top: 4px;
+            font-size: .65rem;
+            line-height: 1.3;
+            color: var(--c-warn);
+        }
+
+        #calendar .tc-susp b {
+            display: block;
+            letter-spacing: .08em;
+        }
+
+        #calendar .tc-susp span {
+            display: block;
+            color: var(--c-text);
+            opacity: .8;
+            overflow-wrap: anywhere;
+        }
+
+        @media (max-width: 576px) {
+            #calendar .tc-day {
+                min-height: 54px;
+                padding: 5px;
+            }
+
+            #calendar .tc-readout {
+                width: 100%;
+                margin-left: 0;
             }
         }
     </style>
@@ -517,24 +729,6 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
 
     <section class="announcement-wrapper">
         <div class="container-fluid">
-            <!-- <div style="margin-bottom:20px; margin-top: 40px;">
-                <h4 style="font-weight:700; color:#1e293b; margin-bottom:2px;">Announcements</h4>
-                <p style="font-size:13px; color:#94a3b8; margin:0;">Stay updated on internship news, requirements, and deadlines.</p>
-            </div> -->
-            <!-- <div style="background:#272f54; border-radius:12px; padding:24px 28px; margin-bottom:24px; position:relative; overflow:hidden;">
-                <div style="position:absolute; top:0; right:0; bottom:0; width:6px; background:#ff6b2c;"></div>
-                <h2 style="color:#fff; font-weight:700; font-size:1.6rem; margin:0 0 4px 0;">Announcements</h2>
-                <p style="color:#9aa3c7; font-size:14px; margin:0;">Stay updated on internship news, requirements, and deadlines.</p>
-            </div> -->
-            <!-- <div style="background: #e8f1ff; border:1px solid #2563eb; border-radius:12px; padding:24px 28px; margin-bottom:24px; margin-top:40px; display:flex; align-items:center; gap:16px;">
-                <div style="width:48px; height:48px; border-radius:10px; background:#e8f1ff; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-                    <i class="fa fa-bullhorn" style="color:#2563eb; font-size:32px;"></i>
-                </div>
-                <div>
-                    <h2 style="color:#2563eb; font-weight:700; font-size:1.8rem; margin:0 0 2px 0;">Announcements</h2>
-                    <p style="color: #4a68a8; font-size:20px; margin:0;">Stay updated on internship news, requirements, and deadlines.</p>
-                </div>
-            </div> -->
             <div class="page-banner">
                 <div class="page-banner-icon"><i class="fa fa-bullhorn"></i></div>
                 <div class="page-banner-text">
@@ -617,7 +811,30 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                     </tbody>
                 </table>
             </div>
-<br>
+            <br>
+            <!-- Calendar Section -->
+            <div id="calendar" class="section <?= $current_section === 'calendar' ? 'active' : '' ?>">
+                <div class="main">
+                    <div class="tc-panel">
+                        <div class="tc-toolbar">
+                            <button type="button" id="calPrev" class="tc-btn"
+                                aria-label="Previous month">&lsaquo;</button>
+
+                            <select id="calMonth" class="tc-select"></select>
+                            <select id="calYear" class="tc-select"></select>
+
+                            <button type="button" id="calNext" class="tc-btn" aria-label="Next month">&rsaquo;</button>
+                            <button type="button" id="calToday" class="tc-btn tc-btn-wide">TODAY</button>
+
+                            <div class="tc-readout" id="calReadout"></div>
+                        </div>
+
+                        <div id="calGrid" class="tc-grid"></div>
+                    </div>
+                </div>
+            </div>
+            <br>
+
             <!-- NEWS — from DB -->
             <p class="section-label">News</p>
             <div class="ann-card">
@@ -647,7 +864,7 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                     <?php endforeach; ?>
                 <?php endif; ?>
             </div>
-<br>
+            <br>
             <!-- UPDATES — from DB -->
             <p class="section-label">Updates</p>
             <div class="ann-card">
@@ -666,7 +883,7 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
                     <?php endforeach; ?>
                 <?php endif; ?>
             </div>
-<br>
+            <br>
             <!-- FAQs — from DB -->
             <p class="section-label">FAQs</p>
             <div class="ann-card">
@@ -707,6 +924,89 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
             desc.classList.toggle('collapsed');
             btn.textContent = collapsed ? 'Read less' : 'Read more';
         }
+
+        // For the calendar
+        const CAL_SUSPENDED = <?= json_encode($suspensions, JSON_HEX_TAG | JSON_HEX_AMP) ?>;
+        document.addEventListener('DOMContentLoaded', function () {
+            const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'];
+            const DAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+
+            const monthSel = document.getElementById('calMonth');
+            const yearSel = document.getElementById('calYear');
+            const calEl = document.getElementById('calGrid');   // not 'calendar'
+            const readout = document.getElementById('calReadout');
+            if (!monthSel || !yearSel || !calEl) return;
+
+
+            const esc = s => String(s).replace(/[&<>"']/g, c =>
+                ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+            const now = new Date();
+
+            // Fill dropdowns
+            MONTHS.forEach((m, i) => monthSel.add(new Option(m, i)));
+            for (let y = now.getFullYear() - 2; y <= now.getFullYear() + 2; y++) {
+                yearSel.add(new Option(y, y));
+            }
+            monthSel.value = now.getMonth();
+            yearSel.value = now.getFullYear();
+
+            function render() {
+                const month = parseInt(monthSel.value, 10);
+                const year = parseInt(yearSel.value, 10);
+                const firstDay = new Date(year, month, 1).getDay();
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+                const data = (typeof CAL_DATA !== 'undefined') ? CAL_DATA : {};
+                const susp = (typeof CAL_SUSPENDED !== 'undefined' && CAL_SUSPENDED) ? CAL_SUSPENDED : {};
+
+                let html = DAYS.map(d => `<div class="tc-head">${d}</div>`).join('');
+                for (let i = 0; i < firstDay; i++) html += '<div class="tc-day empty"></div>';
+
+                for (let d = 1; d <= daysInMonth; d++) {
+                    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                    const dow = new Date(year, month, d).getDay();
+                    const isToday = d === now.getDate() && month === now.getMonth() && year === now.getFullYear();
+                    const hrs = data[dateStr];
+                    const isSusp = Object.prototype.hasOwnProperty.call(susp, dateStr);
+                    const reason = isSusp ? susp[dateStr] : '';
+
+                    html += `<div class="tc-day${isToday ? ' today' : ''}${dow === 0 || dow === 6 ? ' weekend' : ''}${isSusp ? ' suspended' : ''}"
+                        data-date="${dateStr}"${isSusp ? ` title="${esc(reason)}"` : ''}>
+                        <span class="tc-num">${String(d).padStart(2, '0')}</span>
+                        ${hrs ? `<div class="tc-hrs">${hrs} HRS</div>` : ''}
+                        ${isSusp ? `<div class="tc-susp"><b>SUSPENDED</b><span>${esc(reason)}</span></div>` : ''}
+                    </div>`;
+                }
+
+                calEl.innerHTML = html;
+                readout.textContent = `${MONTHS[month].slice(0, 3).toUpperCase()} // ${year}`;
+            }
+
+            function shift(delta) {
+                let m = parseInt(monthSel.value, 10) + delta;
+                let y = parseInt(yearSel.value, 10);
+                if (m < 0) { m = 11; y--; }
+                if (m > 11) { m = 0; y++; }
+                // keep within the year dropdown's range
+                if (![...yearSel.options].some(o => parseInt(o.value, 10) === y)) return;
+                monthSel.value = m;
+                yearSel.value = y;
+                render();
+            }
+
+            monthSel.addEventListener('change', render);
+            yearSel.addEventListener('change', render);
+            document.getElementById('calPrev').addEventListener('click', () => shift(-1));
+            document.getElementById('calNext').addEventListener('click', () => shift(1));
+            document.getElementById('calToday').addEventListener('click', () => {
+                monthSel.value = now.getMonth();
+                yearSel.value = now.getFullYear();
+                render();
+            });
+
+            render();
+        });
     </script>
 </body>
 
