@@ -3005,11 +3005,11 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
             class="sidebar-link <?= $current_section === 'application' ? 'active' : '' ?>">
             <i class="fa fa-list-ul"></i> <span class="sidebar-text">Checklist</span>
         </a>
-        <a href="?section=calendar<?php if ($current_room_id)
+        <!-- <a href="?section=calendar<?php if ($current_room_id)
             echo "&room_id=$current_room_id"; ?>" data-tooltip="Calendar"
             class="sidebar-link <?= $current_section === 'calendar' ? 'active' : '' ?>">
             <i class="fa-solid fa-calendar"></i><span class="sidebar-text">Calendar</span>
-        </a>
+        </a> -->
 
         <?php if ($hasActiveProgress): ?>
             <a href="?section=hours<?php if ($current_room_id)
