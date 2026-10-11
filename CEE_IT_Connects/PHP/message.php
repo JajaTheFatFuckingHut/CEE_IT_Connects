@@ -575,9 +575,6 @@ $result = $rhStmt->fetchColumn();
 $hasApplied = ($result !== false);
 $requiredHours = $hasApplied ? (int) $result : null;
 
-$evalUnlocked = $hasApplied
-    && $requiredHours > 0
-    && $hoursRendered >= $requiredHours;
 
 if (!$hasApplied) {
     $evalTooltip = "Apply for an internship to unlock";
