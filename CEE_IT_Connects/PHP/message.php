@@ -5256,6 +5256,10 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
             const readout = document.getElementById('calReadout');
             if (!monthSel || !yearSel || !calEl) return;
 
+
+            const esc = s => String(s).replace(/[&<>"']/g, c =>
+                ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
             const now = new Date();
 
             // Fill dropdowns
@@ -5272,6 +5276,7 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                 const firstDay = new Date(year, month, 1).getDay();
                 const daysInMonth = new Date(year, month + 1, 0).getDate();
                 const data = (typeof CAL_DATA !== 'undefined') ? CAL_DATA : {};
+                const susp = (typeof CAL_SUSPENDED !== 'undefined' && CAL_SUSPENDED) ? CAL_SUSPENDED : {};
 
                 let html = DAYS.map(d => `<div class="tc-head">${d}</div>`).join('');
                 for (let i = 0; i < firstDay; i++) html += '<div class="tc-day empty"></div>';
@@ -5281,11 +5286,15 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                     const dow = new Date(year, month, d).getDay();
                     const isToday = d === now.getDate() && month === now.getMonth() && year === now.getFullYear();
                     const hrs = data[dateStr];
+                    const isSusp = Object.prototype.hasOwnProperty.call(susp, dateStr);
+                    const reason = isSusp ? susp[dateStr] : '';
 
-                    html += `<div class="tc-day${isToday ? ' today' : ''}${dow === 0 || dow === 6 ? ' weekend' : ''}" data-date="${dateStr}">
+                    html += `<div class="tc-day${isToday ? ' today' : ''}${dow === 0 || dow === 6 ? ' weekend' : ''}${isSusp ? ' suspended' : ''}"
+                        data-date="${dateStr}"${isSusp ? ` title="${esc(reason)}"` : ''}>
                         <span class="tc-num">${String(d).padStart(2, '0')}</span>
                         ${hrs ? `<div class="tc-hrs">${hrs} HRS</div>` : ''}
-                     </div>`;
+                        ${isSusp ? `<div class="tc-susp"><b>SUSPENDED</b><span>${esc(reason)}</span></div>` : ''}
+                    </div>`;
                 }
 
                 calEl.innerHTML = html;
