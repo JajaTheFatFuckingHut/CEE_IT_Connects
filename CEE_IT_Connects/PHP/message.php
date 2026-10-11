@@ -2792,6 +2792,34 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
         }
 
         /* addtl e dashboard ni student */
+
+        .cal-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+        }
+
+        .cal-head {
+            font-weight: 600;
+            text-align: center;
+            padding: 6px 0;
+        }
+
+        .cal-day {
+            min-height: 70px;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 4px 6px;
+        }
+
+        .cal-day.empty {
+            border: none;
+        }
+
+        .cal-day.today {
+            background: #e7f1ff;
+            border-color: #0d6efd;
+        }
     </style>
 </head>
 
@@ -2854,14 +2882,13 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
                 </span>
             </a>
         <?php endif; ?>
-        <a href="#" id="ojtEvalBtn" class="<?= $evalUnlocked ? '' : 'ojt-locked' ?>" <?= $evalUnlocked ? '' : 'aria-disabled="true" tabindex="-1"' ?> onclick="event.preventDefault(); if (this.classList.contains('ojt-locked')) return false;
-            ojtShowEvalModal();" <?= $evalTooltip ? 'data-tooltip="' . htmlspecialchars($evalTooltip) . '"' : '' ?>>
+        <a href="#" id="ojtEvalBtn" class="ojt-locked" aria-disabled="true" tabindex="-1"
+            onclick="event.preventDefault(); if (this.classList.contains('ojt-locked')) return false; ojtShowEvalModal();"
+            data-tooltip="Complete your required OJT hours to unlock">
             <i class="fa-solid fa-clipboard-check m-1"></i>
             <span class="sidebar-text">
                 Evaluation
-                <?php if (!$evalUnlocked): ?>
-                    <i class="fa-solid fa-lock" id="ojtEvalLock" style="font-size:10px;"></i>
-                <?php endif; ?>
+                <i class="fa-solid fa-lock" id="ojtEvalLock" style="font-size:10px;"></i>
             </span>
         </a>
         <div class="rooms-list">
@@ -5044,6 +5071,50 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
                 });
             });
         });
+
+
+        // This is part is for the calendar part 
+        const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June',
+            'July', 'August', 'September', 'October', 'November', 'December'];
+        const DAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+
+        const monthSel = document.getElementById('calMonth');
+        const yearSel = document.getElementById('calYear');
+        const calEl = document.getElementById('calendar');
+
+        const now = new Date();
+
+        // Fill dropdowns
+        MONTHS.forEach((m, i) => monthSel.add(new Option(m, i)));
+        for (let y = now.getFullYear() - 2; y <= now.getFullYear() + 2; y++) {
+            yearSel.add(new Option(y, y));
+        }
+        monthSel.value = now.getMonth();
+        yearSel.value = now.getFullYear();
+
+        function renderCalendar() {
+            const month = parseInt(monthSel.value, 10);
+            const year = parseInt(yearSel.value, 10);
+
+            const firstDay = new Date(year, month, 1).getDay();      // 0 = Sunday
+            const daysInMonth = new Date(year, month + 1, 0).getDate(); // day 0 of next month = last day of this one
+
+            let html = DAYS.map(d => `<div class="cal-head">${d}</div>`).join('');
+
+            // Blank cells before the 1st
+            for (let i = 0; i < firstDay; i++) html += '<div class="cal-day empty"></div>';
+
+            for (let d = 1; d <= daysInMonth; d++) {
+                const isToday = d === now.getDate() && month === now.getMonth() && year === now.getFullYear();
+                html += `<div class="cal-day${isToday ? ' today' : ''}" data-date="${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}">${d}</div>`;
+            }
+
+            calEl.innerHTML = html;
+        }
+
+        monthSel.addEventListener('change', renderCalendar);
+        yearSel.addEventListener('change', renderCalendar);
+        renderCalendar();
     </script>
 </body>
 
