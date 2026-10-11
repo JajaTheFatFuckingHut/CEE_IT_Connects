@@ -2862,10 +2862,8 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
                 </span>
             </a>
         <?php endif; ?>
-        <a href="#" id="ojtEvalBtn" class="<?= $evalUnlocked ? '' : 'ojt-locked' ?>" <?= $evalUnlocked ? '' : 'aria-disabled="true" tabindex="-1"' ?>
-            onclick="event.preventDefault(); if (this.classList.contains('ojt-locked')) return false;
-            ojtShowEvalModal();"
-            <?= $evalTooltip ? 'data-tooltip="' . htmlspecialchars($evalTooltip) . '"' : '' ?>>
+        <a href="#" id="ojtEvalBtn" class="<?= $evalUnlocked ? '' : 'ojt-locked' ?>" <?= $evalUnlocked ? '' : 'aria-disabled="true" tabindex="-1"' ?> onclick="event.preventDefault(); if (this.classList.contains('ojt-locked')) return false;
+            ojtShowEvalModal();" <?= $evalTooltip ? 'data-tooltip="' . htmlspecialchars($evalTooltip) . '"' : '' ?>>
             <i class="fa-solid fa-clipboard-check m-1"></i>
             <span class="sidebar-text">
                 Evaluation
@@ -4450,7 +4448,8 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
         // document.addEventListener('DOMContentLoaded', truncateRoomItems);
 
         // TRACK RENDERED HOURS
-        const OJT_REQUIRED_HOURS = <?= (int) $requiredHours ?>;
+        const OJT_HAS_APPLIED = <?= json_encode($hasApplied) ?>;
+        const OJT_REQUIRED_HOURS = <?= json_encode($requiredHours) ?>;
         const OJT_DAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
         let ojtWeekCounter = 0;
         let ojtUnsavedChanges = {};
@@ -4761,8 +4760,12 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
         function ojtTriggerCompletion() {
             ojtShowEvalModal();
         }
+
         function ojtIsComplete() {
+            if (!OJT_HAS_APPLIED) return false;
+            if (typeof OJT_REQUIRED_HOURS !== 'number' || OJT_REQUIRED_HOURS <= 0) return false;
             if (typeof ojtWeeks === 'undefined' || !Array.isArray(ojtWeeks)) return false;
+
             const req = OJT_REQUIRED_HOURS * 60;
             let grand = 0;
             ojtWeeks.forEach(w => w.rows.forEach(r => { grand += (r.daily || 0); }));
@@ -4778,9 +4781,18 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
             btn.classList.toggle('ojt-locked', !done);
             btn.setAttribute('aria-disabled', String(!done));
             btn.tabIndex = done ? 0 : -1;
-            btn.dataset.tooltip = done ? 'Evaluation' : 'Complete your required OJT hours to unlock';
+
+            if (done) {
+                btn.dataset.tooltip = 'Evaluation';
+            } else if (!OJT_HAS_APPLIED) {
+                btn.dataset.tooltip = 'Apply for an internship to unlock';
+            } else {
+                btn.dataset.tooltip = 'Complete your required OJT hours to unlock';
+            }
+
             if (lock) lock.style.display = done ? 'none' : 'inline';
         }
+
         const _origShowEvalModal = ojtShowEvalModal;
         ojtShowEvalModal = function () {
             if (!ojtIsComplete()) return;
