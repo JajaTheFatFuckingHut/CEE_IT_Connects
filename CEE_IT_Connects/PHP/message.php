@@ -2801,14 +2801,15 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
         /* addtl e dashboard ni student */
 
         #calendar {
-            --tc-bg: #111827;
-            --tc-line: #263041;
-            --tc-text: #e5e7eb;
-            --tc-dim: #6b7280;
-            --tc-accent: #38bdf8;
-            --tc-ok: #34d399;
-            --tc-warn: #f87171;
-            font-family: ui-monospace, "JetBrains Mono", Consolas, monospace;
+            --c-card: #ffffff;
+            --c-line: #e6ebf5;
+            --c-text: #1b2a4e;
+            --c-dim: #7a869f;
+            --c-accent: #ff5a1f;
+            --c-accent-soft: #ffece4;
+            --c-ok: #10a37f;
+            --c-warn: #e5484d;
+            --c-warn-soft: #fdecec;
             box-sizing: border-box;
             max-width: 100%;
             min-width: 0;
@@ -2822,11 +2823,11 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
 
         #calendar .tc-panel {
             width: 100%;
-            background: var(--tc-bg);
-            border: 1px solid var(--tc-line);
-            border-radius: 8px;
-            padding: 14px;
-            color: var(--tc-text);
+            background: var(--c-card);
+            border: 1px solid var(--c-line);
+            border-radius: 14px;
+            padding: 18px;
+            color: var(--c-text);
             overflow-x: auto;
         }
 
@@ -2835,25 +2836,25 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
             display: flex;
             flex-wrap: wrap;
             align-items: center;
-            gap: 6px;
-            margin-bottom: 12px;
+            gap: 8px;
+            margin-bottom: 14px;
         }
 
         #calendar .tc-select,
         #calendar .tc-btn {
-            background: transparent;
-            color: var(--tc-text);
-            border: 1px solid var(--tc-line);
-            border-radius: 4px;
-            padding: 6px 10px;
+            background: #fff;
+            color: var(--c-text);
+            border: 1px solid var(--c-line);
+            border-radius: 8px;
+            padding: 7px 12px;
             font: inherit;
-            font-size: .8rem;
+            font-size: .85rem;
             cursor: pointer;
+            transition: border-color .15s, color .15s, background .15s;
         }
 
-        #calendar .tc-select option {
-            background: var(--tc-bg);
-            color: var(--tc-text);
+        #calendar .tc-btn-wide {
+            font-weight: 600;
         }
 
         #calendar .tc-select:hover,
@@ -2861,103 +2862,116 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
         #calendar .tc-select:focus,
         #calendar .tc-btn:focus-visible {
             outline: none;
-            border-color: var(--tc-accent);
-            color: var(--tc-accent);
+            border-color: var(--c-accent);
+            color: var(--c-accent);
         }
 
         #calendar .tc-readout {
             margin-left: auto;
-            color: var(--tc-dim);
             font-size: .8rem;
-            letter-spacing: .1em;
+            font-weight: 600;
+            letter-spacing: .08em;
+            color: var(--c-dim);
         }
 
         /* grid */
         #calendar .tc-grid {
             display: grid;
             grid-template-columns: repeat(7, minmax(0, 1fr));
-            gap: 4px;
+            gap: 6px;
         }
 
         #calendar .tc-head {
             text-align: center;
-            padding: 4px 0;
+            padding: 6px 0;
             font-size: .7rem;
-            letter-spacing: .12em;
-            color: var(--tc-dim);
+            font-weight: 600;
+            letter-spacing: .1em;
+            color: var(--c-dim);
         }
 
         #calendar .tc-day {
-            min-height: 70px;
-            padding: 6px 8px;
-            border: 1px solid var(--tc-line);
-            border-radius: 4px;
+            min-height: 76px;
+            padding: 8px 10px;
+            background: #fff;
+            border: 1px solid var(--c-line);
+            border-radius: 10px;
+            transition: border-color .15s, background .15s;
         }
 
         #calendar .tc-day.empty {
+            background: transparent;
             border: none;
         }
 
         #calendar .tc-day:not(.empty):hover {
-            border-color: var(--tc-accent);
+            border-color: var(--c-accent);
+            background: #fffaf7;
             cursor: pointer;
         }
 
+        #calendar .tc-day.weekend {
+            background: #f8faff;
+        }
+
         #calendar .tc-day.weekend .tc-num {
-            color: var(--tc-dim);
+            color: var(--c-dim);
         }
 
         #calendar .tc-num {
-            font-size: .8rem;
+            font-size: .85rem;
             font-weight: 600;
         }
 
         #calendar .tc-day.today {
-            border-color: var(--tc-accent);
+            background: var(--c-accent-soft);
+            border-color: var(--c-accent);
         }
 
         #calendar .tc-day.today .tc-num {
-            color: var(--tc-accent);
+            color: var(--c-accent);
         }
 
         #calendar .tc-hrs {
             margin-top: 6px;
-            font-size: .7rem;
-            color: var(--tc-ok);
+            font-size: .72rem;
+            font-weight: 600;
+            color: var(--c-ok);
         }
 
         /* suspended dates */
         #calendar .tc-day.suspended {
-            border-color: var(--tc-warn);
+            background: var(--c-warn-soft);
+            border-color: #f5c2c4;
         }
 
         #calendar .tc-day.suspended .tc-num {
-            color: var(--tc-warn);
+            color: var(--c-warn);
         }
 
         #calendar .tc-susp {
             margin-top: 4px;
-            font-size: .62rem;
+            font-size: .65rem;
             line-height: 1.3;
-            color: var(--tc-warn);
+            color: var(--c-warn);
         }
 
         #calendar .tc-susp b {
             display: block;
-            letter-spacing: .1em;
+            letter-spacing: .08em;
         }
 
         #calendar .tc-susp span {
             display: block;
-            color: var(--tc-text);
-            opacity: .75;
+            color: var(--c-text);
+            opacity: .8;
             overflow-wrap: anywhere;
         }
 
         @media (max-width: 576px) {
             #calendar .tc-day {
-                min-height: 52px;
-                padding: 4px;
+                min-height: 54px;
+                padding: 5px;
             }
 
             #calendar .tc-readout {
