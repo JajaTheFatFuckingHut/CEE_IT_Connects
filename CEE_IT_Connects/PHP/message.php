@@ -575,6 +575,19 @@ $result = $rhStmt->fetchColumn();
 $hasApplied = ($result !== false);
 $requiredHours = $hasApplied ? (int) $result : null;
 
+$evalUnlocked = $hasApplied
+    && $requiredHours > 0
+    && $hoursRendered >= $requiredHours;
+
+if (!$hasApplied) {
+    $evalTooltip = "Apply for an internship to unlock";
+} elseif (!$evalUnlocked) {
+    $remaining = max(0, $requiredHours - $hoursRendered);
+    $evalTooltip = "Complete $remaining more OJT hours to unlock";
+} else {
+    $evalTooltip = "";
+}
+
 $stmt = $pdo->prepare("
     SELECT 
         s.id AS student_id,
@@ -2849,13 +2862,16 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
                 </span>
             </a>
         <?php endif; ?>
-        <a href="#" id="ojtEvalBtn" class="ojt-locked" aria-disabled="true" tabindex="-1"
-            onclick="event.preventDefault(); if (this.classList.contains('ojt-locked')) return false; ojtShowEvalModal();"
-            data-tooltip="Complete your required OJT hours to unlock">
+        <a href="#" id="ojtEvalBtn" class="<?= $evalUnlocked ? '' : 'ojt-locked' ?>" <?= $evalUnlocked ? '' : 'aria-disabled="true" tabindex="-1"' ?>
+            onclick="event.preventDefault(); if (this.classList.contains('ojt-locked')) return false;
+            ojtShowEvalModal();"
+            <?= $evalTooltip ? 'data-tooltip="' . htmlspecialchars($evalTooltip) . '"' : '' ?>>
             <i class="fa-solid fa-clipboard-check m-1"></i>
             <span class="sidebar-text">
                 Evaluation
-                <i class="fa-solid fa-lock" id="ojtEvalLock" style="font-size:10px;"></i>
+                <?php if (!$evalUnlocked): ?>
+                    <i class="fa-solid fa-lock" id="ojtEvalLock" style="font-size:10px;"></i>
+                <?php endif; ?>
             </span>
         </a>
         <div class="rooms-list">
