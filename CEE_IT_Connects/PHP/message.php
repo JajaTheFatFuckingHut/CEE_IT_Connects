@@ -575,16 +575,6 @@ $result = $rhStmt->fetchColumn();
 $hasApplied = ($result !== false);
 $requiredHours = $hasApplied ? (int) $result : null;
 
-
-if (!$hasApplied) {
-    $evalTooltip = "Apply for an internship to unlock";
-} elseif (!$evalUnlocked) {
-    $remaining = max(0, $requiredHours - $hoursRendered);
-    $evalTooltip = "Complete $remaining more OJT hours to unlock";
-} else {
-    $evalTooltip = "";
-}
-
 $stmt = $pdo->prepare("
     SELECT 
         s.id AS student_id,
@@ -2828,6 +2818,11 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
             class="sidebar-link <?= $current_section === 'application' ? 'active' : '' ?>">
             <i class="fa fa-list-ul"></i> <span class="sidebar-text">Checklist</span>
         </a>
+        <a href="?section=application<?php if ($current_room_id)
+            echo "&room_id=$current_room_id"; ?>" data-tooltip="Calendar"
+            class="sidebar-link <?= $current_section === 'application' ? 'active' : '' ?>">
+            <i class="fa fa-list-ul"></i> <span class="sidebar-text">Calendar</span>
+        </a>
 
         <?php if ($hasActiveProgress): ?>
             <a href="?section=hours<?php if ($current_room_id)
@@ -2891,6 +2886,10 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
         </div>
     </div>
 
+    <!-- Calendar Section -->
+    <div id="calendar" class="section <?= $current_section === 'Calendar' ? 'active' : '' ?>">
+
+    </div>
     <!-- HOME SECTION -->
     <!-- addtl s dashboard ni student -->
     <div id="home" class="section <?= $current_section === 'home' ? 'active' : '' ?>">
