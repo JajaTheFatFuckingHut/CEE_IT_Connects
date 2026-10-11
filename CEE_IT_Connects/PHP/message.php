@@ -570,7 +570,10 @@ $rhStmt = $pdo->prepare("
     LIMIT 1
 ");
 $rhStmt->execute([$_SESSION['user_id']]);
-$requiredHours = $rhStmt->fetchColumn() ?: 'Not Applied';
+
+$result = $rhStmt->fetchColumn();
+$hasApplied = ($result !== false);
+$requiredHours = $hasApplied ? (int) $result : null;
 
 $stmt = $pdo->prepare("
     SELECT 
@@ -2966,7 +2969,13 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
                             <div class="hrs-stat-icon orange"><i class="fa-solid fa-hourglass-half"></i></div>
                             <div>
                                 <div class="hrs-stat-label">OJT hours required</div>
-                                <div class="hrs-stat-value"><?= (int) $requiredHours ?> hrs</div>
+                                <div class="hrs-stat-value">
+                                    <?php if ($hasApplied): ?>
+                                        <?= $requiredHours ?> hrs
+                                    <?php else: ?>
+                                        <span class="text-muted" style="font-size:.9rem;">Haven't applied yet</span>
+                                    <?php endif; ?>
+                                </div>
                             </div>
                         </div>
                     </div>
