@@ -26,18 +26,25 @@ if ($is && $reason === '') {
     exit;
 }
 
-$stmt = $pdo->prepare("
-    INSERT INTO calendar_suspensions (day, month, year, is_suspended, reason)
-    VALUES (:d, :m, :y, :s, :r)
-    ON CONFLICT (year, month, day)
-    DO UPDATE SET is_suspended = EXCLUDED.is_suspended,
-                  reason       = EXCLUDED.reason
-");
-$stmt->bindValue(':d', $day, PDO::PARAM_INT);
-$stmt->bindValue(':m', $month, PDO::PARAM_INT);
-$stmt->bindValue(':y', $year, PDO::PARAM_INT);
-$stmt->bindValue(':s', $is, PDO::PARAM_BOOL);
-$stmt->bindValue(':r', $is ? $reason : null, $is ? PDO::PARAM_STR : PDO::PARAM_NULL);
-$stmt->execute();
+try {
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-echo json_encode(['ok' => true]);
+    $stmt = $pdo->prepare("
+        INSERT INTO calendar_suspensions (day, month, year, is_suspended, reason)
+        VALUES (:d, :m, :y, :s, :r)
+        ON CONFLICT (year, month, day)
+        DO UPDATE SET is_suspended = EXCLUDED.is_suspended,
+                      reason       = EXCLUDED.reason
+    ");
+    $stmt->bindValue(':d', $day, PDO::PARAM_INT);
+    $stmt->bindValue(':m', $month, PDO::PARAM_INT);
+    $stmt->bindValue(':y', $year, PDO::PARAM_INT);
+    $stmt->bindValue(':s', $is, PDO::PARAM_BOOL);
+    $stmt->bindValue(':r', $is ? $reason : null, $is ? PDO::PARAM_STR : PDO::PARAM_NULL);
+    $stmt->execute();
+
+    echo json_encode(['ok' => true]);
+} catch (PDOException $e) {
+    http_response_code(500);
+    echo json_encode(['ok' => false, 'error' => $e->getMessage()]);
+}
