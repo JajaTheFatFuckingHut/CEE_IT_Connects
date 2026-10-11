@@ -30,7 +30,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $student_id = $prefix . '-' . $suffix;
 
     $program = $_POST['program'];
-    $year_level = $_POST['year_level'];
+    $year_level = 4; // Default year level to 4 since it is always 4th year for the students in this system
     $section = $_POST['section'];
     $contact_number = $_POST['contact_number'];
 
@@ -93,7 +93,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         ':activity' => 'Student registered an account with schoold Id ' . $student_id
     ]);
     // Redirect after success
-    header("Location: ../PHP/index.php");
+    header("Location: ../index.php");
     exit();
 }
 ?>

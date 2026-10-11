@@ -37,15 +37,10 @@
                     </div>
 
                     <div class="mb-3 d-flex gap-2">
-                        <select name="year_no" class="form-select" required>
-                            <option value="" disabled selected>Year</option>
-                            <option value="20">20</option>
-                            <option value="21">21</option>
-                            <option value="22">22</option>
-                            <option value="23">23</option>
-                            <option value="24">24</option>
-                            <option value="25">25</option>
-                        </select>
+                        <input type="text" name="year_no" class="form-select" placeholder="First two digits of ID No."
+                            maxlength="2" pattern="\d{2}" required>
+                        </input>
+                        -
                         <input type="text" name="id_no" class="form-control" placeholder="Last four digits of ID No."
                             maxlength="4" pattern="\d{4}" required>
                     </div>
@@ -60,7 +55,7 @@
                     </div>
 
                     <div class="row mb-3">
-                        <div class="col-6">
+                        <!-- <div class="col-6">
                             <select name="year_level" class="form-select" required>
                                 <option value="" disabled selected>Year Level</option>
                                 <option value="1">1st Year</option>
@@ -68,7 +63,7 @@
                                 <option value="3">3rd Year</option>
                                 <option value="4">4th Year</option>
                             </select>
-                        </div>
+                        </div> -->
                         <div class="col-6">
                             <select name="section" class="form-select" id="sectionSelect" required>
                                 <option value="" disabled selected>Section</option>
