@@ -37,7 +37,7 @@
                     </div>
 
                     <div class="mb-3 d-flex gap-2">
-                        <input type="text" name="year_no" class="form-select" placeholder="First two digits of ID No."
+                        <input type="text" name="year_no" class="form-control" placeholder="First two digits of ID No."
                             maxlength="2" pattern="\d{2}" required>
                         </input>
                         -

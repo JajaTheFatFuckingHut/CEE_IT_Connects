@@ -23,7 +23,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             die("Student ID already exists.");
         }
         if ($email === $student['email']) {
-            die("Email already registered.");
+            $_SESSION['error'] = "Only three system administrators are allowed.";
+            header("Location: ../student-register.php");
+            exit();
         }
     }
     // Combine final student ID
