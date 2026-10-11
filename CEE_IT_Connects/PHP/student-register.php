@@ -1,6 +1,5 @@
 <?php
 session_start();
-var_dump($_SESSION);
 ?>
 
 <!DOCTYPE html>
@@ -19,6 +18,42 @@ var_dump($_SESSION);
 </head>
 
 <body>
+
+    <?php if (isset($_SESSION['success'])): ?>
+        <div class="alert alert-success alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3"
+            style="z-index:9999; min-width:350px;" role="alert" id="flashAlert">
+            <i class="bi bi-check-circle-fill me-2"></i><?= $_SESSION['success'] ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <?php unset($_SESSION['success']); ?>
+    <?php endif; ?>
+
+    <?php if (isset($_SESSION['warning'])): ?>
+        <div class="alert alert-warning alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3"
+            style="z-index:9999; min-width:400px;" role="alert" id="flashAlert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i><?= $_SESSION['warning'] ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <?php unset($_SESSION['warning']); ?>
+    <?php endif; ?>
+
+    <?php if (isset($_SESSION['info'])): ?>
+        <div class="alert alert-info alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3"
+            style="z-index:9999; min-width:350px;" role="alert" id="flashAlert">
+            <i class="bi bi-info-circle-fill me-2"></i><?= $_SESSION['info'] ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <?php unset($_SESSION['info']); ?>
+    <?php endif; ?>
+
+    <?php if (isset($_SESSION['error'])): ?>
+        <div class="alert alert-danger alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3"
+            style="z-index:9999; min-width:350px;" role="alert" id="flashAlert">
+            <i class="bi bi-x-circle-fill me-2"></i><?= $_SESSION['error'] ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <?php unset($_SESSION['error']); ?>
+    <?php endif; ?>
 
     <div id="loading-screen">
         <img src="../Sources/CEE IT Connects Logo.png" alt="Logo" class="loading-logo">
