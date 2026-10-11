@@ -2846,7 +2846,7 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
             class="sidebar-link <?= $current_section === 'application' ? 'active' : '' ?>">
             <i class="fa fa-list-ul"></i> <span class="sidebar-text">Checklist</span>
         </a>
-        <a href="?section=application<?php if ($current_room_id)
+        <a href="?section=calendar<?php if ($current_room_id)
             echo "&room_id=$current_room_id"; ?>" data-tooltip="Calendar"
             class="sidebar-link <?= $current_section === 'calendar' ? 'active' : '' ?>">
             <i class="fa fa-list-ul"></i> <span class="sidebar-text">Calendar</span>
