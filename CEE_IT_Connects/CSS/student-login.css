@@ -57,7 +57,8 @@ select {
     position: relative;
     overflow: hidden;
     display: flex;
-    background: var(--panel-navy);
+      background: #010e47;
+  background-image: none;
     color: #fff;
 }
 .left-inner {
