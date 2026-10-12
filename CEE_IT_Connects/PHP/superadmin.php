@@ -87,6 +87,17 @@ $recentAnnouncementsStmt = $pdo->query("
 ");
 $recentAnnouncements = $recentAnnouncementsStmt->fetchAll(PDO::FETCH_ASSOC);
 
+$recentAccountsStmt = $pdo->query("
+    SELECT full_name, email, 'Student' AS role, created_at FROM students
+    UNION ALL
+    SELECT full_name, email, 'Adviser' AS role, created_at FROM advisers
+    UNION ALL
+    SELECT name AS full_name, email, 'Admin' AS role, created_at FROM admins
+    ORDER BY created_at DESC
+    LIMIT 5
+");
+$recentAccounts = $recentAccountsStmt->fetchAll(PDO::FETCH_ASSOC);
+
 $stmt = $pdo->query("SELECT id, name, email, role FROM admins ORDER BY id ASC");
 $admins = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -3115,7 +3126,20 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                 <?php endif; ?>
             </div>
 
-            <div id="calendar" class="section active sysAdm-section">
+            <!-- <div id="calendar" class="section active sysAdm-section"> -->
+            <div id="calendar" class="section sysAdm-section">
+                <div class="sysAdm-header--danger sysAdm-header--blue">
+                    <div class="sysAdm-header-left">
+                        <div class="sysAdm-header-icon">
+                            <i class="bi bi-calendar-event"></i>
+                        </div>
+                        <div class="sysAdm-header-text">
+                            <h2>Calendar</h2>
+                            <p>Suspend dates and manage class suspensions.</p>
+                        </div>
+                    </div>
+                </div>
+                
                 <div id="suspAdmin">
 
                     <div class="sa-panel">
@@ -3133,6 +3157,7 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                         <div class="sa-head">
                             <div class="sa-title">Suspended dates</div>
                             <form method="GET" action="superadmin.php">
+                                <input type="hidden" name="section" value="calendar">
                                 <select name="year" class="sa-input" onchange="this.form.submit()">
                                     <option value="all" <?= $filterYear === 'all' ? 'selected' : '' ?>>All years</option>
                                     <?php for ($y = (int) date('Y') - 1; $y <= (int) date('Y') + 5; $y++): ?>
@@ -3632,85 +3657,85 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
         });
 
         // For the calendar
-        const CAL_SUSPENDED = <?= json_encode((object) $suspensions, JSON_HEX_TAG | JSON_HEX_AMP) ?>;
+        // const CAL_SUSPENDED = <?= json_encode((object) $suspensions, JSON_HEX_TAG | JSON_HEX_AMP) ?>;
 
-        document.addEventListener('DOMContentLoaded', function () {
-            const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-            const esc = s => String(s).replace(/[&<>"']/g, c =>
-                ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        // document.addEventListener('DOMContentLoaded', function () {
+        //     const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        //     const esc = s => String(s).replace(/[&<>"']/g, c =>
+        //         ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-            const dateIn = document.getElementById('suspDate');
-            const reasonIn = document.getElementById('suspReason');
-            const addBtn = document.getElementById('suspAdd');
-            const yearSel = document.getElementById('suspYear');
-            const listEl = document.getElementById('suspList');
+            // const dateIn = document.getElementById('suspDate');
+            // const reasonIn = document.getElementById('suspReason');
+            // const addBtn = document.getElementById('suspAdd');
+            // const yearSel = document.getElementById('suspYear');
+            // const listEl = document.getElementById('suspList');
 
-            const thisYear = new Date().getFullYear();
-            yearSel.add(new Option('All years', 'all'));
-            for (let y = thisYear - 1; y <= thisYear + 5; y++) yearSel.add(new Option(y, y));
-            yearSel.value = thisYear;
+            // const thisYear = new Date().getFullYear();
+            // yearSel.add(new Option('All years', 'all'));
+            // for (let y = thisYear - 1; y <= thisYear + 5; y++) yearSel.add(new Option(y, y));
+            // yearSel.value = thisYear;
 
-            function renderList() {
-                const f = yearSel.value;
-                const items = Object.entries(CAL_SUSPENDED)
-                    .filter(([k]) => f === 'all' || k.startsWith(f + '-'))
-                    .sort(([a], [b]) => a.localeCompare(b));
+            // function renderList() {
+            //     const f = yearSel.value;
+            //     const items = Object.entries(CAL_SUSPENDED)
+            //         .filter(([k]) => f === 'all' || k.startsWith(f + '-'))
+            //         .sort(([a], [b]) => a.localeCompare(b));
 
-                if (!items.length) {
-                    listEl.innerHTML = `<div class="sa-empty">No suspended dates${f === 'all' ? '' : ' in ' + f}.</div>`;
-                    return;
-                }
-                listEl.innerHTML = items.map(([k, reason]) => {
-                    const [y, m, d] = k.split('-').map(Number);
-                    return `<div class="sa-item">
-                <div class="sa-item-text"><b>${MONTHS[m - 1]} ${d}, ${y}</b><span>${esc(reason)}</span></div>
-                <button type="button" class="sa-del" data-date="${k}">Remove</button>
-            </div>`;
-                }).join('');
-            }
+            //     if (!items.length) {
+            //         listEl.innerHTML = `<div class="sa-empty">No suspended dates${f === 'all' ? '' : ' in ' + f}.</div>`;
+            //         return;
+            //     }
+            //     listEl.innerHTML = items.map(([k, reason]) => {
+            //         const [y, m, d] = k.split('-').map(Number);
+            //         return `<div class="sa-item">
+            //     <div class="sa-item-text"><b>${MONTHS[m - 1]} ${d}, ${y}</b><span>${esc(reason)}</span></div>
+            //     <button type="button" class="sa-del" data-date="${k}">Remove</button>
+            // </div>`;
+            //     }).join('');
+            // }
 
-            async function save(dateStr, isSusp, reason) {
-                const [y, m, d] = dateStr.split('-').map(Number);
-                const body = new URLSearchParams({
-                    day: d, month: m, year: y,
-                    is_suspended: isSusp ? '1' : '0',
-                    reason: reason || ''
-                });
-                let json;
-                try {
-                    const res = await fetch('calendar-suspend.php', { method: 'POST', body });
-                    json = await res.json();
-                } catch (e) {
-                    json = { ok: false, error: 'Request failed' };
-                }
-                if (!json.ok) { alert(json.error || 'Failed to save'); return false; }
-                if (isSusp) CAL_SUSPENDED[dateStr] = reason;
-                else delete CAL_SUSPENDED[dateStr];
-                return true;
-            }
+            // async function save(dateStr, isSusp, reason) {
+            //     const [y, m, d] = dateStr.split('-').map(Number);
+            //     const body = new URLSearchParams({
+            //         day: d, month: m, year: y,
+            //         is_suspended: isSusp ? '1' : '0',
+            //         reason: reason || ''
+            //     });
+            //     let json;
+            //     try {
+            //         const res = await fetch('calendar-suspend.php', { method: 'POST', body });
+            //         json = await res.json();
+            //     } catch (e) {
+            //         json = { ok: false, error: 'Request failed' };
+            //     }
+            //     if (!json.ok) { alert(json.error || 'Failed to save'); return false; }
+            //     if (isSusp) CAL_SUSPENDED[dateStr] = reason;
+            //     else delete CAL_SUSPENDED[dateStr];
+            //     return true;
+            // }
 
-            addBtn.addEventListener('click', async () => {
-                const dateStr = dateIn.value, reason = reasonIn.value.trim();
-                if (!dateStr) return alert('Pick a date.');
-                if (!reason) return alert('Enter a reason.');
-                if (await save(dateStr, true, reason)) {
-                    const y = dateStr.slice(0, 4);
-                    if ([...yearSel.options].some(o => o.value === y)) yearSel.value = y;
-                    dateIn.value = ''; reasonIn.value = '';
-                    renderList();
-                }
-            });
+        //     addBtn.addEventListener('click', async () => {
+        //         const dateStr = dateIn.value, reason = reasonIn.value.trim();
+        //         if (!dateStr) return alert('Pick a date.');
+        //         if (!reason) return alert('Enter a reason.');
+        //         if (await save(dateStr, true, reason)) {
+        //             const y = dateStr.slice(0, 4);
+        //             if ([...yearSel.options].some(o => o.value === y)) yearSel.value = y;
+        //             dateIn.value = ''; reasonIn.value = '';
+        //             renderList();
+        //         }
+        //     });
 
-            listEl.addEventListener('click', async e => {
-                const btn = e.target.closest('.sa-del');
-                if (!btn) return;
-                if (!confirm(`Lift the suspension on ${btn.dataset.date}?`)) return;
-                if (await save(btn.dataset.date, false, '')) renderList();
-            });
+        //     listEl.addEventListener('click', async e => {
+        //         const btn = e.target.closest('.sa-del');
+        //         if (!btn) return;
+        //         if (!confirm(`Lift the suspension on ${btn.dataset.date}?`)) return;
+        //         if (await save(btn.dataset.date, false, '')) renderList();
+        //     });
 
-            yearSel.addEventListener('change', renderList);
-            renderList();
-        });
+        //     yearSel.addEventListener('change', renderList);
+        //     renderList();
+        // });
     </script>
 </body>
 
