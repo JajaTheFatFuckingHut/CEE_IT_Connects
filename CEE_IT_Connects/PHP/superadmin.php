@@ -3031,10 +3031,10 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                             $programCounts[$row['program']] = $row['total'];
                         }
 
-                        // $hoursStmt = $pdo->prepare("
-                        //     SELECT programs
-                        //     FROM intenrships
-                        // ");
+                        $hoursStmt = $pdo->prepare("
+                            SELECT programs
+                            FROM internships
+                        ");
 
                         $cardStyles = [
                             'Civil Engineering' => ['color' => '#4f51a8', 'icon' => 'bi-pc-display'],
