@@ -57,7 +57,7 @@ select {
     position: relative;
     overflow: hidden;
     display: flex;
-      background: #010e47;
+    background-color: #010e47;
   background-image: none;
     color: #fff;
 }
