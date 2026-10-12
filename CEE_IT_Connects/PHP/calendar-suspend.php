@@ -2,7 +2,7 @@
 session_start();
 require 'db.php';
 
-$back = 'superadmin.php';   // adjust if the page needs a query string
+$back = 'superadmin.php?section=calendar';   // adjust if the page needs a query string
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST' || ($_SESSION['role'] ?? '') !== 'superadmin') {
     http_response_code(403);

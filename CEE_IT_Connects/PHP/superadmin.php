@@ -3469,16 +3469,20 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
             const el = document.getElementById('reject-sup-admin-' + id);
             el.style.display = el.style.display === 'none' ? 'block' : 'none';
         }
+        // document.addEventListener('DOMContentLoaded', function () {
+        //     const params = new URLSearchParams(window.location.search);
+        //     if (params.get('section') === 'ojt_hours') {
+        //         document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        //         const sec = document.getElementById('ojt_hours');
+        //         if (sec) sec.classList.add('active');
+        //         document.querySelectorAll('.sidebar a').forEach(l => l.classList.remove('active'));
+        //         const link = document.querySelector('.sidebar a[onclick*="ojt_hours"]');
+        //         if (link) link.classList.add('active');
+        //     }
+        // });
         document.addEventListener('DOMContentLoaded', function () {
-            const params = new URLSearchParams(window.location.search);
-            if (params.get('section') === 'ojt_hours') {
-                document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-                const sec = document.getElementById('ojt_hours');
-                if (sec) sec.classList.add('active');
-                document.querySelectorAll('.sidebar a').forEach(l => l.classList.remove('active'));
-                const link = document.querySelector('.sidebar a[onclick*="ojt_hours"]');
-                if (link) link.classList.add('active');
-            }
+            const sectionId = new URLSearchParams(window.location.search).get('section');
+            if (sectionId && document.getElementById(sectionId)) goToSection(sectionId);
         });
 
         function handleSyChange(sel) {
