@@ -1,6 +1,7 @@
 <?php
-require 'db.php';
+session_start();
 
+require 'db.php';
 $stmt = $pdo->query("SELECT * FROM students");
 $stmt->execute();
 $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -11,26 +12,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $prefix = $_POST['year_no'];
     $suffix = $_POST['id_no'];
     $email = $_POST['email'];
-    if (!preg_match('/^(20|21|22|23|24|25)$/', $prefix)) {
-        die("Invalid student year.");
-    }
 
     if (!preg_match('/^\d{4}$/', $suffix)) {
-        die("Student ID must be exactly 4 digits.");
+        $_SESSION['error'] = "Student ID must be exactly 4 digits.";
+        header("Location: ../student-register.php");
+        exit();
     }
     foreach ($students as $student) {
         if ($student['student_id'] === $prefix . '-' . $suffix) {
-            die("Student ID already exists.");
+            $_SESSION['error'] = "Student ID already exists.";
+            header("Location: ../student-register.php");
+            exit();
         }
         if ($email === $student['email']) {
-            die("Email already registered.");
+            $_SESSION['error'] = "Email already registered.";
+            header("Location: ../student-register.php");
+            exit();
         }
     }
     // Combine final student ID
     $student_id = $prefix . '-' . $suffix;
 
     $program = $_POST['program'];
-    $year_level = $_POST['year_level'];
+    $year_level = 4; // Default year level to 4 since it is always 4th year for the students in this system
     $section = $_POST['section'];
     $contact_number = $_POST['contact_number'];
 
@@ -38,7 +42,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $passwordRegex = '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>_\-+=~`\[\];\'\/\\\\]).{8,16}$/';
 
     if (!preg_match($passwordRegex, $_POST['password'])) {
-        die("Password must be 8-16 characters and include an uppercase letter, a lowercase letter, a number, and a special character.");
+        $_SESSION['error'] = "Password must be 8-16 characters and include an uppercase letter, a lowercase letter, a number, and a special character.";
+        header("Location: ../student-register.php");
+        exit();
     }
 
     // HASH PASSWORD
@@ -67,9 +73,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // INSERT INTO DATABASE
     $stmt = $pdo->prepare("
         INSERT INTO students
-        (full_name, student_id, program, year_level, section, password_hash, contact_number, email)
+        (full_name, student_id, program, year_level, section, password_hash, contact_number, email, is_archived)
         VALUES
-        (:full_name, :student_id, :program, :year_level, :section, :password_hash, :contact_number, :email)
+        (:full_name, :student_id, :program, :year_level, :section, :password_hash, :contact_number, :email, FALSE)
     ");
 
     $stmt->execute([
@@ -86,6 +92,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $newStudentId = $pdo->lastInsertId();
 
+    session_regenerate_id(true);
+    $_SESSION['user_id'] = $newStudentId;
+    $_SESSION['role'] = 'student';
+
     $stmt = $pdo->prepare("INSERT INTO audits (user_id, roles, activity, activity_date) VALUES (:user_id, :roles, :activity, NOW())");
     $stmt->execute([
         ':user_id' => $newStudentId,
@@ -93,7 +103,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         ':activity' => 'Student registered an account with schoold Id ' . $student_id
     ]);
     // Redirect after success
-    header("Location: ../PHP/index.php");
+    $_SESSION['success'] = "Successfully made your account!";
+    header("Location: ../index.php");
     exit();
 }
 ?>

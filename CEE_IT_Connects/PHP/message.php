@@ -564,13 +564,16 @@ $page = 'messages';
 
 $rhStmt = $pdo->prepare("
     SELECT COALESCE(i.required_hours, 486)
-    FROM internship_bookmarks ib
-    JOIN internships i ON i.id = ib.internship_id
-    WHERE ib.student_id = ?
+    FROM ojt_applications oa
+    JOIN internships i ON i.id = oa.internship_id
+    WHERE oa.student_id = ?
     LIMIT 1
 ");
 $rhStmt->execute([$_SESSION['user_id']]);
-$requiredHours = $rhStmt->fetchColumn() ?: 486;
+
+$result = $rhStmt->fetchColumn();
+$hasApplied = ($result !== false);
+$requiredHours = $hasApplied ? (int) $result : null;
 
 $stmt = $pdo->prepare("
     SELECT 
@@ -591,6 +594,13 @@ $stmt = $pdo->prepare("
 ");
 $stmt->execute([$student_id]);
 $student = $stmt->fetch(PDO::FETCH_ASSOC);
+
+$sStmt = $pdo->query("SELECT day, month, year, reason FROM calendar_suspensions WHERE is_suspended = TRUE");
+$suspensions = [];
+foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+    $key = sprintf('%04d-%02d-%02d', $row['year'], $row['month'], $row['day']);
+    $suspensions[$key] = $row['reason'] ?? '';
+}
 ?>
 
 
@@ -714,7 +724,7 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
             transition: background .15s, color .15s;
         }
 
-        .sidebar a > i:first-child {
+        .sidebar a>i:first-child {
             width: 22px;
             text-align: center;
             font-size: 18px;
@@ -732,7 +742,7 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
             font-weight: 600;
         }
 
-        .sidebar a.active > i:first-child {
+        .sidebar a.active>i:first-child {
             color: #f26b3a;
         }
 
@@ -878,10 +888,22 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
         }
 
         @media (max-width: 768px) {
-            .pg-header { padding: 16px 18px; }
-            .pg-header-icon { width: 48px; height: 48px; min-width: 48px; font-size: 1.1rem; }
-            .pg-header h2 { font-size: 20px; }
+            .pg-header {
+                padding: 16px 18px;
+            }
+
+            .pg-header-icon {
+                width: 48px;
+                height: 48px;
+                min-width: 48px;
+                font-size: 1.1rem;
+            }
+
+            .pg-header h2 {
+                font-size: 20px;
+            }
         }
+
         /* addtl e */
 
         /* CHAT DESIGN */
@@ -2278,9 +2300,13 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
                 z-index: 200;
             }
 
-            .sidebar a, .sidebar .active-room { position: relative; }
+            .sidebar a,
+            .sidebar .active-room {
+                position: relative;
+            }
 
-            .sidebar a::after, .sidebar .active-room::after {
+            .sidebar a::after,
+            .sidebar .active-room::after {
                 content: attr(data-tooltip);
                 position: absolute;
                 left: 56px;
@@ -2301,7 +2327,8 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
                 z-index: 300;
             }
 
-            .sidebar a:hover::after, .sidebar .active-room:hover::after {
+            .sidebar a:hover::after,
+            .sidebar .active-room:hover::after {
                 opacity: 1;
             }
         }
@@ -2315,10 +2342,21 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
             padding: 18px 22px;
         }
 
-        .hrs-progress { margin-bottom: 16px; }
+        .hrs-progress {
+            margin-bottom: 16px;
+        }
 
-        .hrs-progress-title { font-size: 15px; font-weight: 700; color: #1f2a55; }
-        .hrs-progress-pct   { font-size: 14px; font-weight: 700; color: #1f2a55; }
+        .hrs-progress-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #1f2a55;
+        }
+
+        .hrs-progress-pct {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1f2a55;
+        }
 
         .hrs-track {
             height: 8px;
@@ -2351,9 +2389,20 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
             font-size: 22px;
         }
 
-        .hrs-stat-icon.blue   { background: #e8efff; color: #2f5bd8; }
-        .hrs-stat-icon.green  { background: #e1f6ec; color: #16a36a; }
-        .hrs-stat-icon.orange { background: #fdeadf; color: #f26b3a; }
+        .hrs-stat-icon.blue {
+            background: #e8efff;
+            color: #2f5bd8;
+        }
+
+        .hrs-stat-icon.green {
+            background: #e1f6ec;
+            color: #16a36a;
+        }
+
+        .hrs-stat-icon.orange {
+            background: #fdeadf;
+            color: #f26b3a;
+        }
 
         .hrs-stat-label {
             font-size: 13px;
@@ -2382,7 +2431,9 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
             text-align: left;
         }
 
-        .ojt-week-header { margin-bottom: 14px; }
+        .ojt-week-header {
+            margin-bottom: 14px;
+        }
 
         .ojt-week-label[readonly] {
             padding: 0;
@@ -2420,11 +2471,29 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
             padding: 10px;
         }
 
-        .ojt-table thead th.ojt-group  { background: #eef2f9 !important; }
-        .ojt-table thead th.th-morning { background: #fdeedd !important; }
-        .ojt-table thead th.sub-morning { background: #fef6ec !important; font-weight: 500; color: #6b7390; }
-        .ojt-table thead th.th-afternoon { background: #fbe4de !important; }
-        .ojt-table thead th.sub-afternoon { background: #fdeeea !important; font-weight: 500; color: #6b7390; }
+        .ojt-table thead th.ojt-group {
+            background: #eef2f9 !important;
+        }
+
+        .ojt-table thead th.th-morning {
+            background: #fdeedd !important;
+        }
+
+        .ojt-table thead th.sub-morning {
+            background: #fef6ec !important;
+            font-weight: 500;
+            color: #6b7390;
+        }
+
+        .ojt-table thead th.th-afternoon {
+            background: #fbe4de !important;
+        }
+
+        .ojt-table thead th.sub-afternoon {
+            background: #fdeeea !important;
+            font-weight: 500;
+            color: #6b7390;
+        }
 
         /* body rows */
         .ojt-table tbody td,
@@ -2436,7 +2505,9 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
             vertical-align: middle;
         }
 
-        .ojt-table tbody tr:nth-child(even) { background: #f8f9fc; }
+        .ojt-table tbody tr:nth-child(even) {
+            background: #f8f9fc;
+        }
 
         .ojt-table input[type="time"] {
             border: 1px solid #e3e7ef;
@@ -2477,17 +2548,49 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
             font-size: 12px;
         }
 
-        .ojt-status-badge[style*="rgb(220, 53, 69)"]  { background: #fde8e8; }
-        .ojt-status-badge[style*="rgb(25, 135, 84)"]  { background: #e3f6ec; }
-        .ojt-status-badge[style*="rgb(13, 110, 253)"] { background: #e5eeff; }
+        .ojt-status-badge[style*="rgb(220, 53, 69)"] {
+            background: #fde8e8;
+        }
+
+        .ojt-status-badge[style*="rgb(25, 135, 84)"] {
+            background: #e3f6ec;
+        }
+
+        .ojt-status-badge[style*="rgb(13, 110, 253)"] {
+            background: #e5eeff;
+        }
 
         /* addtl s dashboard ni student */
         /* ── HOME (setup guide) ── */
-        .hm-meter { min-width: 220px; flex: 0 1 260px; }
-        .hm-meter-top { display: flex; justify-content: space-between; font-size: 13px; color: #4a5578; margin-bottom: 6px; }
-        .hm-meter-top b { color: #1f2a55; }
-        .hm-meter-track { height: 8px; background: rgba(255, 255, 255, .7); border-radius: 99px; overflow: hidden; }
-        .hm-meter-fill { height: 100%; background: #f26b3a; border-radius: 99px; }
+        .hm-meter {
+            min-width: 220px;
+            flex: 0 1 260px;
+        }
+
+        .hm-meter-top {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            color: #4a5578;
+            margin-bottom: 6px;
+        }
+
+        .hm-meter-top b {
+            color: #1f2a55;
+        }
+
+        .hm-meter-track {
+            height: 8px;
+            background: rgba(255, 255, 255, .7);
+            border-radius: 99px;
+            overflow: hidden;
+        }
+
+        .hm-meter-fill {
+            height: 100%;
+            background: #f26b3a;
+            border-radius: 99px;
+        }
 
         .hm-card {
             background: #fff;
@@ -2497,7 +2600,12 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
             padding: 18px 24px 8px;
         }
 
-        .hm-title { font-size: 15px; font-weight: 700; color: #1f2a55; margin-bottom: 4px; }
+        .hm-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #1f2a55;
+            margin-bottom: 4px;
+        }
 
         .hm-step {
             display: flex;
@@ -2506,65 +2614,167 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
             padding: 16px 0;
             border-top: 1px solid #eef0f6;
         }
-        .hm-card .hm-title + .hm-step { border-top: none; }
+
+        .hm-card .hm-title+.hm-step {
+            border-top: none;
+        }
 
         .hm-dot {
-            width: 40px; height: 40px; min-width: 40px;
+            width: 40px;
+            height: 40px;
+            min-width: 40px;
             border-radius: 50%;
-            background: #eef2f9; color: #6b7390;
-            font-size: 14px; font-weight: 700;
-            display: flex; align-items: center; justify-content: center;
+            background: #eef2f9;
+            color: #6b7390;
+            font-size: 14px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        .hm-step.done .hm-dot    { background: #e1f6ec; color: #16a36a; }
-        .hm-step.current .hm-dot { background: #f26b3a; color: #fff; box-shadow: 0 0 0 5px #fdeee6; }
-        .hm-step.todo { opacity: .75; }
 
-        .hm-text { flex: 1; min-width: 0; }
-        .hm-text strong { display: block; font-size: 15px; color: #1f2a55; margin-bottom: 2px; }
-        .hm-text span   { font-size: 13px; color: #6b7390; line-height: 1.5; }
+        .hm-step.done .hm-dot {
+            background: #e1f6ec;
+            color: #16a36a;
+        }
+
+        .hm-step.current .hm-dot {
+            background: #f26b3a;
+            color: #fff;
+            box-shadow: 0 0 0 5px #fdeee6;
+        }
+
+        .hm-step.todo {
+            opacity: .75;
+        }
+
+        .hm-text {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .hm-text strong {
+            display: block;
+            font-size: 15px;
+            color: #1f2a55;
+            margin-bottom: 2px;
+        }
+
+        .hm-text span {
+            font-size: 13px;
+            color: #6b7390;
+            line-height: 1.5;
+        }
 
         .hm-btn {
-            background: #f26b3a; color: #fff;
-            font-size: 13px; font-weight: 600;
-            padding: 8px 18px; border-radius: 10px;
-            text-decoration: none; white-space: nowrap;
+            background: #f26b3a;
+            color: #fff;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 8px 18px;
+            border-radius: 10px;
+            text-decoration: none;
+            white-space: nowrap;
         }
-        .hm-btn:hover { background: #d9561f; color: #fff; }
+
+        .hm-btn:hover {
+            background: #d9561f;
+            color: #fff;
+        }
 
         .hm-tag {
-            font-size: 12px; font-weight: 600;
-            padding: 4px 12px; border-radius: 999px;
-            background: #eef2f9; color: #6b7390; white-space: nowrap;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 999px;
+            background: #eef2f9;
+            color: #6b7390;
+            white-space: nowrap;
         }
-        .hm-tag.ok { background: #e1f6ec; color: #16a36a; }
 
-        .hm-rooms { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+        .hm-tag.ok {
+            background: #e1f6ec;
+            color: #16a36a;
+        }
+
+        .hm-rooms {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 12px;
+        }
+
         .hm-room {
-            display: flex; align-items: center; gap: 14px;
-            background: #fff; border: 1px solid #eef0f6; border-radius: 14px;
-            padding: 14px 16px; text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: #fff;
+            border: 1px solid #eef0f6;
+            border-radius: 14px;
+            padding: 14px 16px;
+            text-decoration: none;
             box-shadow: 0 1px 3px rgba(20, 30, 70, .04);
             transition: transform .15s, box-shadow .15s;
         }
-        .hm-room:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(20, 30, 70, .08); }
-        .hm-room-ic {
-            width: 44px; height: 44px; min-width: 44px; border-radius: 12px;
-            background: #e8efff; color: #2f5bd8;
-            display: flex; align-items: center; justify-content: center; font-size: 17px;
+
+        .hm-room:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(20, 30, 70, .08);
         }
-        .hm-room-info { flex: 1; min-width: 0; }
-        .hm-room-info strong { display: block; font-size: 15px; color: #1f2a55; }
-        .hm-room-info small  { font-size: 12px; color: #8b93ab; }
-        .hm-room-go { font-size: 12px; color: #9aa3bd; }
+
+        .hm-room-ic {
+            width: 44px;
+            height: 44px;
+            min-width: 44px;
+            border-radius: 12px;
+            background: #e8efff;
+            color: #2f5bd8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 17px;
+        }
+
+        .hm-room-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .hm-room-info strong {
+            display: block;
+            font-size: 15px;
+            color: #1f2a55;
+        }
+
+        .hm-room-info small {
+            font-size: 12px;
+            color: #8b93ab;
+        }
+
+        .hm-room-go {
+            font-size: 12px;
+            color: #9aa3bd;
+        }
 
         @media (max-width: 768px) {
-            .hm-meter { width: 100%; flex-basis: 100%; }
-            .hm-step { flex-wrap: wrap; }
-            .hm-text { flex-basis: calc(100% - 60px); }
+            .hm-meter {
+                width: 100%;
+                flex-basis: 100%;
+            }
+
+            .hm-step {
+                flex-wrap: wrap;
+            }
+
+            .hm-text {
+                flex-basis: calc(100% - 60px);
+            }
         }
 
         /* Home polish */
-        .hm-card { padding-top: 20px; }
+        .hm-card {
+            padding-top: 20px;
+        }
+
         .hm-step.current {
             background: #fff8f4;
             margin: 0 -24px;
@@ -2573,10 +2783,202 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
             border-radius: 12px;
             border-top-color: transparent;
         }
-        .hm-room-ic { background: #fdeee6; color: #f26b3a; }
-        .hm-room:hover .hm-room-go { color: #f26b3a; transform: translateX(3px); }
-        .hm-room-go { transition: transform .15s, color .15s; }
+
+        .hm-room-ic {
+            background: #fdeee6;
+            color: #f26b3a;
+        }
+
+        .hm-room:hover .hm-room-go {
+            color: #f26b3a;
+            transform: translateX(3px);
+        }
+
+        .hm-room-go {
+            transition: transform .15s, color .15s;
+        }
+
         /* addtl e dashboard ni student */
+
+        #calendar {
+            --c-card: #ffffff;
+            --c-line: #e6ebf5;
+            --c-text: #1b2a4e;
+            --c-dim: #7a869f;
+            --c-accent: #ff5a1f;
+            --c-accent-soft: #ffece4;
+            --c-ok: #10a37f;
+            --c-warn: #e5484d;
+            --c-warn-soft: #fdecec;
+            box-sizing: border-box;
+            max-width: 100%;
+            min-width: 0;
+        }
+
+        #calendar *,
+        #calendar *::before,
+        #calendar *::after {
+            box-sizing: border-box;
+        }
+
+        #calendar .tc-panel {
+            width: 100%;
+            background: var(--c-card);
+            border: 1px solid var(--c-line);
+            border-radius: 14px;
+            padding: 18px;
+            color: var(--c-text);
+            overflow-x: auto;
+        }
+
+        /* toolbar */
+        #calendar .tc-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        #calendar .tc-select,
+        #calendar .tc-btn {
+            background: #fff;
+            color: var(--c-text);
+            border: 1px solid var(--c-line);
+            border-radius: 8px;
+            padding: 7px 12px;
+            font: inherit;
+            font-size: .85rem;
+            cursor: pointer;
+            transition: border-color .15s, color .15s, background .15s;
+        }
+
+        #calendar .tc-btn-wide {
+            font-weight: 600;
+        }
+
+        #calendar .tc-select:hover,
+        #calendar .tc-btn:hover,
+        #calendar .tc-select:focus,
+        #calendar .tc-btn:focus-visible {
+            outline: none;
+            border-color: var(--c-accent);
+            color: var(--c-accent);
+        }
+
+        #calendar .tc-readout {
+            margin-left: auto;
+            font-size: .8rem;
+            font-weight: 600;
+            letter-spacing: .08em;
+            color: var(--c-dim);
+        }
+
+        /* grid */
+        #calendar .tc-grid {
+            display: grid;
+            grid-template-columns: repeat(7, minmax(0, 1fr));
+            gap: 6px;
+        }
+
+        #calendar .tc-head {
+            text-align: center;
+            padding: 6px 0;
+            font-size: .7rem;
+            font-weight: 600;
+            letter-spacing: .1em;
+            color: var(--c-dim);
+        }
+
+        #calendar .tc-day {
+            min-height: 76px;
+            padding: 8px 10px;
+            background: #fff;
+            border: 1px solid var(--c-line);
+            border-radius: 10px;
+            transition: border-color .15s, background .15s;
+        }
+
+        #calendar .tc-day.empty {
+            background: transparent;
+            border: none;
+        }
+
+        #calendar .tc-day:not(.empty):hover {
+            border-color: var(--c-accent);
+            background: #fffaf7;
+            cursor: pointer;
+        }
+
+        #calendar .tc-day.weekend {
+            background: #f8faff;
+        }
+
+        #calendar .tc-day.weekend .tc-num {
+            color: var(--c-dim);
+        }
+
+        #calendar .tc-num {
+            font-size: .85rem;
+            font-weight: 600;
+        }
+
+        #calendar .tc-day.today {
+            background: var(--c-accent-soft);
+            border-color: var(--c-accent);
+        }
+
+        #calendar .tc-day.today .tc-num {
+            color: var(--c-accent);
+        }
+
+        #calendar .tc-hrs {
+            margin-top: 6px;
+            font-size: .72rem;
+            font-weight: 600;
+            color: var(--c-ok);
+        }
+
+        /* suspended dates */
+        #calendar .tc-day.suspended {
+            background: var(--c-warn-soft);
+            border-color: #f5c2c4;
+        }
+
+        #calendar .tc-day.suspended .tc-num {
+            color: var(--c-warn);
+        }
+
+        #calendar .tc-susp {
+            margin-top: 4px;
+            font-size: .65rem;
+            line-height: 1.3;
+            color: var(--c-warn);
+        }
+
+        #calendar .tc-susp b {
+            display: block;
+            letter-spacing: .08em;
+        }
+
+        #calendar .tc-susp span {
+            display: block;
+            color: var(--c-text);
+            opacity: .8;
+            overflow-wrap: anywhere;
+        }
+
+        @media (max-width: 576px) {
+            #calendar .tc-day {
+                min-height: 54px;
+                padding: 5px;
+            }
+
+            #calendar .tc-readout {
+                width: 100%;
+                margin-left: 0;
+            }
+        }
     </style>
 </head>
 
@@ -2603,6 +3005,11 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
             class="sidebar-link <?= $current_section === 'application' ? 'active' : '' ?>">
             <i class="fa fa-list-ul"></i> <span class="sidebar-text">Checklist</span>
         </a>
+        <!-- <a href="?section=calendar<?php if ($current_room_id)
+            echo "&room_id=$current_room_id"; ?>" data-tooltip="Calendar"
+            class="sidebar-link <?= $current_section === 'calendar' ? 'active' : '' ?>">
+            <i class="fa-solid fa-calendar"></i><span class="sidebar-text">Calendar</span>
+        </a> -->
 
         <?php if ($hasActiveProgress): ?>
             <a href="?section=hours<?php if ($current_room_id)
@@ -2611,7 +3018,9 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
                 <i class="fa-solid fa-clock m-1"></i> <span class="sidebar-text">Hours</span>
             </a>
         <?php else: ?>
-            <a href="#" onclick="return false;" data-tooltip="Upload MOU, Recommendation Letter, and Waiver documents to unlock" style="opacity:0.4; cursor:not-allowed;">
+            <a href="#" onclick="return false;"
+                data-tooltip="Upload MOU, Recommendation Letter, and Waiver documents to unlock"
+                style="opacity:0.4; cursor:not-allowed;">
                 <i class="fa-solid fa-clock m-1"></i>
                 <span class="sidebar-text">Hours <i class="fa-solid fa-lock" style="font-size:10px;"></i></span>
             </a>
@@ -2624,7 +3033,9 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
                 <i class="fa-solid fa-file m-1"></i> <span class="sidebar-text">Progress Report</span>
             </a>
         <?php else: ?>
-            <a href="#" onclick="return false;" data-tooltip="Upload MOU, Recommendation Letter, and Waiver documents to unlock" style="opacity:0.4; cursor:not-allowed;">
+            <a href="#" onclick="return false;"
+                data-tooltip="Upload MOU, Recommendation Letter, and Waiver documents to unlock"
+                style="opacity:0.4; cursor:not-allowed;">
                 <i class="fa-solid fa-file-lines m-1"></i> <span class="sidebar-text">Progress Report
                     <i class="fa-solid fa-lock" style="font-size:10px;"></i>
                 </span>
@@ -2649,7 +3060,8 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
                         <span class="sidebar-text"><?= $room['room_name'] ?></span>
                     </div>
                 <?php else: ?>
-                    <a href="?room_id=<?= $room['id'] ?>" class="room-link" data-tooltip="<?= htmlspecialchars($room['room_name']) ?>">
+                    <a href="?room_id=<?= $room['id'] ?>" class="room-link"
+                        data-tooltip="<?= htmlspecialchars($room['room_name']) ?>">
                         <div class="room-item">
                             <span class="room-initial"><?= strtoupper(substr(trim($room['room_name']), 0, 1)) ?></span>
                             <span class="sidebar-text"><?= $room['room_name'] ?></span>
@@ -2661,44 +3073,47 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
     </div>
 
     <!-- HOME SECTION -->
-     <!-- addtl s dashboard ni student -->
+    <!-- addtl s dashboard ni student -->
     <div id="home" class="section <?= $current_section === 'home' ? 'active' : '' ?>">
         <div class="main">
             <?php if ($current_room_id): ?>
                 <?php include 'chat-room-content.php'; ?>
             <?php else: ?>
                 <?php
-                $hmFirst   = explode(' ', trim($displayName ?? 'there'))[0];
+                $hmFirst = explode(' ', trim($displayName ?? 'there'))[0];
                 $hmHasRoom = !empty($rooms);
-                $hmSteps   = [
+                $hmSteps = [
                     [
-                        'done'  => !empty($application_internship_id),
+                        'done' => !empty($application_internship_id),
                         'title' => 'Pick your host company',
-                        'desc'  => 'Choose the company where you will do your OJT.',
-                        'link'  => '?section=application',
-                        'cta'   => 'Choose company',
+                        'desc' => 'Choose the company where you will do your OJT.',
+                        'link' => '?section=application',
+                        'cta' => 'Choose company',
                     ],
                     [
-                        'done'  => !empty($hasActiveProgress),
+                        'done' => !empty($hasActiveProgress),
                         'title' => 'Complete your requirements',
-                        'desc'  => 'Once your MOU, Recommendation Letter and Waiver are marked done, Hours and Progress Report unlock.',
-                        'link'  => '?section=application',
-                        'cta'   => 'Open checklist',
+                        'desc' => 'Once your MOU, Recommendation Letter and Waiver are marked done, Hours and Progress Report unlock.',
+                        'link' => '?section=application',
+                        'cta' => 'Open checklist',
                     ],
                     [
-                        'done'  => $hmHasRoom,
+                        'done' => $hmHasRoom,
                         'title' => 'Join your OJT room',
-                        'desc'  => $hmHasRoom
+                        'desc' => $hmHasRoom
                             ? 'You are in a room. Open it to see updates from your adviser.'
                             : 'Your adviser will add you to a room. It will show up in the sidebar once you are added.',
-                        'link'  => null,
-                        'cta'   => null,
+                        'link' => null,
+                        'cta' => null,
                     ],
                 ];
-                $hmDone    = count(array_filter($hmSteps, fn($s) => $s['done']));
+                $hmDone = count(array_filter($hmSteps, fn($s) => $s['done']));
                 $hmCurrent = null;
                 foreach ($hmSteps as $i => $s) {
-                    if (!$s['done']) { $hmCurrent = $i; break; }
+                    if (!$s['done']) {
+                        $hmCurrent = $i;
+                        break;
+                    }
                 }
                 ?>
 
@@ -2708,8 +3123,8 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
                         <div>
                             <h2>Welcome, <?= htmlspecialchars($hmFirst) ?></h2>
                             <p><?= date('l, F j') ?> · <?= $hmDone === 3
-                                ? 'Everything is set up. Open your room from the sidebar.'
-                                : 'Here is what you need to do to get started with your OJT.' ?></p>
+                                   ? 'Everything is set up. Open your room from the sidebar.'
+                                   : 'Here is what you need to do to get started with your OJT.' ?></p>
                         </div>
                     </div>
                     <div class="hm-meter">
@@ -2746,7 +3161,13 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
                             <div class="hrs-stat-icon orange"><i class="fa-solid fa-hourglass-half"></i></div>
                             <div>
                                 <div class="hrs-stat-label">OJT hours required</div>
-                                <div class="hrs-stat-value"><?= (int) $requiredHours ?> hrs</div>
+                                <div class="hrs-stat-value">
+                                    <?php if ($hasApplied): ?>
+                                        <?= $requiredHours ?> hrs
+                                    <?php else: ?>
+                                        <span class="text-muted" style="font-size:.9rem;">Haven't applied yet</span>
+                                    <?php endif; ?>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -2801,6 +3222,28 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
         </div>
     </div>
     <!-- addtl e dashboard ni student -->
+
+    <!-- Calendar Section -->
+    <div id="calendar" class="section <?= $current_section === 'calendar' ? 'active' : '' ?>">
+        <div class="main">
+            <div class="tc-panel">
+                <div class="tc-toolbar">
+                    <button type="button" id="calPrev" class="tc-btn" aria-label="Previous month">&lsaquo;</button>
+
+                    <select id="calMonth" class="tc-select"></select>
+                    <select id="calYear" class="tc-select"></select>
+
+                    <button type="button" id="calNext" class="tc-btn" aria-label="Next month">&rsaquo;</button>
+                    <button type="button" id="calToday" class="tc-btn tc-btn-wide">TODAY</button>
+
+                    <div class="tc-readout" id="calReadout"></div>
+                </div>
+
+                <div id="calGrid" class="tc-grid"></div>
+            </div>
+        </div>
+    </div>
+
 
     <!-- CHATS SECTION -->
     <div id="chats" class="section <?= $current_section === 'chats' ? 'active' : '' ?>">
@@ -3057,26 +3500,27 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
     <div id="application" class="section <?= $current_section === 'application' ? 'active' : '' ?>">
         <div class="main">
             <!-- addtl s -->
-            
-                    <div class="pg-header">
-                        <div class="pg-header-left">
-                            <div class="pg-header-icon"><i class="fa fa-list-ul"></i></div>
-                            <div>
-                                <h2>OJT Requirements Checklist</h2>
-                                <p>Complete each item below. Following the order is recommended, but you may work on them in any sequence.</p>
-                            </div>
-                        </div>
+
+            <div class="pg-header">
+                <div class="pg-header-left">
+                    <div class="pg-header-icon"><i class="fa fa-list-ul"></i></div>
+                    <div>
+                        <h2>OJT Requirements Checklist</h2>
+                        <p>Complete each item below. Following the order is recommended, but you may work on them in any
+                            sequence.</p>
                     </div>
+                </div>
+            </div>
 
-                <!-- addtl e -->
-                <?php if ($application_internship_id): ?>
+            <!-- addtl e -->
+            <?php if ($application_internship_id): ?>
 
-                    <?php
-                    $internship_id = $application_internship_id;
-                    include 'application-progress.php';
-                    ?>
+                <?php
+                $internship_id = $application_internship_id;
+                include 'application-progress.php';
+                ?>
 
-                <?php else: ?>
+            <?php else: ?>
 
                 <!-- HTE NOTICE -->
                 <div class="card border-0 shadow-sm rounded-4 mb-3">
@@ -3535,7 +3979,7 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
                 </div>
             </div>
 
-           <!-- TEMPLATE DOWNLOAD -->
+            <!-- TEMPLATE DOWNLOAD -->
             <div class="card shadow-sm rounded-3 p-3 mb-3 d-flex flex-row align-items-center justify-content-between"
                 style="border:1px solid #e5e7eb;">
                 <div class="d-flex align-items-center gap-3">
@@ -4204,7 +4648,8 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
         // document.addEventListener('DOMContentLoaded', truncateRoomItems);
 
         // TRACK RENDERED HOURS
-        const OJT_REQUIRED_HOURS = <?= (int) $requiredHours ?>;
+        const OJT_HAS_APPLIED = <?= json_encode($hasApplied) ?>;
+        const OJT_REQUIRED_HOURS = <?= json_encode($requiredHours) ?>;
         const OJT_DAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
         let ojtWeekCounter = 0;
         let ojtUnsavedChanges = {};
@@ -4515,8 +4960,12 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
         function ojtTriggerCompletion() {
             ojtShowEvalModal();
         }
+
         function ojtIsComplete() {
+            if (!OJT_HAS_APPLIED) return false;
+            if (typeof OJT_REQUIRED_HOURS !== 'number' || OJT_REQUIRED_HOURS <= 0) return false;
             if (typeof ojtWeeks === 'undefined' || !Array.isArray(ojtWeeks)) return false;
+
             const req = OJT_REQUIRED_HOURS * 60;
             let grand = 0;
             ojtWeeks.forEach(w => w.rows.forEach(r => { grand += (r.daily || 0); }));
@@ -4532,9 +4981,18 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
             btn.classList.toggle('ojt-locked', !done);
             btn.setAttribute('aria-disabled', String(!done));
             btn.tabIndex = done ? 0 : -1;
-            btn.dataset.tooltip = done ? 'Evaluation' : 'Complete your required OJT hours to unlock';
+
+            if (done) {
+                btn.dataset.tooltip = 'Evaluation';
+            } else if (!OJT_HAS_APPLIED) {
+                btn.dataset.tooltip = 'Apply for an internship to unlock';
+            } else {
+                btn.dataset.tooltip = 'Complete your required OJT hours to unlock';
+            }
+
             if (lock) lock.style.display = done ? 'none' : 'inline';
         }
+
         const _origShowEvalModal = ojtShowEvalModal;
         ojtShowEvalModal = function () {
             if (!ojtIsComplete()) return;
@@ -4719,8 +5177,6 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
             <?php endif; ?>
         })();
 
-
-
         const OJT_EXPECTED_TIME_IN = "<?= htmlspecialchars($ojtTimeIn ?? '') ?>";
         const OJT_EXPECTED_TIME_OUT = "<?= htmlspecialchars($ojtTimeOut ?? '') ?>";
         function timeToMinutes(t) {
@@ -4784,6 +5240,90 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC);
                     ojtComputeStatus(weekIndex, rowIndex);
                 });
             });
+        });
+
+
+        // This is part is for the calendar part 
+        const CAL_SUSPENDED = <?= json_encode($suspensions, JSON_HEX_TAG | JSON_HEX_AMP) ?>;
+        document.addEventListener('DOMContentLoaded', function () {
+            const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'];
+            const DAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+
+            const monthSel = document.getElementById('calMonth');
+            const yearSel = document.getElementById('calYear');
+            const calEl = document.getElementById('calGrid');   // not 'calendar'
+            const readout = document.getElementById('calReadout');
+            if (!monthSel || !yearSel || !calEl) return;
+
+
+            const esc = s => String(s).replace(/[&<>"']/g, c =>
+                ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+            const now = new Date();
+
+            // Fill dropdowns
+            MONTHS.forEach((m, i) => monthSel.add(new Option(m, i)));
+            for (let y = now.getFullYear() - 2; y <= now.getFullYear() + 2; y++) {
+                yearSel.add(new Option(y, y));
+            }
+            monthSel.value = now.getMonth();
+            yearSel.value = now.getFullYear();
+
+            function render() {
+                const month = parseInt(monthSel.value, 10);
+                const year = parseInt(yearSel.value, 10);
+                const firstDay = new Date(year, month, 1).getDay();
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+                const data = (typeof CAL_DATA !== 'undefined') ? CAL_DATA : {};
+                const susp = (typeof CAL_SUSPENDED !== 'undefined' && CAL_SUSPENDED) ? CAL_SUSPENDED : {};
+
+                let html = DAYS.map(d => `<div class="tc-head">${d}</div>`).join('');
+                for (let i = 0; i < firstDay; i++) html += '<div class="tc-day empty"></div>';
+
+                for (let d = 1; d <= daysInMonth; d++) {
+                    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                    const dow = new Date(year, month, d).getDay();
+                    const isToday = d === now.getDate() && month === now.getMonth() && year === now.getFullYear();
+                    const hrs = data[dateStr];
+                    const isSusp = Object.prototype.hasOwnProperty.call(susp, dateStr);
+                    const reason = isSusp ? susp[dateStr] : '';
+
+                    html += `<div class="tc-day${isToday ? ' today' : ''}${dow === 0 || dow === 6 ? ' weekend' : ''}${isSusp ? ' suspended' : ''}"
+                        data-date="${dateStr}"${isSusp ? ` title="${esc(reason)}"` : ''}>
+                        <span class="tc-num">${String(d).padStart(2, '0')}</span>
+                        ${hrs ? `<div class="tc-hrs">${hrs} HRS</div>` : ''}
+                        ${isSusp ? `<div class="tc-susp"><b>SUSPENDED</b><span>${esc(reason)}</span></div>` : ''}
+                    </div>`;
+                }
+
+                calEl.innerHTML = html;
+                readout.textContent = `${MONTHS[month].slice(0, 3).toUpperCase()} // ${year}`;
+            }
+
+            function shift(delta) {
+                let m = parseInt(monthSel.value, 10) + delta;
+                let y = parseInt(yearSel.value, 10);
+                if (m < 0) { m = 11; y--; }
+                if (m > 11) { m = 0; y++; }
+                // keep within the year dropdown's range
+                if (![...yearSel.options].some(o => parseInt(o.value, 10) === y)) return;
+                monthSel.value = m;
+                yearSel.value = y;
+                render();
+            }
+
+            monthSel.addEventListener('change', render);
+            yearSel.addEventListener('change', render);
+            document.getElementById('calPrev').addEventListener('click', () => shift(-1));
+            document.getElementById('calNext').addEventListener('click', () => shift(1));
+            document.getElementById('calToday').addEventListener('click', () => {
+                monthSel.value = now.getMonth();
+                yearSel.value = now.getFullYear();
+                render();
+            });
+
+            render();
         });
     </script>
 </body>

@@ -1,3 +1,7 @@
+<?php
+session_start();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -14,6 +18,42 @@
 </head>
 
 <body>
+
+    <?php if (isset($_SESSION['success'])): ?>
+        <div class="alert alert-success alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3"
+            style="z-index:9999; min-width:350px;" role="alert" id="flashAlert">
+            <i class="bi bi-check-circle-fill me-2"></i><?= $_SESSION['success'] ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <?php unset($_SESSION['success']); ?>
+    <?php endif; ?>
+
+    <?php if (isset($_SESSION['warning'])): ?>
+        <div class="alert alert-warning alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3"
+            style="z-index:9999; min-width:400px;" role="alert" id="flashAlert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i><?= $_SESSION['warning'] ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <?php unset($_SESSION['warning']); ?>
+    <?php endif; ?>
+
+    <?php if (isset($_SESSION['info'])): ?>
+        <div class="alert alert-info alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3"
+            style="z-index:9999; min-width:350px;" role="alert" id="flashAlert">
+            <i class="bi bi-info-circle-fill me-2"></i><?= $_SESSION['info'] ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <?php unset($_SESSION['info']); ?>
+    <?php endif; ?>
+
+    <?php if (isset($_SESSION['error'])): ?>
+        <div class="alert alert-danger alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3"
+            style="z-index:9999; min-width:350px;" role="alert" id="flashAlert">
+            <i class="bi bi-x-circle-fill me-2"></i><?= $_SESSION['error'] ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <?php unset($_SESSION['error']); ?>
+    <?php endif; ?>
 
     <div id="loading-screen">
         <img src="../Sources/CEE IT Connects Logo.png" alt="Logo" class="loading-logo">
@@ -37,15 +77,10 @@
                     </div>
 
                     <div class="mb-3 d-flex gap-2">
-                        <select name="year_no" class="form-select" required>
-                            <option value="" disabled selected>Year</option>
-                            <option value="20">20</option>
-                            <option value="21">21</option>
-                            <option value="22">22</option>
-                            <option value="23">23</option>
-                            <option value="24">24</option>
-                            <option value="25">25</option>
-                        </select>
+                        <input type="text" name="year_no" class="form-control" placeholder="First two digits of ID No."
+                            maxlength="2" pattern="\d{2}" required>
+                        </input>
+                        -
                         <input type="text" name="id_no" class="form-control" placeholder="Last four digits of ID No."
                             maxlength="4" pattern="\d{4}" required>
                     </div>
@@ -60,7 +95,7 @@
                     </div>
 
                     <div class="row mb-3">
-                        <div class="col-6">
+                        <!-- <div class="col-6">
                             <select name="year_level" class="form-select" required>
                                 <option value="" disabled selected>Year Level</option>
                                 <option value="1">1st Year</option>
@@ -68,7 +103,7 @@
                                 <option value="3">3rd Year</option>
                                 <option value="4">4th Year</option>
                             </select>
-                        </div>
+                        </div> -->
                         <div class="col-6">
                             <select name="section" class="form-select" id="sectionSelect" required>
                                 <option value="" disabled selected>Section</option>
