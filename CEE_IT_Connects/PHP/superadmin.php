@@ -87,16 +87,18 @@ $recentAnnouncementsStmt = $pdo->query("
 ");
 $recentAnnouncements = $recentAnnouncementsStmt->fetchAll(PDO::FETCH_ASSOC);
 
-$recentAccountsStmt = $pdo->query("
-    SELECT full_name, email, 'Student' AS role, created_at FROM students
-    UNION ALL
-    SELECT full_name, email, 'Adviser' AS role, created_at FROM advisers
-    UNION ALL
-    SELECT name AS full_name, email, 'Admin' AS role, created_at FROM admins
-    ORDER BY created_at DESC
-    LIMIT 5
-");
-$recentAccounts = $recentAccountsStmt->fetchAll(PDO::FETCH_ASSOC);
+// $recentAccountsStmt = $pdo->query("
+//     SELECT full_name, email, 'Student' AS role, created_at FROM students
+//     UNION ALL
+//     SELECT full_name, email, 'Adviser' AS role, created_at FROM advisers
+//     UNION ALL
+//     SELECT name AS full_name, email, 'Admin' AS role, created_at FROM admins
+//     ORDER BY created_at DESC
+//     LIMIT 5
+// ");
+// $recentAccounts = $recentAccountsStmt->fetchAll(PDO::FETCH_ASSOC);
+
+$recentAccounts = [];
 
 $stmt = $pdo->query("SELECT id, name, email, role FROM admins ORDER BY id ASC");
 $admins = $stmt->fetchAll(PDO::FETCH_ASSOC);
