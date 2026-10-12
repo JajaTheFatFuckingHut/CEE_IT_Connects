@@ -48,161 +48,187 @@ select {
 }
 
 /* --- LOGIN PAGE STYLES --- */
-.login-container {
-    min-height: 100vh;
-}
+/* --- LOGIN PAGE STYLES --- */
+.login-container { padding: 0; min-height: 100vh; min-height: 100dvh; }
+.login-container > .row { min-height: 100vh; min-height: 100dvh; }
 
+/* LEFT PANEL */
 .left-panel {
-    background-image: url("../Sources/left image.png");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    min-height: 100vh;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    background: var(--panel-navy);
+    color: #fff;
 }
-
-.right-panel {
+.left-inner {
+    position: relative;
+    z-index: 1;
+    width: 100%;
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
+    gap: 2rem;
+    padding: clamp(1.5rem, 4vw, 4rem);
+}
+.brand { display: flex; align-items: center; gap: 1rem; }
+.brand-logo {
+    width: clamp(52px, 5vw, 80px);
+    height: auto;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .06);
+    padding: 4px;
+}
+.brand-name { font-weight: 700; font-size: clamp(1.15rem, 2vw, 1.75rem); letter-spacing: .5px; line-height: 1.1; }
+.brand-sub  { font-size: clamp(.75rem, 1.1vw, 1rem); opacity: .85; }
+
+.hero-title { font-weight: 700; font-size: clamp(1.9rem, 3.4vw, 3.4rem); line-height: 1.15; margin: 0 0 1rem; }
+.c-orange { color: #e8572e; }
+.c-yellow { color: #f4a614; }
+.hero-text { font-size: clamp(.9rem, 1.3vw, 1.15rem); line-height: 1.6; max-width: 30em; opacity: .92; margin: 0; }
+
+.school-info {
+    list-style: none; margin: 0; padding: 0;
+    display: flex; flex-direction: column; gap: .5rem;
+    font-size: clamp(.78rem, 1vw, .95rem); opacity: .85;
+}
+.school-info i { width: 1.5rem; }
+
+.wave { position: absolute; pointer-events: none; z-index: 0; height: auto; }
+.wave-top    { top: 0;    right: 0; width: clamp(120px, 22%, 200px); }
+.wave-bottom { bottom: 0; right: 0; width: clamp(160px, 45%, 360px); }
+
+/* RIGHT PANEL */
+.right-panel {
+    position: relative;
+    overflow: hidden;
+    display: flex;
     justify-content: center;
     align-items: center;
-    padding: 0px;
-    padding-bottom: 50px;
+    padding: clamp(1rem, 4vw, 3rem) 1rem;
+    background: #f6f8fc;
 }
-
-.logo-img {
-    width: 250px;
-    margin-bottom: 2rem;
+.right-panel::before,
+.right-panel::after {
+    content: "";
+    position: absolute;
+    width: clamp(120px, 22vw, 260px);
+    aspect-ratio: 1;
+    pointer-events: none;
+    z-index: 0;
 }
+.right-panel::before { top: 0;    right: 0; background: #fbe9d2; clip-path: polygon(35% 0, 100% 0, 100% 65%); }
+.right-panel::after  { bottom: 0; right: 0; background: #dde3f3; clip-path: polygon(100% 35%, 100% 100%, 35% 100%); }
 
+/* LOGIN CARD (the container around the credentials) */
+.login-card {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 440px;
+    background: #fff;
+    border: 1px solid #e6eaf2;
+    border-radius: 16px;
+    box-shadow: 0 12px 32px rgba(39, 47, 84, .10);
+    padding: clamp(1.5rem, 4vw, 2.25rem) clamp(1.25rem, 4vw, 2rem);
+    text-align: center;
+}
+.logo-img { width: clamp(72px, 18vw, 96px); height: auto; margin-bottom: .75rem; }
 .login-title {
     color: var(--primary-dark-blue);
     font-weight: 700;
-    font-size: 1.75rem;
-    margin-bottom: 0.2rem;
+    font-size: clamp(1.3rem, 4.5vw, 1.6rem);
+    margin-bottom: .2rem;
     text-transform: uppercase;
     letter-spacing: 1px;
 }
-
 .login-subtitle {
-    color: var(--primary-dark-blue);
-    font-size: 1.5rem;
-    margin-bottom: 1.5rem;
+    color: #5b6486;
+    font-weight: 400;
+    font-size: clamp(1rem, 3.5vw, 1.2rem);
+    margin-bottom: 1.25rem;
 }
 
-/* --- TOGGLE BUTTONS (Now <a> tags) --- */
+/* ROLE TOGGLE (pill container like the reference) */
 .role-toggle {
-    background-color: #fff;
-    padding: 0;
-    margin-bottom: 2rem;
     display: flex;
-    gap: 10px;
+    gap: 4px;
+    padding: 4px;
+    margin-bottom: 1.5rem;
     width: 100%;
-    max-width: 400px;
+    background: #e9edf6;
+    border-radius: 12px;
 }
-
 .btn-role {
     flex: 1;
-    padding: 10px;
-    border-radius: 8px;
-    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .4rem;
+    padding: 9px 6px;
+    border-radius: 9px;
+    font-size: .85rem;
     font-weight: 500;
-    transition: all 0.3s;
-    text-align: center;
     text-decoration: none;
-    display: inline-block;
+    white-space: nowrap;
+    transition: all .25s;
 }
+.btn-role.active   { background: var(--primary-dark-blue); color: #fff; cursor: default; }
+.btn-role.inactive { background: transparent; color: #4b567a; }
+.btn-role.inactive:hover { background: rgba(39, 47, 84, .08); color: var(--primary-dark-blue); }
 
-.btn-role.active {
-    background-color: var(--primary-dark-blue);
-    color: #fff;
-    cursor: default;
+/* FORM */
+.form-wrapper { width: 100%; text-align: left; }
+.field-label { display: block; font-size: .85rem; font-weight: 600; color: var(--primary-dark-blue); margin-bottom: .4rem; }
+.input-icon { position: relative; }
+.input-icon .field-icon {
+    position: absolute; top: 50%; left: 14px; transform: translateY(-50%);
+    color: #6b7595; font-size: .95rem; pointer-events: none;
 }
-
-.btn-role.inactive {
-    background-color: #777;
-    color: #fff;
-}
-
-.btn-role.inactive:hover {
-    background-color: #666;
-    color: #fff;
-}
-
-/* --- FORM STYLES --- */
-.form-wrapper {
-    width: 100%;
-    max-width: 400px;
-}
-
 .form-control {
-    background-color: #f5f5f5;
-    border: 1px solid #ddd;
-    padding: 12px;
-    border-radius: 8px;
-    font-size: 0.95rem;
+    background-color: var(--field-bg);
+    border: 1px solid var(--border);
+    padding: 12px 12px 12px 42px;
+    border-radius: 10px;
+    font-size: .95rem;
 }
-
-.form-control:focus {
-    box-shadow: none;
-    border-color: var(--primary-dark-blue);
-}
+.form-control::placeholder { color: #a3abc2; }
+.form-control:focus { box-shadow: 0 0 0 3px rgba(39, 47, 84, .10); border-color: var(--primary-dark-blue); }
 
 .password-group { position: relative; }
-.password-group .form-control { padding-right: 40px; }
+.password-group .form-control { padding-right: 44px; }
 .toggle-password {
-    position: absolute;
-    top: 50%;
-    right: 14px;
-    transform: translateY(-50%);
-    cursor: pointer;
-    color: #888;
+    position: absolute; top: 50%; right: 14px; transform: translateY(-50%);
+    cursor: pointer; color: #6b7595;
 }
 
 .forgot-link {
-    text-align: center;
-    display: block;
-    margin-top: 10px;
-    color: var(--primary-dark-blue);
-    text-decoration: underline;
-    font-size: 0.9rem;
+    display: block; text-align: right; margin-top: .5rem;
+    color: var(--primary-dark-blue); text-decoration: underline; font-size: .8rem;
 }
-
 .btn-login {
     width: 100%;
+    display: flex; align-items: center; justify-content: center; gap: .5rem;
     background-color: var(--primary-dark-blue);
-    color: white;
+    color: #fff;
     padding: 12px;
-    border-radius: 8px;
-    font-size: 1.1rem;
+    border-radius: 10px;
+    font-size: 1rem; font-weight: 500;
     border: none;
-    margin-top: 20px;
-    transition: background 0.3s;
+    margin-top: 1.25rem;
+    transition: background .3s;
     cursor: pointer;
 }
+.btn-login:hover { background-color: #1b223d; }
 
-.btn-login:hover {
-    background-color: #1b223d;
+.register-text { text-align: center; margin-top: 1.25rem; font-size: .85rem; color: #555; }
+.register-link { color: var(--accent-orange); font-weight: 600; text-decoration: none; }
+.register-link:hover { text-decoration: underline; }
+
+/* RESPONSIVE */
+@media (max-width: 991.98px) {
+    .left-panel { display: none; }
 }
-
-.register-text {
-    text-align: center;
-    margin-top: 20px;
-    font-size: 0.9rem;
-    color: #333;
-}
-
-.register-link {
-    color: var(--accent-orange);
-    font-weight: 700;
-    text-decoration: none;
-}
-
-.register-link:hover {
-    text-decoration: underline;
-}
-
-@media (max-width: 768px) {
-    .left-panel {
-        display: none;
-    }
+@media (max-width: 400px) {
+    .btn-role i { display: none; }           /* keeps the 3 tabs from overflowing on small phones */
+    .login-card { padding: 1.25rem 1rem; }
 }
