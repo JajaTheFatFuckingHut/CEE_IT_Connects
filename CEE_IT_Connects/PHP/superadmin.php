@@ -1620,63 +1620,71 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                 </style>
 
                 <div class="row g-3 mb-4">
-                    <div class="col-md-4">
-                        <div class="card border-0 rounded-4 h-100 ojtc-stat-card" style="background:#EEF3FF;">
-                            <div class="card-body p-4">
-                                <div class="d-flex flex-wrap align-items-center gap-3">
-                                    <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0"
-                                        style="width:44px;height:44px;background:#272f54;">
-                                        <i class="bi bi-briefcase-fill text-white fs-5"></i>
-                                    </div>
-                                    <div class="flex-grow-1" style="min-width:90px;">
-                                        <p class="small mb-1 fw-semibold text-uppercase"
-                                            style="letter-spacing:.05em; font-size:11px; color:#272f54;">Internships</p>
-                                        <h2 class="fw-bold mb-0" style="color:#272f54;"><?= (int) $totalInternships ?>
-                                        </h2>
-                                    </div>
+                <!-- INTERNSHIPS (blue, unchanged) -->
+                <div class="col-md-4">
+                    <div class="card border-0 rounded-4 h-100 ojtc-stat-card" style="background:#EEF3FF;">
+                        <div class="card-body p-4">
+                            <div class="d-flex flex-wrap align-items-center gap-3">
+                                <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0"
+                                    style="width:44px;height:44px;background:#272f54;">
+                                    <i class="bi bi-briefcase-fill text-white fs-5"></i>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-4">
-                        <div class="card border-0 rounded-4 h-100 ojtc-stat-card" style="background:#FFF6E3;">
-                            <div class="card-body p-4">
-                                <div class="d-flex flex-wrap align-items-center gap-3">
-                                    <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0"
-                                        style="width:44px;height:44px;background:#FFB62F;">
-                                        <i class="bi bi-person-badge-fill fs-5" style="color:#3b2600;"></i>
-                                    </div>
-                                    <div class="flex-grow-1" style="min-width:90px;">
-                                        <p class="small mb-1 fw-semibold text-uppercase"
-                                            style="letter-spacing:.05em;font-size:11px;color:#7a5200;">Accounts
-                                        </p>
-                                        <h2 class="fw-bold mb-0" style="color:#3b2600;"><?= (int) $totalAccounts ?></h2>
-
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-4">
-                        <div class="card border-0 rounded-4 h-100 ojtc-stat-card" style="background:#FDEEE8;">
-                            <div class="card-body p-4">
-                                <div class="d-flex flex-wrap align-items-center gap-3">
-                                    <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0"
-                                        style="width:44px;height:44px;background:#E4572E;">
-                                        <i class="bi bi-clock-history text-white fs-5"></i>
-                                    </div>
-                                    <div class="flex-grow-1" style="min-width:90px;">
-                                        <p class="small mb-1 fw-semibold text-uppercase"
-                                            style="letter-spacing:.05em;font-size:11px;color:#a13d1f;">Programs</p>
-                                        <h2 class="fw-bold mb-0" style="color:#a13d1f;"><?= (int) $totalPrograms ?></h2>
-                                    </div>
+                                <div class="flex-grow-1" style="min-width:90px;">
+                                    <p class="small mb-1 fw-semibold text-uppercase"
+                                        style="letter-spacing:.05em; font-size:11px; color:#272f54;">Internships</p>
+                                    <h2 class="fw-bold mb-0" style="color:#272f54;"><?= (int) $totalInternships ?></h2>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <!-- ACCOUNTS + ACTIVE ACCOUNTS (merged, orange) -->
+                <div class="col-md-4">
+                    <div class="card border-0 rounded-4 h-100 ojtc-stat-card" data-go="restore" style="background:#FDEEE8;">
+                        <div class="card-body p-4">
+                            <div class="d-flex flex-wrap align-items-center gap-3">
+                                <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0"
+                                    style="width:44px;height:44px;background:#E4572E;">
+                                    <i class="bi bi-people-fill text-white fs-5"></i>
+                                </div>
+                                <div class="flex-grow-1" style="min-width:90px;">
+                                    <p class="small mb-1 fw-semibold text-uppercase"
+                                        style="letter-spacing:.05em;font-size:11px;color:#a13d1f;">Accounts</p>
+                                    <h2 class="fw-bold mb-0" style="color:#a13d1f;"><?= (int) $totalAccounts ?></h2>
+                                    <p class="mb-0 mt-1 d-none d-md-block" style="font-size:11px;color:#a13d1f;">
+                                        <?= $saActivePct ?>% active &middot; <?= (int) $saArchived ?> archived
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SYSTEM ADMIN SEATS (yellow) -->
+                <div class="col-md-4">
+                    <div class="card border-0 rounded-4 h-100 ojtc-stat-card" data-go="roles" style="background:#FFF6E3;">
+                        <div class="card-body p-4">
+                            <div class="d-flex flex-wrap align-items-center gap-3">
+                                <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0"
+                                    style="width:44px;height:44px;background:#FFB62F;">
+                                    <i class="bi bi-shield-lock-fill fs-5" style="color:#3b2600;"></i>
+                                </div>
+                                <div class="flex-grow-1" style="min-width:90px;">
+                                    <p class="small mb-1 fw-semibold text-uppercase"
+                                        style="letter-spacing:.05em;font-size:11px;color:#7a5200;">System Admin Seats</p>
+                                    <h2 class="fw-bold mb-0" style="color:#3b2600;">
+                                        <?= (int) $saSeatsUsed ?> of <?= (int) $saSeatMax ?>
+                                    </h2>
+                                    <p class="mb-0 mt-1 d-none d-md-block" style="font-size:11px;color:#7a5200;">
+                                        <?= (int) $saSeatsOpen ?> open
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
                 <!-- Recent Internship Postings -->
                 <!-- ADMIN SUMMARY CARDS -->
