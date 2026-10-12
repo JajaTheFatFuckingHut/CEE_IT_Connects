@@ -83,7 +83,7 @@ $registerVisible = file_exists($statePath) ? trim(file_get_contents($statePath))
                             <i class="fa-regular fa-user"></i> Adviser
                         </a>
                         <a href="login-ui.php?role=admin" class="btn-role <?= $role === 'admin' ? 'active' : 'inactive' ?>">
-                            <i class="fa-solid fa-shield-halved"></i> Admins
+                            <i class="fa-solid fa-user-shield"></i> Admins
                         </a>
                     </div>
 
