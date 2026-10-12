@@ -98,7 +98,7 @@ $recentAnnouncements = $recentAnnouncementsStmt->fetchAll(PDO::FETCH_ASSOC);
 // ");
 // $recentAccounts = $recentAccountsStmt->fetchAll(PDO::FETCH_ASSOC);
 
-$recentAccounts = [];
+// $recentAccounts = [];
 
 $stmt = $pdo->query("SELECT id, name, email, role FROM admins ORDER BY id ASC");
 $admins = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -1849,51 +1849,8 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
 
                 <!-- Bottom Row -->
                 <div class="row g-4">
-                    <div class="col-lg-6">
-                        <div class="card border-0 rounded-4 shadow-sm h-100">
-                            <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
-                                <i class="bi bi-person-plus" style="color:#272f54;"></i>
-                                <h6 class="fw-bold mb-0" style="color:#272f54;">Recent Account Activity</h6>
-                            </div>
-                            <div id="table-account-activity" class="card-body px-4 pb-4 pt-2">
-                                <?php if (empty($recentAccounts)): ?>
-                                    <p class="text-muted small mb-0">No accounts created recently.</p>
-                                <?php else: ?>
-                                    <div class="d-flex flex-column gap-2">
-                                        <?php foreach ($recentAccounts as $ra): ?>
-                                            <!-- CHANGED: added ojtc-activity-row class for a subtle hover
-                                                 background, matching the "List Item (Hover)" style. -->
-                                            <div class="d-flex align-items-center gap-3 ojtc-activity-row">
-                                                <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 fw-bold"
-                                                    style="width:38px;height:38px;background:#eef1ff;color:#272f54;font-size:13px;">
-                                                    <?= strtoupper(substr($ra['full_name'], 0, 1)) ?>
-                                                </div>
-                                                <div class="flex-grow-1 overflow-hidden">
-                                                    <p class="fw-semibold mb-0 text-truncate"
-                                                        style="color:#272f54;font-size:14px;">
-                                                        <?= htmlspecialchars($ra['full_name']) ?>
-                                                    </p>
-                                                    <p class="text-muted mb-0 text-truncate" style="font-size:12px;">
-                                                        <?= htmlspecialchars($ra['email']) ?>
-                                                    </p>
-                                                </div>
-                                                <div class="text-end flex-shrink-0">
-                                                    <span class="badge rounded-pill px-2"
-                                                        style="background:#f5f5f5;color:#555;font-size:11px;font-weight:500;">
-                                                        <?= htmlspecialchars($ra['role']) ?>
-                                                    </span>
-                                                    <p class="text-muted mb-0 mt-1" style="font-size:11px;">
-                                                        <?= date("M d", strtotime($ra['created_at'])) ?>
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        <?php endforeach; ?>
-                                    </div>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-6">
+                    
+                    <div class="col-lg-12">
                         <div class="card border-0 rounded-4 shadow-sm h-100">
                             <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
                                 <i class="bi bi-clock-history" style="color:#272f54;"></i>
@@ -3561,19 +3518,7 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                 options: { maintainAspectRatio: false, plugins: { legend } }
             });
 
-            // Supervisor requests by status (solid pie)
-            // make('saReqChart', {
-            //     type: 'pie',
-            //     data: {
-            //         labels: <?= json_encode(array_keys($saReq)) ?>,
-            //         datasets: [{
-            //             data: <?= json_encode(array_values($saReq)) ?>,
-            //             backgroundColor: ['#FFB62F', '#3E8E58', '#E4572E'],
-            //             borderWidth: 0
-            //         }]
-            //     },
-            //     options: { maintainAspectRatio: false, plugins: { legend } }
-            // });
+            
 
             // Students by program
             make('saProgramChart', {
@@ -3659,7 +3604,7 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
         });
 
         // For the calendar
-        // const CAL_SUSPENDED = <?= json_encode((object) $suspensions, JSON_HEX_TAG | JSON_HEX_AMP) ?>;
+        // 
 
         // document.addEventListener('DOMContentLoaded', function () {
         //     const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
