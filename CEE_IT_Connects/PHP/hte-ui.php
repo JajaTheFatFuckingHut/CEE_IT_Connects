@@ -2073,6 +2073,44 @@ foreach ($roomStatuses as $s) {
                 opacity: 1;
             }
         }
+
+
+        /* addtl s */
+        /* ── DTR VIEW MODAL (copied from student Hours UI) ── */
+        #dtr-view-modal .modal-content { border-radius: 16px; overflow: hidden; }
+        #dtr-view-modal .modal-body { background: #f5f7fb; overflow-x: hidden; }
+
+        .hrs-card { background:#fff; border:1px solid #eef0f6; border-radius:14px; box-shadow:0 1px 3px rgba(20,30,70,.04); padding:18px 22px; min-width:0; }
+        .hrs-progress-title { font-size:15px; font-weight:700; color:#1f2a55; }
+        .hrs-progress-pct { font-size:14px; font-weight:700; color:#1f2a55; }
+        .hrs-track { height:8px; background:#e9edf5; border-radius:99px; overflow:hidden; }
+        .hrs-fill { height:100%; border-radius:99px; background:#f26b3a; }
+        .hrs-stat { display:flex; align-items:center; gap:16px; height:100%; }
+        .hrs-stat-icon { width:56px; height:56px; min-width:56px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:22px; }
+        .hrs-stat-icon.blue { background:#e8efff; color:#2f5bd8; }
+        .hrs-stat-icon.green { background:#e1f6ec; color:#16a36a; }
+        .hrs-stat-icon.orange { background:#fdeadf; color:#f26b3a; }
+        .hrs-stat-label { font-size:13px; font-weight:500; color:#4a5578; text-transform:uppercase; letter-spacing:.03em; margin-bottom:2px; }
+        .hrs-stat-value { font-size:28px; font-weight:700; color:#1f2a55; line-height:1.2; }
+
+        #dtr-view-modal .ojt-week-block { background:#fff; border:1px solid #eef0f6; border-radius:14px; box-shadow:0 1px 3px rgba(20,30,70,.04); padding:20px 22px; margin:0 0 16px; text-align:left; min-width:0; }
+        #dtr-view-modal .ojt-week-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; font-size:20px; color:#1f2a55; }
+        #dtr-view-modal .ojt-total-chip { background:#eaf0ff; color:#2f5bd8; font-size:13px; font-weight:600; padding:6px 14px; border-radius:999px; }
+        #dtr-view-modal .ojt-table-scroll { overflow-x:auto; max-width:100%; border:1px solid #e8ebf3; border-radius:10px; }
+        #dtr-view-modal .ojt-table { width:100%; min-width:780px; border-collapse:collapse; }
+        #dtr-view-modal .ojt-table thead th { border:none; font-size:13px; font-weight:600; color:#2b3a67; text-align:center; padding:10px; }
+        #dtr-view-modal .ojt-table thead th.ojt-group { background:#eef2f9; }
+        #dtr-view-modal .ojt-table thead th.th-morning { background:#fdeedd; }
+        #dtr-view-modal .ojt-table thead th.sub-morning { background:#fef6ec; font-weight:500; color:#6b7390; }
+        #dtr-view-modal .ojt-table thead th.th-afternoon { background:#fbe4de; }
+        #dtr-view-modal .ojt-table thead th.sub-afternoon { background:#fdeeea; font-weight:500; color:#6b7390; }
+        #dtr-view-modal .ojt-table tbody td { padding:12px 10px; text-align:center; vertical-align:middle; background:transparent; font-size:13px; color:#2b3a67; }
+        #dtr-view-modal .ojt-table tbody tr:nth-child(even) { background:#f8f9fc; }
+        #dtr-view-modal .ojt-day-badge,
+        #dtr-view-modal .ojt-hrs-val,
+        #dtr-view-modal .ojt-daily-val { font-size:13px; font-weight:500; color:#2b3a67; }
+        #dtr-view-modal .ojt-status-badge { display:inline-block; padding:3px 16px; border-radius:999px; font-size:12px; font-weight:600; white-space:nowrap; }
+        /* addtl e */
     </style>
 </head>
 
@@ -3769,104 +3807,86 @@ foreach ($roomStatuses as $s) {
         }
 
         function renderDtrSummary(data) {
-            const s = computeDtrStats(data);
+    const s = computeDtrStats(data);
+    const weekly = data.weeks.map(w => ({
+        label: w.week_label,
+        ...computeDtrStats({ student: data.student, weeks: [w] })
+    }));
+    const maxDays = Math.max(1, ...weekly.map(w => w.loggedDays));
+    const onTimeDays = s.loggedDays - s.lateDays;
+    const remaining = Math.max(0, s.requiredHours - s.totalHours);
 
-            // addtl s
-            const weekly = data.weeks.map(w => ({
-                label: w.week_label,
-                ...computeDtrStats({ student: data.student, weeks: [w] })
-            }));
-            const maxDays = Math.max(1, ...weekly.map(w => w.loggedDays));
-            // addtl e
-
-            const circumference = 2 * Math.PI * 54;
-            const dashOffset = circumference - (s.progressPct / 100) * circumference;
-
-            return `
-    <div style="display:flex; gap:24px; flex-wrap:wrap; align-items:center;
-                background:#f8f9fb; border:1px solid #e2e8f0; border-radius:12px;
-                padding:20px 24px; margin-bottom:20px;">
-
-        <div style="display:flex; align-items:center; gap:16px;">
-            <svg width="130" height="130" viewBox="0 0 130 130">
-                <circle cx="65" cy="65" r="54" fill="none" stroke="#e5e7eb" stroke-width="12"/>
-                <circle cx="65" cy="65" r="54" fill="none" stroke="#ff6b2c" stroke-width="12"
-                        stroke-linecap="round"
-                        stroke-dasharray="${circumference}"
-                        stroke-dashoffset="${dashOffset}"
-                        transform="rotate(-90 65 65)"/>
-                <text x="65" y="60" text-anchor="middle" font-size="22" font-weight="700" fill="#1f2937">
-                    ${s.progressPct}%
-                </text>
-                <text x="65" y="80" text-anchor="middle" font-size="11" fill="#6b7280">
-                    completed
-                </text>
-            </svg>
+    const stat = (icon, tone, label, value, unit, sub) => `
+        <div class="hrs-card hrs-stat">
+            <div class="hrs-stat-icon ${tone}"><i class="fa-solid ${icon}"></i></div>
             <div>
-                <div style="font-size:13px; color:#6b7280; font-weight:600; text-transform:uppercase; letter-spacing:.05em;">
-                    OJT Hours
+                <div class="hrs-stat-label">${label}</div>
+                <div class="hrs-stat-value">${value} <span style="font-size:13px; font-weight:500; color:#6b7390;">${unit}</span></div>
+                <div style="font-size:11.5px; color:#8b93ab;">${sub}</div>
+            </div>
+        </div>`;
+
+    const bars = weekly.length === 0
+        ? `<div style="color:#8b93ab; font-size:13px; padding:20px 0;">No weekly data yet.</div>`
+        : weekly.map(w => {
+            const onTime = w.loggedDays - w.lateDays;
+            const h = Math.max(10, (w.loggedDays / maxDays) * 100);
+            return `
+            <div style="flex:1; min-width:64px; max-width:110px; display:flex; flex-direction:column; align-items:center; gap:6px;"
+                 title="${w.label}: ${w.lateDays} late, ${onTime} on time, ${w.overtimeDays} overtime">
+                <div style="height:100px; display:flex; align-items:flex-end; width:100%; justify-content:center;">
+                    <div style="width:44px; max-width:100%; height:${h}px; display:flex; flex-direction:column; border-radius:8px; overflow:hidden; background:#eef2f9;">
+                        <div style="flex:${w.lateDays}; background:#f26b3a;"></div>
+                        <div style="flex:${onTime}; background:#16a36a;"></div>
+                    </div>
                 </div>
-                <div style="font-size:20px; font-weight:700; color:#1f2937; margin-top:2px;">
-                    ${s.totalHours.toFixed(1)} <span style="font-size:14px; color:#9ca3af; font-weight:500;">/ ${s.requiredHours} hrs</span>
+                <div style="font-size:12px; font-weight:600; color:#2b3a67; white-space:nowrap;">${w.label}</div>
+                <div style="font-size:11px; color:#8b93ab; white-space:nowrap;">${w.lateDays}/${w.loggedDays} late</div>
+                ${w.overtimeDays > 0
+                    ? `<span style="font-size:10px; font-weight:600; background:#e5eeff; color:#2f5bd8; padding:1px 8px; border-radius:99px;">OT ${w.overtimeDays}</span>`
+                    : ''}
+            </div>`;
+        }).join('');
+
+    return `
+    <div style="margin-bottom:16px;">
+
+        <div class="hrs-card" style="margin-bottom:12px;">
+            <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-1">
+                <span class="hrs-progress-title">OJT Progress</span>
+                <span class="hrs-progress-pct">${s.progressPct}%</span>
+            </div>
+            <div class="hrs-track"><div class="hrs-fill" style="width:${s.progressPct}%;"></div></div>
+            <div style="font-size:12.5px; color:#6b7390; margin-top:8px;">
+                <b style="color:#1f2a55;">${s.totalHours.toFixed(1)}</b> of ${s.requiredHours} hrs rendered
+                &middot; ${remaining.toFixed(1)} hrs remaining
+            </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(210px, 1fr)); gap:12px; margin-bottom:12px;">
+            ${stat('fa-clock', 'orange', 'Late', s.lateDays, s.lateDays === 1 ? 'time' : 'times', `out of ${s.loggedDays} logged day(s)`)}
+            ${stat('fa-business-time', 'blue', 'Overtime', s.overtimeDays, s.overtimeDays === 1 ? 'time' : 'times', `out of ${s.loggedDays} logged day(s)`)}
+            ${stat('fa-circle-check', 'green', 'On time', onTimeDays, onTimeDays === 1 ? 'day' : 'days', `out of ${s.loggedDays} logged day(s)`)}
+        </div>
+
+        <div class="hrs-card">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                <span class="hrs-progress-title">Attendance per week</span>
+                <div style="display:flex; gap:12px; font-size:11.5px; color:#6b7390;">
+                    <span><i class="fa-solid fa-square" style="color:#f26b3a;"></i> Late</span>
+                    <span><i class="fa-solid fa-square" style="color:#16a36a;"></i> On time</span>
+                    <span><i class="fa-solid fa-square" style="color:#2f5bd8;"></i> OT = overtime days</span>
+                </div>
+            </div>
+            <div style="overflow-x:auto;">
+                <div style="display:flex; gap:16px; align-items:flex-end; border-bottom:1px solid #e8ebf3; padding-bottom:10px; min-width:max-content;">
+                    ${bars}
                 </div>
             </div>
         </div>
 
-        
-
-        <div style="display:flex; flex-direction:column; gap:14px; flex:1; min-width:260px;">
-
-        <div style="display:flex; gap:14px;">
-            <div style="flex:1; background:#fff; border:1px solid #fde68a; border-radius:10px; padding:14px 16px;">
-                <div style="font-size:11px; color:#92400e; font-weight:700; text-transform:uppercase; letter-spacing:.05em;">
-                    Late
-                </div>
-                <div style="font-size:24px; font-weight:700; color:#92400e; margin-top:4px;">
-                    ${s.lateDays} <span style="font-size:13px; font-weight:500;">${s.lateDays === 1 ? 'time' : 'times'}</span>
-                </div>
-                <div style="font-size:11px; color:#a16207; margin-top:2px;">
-                    out of ${s.loggedDays} logged day(s)
-                </div>
-            </div>
-            <div style="flex:1; background:#fff; border:1px solid #93c5fd; border-radius:10px; padding:14px 16px;">
-                <div style="font-size:11px; color:#1e40af; font-weight:700; text-transform:uppercase; letter-spacing:.05em;">
-                    Overtime
-                </div>
-                <div style="font-size:24px; font-weight:700; color:#1e40af; margin-top:4px;">
-                    ${s.overtimeDays} <span style="font-size:13px; font-weight:500;">${s.overtimeDays === 1 ? 'time' : 'times'}</span>
-                </div>
-                <div style="font-size:11px; color:#2563eb; margin-top:2px;">
-                    out of ${s.loggedDays} logged day(s)
-                </div>
-            </div>
-        </div>
-
-        <div style="background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:14px 16px;">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <div style="font-size:11px; color:#6b7280; font-weight:700; text-transform:uppercase; letter-spacing:.05em;">
-                    Late per week
-                </div>
-                <div style="font-size:10px; color:#9ca3af; display:flex; align-items:center; gap:4px;">
-                    <span style="width:8px; height:8px; background:#f59e0b; border-radius:2px; display:inline-block;"></span> Late
-                    <span style="width:8px; height:8px; background:#fef3c7; border-radius:2px; display:inline-block; margin-left:6px;"></span> On time
-                </div>
-            </div>
-            <div style="display:flex; align-items:flex-end; gap:12px; margin-top:10px; overflow-x:auto;">
-                ${weekly.map(w => `
-                    <div style="flex:1; min-width:44px; display:flex; flex-direction:column; align-items:center; gap:4px;">
-                        <div style="font-size:11px; font-weight:600; color:#92400e;">${w.lateDays}/${w.loggedDays}</div>
-                        <div style="width:100%; max-width:36px; height:${Math.max(6, (w.loggedDays / maxDays) * 56)}px;
-                                    background:#fef3c7; border-radius:4px 4px 0 0; display:flex; align-items:flex-end; overflow:hidden;">
-                            <div style="width:100%; height:${w.loggedDays ? (w.lateDays / w.loggedDays) * 100 : 0}%; background:#f59e0b;"></div>
-                        </div>
-                        <div style="font-size:10px; color:#9ca3af; white-space:nowrap;">${w.label}</div>
-                    </div>`).join('')}
-            </div>
-        </div>
-
-    </div>
     </div>`;
-        }
+}
 
         function renderDtrWeekReadOnly(week) {
             const rows = week.rows.length > 0 ? week.rows : Array.from({ length: 6 }, (_, i) => ({
@@ -4299,43 +4319,56 @@ foreach ($roomStatuses as $s) {
         }
 
         function renderDtrWeekReadOnly(week, schedule) {
-            const rows = week.rows.length > 0 ? week.rows : Array.from({ length: 6 }, (_, i) => ({
-                row_index: i, date: '', m_in: '', m_out: '', a_in: '', a_out: ''
-            }));
+    const rows = week.rows.length > 0 ? week.rows : Array.from({ length: 6 }, (_, i) => ({
+        row_index: i, date: '', m_in: '', m_out: '', a_in: '', a_out: ''
+    }));
 
-            const rowsHtml = rows.map(row => {
-                const mHrs = calcHrs(row.m_in, row.m_out);
-                const aHrs = calcHrs(row.a_in, row.a_out);
-                const daily = (mHrs + aHrs).toFixed(2);
-                const dayName = row.date
-                    ? new Date(row.date + 'T00:00:00').toLocaleDateString(undefined, { weekday: 'short' })
-                    : '—';
-                const st = getDtrStatus(row, schedule);
+    const fmtH = h => {
+        if (!h || h <= 0) return '—';
+        const m = Math.round(h * 60), hh = Math.floor(m / 60), mm = m % 60;
+        return mm ? `${hh}h ${mm}m` : `${hh}h`;
+    };
+    const fmtT = t => {
+        if (!t) return '—';
+        const [H, M] = t.split(':').map(Number);
+        return `${String(H % 12 || 12).padStart(2, '0')}:${String(M).padStart(2, '0')} ${H >= 12 ? 'PM' : 'AM'}`;
+    };
+    const fmtD = d => d ? `${d.slice(5, 7)}/${d.slice(8, 10)}/${d.slice(0, 4)}` : '—';
 
-                return `
+    let weekTotal = 0;
+
+    const rowsHtml = rows.map(row => {
+        const mHrs = calcHrs(row.m_in, row.m_out);
+        const aHrs = calcHrs(row.a_in, row.a_out);
+        const daily = mHrs + aHrs;
+        weekTotal += daily;
+        const dayName = row.date
+            ? new Date(row.date + 'T00:00:00').toLocaleDateString(undefined, { weekday: 'short' }).toUpperCase()
+            : '';
+        const st = getDtrStatus(row, schedule);
+
+        return `
         <tr>
-            <td>${row.date || '—'}</td>
-            <td style="text-align:center">${dayName}</td>
-            <td class="td-morning">${row.m_in || '—'}</td>
-            <td class="td-morning">${row.m_out || '—'}</td>
-            <td class="td-morning">${mHrs ? mHrs.toFixed(2) : '—'}</td>
-            <td class="td-afternoon">${row.a_in || '—'}</td>
-            <td class="td-afternoon">${row.a_out || '—'}</td>
-            <td class="td-afternoon">${aHrs ? aHrs.toFixed(2) : '—'}</td>
-            <td>${daily}</td>
+            <td>${fmtD(row.date)}</td>
+            <td>${dayName}</td>
+            <td>${fmtT(row.m_in)}</td>
+            <td>${fmtT(row.m_out)}</td>
+            <td><span class="ojt-hrs-val">${fmtH(mHrs)}</span></td>
+            <td>${fmtT(row.a_in)}</td>
+            <td>${fmtT(row.a_out)}</td>
+            <td><span class="ojt-hrs-val">${fmtH(aHrs)}</span></td>
+            <td><span class="ojt-daily-val">${fmtH(daily)}</span></td>
             <td>
-                <span class="ojt-status-badge"
-                      style="color:${st.color}; background:${st.bg}; padding:2px 8px; border-radius:999px; font-size:.8rem; white-space:nowrap;">
-                    ${st.label}
-                </span>
+                <span class="ojt-status-badge" style="color:${st.color}; background:${st.bg};">${st.label}</span>
             </td>
         </tr>`;
-            }).join('');
+    }).join('');
 
-            return `
-    <div class="ojt-week-block mb-3">
+    return `
+    <div class="ojt-week-block">
         <div class="ojt-week-header">
             <strong>${week.week_label}</strong>
+            <span class="ojt-total-chip">${fmtH(weekTotal)}</span>
         </div>
         <div class="ojt-table-scroll">
             <table class="ojt-table">
@@ -4343,25 +4376,25 @@ foreach ($roomStatuses as $s) {
                     <tr>
                         <th rowspan="2" class="ojt-group">Date</th>
                         <th rowspan="2" class="ojt-group">Day</th>
-                        <th colspan="3" style="background:#FFB62F;">Morning</th>
-                        <th colspan="3" style="background:#FF673A;">Afternoon</th>
+                        <th class="th-morning" colspan="3">Morning</th>
+                        <th class="th-afternoon" colspan="3">Afternoon</th>
                         <th rowspan="2" class="ojt-group">Daily<br>Hours</th>
                         <th rowspan="2" class="ojt-group">Status</th>
                     </tr>
                     <tr>
-                        <th style="background:#f9c565;">In</th>
-                        <th style="background:#f9c565;">Out</th>
-                        <th style="background:#f9c565;">Hrs</th>
-                        <th style="background:#f49679;">In</th>
-                        <th style="background:#f49679;">Out</th>
-                        <th style="background:#f49679;">Hrs</th>
+                        <th class="sub-morning">In</th>
+                        <th class="sub-morning">Out</th>
+                        <th class="sub-morning">Hrs</th>
+                        <th class="sub-afternoon">In</th>
+                        <th class="sub-afternoon">Out</th>
+                        <th class="sub-afternoon">Hrs</th>
                     </tr>
                 </thead>
                 <tbody>${rowsHtml}</tbody>
             </table>
         </div>
     </div>`;
-        }
+}
     </script>
 </body>
 
