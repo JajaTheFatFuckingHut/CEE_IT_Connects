@@ -792,6 +792,7 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                 </table>
             </div>
             <br>
+            <p class="section-label">Calendar</p>
             <!-- Calendar Section -->
             <div id="calendar" class="section <?= $current_section === 'calendar' ? 'active' : '' ?>">
                 <div class="main">
