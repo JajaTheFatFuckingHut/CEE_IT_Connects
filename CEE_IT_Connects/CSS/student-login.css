@@ -79,8 +79,8 @@ select {
     left: -3px;
     width: calc(50% + 3px);
     height: 100vh;
-    background: url("../Sources/wave.svg") no-repeat left top;
-    background-size: 100% 100%;
+    background: url("../Sources/wave.svg") no-repeat left center;
+    background-size: auto 100%;
     z-index: 1;
     pointer-events: none;
 }
