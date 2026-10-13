@@ -32,8 +32,8 @@ $registerVisible = file_exists($statePath) ? trim(file_get_contents($statePath))
     </div> -->
 
         <div class="container-fluid login-container">
-            <img class="wave-bg" src="../Sources/wave.svg" alt="" aria-hidden="true">
-
+            <!-- <img class="wave-bg" src="../Sources/wave.svg" alt="" aria-hidden="true"> -->
+            <div class="wave-bg" aria-hidden="true"></div>
         <div class="row g-0">
 
             <!-- LEFT BRAND PANEL (text is now real HTML so it scales instead of being cropped) -->
