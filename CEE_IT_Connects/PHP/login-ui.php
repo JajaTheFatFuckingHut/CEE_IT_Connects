@@ -32,26 +32,7 @@ $registerVisible = file_exists($statePath) ? trim(file_get_contents($statePath))
     </div> -->
 
         <div class="container-fluid login-container">
-            <svg class="wave-bg" viewBox="0 0 580 1000" preserveAspectRatio="none" aria-hidden="true">
-                <!-- outer band (yellow) -->
-                <path fill="#f4a614" d="M0 0 L468 0
-                    C510 65 565 155 558 290
-                    C552 385 510 430 498 510
-                    C486 600 480 690 446 790
-                    C420 868 410 945 415 1000 L0 1000 Z"/>
-                <!-- middle band (orange) -->
-                <path fill="#e5572f" d="M0 0 L440 0
-                    C482 60 538 150 532 285
-                    C528 380 488 425 478 500
-                    C468 590 462 680 428 780
-                    C400 860 385 940 392 1000 L0 1000 Z"/>
-                <!-- navy panel -->
-                <path fill="#010e47" d="M0 0 L412 0
-                    C450 60 505 140 500 270
-                    C497 360 462 400 455 470
-                    C448 560 440 640 400 740
-                    C370 810 345 900 330 1000 L0 1000 Z"/>
-            </svg>
+            <img class="wave-bg" src="../Sources/wave.svg" alt="" aria-hidden="true">
 
         <div class="row g-0">
 

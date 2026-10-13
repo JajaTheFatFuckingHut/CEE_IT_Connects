@@ -50,7 +50,53 @@ select {
 }
 
 /* --- LOGIN PAGE STYLES --- */
-.login-container { position: relative; overflow: hidden; padding: 0; min-height: 100vh; min-height: 100dvh; }
+.login-container {
+    position: relative;
+    overflow: hidden;
+    padding: 0;
+    min-height: 100vh;
+    min-height: 100dvh;
+    background: #f6f8fc;               /* page background now covers the full height, no white strip */
+}
+
+/* corner triangles now belong to the page, so they never get cut */
+.login-container::before,
+.login-container::after {
+    content: "";
+    position: absolute;
+    width: clamp(120px, 22vw, 260px);
+    aspect-ratio: 1;
+    pointer-events: none;
+    z-index: 0;
+}
+.login-container::before { top: 0;    right: 0; background: #fbe9d2; clip-path: polygon(35% 0, 100% 0, 100% 65%); }
+.login-container::after  { bottom: 0; right: 0; background: #dde3f3; clip-path: polygon(100% 35%, 100% 100%, 35% 100%); }
+
+.wave-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+}
+.left-inner { z-index: 3; }
+.login-card { z-index: 3; }
+
+.right-panel {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding: clamp(1rem, 4vw, 3rem) 1rem;
+    background: transparent;           /* was #f6f8fc, now the container paints it */
+}
+@media (min-width: 992px) {
+    .right-panel { padding-left: clamp(2rem, 9vw, 10rem); }
+}
 
 .left-panel {
     position: relative;
@@ -90,28 +136,6 @@ select {
     font-size: clamp(.78rem, 1vw, .95rem); opacity: .85;
 }
 .school-info i { width: 1.5rem; }
-
-/* RIGHT PANEL */
-.right-panel {
-    position: relative;
-    overflow: hidden;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: clamp(1rem, 4vw, 3rem) 1rem;
-    background: #f6f8fc;
-}
-.right-panel::before,
-.right-panel::after {
-    content: "";
-    position: absolute;
-    width: clamp(120px, 22vw, 260px);
-    aspect-ratio: 1;
-    pointer-events: none;
-    z-index: 0;
-}
-.right-panel::before { top: 0;    right: 0; background: #fbe9d2; clip-path: polygon(35% 0, 100% 0, 100% 65%); }
-.right-panel::after  { bottom: 0; right: 0; background: #dde3f3; clip-path: polygon(100% 35%, 100% 100%, 35% 100%); }
 
 /* LOGIN CARD (the container around the credentials) */
 .login-card {
@@ -218,15 +242,6 @@ select {
 .register-link { color: var(--accent-orange); font-weight: 600; text-decoration: none; }
 .register-link:hover { text-decoration: underline; }
 
-.wave-bg {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 58%;
-    height: 100%;
-    z-index: 1;                /* above the right panel's background */
-    pointer-events: none;
-}
 .left-inner { z-index: 3; }    /* text stays above the wave */
 .login-card { z-index: 3; }    /* card stays above the wave */
 
