@@ -3771,6 +3771,14 @@ foreach ($roomStatuses as $s) {
         function renderDtrSummary(data) {
             const s = computeDtrStats(data);
 
+            // addtl s
+            const weekly = data.weeks.map(w => ({
+                label: w.week_label,
+                ...computeDtrStats({ student: data.student, weeks: [w] })
+            }));
+            const maxDays = Math.max(1, ...weekly.map(w => w.loggedDays));
+            // addtl e
+
             const circumference = 2 * Math.PI * 54;
             const dashOffset = circumference - (s.progressPct / 100) * circumference;
 
@@ -3804,16 +3812,20 @@ foreach ($roomStatuses as $s) {
             </div>
         </div>
 
-        <div style="display:flex; gap:14px; flex:1; min-width:260px;">
+        
+
+        <div style="display:flex; flex-direction:column; gap:14px; flex:1; min-width:260px;">
+
+        <div style="display:flex; gap:14px;">
             <div style="flex:1; background:#fff; border:1px solid #fde68a; border-radius:10px; padding:14px 16px;">
                 <div style="font-size:11px; color:#92400e; font-weight:700; text-transform:uppercase; letter-spacing:.05em;">
                     Late
                 </div>
                 <div style="font-size:24px; font-weight:700; color:#92400e; margin-top:4px;">
-                    ${s.latePct}%
+                    ${s.lateDays} <span style="font-size:13px; font-weight:500;">${s.lateDays === 1 ? 'time' : 'times'}</span>
                 </div>
                 <div style="font-size:11px; color:#a16207; margin-top:2px;">
-                    ${s.lateDays} of ${s.loggedDays} logged day(s)
+                    out of ${s.loggedDays} logged day(s)
                 </div>
             </div>
             <div style="flex:1; background:#fff; border:1px solid #93c5fd; border-radius:10px; padding:14px 16px;">
@@ -3821,13 +3833,38 @@ foreach ($roomStatuses as $s) {
                     Overtime
                 </div>
                 <div style="font-size:24px; font-weight:700; color:#1e40af; margin-top:4px;">
-                    ${s.overtimePct}%
+                    ${s.overtimeDays} <span style="font-size:13px; font-weight:500;">${s.overtimeDays === 1 ? 'time' : 'times'}</span>
                 </div>
                 <div style="font-size:11px; color:#2563eb; margin-top:2px;">
-                    ${s.overtimeDays} of ${s.loggedDays} logged day(s)
+                    out of ${s.loggedDays} logged day(s)
                 </div>
             </div>
         </div>
+
+        <div style="background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:14px 16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div style="font-size:11px; color:#6b7280; font-weight:700; text-transform:uppercase; letter-spacing:.05em;">
+                    Late per week
+                </div>
+                <div style="font-size:10px; color:#9ca3af; display:flex; align-items:center; gap:4px;">
+                    <span style="width:8px; height:8px; background:#f59e0b; border-radius:2px; display:inline-block;"></span> Late
+                    <span style="width:8px; height:8px; background:#fef3c7; border-radius:2px; display:inline-block; margin-left:6px;"></span> On time
+                </div>
+            </div>
+            <div style="display:flex; align-items:flex-end; gap:12px; margin-top:10px; overflow-x:auto;">
+                ${weekly.map(w => `
+                    <div style="flex:1; min-width:44px; display:flex; flex-direction:column; align-items:center; gap:4px;">
+                        <div style="font-size:11px; font-weight:600; color:#92400e;">${w.lateDays}/${w.loggedDays}</div>
+                        <div style="width:100%; max-width:36px; height:${Math.max(6, (w.loggedDays / maxDays) * 56)}px;
+                                    background:#fef3c7; border-radius:4px 4px 0 0; display:flex; align-items:flex-end; overflow:hidden;">
+                            <div style="width:100%; height:${w.loggedDays ? (w.lateDays / w.loggedDays) * 100 : 0}%; background:#f59e0b;"></div>
+                        </div>
+                        <div style="font-size:10px; color:#9ca3af; white-space:nowrap;">${w.label}</div>
+                    </div>`).join('')}
+            </div>
+        </div>
+
+    </div>
     </div>`;
         }
 
