@@ -3,6 +3,8 @@
     --primary-dark-blue: #272f54;
     --accent-orange: #e05834;
     --text-gray: #777;
+    --field-bg: #f5f7fb;
+    --border: #dfe4ee;
 }
 body{
     z-index: 1000;
@@ -48,17 +50,12 @@ select {
 }
 
 /* --- LOGIN PAGE STYLES --- */
-/* --- LOGIN PAGE STYLES --- */
-.login-container { padding: 0; min-height: 100vh; min-height: 100dvh; }
-.login-container > .row { min-height: 100vh; min-height: 100dvh; }
+.login-container { position: relative; overflow: hidden; padding: 0; min-height: 100vh; min-height: 100dvh; }
 
-/* LEFT PANEL */
 .left-panel {
     position: relative;
-    overflow: hidden;
     display: flex;
-    background-color: #010e47;
-  background-image: none;
+    background: transparent;
     color: #fff;
 }
 .left-inner {
@@ -93,10 +90,6 @@ select {
     font-size: clamp(.78rem, 1vw, .95rem); opacity: .85;
 }
 .school-info i { width: 1.5rem; }
-
-.wave { position: absolute; pointer-events: none; z-index: 0; height: auto; }
-.wave-top    { top: 0;    right: 0; width: clamp(120px, 22%, 200px); }
-.wave-bottom { bottom: 0; right: 0; width: clamp(160px, 45%, 360px); }
 
 /* RIGHT PANEL */
 .right-panel {
@@ -225,9 +218,27 @@ select {
 .register-link { color: var(--accent-orange); font-weight: 600; text-decoration: none; }
 .register-link:hover { text-decoration: underline; }
 
+.wave-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 58%;
+    height: 100%;
+    z-index: 1;                /* above the right panel's background */
+    pointer-events: none;
+}
+.left-inner { z-index: 3; }    /* text stays above the wave */
+.login-card { z-index: 3; }    /* card stays above the wave */
+
+/* keeps the card clear of the wave bulge on smaller desktops */
+@media (min-width: 992px) {
+    .right-panel { padding-left: clamp(2rem, 9vw, 10rem); }
+}
+
 /* RESPONSIVE */
 @media (max-width: 991.98px) {
     .left-panel { display: none; }
+    .wave-bg { display: none; }
 }
 @media (max-width: 400px) {
     .btn-role i { display: none; }           /* keeps the 3 tabs from overflowing on small phones */

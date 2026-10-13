@@ -32,18 +32,32 @@ $registerVisible = file_exists($statePath) ? trim(file_get_contents($statePath))
     </div> -->
 
         <div class="container-fluid login-container">
+            <svg class="wave-bg" viewBox="0 0 580 1000" preserveAspectRatio="none" aria-hidden="true">
+                <!-- outer band (yellow) -->
+                <path fill="#f4a614" d="M0 0 L468 0
+                    C510 65 565 155 558 290
+                    C552 385 510 430 498 510
+                    C486 600 480 690 446 790
+                    C420 868 410 945 415 1000 L0 1000 Z"/>
+                <!-- middle band (orange) -->
+                <path fill="#e5572f" d="M0 0 L440 0
+                    C482 60 538 150 532 285
+                    C528 380 488 425 478 500
+                    C468 590 462 680 428 780
+                    C400 860 385 940 392 1000 L0 1000 Z"/>
+                <!-- navy panel -->
+                <path fill="#010e47" d="M0 0 L412 0
+                    C450 60 505 140 500 270
+                    C497 360 462 400 455 470
+                    C448 560 440 640 400 740
+                    C370 810 345 900 330 1000 L0 1000 Z"/>
+            </svg>
+
         <div class="row g-0">
 
             <!-- LEFT BRAND PANEL (text is now real HTML so it scales instead of being cropped) -->
             <div class="col-lg-5 left-panel">
-                <svg class="wave wave-top" viewBox="0 0 200 130" aria-hidden="true">
-                    <path d="M70 0 C110 55 160 80 200 120 L200 0 Z" fill="#f4a614"/>
-                    <path d="M120 0 L200 0 L200 120 C170 85 140 50 120 0 Z" fill="#e5572f"/>
-                </svg>
-                <svg class="wave wave-bottom" viewBox="0 0 360 420" aria-hidden="true">
-                    <path d="M360 0 C340 150 240 230 150 300 C100 340 60 380 30 420 L360 420 Z" fill="#f4a614"/>
-                    <path d="M360 130 C330 250 260 300 200 350 C185 365 170 390 160 420 L360 420 Z" fill="#e5572f"/>
-                </svg>
+                
 
                 <div class="left-inner">
                     <div class="brand">
