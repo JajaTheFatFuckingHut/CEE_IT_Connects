@@ -97,9 +97,6 @@ select {
     padding: clamp(1rem, 4vw, 3rem) 1rem;
     background: transparent;           /* was #f6f8fc, now the container paints it */
 }
-@media (min-width: 992px) {
-    .right-panel { padding-left: clamp(2rem, 9vw, 10rem); }
-}
 
 .left-panel {
     position: relative;
@@ -251,6 +248,8 @@ select {
 /* keeps the card clear of the wave bulge on smaller desktops */
 @media (min-width: 992px) {
     .right-panel { padding-left: clamp(2rem, 9vw, 10rem); }
+    html { background: linear-gradient(90deg, #0e1f45 0, #0e1f45 25%, #f6f8fc 25%);
+    }
 }
 
 /* RESPONSIVE */
