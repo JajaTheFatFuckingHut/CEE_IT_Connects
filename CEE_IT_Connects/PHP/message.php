@@ -2988,10 +2988,10 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
 
     <!-- SIDEBAR -->
     <div class="sidebar">
-        <a href="?section=home<?php if ($current_room_id)
-            echo "&room_id=$current_room_id"; ?>" data-tooltip="Home"
-            class="sidebar-link <?= $current_section === 'home' ? 'active' : '' ?>">
-            <i class="fa-solid fa-house"></i> <span class="sidebar-text">Home</span>
+        <a href="?section=home" data-tooltip="Home"
+            class="sidebar-link <?= ($current_section === 'home' && !$current_room_id) ? 'active' : '' ?>">
+            <i class="fa-solid fa-house"></i>
+            <span class="sidebar-text">Home</span>
         </a>
 
         <a href="?section=chats<?php if ($current_room_id)
