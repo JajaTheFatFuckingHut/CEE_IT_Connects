@@ -1304,7 +1304,7 @@ $page = 'messages';
     <!-- MAIN CONTENT -->
     <div class="main">
 
-        <?php if ($section === ''): ?>
+        <?php if ($section === '' || $section === 'rooms'): ?>
             <?php include 'chat-room-content.php'; ?>
 
         <?php elseif ($section === 'chats'): ?>
