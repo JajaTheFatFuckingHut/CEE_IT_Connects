@@ -3,6 +3,12 @@ session_start();
 require 'db.php';
 require_once 'auth.php';
 
+// addtl s — admin credentials for sidebar account box
+$adminInfoStmt = $pdo->prepare("SELECT name FROM admins WHERE id = ?");
+$adminInfoStmt->execute([$_SESSION['user_id']]);
+$adminFullName = $adminInfoStmt->fetchColumn() ?: 'Admin';
+// addtl e
+
 // Second code's real queries
 $applicantsStmt = $pdo->query("
     SELECT 
@@ -433,11 +439,60 @@ for ($t = 13; $t >= 0; $t--) {
             padding: 20px;
             display: flex;
             flex-direction: column;
-            height: 100vh;
             position: fixed;
             left: 0;
             top: 70px;
+            bottom: 0;
+            overflow-y: auto;
         }
+ /* s */
+        .sidebar-user {
+            margin-top: auto;
+            margin-left: -20px;
+            margin-right: -20px;
+            margin-bottom: -20px;
+            width: calc(100% + 40px);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            background: #1f2744;
+            flex-shrink: 0;
+        }
+
+        .sidebar-user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #3a4374;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            flex-shrink: 0;
+        }
+
+        .sidebar-user-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .sidebar-user-name {
+            font-size: 13.5px;
+            font-weight: 700;
+            color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .sidebar-user-role {
+            font-size: 11px;
+            color: #9aa3c7;
+        }
+        /* e */
 
         .sidebar h3 {
             margin-bottom: 20px;
@@ -722,6 +777,18 @@ for ($t = 13; $t >= 0; $t--) {
                 z-index: 1050;
             }
 
+            .sidebar-user {
+                flex-direction: column;
+                gap: 4px;
+                padding: 10px 0;
+                margin: auto 0 0 0;
+                width: 100%;
+            }
+
+            .sidebar-user-info {
+                display: none;
+            }
+
             .sidebar h3 {
                 display: none !important;
             }
@@ -999,6 +1066,15 @@ for ($t = 13; $t >= 0; $t--) {
                 <i class="bi bi-file-text-fill"></i>
                 <span class="nav-label">Upload MOU</span>
             </a>
+
+            <!-- ADDED: account box (name + role) -->
+            <div class="sidebar-user">
+                <div class="sidebar-user-avatar"><?= strtoupper(substr($adminFullName, 0, 1)) ?></div>
+                <div class="sidebar-user-info">
+                    <div class="sidebar-user-name"><?= htmlspecialchars($adminFullName) ?></div>
+                    <div class="sidebar-user-role">Internship Admin</div>
+                </div>
+            </div>
         </aside>
 
         <div class="main-content">
