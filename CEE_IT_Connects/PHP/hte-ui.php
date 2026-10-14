@@ -3746,7 +3746,6 @@ foreach ($roomStatuses as $s) {
 
         /* ---------- time helpers ---------- */
 
-        // "08:30" or "08:30:00" -> minutes since midnight. Returns null if blank/invalid.
         function timeToMinutes(str) {
             if (!str) return null;
             const m = String(str).match(/^(\d{1,2}):(\d{2})/);

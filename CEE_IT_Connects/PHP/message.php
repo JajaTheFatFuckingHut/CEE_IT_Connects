@@ -3723,6 +3723,21 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                     </div>
                 </div>
 
+
+                <?php
+                    $fmtSched = fn($t) => $t ? date('h:i A', strtotime($t)) : null;
+                    $schedIn  = $fmtSched($ojtTimeIn);
+                    $schedOut = $fmtSched($ojtTimeOut);
+                ?>
+                <div class="mb-3" style="font-size:13px; color:#6b7390;">
+                    <i class="fa-solid fa-clock" style="color:#f26b3a;"></i>
+                    <b style="color:#1f2a55;"><?= htmlspecialchars($student['company_name'] ?? 'No company') ?></b>
+                    office hours:
+                    <b style="color:#1f2a55;">
+                        <?= ($schedIn && $schedOut) ? "$schedIn – $schedOut" : 'Not set' ?>
+                    </b>
+                </div>
+                
                 <!-- Summary Cards -->
                 <div class="row g-3 mb-3">
                     <div class="col-md-4">
