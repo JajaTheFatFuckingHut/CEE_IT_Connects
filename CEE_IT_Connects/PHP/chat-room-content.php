@@ -1510,14 +1510,6 @@ $rmFmtTime = function ($ts): string {
 };
 ?>
 
-<?php if (($_SESSION['role'] ?? '') === 'student'): ?>
-    <div class="d-flex justify-content-end mb-2">
-        <a href="<?= $backLink ?>" class="text-danger fw-semibold" style="text-decoration:none;">
-            <i class="fa-solid fa-arrow-left"></i> Back to rooms
-        </a>
-    </div>
-<?php endif; ?>
-
 <!-- HEADER -->
 <div class="rm-hero">
     <div>
