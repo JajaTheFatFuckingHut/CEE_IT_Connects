@@ -3648,20 +3648,6 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                     </a>
                 </div>
             <?php else: ?>
-                <!-- Header -->
-                <!-- <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-                    <div>
-                        <h3>Rendered Hours</h3>
-                        <p class="text-muted mb-0">OJT Daily Time Record</p>
-                    </div>
-                    <div class="d-flex align-items-center gap-2 text-end">
-                        <label style="font-size:16px; color:#555; font-weight:500;">OJT Hours Required:</label>
-                        <span style="font-size:16px; font-weight:600; color:#29335C;">
-                            <?= $requiredHours ?> hrs
-                        </span>
-                    </div>
-                </div> -->
-                <!-- Header -->
                 <div class="pg-header">
                     <div class="pg-header-left">
                         <div class="pg-header-icon"><i class="fa-solid fa-clock"></i></div>
@@ -3670,9 +3656,24 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                             <p>OJT Daily Time Record</p>
                         </div>
                     </div>
-                    <div class="d-flex align-items-center gap-2">
-                        <label style="font-size:15px; color:#555; font-weight:500; margin:0;">OJT Hours Required:</label>
-                        <span style="font-size:16px; font-weight:700; color:#272f54;"><?= $requiredHours ?> hrs</span>
+                    <?php
+                        $fmtSched = fn($t) => $t ? date('h:i A', strtotime($t)) : null;
+                        $schedIn  = $fmtSched($ojtTimeIn);
+                        $schedOut = $fmtSched($ojtTimeOut);
+                    ?>
+                    <div class="text-end">
+                        <div class="d-flex align-items-center justify-content-end gap-2">
+                            <label style="font-size:15px; color:#555; font-weight:500; margin:0;">OJT Hours Required:</label>
+                            <span style="font-size:16px; font-weight:700; color:#272f54;"><?= $requiredHours ?> hrs</span>
+                        </div>
+                        <div style="font-size:13px; color:#64748b; margin-top:4px;">
+                            <i class="fa-solid fa-clock" style="color:#f26b3a;"></i>
+                            <b style="color:#272f54;"><?= htmlspecialchars($student['company_name'] ?? 'No company') ?></b>
+                            office hours:
+                            <b style="color:#272f54;">
+                                <?= ($schedIn && $schedOut) ? "$schedIn – $schedOut" : 'Not set' ?>
+                            </b>
+                        </div>
                     </div>
                 </div>
 
@@ -3723,21 +3724,6 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                     </div>
                 </div>
 
-
-                <?php
-                    $fmtSched = fn($t) => $t ? date('h:i A', strtotime($t)) : null;
-                    $schedIn  = $fmtSched($ojtTimeIn);
-                    $schedOut = $fmtSched($ojtTimeOut);
-                ?>
-                <div class="mb-3" style="font-size:13px; color:#6b7390;">
-                    <i class="fa-solid fa-clock" style="color:#f26b3a;"></i>
-                    <b style="color:#1f2a55;"><?= htmlspecialchars($student['company_name'] ?? 'No company') ?></b>
-                    office hours:
-                    <b style="color:#1f2a55;">
-                        <?= ($schedIn && $schedOut) ? "$schedIn – $schedOut" : 'Not set' ?>
-                    </b>
-                </div>
-                
                 <!-- Summary Cards -->
                 <div class="row g-3 mb-3">
                     <div class="col-md-4">
