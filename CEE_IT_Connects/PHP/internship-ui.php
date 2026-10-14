@@ -1033,7 +1033,7 @@ for ($t = 13; $t >= 0; $t--) {
 
     <div class="page-body">
         <!-- SIDEBAR -->
-        <aside class="sidebar" style="padding-bottom:70px;">
+        <aside class="sidebar">
             <a href="#" class="active" onclick="showSection('dashboard')" data-tooltip="Home">
                 <i class="bi bi-person-fill-lock"></i>
                 <span class="nav-label">Home</span>
