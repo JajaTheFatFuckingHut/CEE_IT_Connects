@@ -3806,6 +3806,11 @@ foreach ($roomStatuses as $s) {
             return { totalHours, requiredHours, progressPct, loggedDays, lateDays, overtimeDays, latePct, overtimePct };
         }
 
+    function fmtSchedTime(t) {
+        if (!t) return null;
+        const [H, M] = t.split(':').map(Number);
+        return `${String(H % 12 || 12).padStart(2, '0')}:${String(M).padStart(2, '0')} ${H >= 12 ? 'PM' : 'AM'}`;
+    }
         function renderDtrSummary(data) {
     const s = computeDtrStats(data);
     const weekly = data.weeks.map(w => ({
@@ -3815,6 +3820,9 @@ foreach ($roomStatuses as $s) {
     const maxDays = Math.max(1, ...weekly.map(w => w.loggedDays));
     const onTimeDays = s.loggedDays - s.lateDays;
     const remaining = Math.max(0, s.requiredHours - s.totalHours);
+
+    const schedIn = fmtSchedTime(data.student.ojt_time_in);
+    const schedOut = fmtSchedTime(data.student.ojt_time_out);
 
     const stat = (icon, tone, label, value, unit, sub) => `
         <div class="hrs-card hrs-stat">
@@ -3860,6 +3868,15 @@ foreach ($roomStatuses as $s) {
             <div style="font-size:12.5px; color:#6b7390; margin-top:8px;">
                 <b style="color:#1f2a55;">${s.totalHours.toFixed(1)}</b> of ${s.requiredHours} hrs rendered
                 &middot; ${remaining.toFixed(1)} hrs remaining
+
+                <div style="font-size:12.5px; color:#6b7390; margin-top:4px;">
+                    <i class="fa-solid fa-clock" style="color:#f26b3a;"></i>
+                    Office hours:
+                    ${schedIn && schedOut
+                        ? `<b style="color:#1f2a55;">${schedIn} – ${schedOut}</b>
+                        &middot; Late if time-in is after ${schedIn} &middot; Undertime if time-out is before ${schedOut}`
+                        : `<b style="color:#1f2a55;">Not set</b> &middot; status shows "Present" only`}
+                </div>
             </div>
         </div>
 
