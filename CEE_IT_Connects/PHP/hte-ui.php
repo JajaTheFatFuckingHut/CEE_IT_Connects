@@ -2149,9 +2149,6 @@ foreach ($roomStatuses as $s) {
 
         <hr style="border-top: 2px solid rgba(255,255,255,0.59); margin: 16px auto; width: calc(100% - 32px);">
 
-        <!-- <a href="#" onclick="showSection('home', event)" id="nav-home" data-tooltip="Home">
-            <i class="fa-solid fa-calendar-check me-2"></i><span class="sidebar-text">Home</span>
-        </a> -->
         <a href="#" onclick="showSection('home', event)" id="nav-home" data-tooltip="Home"
             class="<?= ($section === '' || $section === 'home') ? 'active' : '' ?>">
             <i class="fa-solid fa-house me-2"></i><span class="sidebar-text">Home</span>
