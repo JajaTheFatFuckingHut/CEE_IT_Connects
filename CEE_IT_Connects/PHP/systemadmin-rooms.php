@@ -1320,7 +1320,7 @@ $page = 'messages';
     <!-- SIDEBAR -->
     <div class="sidebar">
         <div class="rooms-list" style="display:flex; flex-direction:column; width:100%;">
-            <a href="superadmin.php" title="Back to Home">
+            <a href="superadmin.php" data-tooltip="Back to Home">
                 <i class="fa-solid fa-arrow-left me-2"></i>
                 <span class="sidebar-text">Back to Home</span>
             </a>
