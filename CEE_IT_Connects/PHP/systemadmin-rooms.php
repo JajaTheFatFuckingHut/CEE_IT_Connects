@@ -407,8 +407,23 @@ $page = 'messages';
         }
 
         .sidebar a.active {
-            background: #ffdac8;
+            background: #fdeee8;
             color: #ff6b2c;
+        }
+
+        .rooms-list h6 {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: .08em;
+            color: #8b93ab;
+            padding: 0 30px;
+            margin: 6px 0 8px;
+        }
+
+        .rooms-list hr {
+            margin: 12px 10px;
+            border-color: #e5e7eb;
+            opacity: 1;
         }
 
         .main {
@@ -1297,6 +1312,29 @@ $page = 'messages';
                     <span class="sidebar-text">
                         <?= htmlspecialchars($room['room_name']) ?>
                     </span>
+                </a>
+            <?php endforeach; ?>
+        </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <div class="rooms-list" style="display:flex; flex-direction:column; width:100%;">
+            <a href="superadmin.php" title="Back to Home">
+                <i class="fa-solid fa-arrow-left me-2"></i>
+                <span class="sidebar-text">Back to Home</span>
+            </a>
+            <hr>
+            <h6>ROOMS</h6>
+            <?php foreach ($myRooms as $room): ?>
+                <a href="systemadmin-rooms.php?room_id=<?= $room['id'] ?>"
+                    class="<?= ((int) $current_room_id === (int) $room['id']) ? 'active' : '' ?>"
+                    title="<?= htmlspecialchars($room['room_name']) ?>">
+                    <i class="bi bi-people-fill me-2"></i>
+                    <span class="sidebar-text">
+                        <?= htmlspecialchars($room['room_name']) ?>
+                    </span>
+                    <span class="sidebar-text ms-auto"><i class="fa-solid fa-chevron-right" style="font-size:10px;"></i></span>
                 </a>
             <?php endforeach; ?>
         </div>

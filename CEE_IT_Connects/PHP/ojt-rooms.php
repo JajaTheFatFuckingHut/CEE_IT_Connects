@@ -2664,7 +2664,7 @@ $page = 'messages';
                 </div>
             </div>
             <!-- addtl e -->
-        <?php elseif ($section === 'room'): ?>
+        <?php elseif ($section === 'room' || $section === 'rooms'): ?>
             <?php if ($current_room_id): ?>
                 <?php include 'chat-room-content.php'; ?>
             <?php endif; ?>
