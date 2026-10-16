@@ -777,10 +777,10 @@ function uploadBlock(string $step_key, string $label, array $progress, ?int $int
                         <?= $s2done ? '<i class="fa fa-check"></i>' : 'x' ?>
                     </div>
                     <div class="step-meta">
-                        <h3>Apply for Internship</h3>
+                        <h3>Choose Internship</h3>
                         <p><?= $s2done
                             ? htmlspecialchars(($selectedInternship['title'] ?? '') . ' — ' . ($selectedInternship['company'] ?? ''))
-                            : 'Browse listings and apply to an HTE' ?>
+                            : 'Browse listings and choose an HTE' ?>
                         </p>
                     </div>
                     <div class="step-right">
@@ -813,7 +813,7 @@ function uploadBlock(string $step_key, string $label, array $progress, ?int $int
                         <div class="info-box blue">
                             <i class="fa fa-circle-info"></i>
                             <div>
-                                <p>Find and apply to an HTE</p>
+                                <p>Find and choose an HTE</p>
                                 <span>Browse the internship listings and click <strong>Interested</strong> on a posting to
                                     begin.</span>
                             </div>
@@ -871,21 +871,6 @@ function uploadBlock(string $step_key, string $label, array $progress, ?int $int
                             </span>
                         </div>
                     </div>
-                    <!-- <div class="doc-row">
-                        <i class="fa fa-file-lines" style="color:var(--brand);"></i>
-                        <span class="doc-name">Addendum for Student Intern Placement</span>
-                        <?php if ($internship_id): ?>
-                            <a href="mou-preview.php?id=<?= $internship_id ?>&student_id=<?= $student_id ?>&action=addendum"
-                                target="_blank" class="btn-action btn-outline-action"
-                                style="padding:5px 10px;font-size:11.5px;">
-                                <i class="fa fa-eye"></i> Preview
-                            </a>
-                            <a href="download-form.php?id=<?= $internship_id ?>&action=resume"
-                                class="btn-action btn-outline-action" style="padding:5px 10px;font-size:11.5px;">
-                                <i class="fa fa-download"></i> Download
-                            </a>
-                        <?php endif; ?>
-                    </div> -->
                     <?php if (!$s3done): ?>
                         <?= uploadBlock('resume', 'I have picked up the MOU/Partnership Letter and submitted the Addendum to the college.', $progress, $internship_id) ?>
                     <?php endif; ?>
@@ -921,7 +906,7 @@ function uploadBlock(string $step_key, string $label, array $progress, ?int $int
                         <i class="fa fa-triangle-exclamation"></i>
                         <div>
                             <p>Wait for confirmation before pickup</p>
-                            <span>Wait for your OJT Coordinator to confirm that your MOU / Partnership Letter
+                            <span>See Announcements section for updates on when your MOU 
                                 is ready for pickup at the college secretary's office.</span>
                         </div>
                     </div>
@@ -1200,7 +1185,7 @@ function uploadBlock(string $step_key, string $label, array $progress, ?int $int
                     <div class="info-box blue">
                         <i class="fa fa-stethoscope"></i>
                         <div>
-                            <p>Complete this first before applying to any HTE</p>
+                            <p>Complete this first before choosing any HTE</p>
                             <span>Obtain a medical certificate tagged <strong>"fit to work / fit for OJT"</strong>
                                 signed by a licensed physician from a DOH-accredited clinic.
                                 Submit to your OJT Coordinator before anything else.</span>
@@ -1391,7 +1376,7 @@ function uploadBlock(string $step_key, string $label, array $progress, ?int $int
                         <i class="fa fa-xmark"></i>
                     </div>
                     <div class="step-meta">
-                        <h3 style="color:#dc2626;">Cancel Application</h3>
+                        <h3 style="color:#dc2626;">Cancel internship</h3>
                         <p>Withdraw from this internship and reset your progress</p>
                     </div>
                     <div class="step-right">
@@ -1405,7 +1390,7 @@ function uploadBlock(string $step_key, string $label, array $progress, ?int $int
                         <div>
                             <p>This cannot be undone</p>
                             <span>Cancelling will permanently delete all uploaded documents and reset
-                                checklist progress for this internship. You can apply again afterward,
+                                checklist progress for this internship. You can choose an HTE again afterwards,
                                 but you will need to redo the checklist from the start.</span>
                         </div>
                     </div>
@@ -1442,7 +1427,7 @@ function uploadBlock(string $step_key, string $label, array $progress, ?int $int
                         <input type="hidden" name="application_id"
                             value="<?= (int) ($selectedInternship['application_id'] ?? 0) ?>">
                         <button type="submit" class="btn-action" style="background:#dc2626; color:white;">
-                            <i class="fa fa-trash-can"></i> Cancel Application
+                            <i class="fa fa-trash-can"></i> Cancel Internship
                         </button>
                     </form>
 
