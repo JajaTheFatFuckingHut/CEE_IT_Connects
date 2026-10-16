@@ -378,7 +378,7 @@ $page = 'messages';
 
         .sidebar a {
             display: flex;
-            position: absolute;
+            position: relative;
             align-items: center;
             padding: 10px 20px;
             color: #333;
@@ -397,6 +397,29 @@ $page = 'messages';
         .sidebar a.active {
             background: #fdeee8;
             color: #ff6b2c;
+        }
+
+        .sidebar a::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            left: calc(100% + 8px);
+            top: 50%;
+            transform: translateY(-50%);
+            background: #1a1a2e;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 500;
+            padding: 5px 10px;
+            border-radius: 6px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+            z-index: 300;
+        }
+
+        .sidebar a[data-tooltip]:hover::after {
+            opacity: 1;
         }
 
         .rooms-list h6 {
@@ -1292,7 +1315,7 @@ $page = 'messages';
     <!-- SIDEBAR -->
     <div class="sidebar">
         <div class="rooms-list" style="display:flex; flex-direction:column; width:100%;">
-            <a href="internship-ui.php" title="Back to Home">
+            <a href="internship-ui.php" data-tooltip="Back to Home">
                 <i class="fa-solid fa-arrow-left me-2"></i>
                 <span class="sidebar-text">Back to Home</span>
             </a>
@@ -1301,7 +1324,7 @@ $page = 'messages';
             <?php foreach ($myRooms as $room): ?>
                 <a href="internadmin-rooms.php?room_id=<?= $room['id'] ?>"
                     class="<?= ((int) $current_room_id === (int) $room['id']) ? 'active' : '' ?>"
-                    title="<?= htmlspecialchars($room['room_name']) ?>">
+                    data-tooltip="<?= htmlspecialchars($room['room_name']) ?>">
                     <i class="bi bi-people-fill me-2"></i>
                     <span class="sidebar-text">
                         <?= htmlspecialchars($room['room_name']) ?>
@@ -1564,7 +1587,7 @@ $page = 'messages';
                                         <?php if ($done && $file_path): ?>
                                             <!-- Clickable — downloads the uploaded proof -->
                                             <a href="<?= htmlspecialchars($file_path) ?>" target="_blank" download
-                                                title="Download proof for <?= htmlspecialchars($label) ?>" class="checklist-pill done"
+                                                data-tooltip="Download proof for <?= htmlspecialchars($label) ?>" class="checklist-pill done"
                                                 style="text-decoration:none; cursor:pointer; display:inline-flex; align-items:center; gap:4px;">
                                                 <i class="fa fa-circle-check" style="font-size:10px;"></i>
                                                 <?= $label ?>
@@ -1573,7 +1596,7 @@ $page = 'messages';
 
                                         <?php elseif ($done): ?>
                                             <!-- Done but no file (legacy rows before upload was required) -->
-                                            <span class="checklist-pill done" title="Marked done — no file attached"
+                                            <span class="checklist-pill done" data-tooltip="Marked done — no file attached"
                                                 style="display:inline-flex; align-items:center; gap:4px;">
                                                 <i class="fa fa-circle-check" style="font-size:10px;"></i>
                                                 <?= $label ?>
