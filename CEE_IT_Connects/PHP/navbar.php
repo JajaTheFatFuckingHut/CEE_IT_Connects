@@ -599,17 +599,28 @@ function timeAgo($datetime)
                 right: -60px;
             }
         }
+
+        .hg-hero{display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,#272f54,#33448f);color:#fff;border-radius:14px;padding:18px 20px;border-left:4px solid #FFB62F;margin-bottom:18px}
+        .hg-hero-icon{width:46px;height:46px;border-radius:12px;background:rgba(255,255,255,.14);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+        .hg-hero-title{font-size:17px;font-weight:700}
+        .hg-hero-sub{font-size:12.5px;opacity:.85;margin-top:2px}
+        .hg-label{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#8b93ab;margin:0 0 10px}
+        .hg-flow{display:flex;flex-wrap:wrap;align-items:center;gap:8px 6px;margin-bottom:22px}
+        .hg-flow-step{display:inline-flex;align-items:center;gap:8px;background:#f4f6ff;border:1px solid #e8eaf0;border-radius:999px;padding:5px 14px 5px 5px;font-size:12.5px;font-weight:600;color:#272f54}
+        .hg-flow-num{width:22px;height:22px;border-radius:50%;background:#ff6b2c;color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center}
+        .hg-flow-arrow{color:#cbd5e1;font-size:12px}
+        .hg-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+        .hg-card{border:1px solid #e8eaf0;border-radius:12px;padding:14px 16px;background:#fff}
+        .hg-card-head{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+        .hg-card-ic{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+        .hg-card-title{font-weight:700;font-size:13.5px;color:#272f54}
+        .hg-where{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:#64748b;background:#f1f3f8;border-radius:6px;padding:2px 8px;margin-top:3px}
+        .hg-steps{margin:0;padding-left:18px}
+        .hg-steps li{font-size:12.5px;color:#444;line-height:1.65}
+        .hg-tip{margin-top:16px;background:#fff8f0;border:1px solid #ffd8a8;border-radius:12px;padding:12px 16px;font-size:12.5px;color:#7a3f00;display:flex;gap:10px;align-items:flex-start}
+        .hg-tip i{color:#c46a00;font-size:16px;margin-top:1px}
+        @media (max-width:640px){.hg-grid{grid-template-columns:1fr}}
     </style>
-<!-- 
-    <?php if ($userType === 'student'): ?>
-    <style>
-        @media (max-width: 768px) {
-            .navbar-custom .nav-logo {
-                height: 46px;
-            }
-        }
-    </style>
-    <?php endif; ?> -->
 </head>
 
 <nav class="navbar navbar-expand-lg navbar-custom fixed-top">
@@ -778,7 +789,7 @@ function timeAgo($datetime)
     <div id="helpModal"
         style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.45);align-items:flex-start;justify-content:center;padding-top:40px;">
         <div
-            style="background:#fff;border-radius:16px;width:min(720px,95vw);max-height:85vh;display:flex;flex-direction:column;overflow:hidden;">
+            style="background:#fff;border-radius:16px;width:min(900px,95vw);max-height:85vh;display:flex;flex-direction:column;overflow:hidden;">
 
             <!-- Header -->
             <div
@@ -810,411 +821,267 @@ function timeAgo($datetime)
             <!-- Body -->
             <div style="overflow-y:auto;padding:24px 28px;flex:1;">
 
-                <?php if ($currentRole === 'student'): ?>
-                    <!-- ======== STUDENT ======== -->
-                    <div style="margin-bottom:18px;">
-                        <div style="font-size:15px;font-weight:700;color:#272f54;margin-bottom:4px;">
-                            <i class="bi bi-mortarboard-fill" style="margin-right:6px;"></i>Student User Guide
-                        </div>
+                <?php
+                $helpGuides = [
+                    'student' => [
+                        'title' => 'Student Guide',
+                        'icon' => 'bi-mortarboard-fill',
+                        'tagline' => 'From finding a company to finishing your OJT.',
+                        'flow' => ['Pick company', 'Requirements', 'Join room', 'Log hours', 'Progress report', 'Evaluation'],
+                        'cards' => [
+                            ['bi-funnel-fill', 'Find an internship', 'Top bar › Internships', [
+                                'Use the filters (program, classification, location) to narrow the list.',
+                                'Click <strong>Read More</strong> for requirements, schedule and contact details.',
+                                'Open the map on <strong>Home</strong> to see company locations and get directions.',
+                            ]],
+                            ['bi-building', 'Pick your host company', 'Home › Checklist', [
+                                'Choose the company where you will do your OJT.',
+                                'The Checklist marks this step <strong>Done</strong> once it is saved.',
+                            ]],
+                            ['bi-list-check', 'Complete your requirements', 'Sidebar › Checklist', [
+                                'Upload proof for each requirement (MOU, Recommendation Letter, Waiver and the other forms).',
+                                'Preview or download the generated documents where available.',
+                                'Once the MOU, Recommendation Letter and Waiver are done, <strong>Hours</strong> and <strong>Progress Report</strong> unlock.',
+                            ]],
+                            ['bi-clock-history', 'Log your hours', 'Sidebar › Hours', [
+                                'Enter your morning and afternoon time in/out for each day.',
+                                'Your adviser and HTE supervisor can see them on the Timesheet.',
+                                'Late or early time-outs are flagged against the company office hours.',
+                            ]],
+                            ['bi-file-earmark-text-fill', 'Submit progress reports', 'Sidebar › Progress Report', [
+                                'Upload your weekly report as a file.',
+                                'Your OJT adviser can view every week you submit.',
+                            ]],
+                            ['bi-clipboard-check', 'Evaluation', 'Sidebar › Evaluation', [
+                                'Open it once you have finished your required hours.',
+                                'Complete the evaluation form shown there.',
+                            ]],
+                            ['bi-door-open-fill', 'Your OJT room', 'Sidebar › Rooms', [
+                                'Open your room to read updates posted by your adviser.',
+                                'Check classmates and advisers under the <strong>Members</strong> tab.',
+                            ]],
+                            ['bi-chat-dots-fill', 'Chats and notifications', 'Sidebar › Chats · top bar bell', [
+                                'Pick your adviser or supervisor and click <strong>Send</strong>.',
+                                'The bell shows new updates. Click one to jump to the page.',
+                            ]],
+                        ],
+                        'tip' => 'Hours and Progress Report stay locked until your MOU, Recommendation Letter and Waiver are marked done.',
+                    ],
+
+                    'ojt_adviser' => [
+                        'title' => 'OJT Adviser Guide',
+                        'icon' => 'bi-person-badge-fill',
+                        'tagline' => 'Run your section room and track every intern.',
+                        'flow' => ['Open room', 'Post updates', 'Check requirements', 'Monitor hours', 'Review reports'],
+                        'cards' => [
+                            ['bi-speedometer2', 'Home dashboard', 'Sidebar › Home', [
+                                'See your student count, incomplete requirements, weekly reports and available documents.',
+                                'Charts show attendance, hours rendered and requirement completion.',
+                            ]],
+                            ['bi-megaphone-fill', 'Post updates', 'Sidebar › ROOMS › Updates tab', [
+                                'Pick your room under <strong>ROOMS</strong>.',
+                                'Type in the box and click <strong>Post Announcement</strong>. Everyone in the room sees it.',
+                            ]],
+                            ['bi-people-fill', 'Manage members', 'Room › Members tab', [
+                                'Click <strong>Add Participant</strong>, tick the people and confirm.',
+                                'Hover a member card and click the <strong>✕</strong> to remove them.',
+                            ]],
+                            ['bi-list-ul', 'Requirements', 'Sidebar › Requirements', [
+                                'Search by name, student no. or company, or filter by progress.',
+                                'Click <strong>View</strong> to preview or download each uploaded document.',
+                            ]],
+                            ['bi-calendar-check-fill', 'OJT Status', 'Sidebar › OJT Status', [
+                                'View each intern\'s hours and progress bar.',
+                                'The <strong>Supervisor Eval</strong> button turns active once the supervisor submits.',
+                            ]],
+                            ['bi-file-earmark-text-fill', 'Progress Reports', 'Sidebar › Progress Reports', [
+                                'Click <strong>View</strong> on a student, then pick a week.',
+                                'Use <strong>Open</strong> or <strong>Download</strong> on the preview.',
+                            ]],
+                            ['bi-folder2-open', 'Documents Available', 'Sidebar › Documents Available', [
+                                'Check which partner companies have the MOU, Recommendation Letter and Waiver ready.',
+                            ]],
+                            ['bi-chat-left-text-fill', 'Chats', 'Sidebar › Chats', [
+                                'Message your students and the HTE supervisors linked to them.',
+                            ]],
+                        ],
+                        'tip' => 'Required OJT hours are set per program by the System Administrator. Advisers cannot change them.',
+                    ],
+
+                    'hte_adviser' => [
+                        'title' => 'HTE Adviser Guide',
+                        'icon' => 'bi-building',
+                        'tagline' => 'Supervise interns at your company and complete their evaluation.',
+                        'flow' => ['Assign supervisor', 'Monitor hours', 'Review timesheet', 'Evaluation'],
+                        'cards' => [
+                            ['bi-speedometer2', 'Home dashboard', 'Sidebar › Home', [
+                                'See interns, who is present today and who finished their hours.',
+                                'Latest timesheet logs and attendance charts are shown below.',
+                            ]],
+                            ['bi-calendar-check-fill', 'OJT Status', 'Sidebar › OJT Status', [
+                                'View each intern\'s rendered hours and progress.',
+                                'Use the search box to find a student.',
+                            ]],
+                            ['bi-person-plus-fill', 'Assign a supervisor', 'OJT Status › Assign Supervisor', [
+                                'Click <strong>Assign Supervisor</strong> beside the intern.',
+                                'Enter the supervisor name and email, then <strong>Save Supervisor</strong>.',
+                            ]],
+                            ['bi-envelope-paper-fill', 'Supervisor evaluation', 'OJT Status › Actions', [
+                                'When an intern reaches the required hours, the evaluation email is sent to the supervisor automatically.',
+                                'Use <strong>Resend Email</strong> to send it again, or <strong>Fill Manually</strong> to answer it yourself.',
+                                'Use <strong>Preview PDF</strong>, then <strong>Submit Evaluation</strong>. A <strong>Supervisor Eval</strong> PDF button then appears.',
+                            ]],
+                            ['bi-clock-fill', 'Timesheet', 'Sidebar › Timesheet › eye icon', [
+                                'The popup shows progress, <strong>Office hours</strong>, and Late / Overtime / On-time counts.',
+                                'The weekly tables show a status per day: <strong>On time</strong>, <strong>Late</strong>, <strong>Undertime</strong>, <strong>Late + Undertime</strong> or <strong>Incomplete</strong>.',
+                            ]],
+                            ['bi-inbox-fill', 'Intern information', 'Sidebar › Information', [
+                                'View student number, program, year and section, contact, company and adviser.',
+                            ]],
+                            ['bi-door-open-fill', 'Your room', 'Sidebar › ROOMS', [
+                                'Open a room to read updates and see its members.',
+                            ]],
+                            ['bi-chat-dots-fill', 'Chats', 'Sidebar › Chats', [
+                                'Message your interns and their OJT advisers.',
+                            ]],
+                        ],
+                        'tip' => 'The evaluation email goes out automatically the first time this page loads after an intern reaches the required hours and has a supervisor assigned.',
+                    ],
+
+                    'intern_admin' => [
+                        'title' => 'Internship Admin Guide',
+                        'icon' => 'bi-clipboard-data-fill',
+                        'tagline' => 'Publish postings, manage documents and keep students informed.',
+                        'flow' => ['Post internship', 'Upload MOU', 'Announce documents', 'Track interns', 'Announce'],
+                        'cards' => [
+                            ['bi-speedometer2', 'Overview', 'Sidebar › Home', [
+                                'See applications, postings, announcements and document counts.',
+                                'Charts show intern phases, requirements and applicants per program.',
+                            ]],
+                            ['bi-briefcase-fill', 'Post an internship', 'Sidebar › Postings', [
+                                'Click <strong>Add Internship Post</strong> and fill in the details.',
+                                'Set the <strong>OJT Schedule Time</strong> in/out, since Timesheets use it to mark late and undertime.',
+                                'Search for the location or click the map to pin it, then <strong>Create Posting</strong>.',
+                            ]],
+                            ['bi-people-fill', 'Track interns', 'Sidebar › Interns', [
+                                'See each student\'s phase: <strong>Internship Confirmed</strong>, <strong>In Progress</strong> or <strong>No Progress</strong>.',
+                                'Filter by requirements (Complete / Incomplete) or program.',
+                            ]],
+                            ['bi-file-earmark-text-fill', 'Review documents', 'Sidebar › Documents', [
+                                'Filter by student, document type or program.',
+                                'Click the <strong>eye</strong> icon to open a submitted file.',
+                            ]],
+                            ['bi-file-text-fill', 'Upload an MOU', 'Sidebar › Upload MOU', [
+                                'Click <strong>Upload MOU</strong>, choose the internship posting and attach a PDF (max 5 MB).',
+                                'Use the <strong>eye</strong> or <strong>trash</strong> icon to view or delete it.',
+                            ]],
+                            ['bi-bookmark-fill', 'Document availability', 'Sidebar › Document Availability', [
+                                'Click <strong>Post Document Availability</strong>.',
+                                'Pick the internship and tick MOU, Recommendation Letter and/or Waiver.',
+                            ]],
+                            ['bi-bell-fill', 'Announcements', 'Sidebar › Manage Announcements', [
+                                'Click <strong>Post Announcement</strong> and choose News, Updates or FAQs.',
+                                'Edit a row directly, then click the <strong>save</strong> icon. Use the <strong>trash</strong> icon to delete.',
+                            ]],
+                            ['bi-door-open-fill', 'Department rooms', 'Top bar › Rooms icon', [
+                                'Open a department room to post updates and add participants.',
+                            ]],
+                        ],
+                        'tip' => 'Double-check the OJT schedule time on each posting. It is the basis for every Late and Undertime mark on the Timesheet.',
+                    ],
+
+                    'sys_admin' => [
+                        'title' => 'System Admin Guide',
+                        'icon' => 'bi-shield-lock-fill',
+                        'tagline' => 'Set up the school year, accounts and rules for the whole platform.',
+                        'flow' => ['Set sections', 'Import students', 'Create accounts', 'Assign advisers', 'Set OJT hours'],
+                        'cards' => [
+                            ['bi-speedometer2', 'Overview', 'Sidebar › Home', [
+                                'See accounts, system admin seats and charts for roles, programs and activity.',
+                                'Use <strong>Hide / Show Registration Link</strong> to control the login page link.',
+                                'Download the dashboard as <strong>CSV</strong> or <strong>PDF</strong>.',
+                            ]],
+                            ['bi-ui-checks', 'Set up sections', 'Sidebar › Section', [
+                                'Pick a school year (or <strong>+ Add new school year</strong>).',
+                                'Enter how many sections each year level has, then <strong>Save</strong>.',
+                            ]],
+                            ['bi-person-vcard', 'Register students', 'Sidebar › Student Register', [
+                                'Click <strong>Edit Current CSV</strong> to fix rows, then <strong>Save CSV</strong>.',
+                                'Click <strong>Add to Database</strong> to create the student accounts.',
+                                'Or <strong>Replace CSV</strong> with a new file. Use <strong>Download Template</strong> for the format.',
+                            ]],
+                            ['bi-person-gear', 'Create and manage accounts', 'Sidebar › Account Management', [
+                                'Click <strong>Add Admin</strong> or <strong>Add Adviser</strong> and fill in the form.',
+                                'HTE advisers need an internship. OJT advisers need a department.',
+                                'Change an admin\'s role, then <strong>Update Roles</strong>. Only 3 System Admins are allowed.',
+                            ]],
+                            ['bi-person-lines-fill', 'Assign advisers', 'Sidebar › Assign Adviser', [
+                                'Pick an open section for an OJT adviser and click <strong>Assign</strong>.',
+                                'Click the <strong>✕</strong> on a section badge to unassign. This deletes the room and its members.',
+                                'Use <strong>Import via CSV</strong> (student_id, adviser_id) to assign students in bulk.',
+                            ]],
+                            ['bi-clock-history', 'Required OJT hours', 'Sidebar › OJT Hours', [
+                                'Enter the required hours for each program and click <strong>Save Changes</strong>.',
+                                'It applies to every internship under that program.',
+                            ]],
+                            ['bi-calendar-event', 'Suspend dates', 'Sidebar › Calendar', [
+                                'Pick a date, type the reason and click <strong>Add</strong>.',
+                                'Click <strong>Remove</strong> to lift a suspension.',
+                            ]],
+                            ['bi-binoculars', 'Monitor, delete and restore', 'Sidebar › Monitor · Account Deletion · Archives', [
+                                'Monitor lists recent actions. Filter by role or name.',
+                                'Account Deletion removes a user. Archives lets you <strong>Restore</strong> archived accounts.',
+                            ]],
+                        ],
+                        'tip' => 'Deleting an account is permanent. Archived accounts can be restored from Archives.',
+                    ],
+                ];
+
+                $hg = $helpGuides[$currentRole] ?? $helpGuides['student'];
+                $hgTones = [['#dbeafe', '#1e40af'], ['#ffe5d9', '#ff6b2c'], ['#ffe7b3', '#7a5200'], ['#d1fae5', '#065f46']];
+                ?>
+
+                <div class="hg-hero">
+                    <div class="hg-hero-icon"><i class="bi <?= $hg['icon'] ?>"></i></div>
+                    <div>
+                        <div class="hg-hero-title"><?= htmlspecialchars($hg['title']) ?></div>
+                        <div class="hg-hero-sub"><?= htmlspecialchars($hg['tagline']) ?></div>
                     </div>
-                    <?php
-                    $sections = [
-                        [
-                            'bi-funnel-fill',
-                            'View Internship Listings',
-                            [
-                                'Go to the <strong>Internships</strong> section from the navigation bar.',
-                                'Use the filter options to narrow results by preferred criteria (company classification, location, department).',
-                                'Browse the available internship opportunities.',
-                            ]
-                        ],
-                        [
-                            'bi-info-circle-fill',
-                            'View Opportunity Details',
-                            [
-                                'Click on any internship listing<strong> Read More</strong> button to open its full details.',
-                                'Review the complete, structured information including company, requirements, and schedule.',
-                                'Use the provided contact information to inquire directly with the company if needed.',
-                            ]
-                        ],
-                        [
-                            'bi-file-earmark-text-fill',
-                            'View Internship Documentation',
-                            [
-                                'Go to the <strong>Applications</strong> section from the Monitor section to track documents.',
-                                'View all internship-related paperwork uploaded for your reference.',
-                            ]
-                        ],
-                        [
-                            'bi-file-earmark-arrow-down-fill',
-                            'Generate Automated Documents',
-                            [
-                                'Navigate to the <strong>Applications</strong> section.',
-                                'Click <strong>Preview</strong> or <strong>Download</strong> on the document type you need.',
-                            ]
-                        ],
-                        [
-                            'bi-geo-alt-fill',
-                            'View Map & Locate Partner Institutions',
-                            [
-                                'Open the <strong>Home</strong> or search in <strong>Internships</strong> section for company location.',
-                                'Browse partner company locations on the interactive map.',
-                                'Get navigation directions.',
-                            ]
-                        ],
-                        [
-                            'bi-person-lines-fill',
-                            'Submit Academic & Personal Information',
-                            [
-                                'Navigate to <strong>Profile</strong> or <strong>Edit Profile</strong>.',
-                                'Fill in or update your academic and personal details.',
-                                'Click <strong>Apply Changes</strong> to submit your information.',
-                            ]
-                        ],
-                        [
-                            'bi-card-checklist',
-                            'View Application Status',
-                            [
-                                'Go to <strong>Applications</strong> from the Monitor section.',
-                                'View the current status of each internship application.',
-                            ]
-                        ],
-                        [
-                            'bi-clipboard-check-fill',
-                            'View and Input Status',
-                            [
-                                'Go to the <strong>Hours</strong> section on the Monitor section.',
-                                'View and log hours rendered.',
-                            ]
-                        ],
-                        [
-                            'bi-door-open-fill',
-                            'View OJT Room & Content',
-                            [
-                                'Open your assigned <strong>OJT Room</strong> from the Monitor section.',
-                                'Read announcements posted by your OJT Adviser.',
-                            ]
-                        ],
-                        [
-                            'bi-bell-fill',
-                            'Receive Real-Time Notifications',
-                            [
-                                'Notifications appear automatically on the platform.',
-                                'You will be alerted for changes and postings.',
-                                'Click a notification to go directly to the relevant page.',
-                            ]
-                        ],
-                        [
-                            'bi-chat-dots-fill',
-                            'Message a User',
-                            [
-                                'Go to the <strong>Chats</strong> section from the sidebar of Monitor section.',
-                                'Select the user you want to contact.',
-                                'Type your message and click <strong>Send</strong>.',
-                            ]
-                        ],
-                    ];
-                    foreach ($sections as [$icon, $title, $steps]): ?>
-                        <div style="margin-bottom:16px;border:1px solid #e8eaf0;border-radius:12px;overflow:hidden;">
-                            <div
-                                style="background:#f4f6ff;padding:11px 16px;display:flex;align-items:center;gap:9px;border-bottom:1px solid #e8eaf0;">
-                                <i class="bi <?= $icon ?>" style="color:#272f54;font-size:15px;flex-shrink:0;"></i>
-                                <span style="font-weight:700;font-size:13.5px;color:#272f54;">
-                                    <?= $title ?>
-                                </span>
+                </div>
+
+                <div class="hg-label">Your workflow</div>
+                <div class="hg-flow">
+                    <?php foreach ($hg['flow'] as $i => $f): ?>
+                        <div class="hg-flow-step"><span class="hg-flow-num"><?= $i + 1 ?></span><?= htmlspecialchars($f) ?></div>
+                        <?php if ($i < count($hg['flow']) - 1): ?><i class="bi bi-chevron-right hg-flow-arrow"></i><?php endif; ?>
+                    <?php endforeach; ?>
+                </div>
+
+                <div class="hg-label">What you can do</div>
+                <div class="hg-grid">
+                    <?php foreach ($hg['cards'] as $i => [$icon, $title, $where, $steps]):
+                        [$tbg, $tfg] = $hgTones[$i % count($hgTones)]; ?>
+                        <div class="hg-card">
+                            <div class="hg-card-head">
+                                <div class="hg-card-ic" style="background:<?= $tbg ?>;color:<?= $tfg ?>;"><i class="bi <?= $icon ?>"></i></div>
+                                <div>
+                                    <div class="hg-card-title"><?= htmlspecialchars($title) ?></div>
+                                    <span class="hg-where"><i class="bi bi-signpost-2"></i> <?= htmlspecialchars($where) ?></span>
+                                </div>
                             </div>
-                            <div style="padding:12px 16px;">
-                                <ol style="margin:0;padding-left:18px;">
-                                    <?php foreach ($steps as $step): ?>
-                                        <li style="font-size:13px;color:#444;line-height:1.7;margin-bottom:2px;">
-                                            <?= $step ?>
-                                        </li>
-                                    <?php endforeach; ?>
-                                </ol>
-                            </div>
+                            <ol class="hg-steps">
+                                <?php foreach ($steps as $s): ?>
+                                    <li><?= $s ?></li>
+                                <?php endforeach; ?>
+                            </ol>
                         </div>
                     <?php endforeach; ?>
+                </div>
 
-                <?php elseif ($currentRole === 'ojt_adviser'): ?>
-                    <!-- ======== OJT ADVISER ======== -->
-                    <div style="margin-bottom:18px;">
-                        <div style="font-size:15px;font-weight:700;color:#272f54;margin-bottom:4px;">
-                            <i class="bi bi-person-badge-fill" style="margin-right:6px;"></i>OJT Adviser User Guide
-                        </div>
-                    </div>
-                    <?php
-                    $sections = [
-                        [
-                            'bi-people-fill',
-                            'Add Participants to a Room',
-                            [
-                                'Open an existing room from the Rooms list.',
-                                'Click <strong>Add Participants</strong>.',
-                                'Search for and select the students to add manually.',
-                                'Confirm to join them in the room.',
-                            ]
-                        ],
-                        [
-                            'bi-clock-history',
-                            'Monitor Rendered OJT Hours & Remarks',
-                            [
-                                'Go to the <strong>Status</strong> tab in the sidebar.',
-                                'View each student\'s total rendered OJT hours and progress bar.',
-                                'Check HTE Adviser remarks submitted for each student.',
-                            ]
-                        ],
-                        [
-                            'bi-megaphone-fill',
-                            'Post Announcements',
-                            [
-                                'Open the room where you want to post and type in the text box.',
-                                'Enter a title and compose your message using the text editor.',
-                                'Click <strong>Post Announcement</strong> to publish to all room participants.',
-                            ]
-                        ],
-                        [
-                            'bi-chat-left-text-fill',
-                            'Communicate with HTE Advisers and Students',
-                            [
-                                'Go to the <strong>Chats</strong> section.',
-                                'Select an HTE Adviser or student from the contact list.',
-                                'Type your message and click <strong>Send</strong> for real-time messaging.',
-                            ]
-                        ],
-                    ];
-                    foreach ($sections as [$icon, $title, $steps]): ?>
-                        <div style="margin-bottom:16px;border:1px solid #e8eaf0;border-radius:12px;overflow:hidden;">
-                            <div
-                                style="background:#f4f6ff;padding:11px 16px;display:flex;align-items:center;gap:9px;border-bottom:1px solid #e8eaf0;">
-                                <i class="bi <?= $icon ?>" style="color:#272f54;font-size:15px;flex-shrink:0;"></i>
-                                <span style="font-weight:700;font-size:13.5px;color:#272f54;">
-                                    <?= $title ?>
-                                </span>
-                            </div>
-                            <div style="padding:12px 16px;">
-                                <ol style="margin:0;padding-left:18px;">
-                                    <?php foreach ($steps as $step): ?>
-                                        <li style="font-size:13px;color:#444;line-height:1.7;margin-bottom:2px;">
-                                            <?= $step ?>
-                                        </li>
-                                    <?php endforeach; ?>
-                                </ol>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
-
-                <?php elseif ($currentRole === 'hte_adviser'): ?>
-                    <!-- ======== HTE ADVISER ======== -->
-                    <div style="margin-bottom:18px;">
-                        <div style="font-size:15px;font-weight:700;color:#272f54;margin-bottom:4px;">
-                            <i class="bi bi-building" style="margin-right:6px;"></i>HTE Adviser User
-                            Guide
-                        </div>
-                        <p style="font-size:13px;color:#666;margin:0;line-height:1.6;">
-                            As an HTE Adviser, you are the on-site supervisor at the Host Training
-                            Establishment. Your main
-                            responsibilities involve evaluating students and updating their progress.
-                        </p>
-                    </div>
-                    <?php
-                    $sections = [
-                        [
-                            'bi-pencil-square',
-                            'Submit Remarks & Feedback on Students',
-                            [
-                                'From your dashboard, go to the <strong>Remarks</strong> section.',
-                                'Select or search the student you want to evaluate.',
-                                'Click <strong>Save</strong> to submit your evaluation.',
-                            ]
-                        ],
-                        [
-                            'bi-stopwatch-fill',
-                            'Confirm Student Rendered OJT Hours',
-                            [
-                                'Open the <strong>Status</strong> section from your dashboard.',
-                                'Select the student whose hours you want to update.',
-                                'Click <strong>Confirm</strong> to save the changes.',
-                            ]
-                        ],
-                        [
-                            'bi-chat-dots-fill',
-                            'Communicate with Students & OJT Advisers',
-                            [
-                                'Go to the <strong>Chats</strong> section.',
-                                'Select a student or an OJT Adviser from your contact list.',
-                                'Type your message and click <strong>Send</strong>.',
-                            ]
-                        ],
-                    ];
-                    foreach ($sections as [$icon, $title, $steps]): ?>
-                        <div style="margin-bottom:16px;border:1px solid #e8eaf0;border-radius:12px;overflow:hidden;">
-                            <div
-                                style="background:#f4f6ff;padding:11px 16px;display:flex;align-items:center;gap:9px;border-bottom:1px solid #e8eaf0;">
-                                <i class="bi <?= $icon ?>" style="color:#272f54;font-size:15px;flex-shrink:0;"></i>
-                                <span style="font-weight:700;font-size:13.5px;color:#272f54;">
-                                    <?= $title ?>
-                                </span>
-                            </div>
-                            <div style="padding:12px 16px;">
-                                <ol style="margin:0;padding-left:18px;">
-                                    <?php foreach ($steps as $step): ?>
-                                        <li style="font-size:13px;color:#444;line-height:1.7;margin-bottom:2px;">
-                                            <?= $step ?>
-                                        </li>
-                                    <?php endforeach; ?>
-                                </ol>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
-
-                <?php elseif ($currentRole === 'intern_admin'): ?>
-                    <!-- ======== INTERNSHIP ADMIN ======== -->
-                    <div style="margin-bottom:18px;">
-                        <div style="font-size:15px;font-weight:700;color:#272f54;margin-bottom:4px;">
-                            <i class="bi bi-clipboard-data-fill" style="margin-right:6px;"></i>Internship Admin User Guide
-                        </div>
-                    </div>
-                    <?php
-                    $sections = [
-                        [
-                            'bi-briefcase-fill',
-                            'Post Internship Opportunities',
-                            [
-                                'Navigate to <strong>Postings</strong>.',
-                                'Click <strong>Add Internship Post</strong> and fill in all required details.',
-                                'Ensure complete and validated information.',
-                                'Click <strong>Create Posting</strong> to make it visible to students.',
-                            ]
-                        ],
-                        [
-                            'bi-eye-fill',
-                            'Monitor Students Who Expressed Interest',
-                            [
-                                'Open an internship posting.',
-                                'Go to the <strong>Interested Students</strong> tab.',
-                                'View the list of students who expressed interest in a company.',
-                                'Return with feedback if needed.'
-                            ]
-                        ],
-                        [
-                            'bi-megaphone-fill',
-                            'Update System Announcements',
-                            [
-                                'Navigate to the <strong>Announcements</strong> section.',
-                                'Compose your message and click <strong>Post Announcement</strong>.',
-                            ]
-                        ],
-                        [
-                            'bi-newspaper',
-                            'Manage Informational Content',
-                            [
-                                'Go to <strong>Management Announcements</strong> from the sidebar.',
-                                'Edit or delete informational articles and announcements.',
-                                'Click <strong>Save</strong> icon to make changes visible to users.',
-                            ]
-                        ],
-                        [
-                            'bi-card-checklist',
-                            'Track Student Applications & Documentation',
-                            [
-                                'Go to <strong>Documents</strong> from the sidebar.',
-                                'View each student\'s application and submitted documents.',
-                            ]
-                        ],
-                    ];
-                    foreach ($sections as [$icon, $title, $steps]): ?>
-                        <div style="margin-bottom:16px;border:1px solid #e8eaf0;border-radius:12px;overflow:hidden;">
-                            <div
-                                style="background:#f4f6ff;padding:11px 16px;display:flex;align-items:center;gap:9px;border-bottom:1px solid #e8eaf0;">
-                                <i class="bi <?= $icon ?>" style="color:#272f54;font-size:15px;flex-shrink:0;"></i>
-                                <span style="font-weight:700;font-size:13.5px;color:#272f54;">
-                                    <?= $title ?>
-                                </span>
-                            </div>
-                            <div style="padding:12px 16px;">
-                                <ol style="margin:0;padding-left:18px;">
-                                    <?php foreach ($steps as $step): ?>
-                                        <li style="font-size:13px;color:#444;line-height:1.7;margin-bottom:2px;">
-                                            <?= $step ?>
-                                        </li>
-                                    <?php endforeach; ?>
-                                </ol>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
-
-                <?php elseif ($currentRole === 'sys_admin'): ?>
-                    <!-- ======== SYSTEM ADMIN ======== -->
-                    <div style="margin-bottom:18px;">
-                        <div style="font-size:15px;font-weight:700;color:#272f54;margin-bottom:4px;">
-                            <i class="bi bi-shield-lock-fill" style="margin-right:6px;"></i>System Admin User
-                            Guide
-                        </div>
-                        <p style="font-size:13px;color:#666;margin:0;line-height:1.6;">
-                            As a System Admin, you have full platform oversight —
-                            managing users, monitoring all activity,
-                            and ensuring system integrity and compliance.
-                        </p>
-                    </div>
-                    <?php
-                    $sections = [
-                        [
-                            'bi-bar-chart-line-fill',
-                            'Monitor Overall Internship Activities',
-                            [
-                                'Go to the <strong>Dashboard</strong> for a system-wide overview.',
-                                'View internship postings, students interested, and announcements.',
-                            ]
-                        ],
-                        [
-                            'bi-person-gear',
-                            'Create Admin, Adviser, and Student Accounts',
-                            [
-                                'Go to <strong>Add (user role)</strong> from the sidebar.',
-                                'Click <strong>Create Account</strong> and select the <strong>Internship Admin</strong> role.',
-                                'Fill in the required details and click <strong>Save</strong>.',
-                            ]
-                        ],
-                        [
-                            'bi-people-fill',
-                            'Change Roles of All Admin Accounts',
-                            [
-                                'Go to <strong>Change Roles</strong>.',
-                                'Edit role of any admin user account if they are an Internship Admin or a System Admin.',
-                                'Assign or update roles and access permissions per user.',
-                            ]
-                        ],
-                        [
-                            'bi-layout-text-sidebar-reverse',
-                            'Access All User Activities and Actions',
-                            [
-                                'Use the sidebar to navigate between all activities in the system.',
-                                'Review user actions, internship postings, and announcements.',
-                            ]
-                        ]
-                    ];
-                    foreach ($sections as [$icon, $title, $steps]): ?>
-                        <div style="margin-bottom:16px;border:1px solid #e8eaf0;border-radius:12px;overflow:hidden;">
-                            <div
-                                style="background:#f4f6ff;padding:11px 16px;display:flex;align-items:center;gap:9px;border-bottom:1px solid #e8eaf0;">
-                                <i class="bi <?= $icon ?>" style="color:#272f54;font-size:15px;flex-shrink:0;"></i>
-                                <span style="font-weight:700;font-size:13.5px;color:#272f54;">
-                                    <?= $title ?>
-                                </span>
-                            </div>
-                            <div style="padding:12px 16px;">
-                                <ol style="margin:0;padding-left:18px;">
-                                    <?php foreach ($steps as $step): ?>
-                                        <li style="font-size:13px;color:#444;line-height:1.7;margin-bottom:2px;">
-                                            <?= $step ?>
-                                        </li>
-                                    <?php endforeach; ?>
-                                </ol>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-
+                <div class="hg-tip">
+                    <i class="bi bi-lightbulb-fill"></i>
+                    <div><strong>Good to know:</strong> <?= htmlspecialchars($hg['tip']) ?></div>
+                </div>
                 <!-- Log Out — always shown for all roles -->
                 <div
                     style="margin-top:10px;background:#fff8f0;border:1px solid #ffd8a8;border-radius:12px;padding:14px 18px;display:flex;align-items:flex-start;gap:12px;">
