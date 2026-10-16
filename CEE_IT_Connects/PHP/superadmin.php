@@ -1691,7 +1691,7 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                             <div class="d-flex flex-wrap align-items-center gap-3">
                                 <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0"
                                     style="width:44px;height:44px;background:#E4572E;">
-                                    <i class="fa-solid fa-users me-2"></i>
+                                    <i class="bi bi-people-fill text-white fs-5"></i>
                                 </div>
                                 <div class="flex-grow-1" style="min-width:90px;">
                                     <p class="small mb-1 fw-semibold text-uppercase"
@@ -1793,7 +1793,7 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                     <div class="col-12 col-xl-4">
                         <div class="card border-0 rounded-4 shadow-sm h-100 ojtc-stat-card" data-go="monitor">
                             <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
-                                <i class="fa-solid fa-users" style="color:#272f54;"></i>
+                                <i class="bi bi-people" style="color:#272f54;"></i>
                                 <h6 class="fw-bold mb-0" style="color:#272f54;">Activity by Role</h6>
                             </div>
                             <div class="card-body px-4 pb-4 pt-2">

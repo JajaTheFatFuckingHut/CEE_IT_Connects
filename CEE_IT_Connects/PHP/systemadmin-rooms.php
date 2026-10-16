@@ -1308,7 +1308,7 @@ $page = 'messages';
                 <a href="systemadmin-rooms.php?room_id=<?= $room['id'] ?>"
                     class="<?= ((int) $current_room_id === (int) $room['id']) ? 'active' : '' ?>"
                     data-tooltip="<?= htmlspecialchars($room['room_name']) ?>">
-                    <i class="fa-solid fa-users me-2" aria-hidden="true"></i>
+                    <i class="bi bi-people-fill me-2"></i>
                     <span class="sidebar-text">
                         <?= htmlspecialchars($room['room_name']) ?>
                     </span>
@@ -1330,7 +1330,7 @@ $page = 'messages';
                 <a href="systemadmin-rooms.php?room_id=<?= $room['id'] ?>"
                     class="<?= ((int) $current_room_id === (int) $room['id']) ? 'active' : '' ?>"
                     data-tooltip="<?= htmlspecialchars($room['room_name']) ?>">
-                    <i class="fa-solid fa-users me-2" aria-hidden="true"></i>
+                    <i class="bi bi-people-fill me-2"></i>
                     <span class="sidebar-text">
                         <?= htmlspecialchars($room['room_name']) ?>
                     </span>
