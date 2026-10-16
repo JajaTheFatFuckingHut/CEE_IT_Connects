@@ -3123,7 +3123,7 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                         <div>
                             <h2>Welcome, <?= htmlspecialchars($hmFirst) ?></h2>
                             <p><?= date('l, F j') ?> · <?= $hmDone === 3
-                                   ? 'Everything is set up. Open your room from the sidebar.'
+                                   ? 'Open your room from the sidebar.'
                                    : 'Here is what you need to do to get started with your OJT.' ?></p>
                         </div>
                     </div>
