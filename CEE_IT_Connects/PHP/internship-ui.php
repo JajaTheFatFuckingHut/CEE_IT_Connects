@@ -1108,7 +1108,7 @@ for ($t = 13; $t >= 0; $t--) {
                 <span class="nav-label">Postings</span>
             </a>
             <a href="#" onclick="showSection('interns')" data-tooltip="Interns">
-                <i class="bi bi-people-fill"></i>
+                <i class="fa-solid fa-users"></i>
                 <span class="nav-label">Interns</span>
             </a>
             <a href="#" onclick="showSection('documents')" data-tooltip="Documents">
@@ -1797,7 +1797,7 @@ for ($t = 13; $t >= 0; $t--) {
                 <div class="sysAdm-header--danger sysAdm-header--blue mb-4">
                     <div class="sysAdm-header-left">
                         <div class="sysAdm-header-icon">
-                            <i class="bi bi-people-fill"></i>
+                            <i class="fa-solid fa-users"></i>
                         </div>
                         <div class="sysAdm-header-text">
                             <h2>Interns</h2>
