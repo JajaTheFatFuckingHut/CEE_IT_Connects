@@ -378,6 +378,7 @@ $page = 'messages';
 
         .sidebar a {
             display: flex;
+            position: relative;
             align-items: center;
             padding: 10px 20px;
             color: #333;
@@ -399,23 +400,27 @@ $page = 'messages';
         }
 
         .sidebar a::after {
-                content: attr(data-tooltip);
-                position: absolute;
-                left: 56px;
-                top: 50%;
-                transform: translateY(-50%);
-                background: #1a1a2e;
-                color: #fff;
-                font-size: 12px;
-                font-weight: 500;
-                padding: 5px 10px;
-                border-radius: 6px;
-                white-space: nowrap;
-                opacity: 0;
-                pointer-events: none;
-                transition: opacity 0.2s ease;
-                z-index: 300;
-            }
+            content: attr(data-tooltip);
+            position: absolute;
+            left: calc(100% + 8px);
+            top: 50%;
+            transform: translateY(-50%);
+            background: #1a1a2e;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 500;
+            padding: 5px 10px;
+            border-radius: 6px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+            z-index: 300;
+        }
+
+        .sidebar a[data-tooltip]:hover::after {
+            opacity: 1;
+        }
 
         .rooms-list h6 {
             font-size: 11px;
