@@ -1307,7 +1307,7 @@ $page = 'messages';
             <?php foreach ($myRooms as $room): ?>
                 <a href="systemadmin-rooms.php?room_id=<?= $room['id'] ?>"
                     class="<?= ((int) $current_room_id === (int) $room['id']) ? 'active' : '' ?>"
-                    title="<?= htmlspecialchars($room['room_name']) ?>">
+                    data-tooltip="<?= htmlspecialchars($room['room_name']) ?>">
                     <i class="bi bi-people-fill me-2"></i>
                     <span class="sidebar-text">
                         <?= htmlspecialchars($room['room_name']) ?>
@@ -1329,7 +1329,7 @@ $page = 'messages';
             <?php foreach ($myRooms as $room): ?>
                 <a href="systemadmin-rooms.php?room_id=<?= $room['id'] ?>"
                     class="<?= ((int) $current_room_id === (int) $room['id']) ? 'active' : '' ?>"
-                    title="<?= htmlspecialchars($room['room_name']) ?>">
+                    data-tooltip="<?= htmlspecialchars($room['room_name']) ?>">
                     <i class="bi bi-people-fill me-2"></i>
                     <span class="sidebar-text">
                         <?= htmlspecialchars($room['room_name']) ?>
