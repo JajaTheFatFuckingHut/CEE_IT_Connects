@@ -1291,7 +1291,7 @@ $page = 'messages';
     <!-- SIDEBAR -->
     <div class="sidebar">
         <div class="rooms-list" style="display:flex; flex-direction:column; width:100%;">
-            <a href="internship-ui.php" title="Back to Home">
+            <a href="internship-ui.php" data-tooltip="Back to Home">
                 <i class="fa-solid fa-arrow-left me-2"></i>
                 <span class="sidebar-text">Back to Home</span>
             </a>
@@ -1300,7 +1300,7 @@ $page = 'messages';
             <?php foreach ($myRooms as $room): ?>
                 <a href="internadmin-rooms.php?room_id=<?= $room['id'] ?>"
                     class="<?= ((int) $current_room_id === (int) $room['id']) ? 'active' : '' ?>"
-                    title="<?= htmlspecialchars($room['room_name']) ?>">
+                    data-tooltip="<?= htmlspecialchars($room['room_name']) ?>">
                     <i class="bi bi-people-fill me-2"></i>
                     <span class="sidebar-text">
                         <?= htmlspecialchars($room['room_name']) ?>
@@ -1563,7 +1563,7 @@ $page = 'messages';
                                         <?php if ($done && $file_path): ?>
                                             <!-- Clickable — downloads the uploaded proof -->
                                             <a href="<?= htmlspecialchars($file_path) ?>" target="_blank" download
-                                                title="Download proof for <?= htmlspecialchars($label) ?>" class="checklist-pill done"
+                                                data-tooltip="Download proof for <?= htmlspecialchars($label) ?>" class="checklist-pill done"
                                                 style="text-decoration:none; cursor:pointer; display:inline-flex; align-items:center; gap:4px;">
                                                 <i class="fa fa-circle-check" style="font-size:10px;"></i>
                                                 <?= $label ?>
@@ -1572,7 +1572,7 @@ $page = 'messages';
 
                                         <?php elseif ($done): ?>
                                             <!-- Done but no file (legacy rows before upload was required) -->
-                                            <span class="checklist-pill done" title="Marked done — no file attached"
+                                            <span class="checklist-pill done" data-tooltip="Marked done — no file attached"
                                                 style="display:inline-flex; align-items:center; gap:4px;">
                                                 <i class="fa fa-circle-check" style="font-size:10px;"></i>
                                                 <?= $label ?>
