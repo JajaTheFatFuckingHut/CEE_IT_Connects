@@ -702,6 +702,8 @@ foreach ($roomStatuses as $s) {
             /* color: inherit !important; */
         }
 
+        .sidebar a.room-link { padding: 0; }
+
         /* addtl s */
         .home-hero {
             position: relative;
@@ -825,6 +827,7 @@ foreach ($roomStatuses as $s) {
         .room-item {
             border-radius: 10px;
             font-size: 14px;
+            padding: 10px 20px;
         }
 
         .room-link {
@@ -839,14 +842,15 @@ foreach ($roomStatuses as $s) {
             cursor: pointer;
             color: #FFB62F;
         }
+        .room-link .room-item.active-room:hover {
+            color: #fff;
+        }
 
         .active-room {
             background: #ff6b2c;
             color: #fff;
             font-weight: bold;
             cursor: default;
-            width: calc(100% - 24px);
-            padding: 10px 10px;
         }
 
         /* ── MAIN ── */
@@ -2120,26 +2124,11 @@ foreach ($roomStatuses as $s) {
     <div class="sidebar">
         <div class="rooms-list" style="margin-top:0;">
             <h6>ROOMS</h6>
-            <!-- <?php foreach ($rooms as $room): ?>
-                <?php if ($current_room_id == $room['id']): ?>
-                    <div class="room-item active-room">
-                        <span class="room-initial"><?= strtoupper(substr(trim($room['room_name']), 0, 1)) ?></span>
-                        <span class="room-name-text"><?= htmlspecialchars($room['room_name']) ?></span>
-                    </div>
-                <?php else: ?>
-                    <a href="?room_id=<?= $room['id'] ?>" class="room-link">
-                        <div class="room-item">
-                            <span class="room-initial"><?= strtoupper(substr(trim($room['room_name']), 0, 1)) ?></span>
-                            <span class="room-name-text"><?= htmlspecialchars($room['room_name']) ?></span>
-                        </div>
-                    </a>
-                <?php endif; ?>
-            <?php endforeach; ?> -->
-
-            <?php foreach ($rooms as $room): ?>
+            <?php foreach ($rooms as $room):
+                $isActiveRoom = ($section === 'rooms' && $current_room_id == $room['id']); ?>
                 <a href="?room_id=<?= $room['id'] ?>&section=rooms" data-tooltip="<?= htmlspecialchars($room['room_name']) ?>"
-                    class="room-link <?= $current_room_id == $room['id'] ? 'active-room-link' : '' ?>">
-                    <div class="room-item <?= $current_room_id == $room['id'] ? 'active-room' : '' ?>">
+                    class="room-link <?= $isActiveRoom ? 'active-room-link' : '' ?>">
+                    <div class="room-item <?= $isActiveRoom ? 'active-room' : '' ?>">
                         <span class="room-initial"><?= strtoupper(substr(trim($room['room_name']), 0, 1)) ?></span>
                         <span class="room-name-text"><?= htmlspecialchars($room['room_name']) ?></span>
                     </div>
@@ -3973,7 +3962,9 @@ foreach ($roomStatuses as $s) {
             const navEl = document.getElementById('nav-' + sectionId);
             if (navEl) navEl.classList.add('active');
 
-            document.querySelectorAll('.room-item.active-room').forEach(room => room.classList.remove('active-room'));
+            if (sectionId !== 'rooms') {
+                document.querySelectorAll('.room-item.active-room').forEach(room => room.classList.remove('active-room'));
+            }
 
             if (sectionId === 'home') {
                 ['attendanceChart', 'hoursBarChart', 'completionChart'].forEach(id => Chart.getChart(id)?.resize());
@@ -4012,10 +4003,11 @@ foreach ($roomStatuses as $s) {
         }
 
         function filterDtr() {
-            const search = document.getElementById('searchDtr')?.value.toLowerCase() ?? '';
+            const search = document.getElementById('searchDtr')?.value.toLowerCase().trim() ?? '';
             document.querySelectorAll('#dtr-student tr').forEach(row => {
-                const name = row.querySelector('.student-cell span')?.textContent.toLowerCase() ?? '';
-                row.style.display = name.includes(search) ? '' : 'none';
+                const name = row.cells[0]?.textContent.toLowerCase() ?? '';
+                const company = row.cells[1]?.textContent.toLowerCase() ?? '';
+                row.style.display = (name.includes(search) || company.includes(search)) ? '' : 'none';
             });
         }
 
