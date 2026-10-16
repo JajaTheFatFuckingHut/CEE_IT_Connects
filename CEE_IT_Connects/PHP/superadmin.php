@@ -605,20 +605,70 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
             width: 100vw;
         }
 
-        /* .sidebar {
-            width: 220px;
-            margin-top: 10px;
-            background: #272f54;
-            color: white;
-            padding: 25px;
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            position: fixed;
-            top: 0;
-            left: 0;
-            overflow-y: auto;
-        } */
+        .home-hero {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, #272f54 0%, #33448f 60%, #2c6fff 100%);
+            border-radius: 14px;
+            padding: 28px 32px;
+            color: #fff;
+            margin-bottom: 20px;
+        }
+
+        .home-hero--flush {
+            margin: -24px -24px 20px -24px;
+            width: calc(100% + 48px);
+            border-radius: 14px 14px 0 0;
+        }
+
+        .home-hero::before,
+        .home-hero::after {
+            content: '';
+            position: absolute;
+            top: -30%;
+            height: 160%;
+            width: 60px;
+            transform: skewX(-20deg);
+        }
+
+        .home-hero::before {
+            right: 90px;
+            background: rgba(255, 107, 44, 0.85);
+        }
+
+        .home-hero::after {
+            right: 20px;
+            background: rgba(255, 182, 47, 0.85);
+        }
+
+        .home-hero-bar {
+            border-left: 4px solid #FFB62F;
+            padding-left: 14px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .home-hero h2 {
+            font-size: 26px;
+            font-weight: 800;
+            margin: 2px 0 6px;
+            color: #fff;
+        }
+
+        .home-hero p {
+            margin: 0;
+            opacity: .85;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .home-hero--flush {
+                margin: -20px -20px 20px -20px;
+                width: calc(100% + 40px);
+                border-radius: 0;
+                padding: 20px 110px 20px 20px; /* keep text clear of the stripes */
+            }
+        }
         .sidebar {
             width: 240px;
             background: #272f54;
@@ -1534,15 +1584,10 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
 
             <!-- DASHBOARD -->
             <div id="dashboard" class="section active sysAdm-section">
-                <div class="sysAdm-header--danger sysAdm-header--blue mb-4">
-                    <div class="sysAdm-header-left">
-                        <div class="sysAdm-header-icon">
-                            <i class="bi bi-speedometer2"></i>
-                        </div>
-                        <div class="sysAdm-header-text">
-                            <h2>System Admin Overview</h2>
-                            <p>Live summary from the internship admin panel</p>
-                        </div>
+                <div class="home-hero home-hero--flush">
+                    <div class="home-hero-bar">
+                        <h2>Welcome back, <?= htmlspecialchars($adminFullName) ?></h2>
+                        <p>Manage accounts and roles, monitor system activity, and keep the internship portal running — all in one place.</p>
                     </div>
                 </div>
 
