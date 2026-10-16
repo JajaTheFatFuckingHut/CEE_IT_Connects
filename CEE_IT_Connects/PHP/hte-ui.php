@@ -2123,12 +2123,12 @@ foreach ($roomStatuses as $s) {
     <!-- SIDEBAR -->
     <div class="sidebar">
         <div class="rooms-list" style="margin-top:0;">
-            <h6><i class="fa-solid fa-users me-2" aria-hidden="true"></i>ROOMS</h6>
+            <h6>ROOMS</h6>
             <?php foreach ($rooms as $room):
                 $isActiveRoom = ($section === 'rooms' && $current_room_id == $room['id']); ?>
                 <a href="?room_id=<?= $room['id'] ?>&section=rooms" data-tooltip="<?= htmlspecialchars($room['room_name']) ?>"
                     class="room-link <?= $isActiveRoom ? 'active-room-link' : '' ?>">
-                    <div class="room-item <?= $isActiveRoom ? 'active-room' : '' ?>">
+                    <div class="room-item <?= $isActiveRoom ? 'active-room' : '' ?>"><i class="fa-solid fa-users me-2" aria-hidden="true"></i>
                         <span class="room-initial"><?= strtoupper(substr(trim($room['room_name']), 0, 1)) ?></span>
                         <span class="room-name-text"><?= htmlspecialchars($room['room_name']) ?></span>
                     </div>
