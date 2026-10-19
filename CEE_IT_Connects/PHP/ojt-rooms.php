@@ -216,9 +216,8 @@ $stmt = $pdo->prepare("
     FROM students s
     JOIN room_members rm ON s.id = rm.user_id AND rm.user_type = 'student'
     JOIN rooms r ON rm.room_id = r.id
-    LEFT JOIN student_internships si ON s.id = si.student_id
-    LEFT JOIN internships i ON si.internship_id = i.id
     LEFT JOIN ojt_applications oa ON s.id = oa.student_id
+    LEFT JOIN internships i ON oa.internship_id = i.id
     LEFT JOIN (
         SELECT DISTINCT ON (student_id)
             student_id, remarks
