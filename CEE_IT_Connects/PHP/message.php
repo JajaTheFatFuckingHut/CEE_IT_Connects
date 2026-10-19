@@ -2986,6 +2986,42 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
 
     <?php include 'navbar.php'; ?>
 
+    <?php if (isset($_SESSION['success'])): ?>
+        <div class="alert alert-success alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3"
+            style="z-index:9999; min-width:350px;" role="alert" id="flashAlert">
+            <i class="fa fa-circle-check me-1"></i><?= $_SESSION['success'] ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <?php unset($_SESSION['success']); ?>
+    <?php endif; ?>
+
+    <?php if (isset($_SESSION['warning'])): ?>
+        <div class="alert alert-warning alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3"
+            style="z-index:9999; min-width:400px;" role="alert" id="flashAlert">
+            <i class="fa fa-triangle-exclamation me-1"></i><?= $_SESSION['warning'] ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <?php unset($_SESSION['warning']); ?>
+    <?php endif; ?>
+
+    <?php if (isset($_SESSION['error'])): ?>
+        <div class="alert alert-danger alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3"
+            style="z-index:9999; min-width:350px;" role="alert" id="flashAlert">
+            <i class="fa fa-circle-xmark me-1"></i><?= $_SESSION['error'] ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <?php unset($_SESSION['error']); ?>
+    <?php endif; ?>
+
+    <?php if (isset($_SESSION['info'])): ?>
+        <div class="alert alert-info alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3"
+            style="z-index:9999; min-width:350px;" role="alert" id="flashAlert">
+            <i class="fa fa-circle-info me-1"></i><?= $_SESSION['info'] ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <?php unset($_SESSION['info']); ?>
+    <?php endif; ?>
+
     <!-- SIDEBAR -->
     <div class="sidebar">
         <a href="?section=home" data-tooltip="Home"
@@ -3998,11 +4034,11 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                 </a>
             </div>
 
-                <?php
-                $linkStmt = $pdo->prepare("SELECT link FROM report_links WHERE student_id = ?");
-                $linkStmt->execute([$student_id]);
-                $savedLink = $linkStmt->fetchColumn() ?: '';
-                ?>
+            <?php
+            $linkStmt = $pdo->prepare("SELECT link FROM report_links WHERE student_id = ?");
+            $linkStmt->execute([$student_id]);
+            $savedLink = $linkStmt->fetchColumn() ?: '';
+            ?>
 
             <!-- LINK FORM -->
             <form method="POST" action="progress-report-db.php">
@@ -4138,26 +4174,26 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                             <div
                                 style="background:#fff;border-radius:10px;padding:18px 22px;margin-bottom:14px;border:1px solid #e2e8f0;">
                                 <div style="font-weight:700;color:#29335C;margin-bottom:12px;font-size:14px;">
-                                        <?= $sectionTitle ?>
+                                    <?= $sectionTitle ?>
                                 </div>
-                                    <?php $i = 1;
-                                    foreach ($fields as $name => $label): ?>
+                                <?php $i = 1;
+                                foreach ($fields as $name => $label): ?>
                                     <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;
                  padding:8px 0;<?= $i > 1 ? 'border-top:1px solid #f1f5f9;' : '' ?>">
                                         <span style="font-size:13px;color:#374151;flex:1;"><?= $i ?>.
-                                                    <?= htmlspecialchars($label) ?></span>
+                                            <?= htmlspecialchars($label) ?></span>
                                         <div class="d-flex gap-2 flex-shrink-0">
-                                                    <?php for ($r = 1; $r <= 4; $r++): ?>
+                                            <?php for ($r = 1; $r <= 4; $r++): ?>
                                                 <label
                                                     style="cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;">
                                                     <input type="radio" name="<?= $name ?>" value="<?= $r ?>" required
                                                         style="accent-color:#29335C;width:16px;height:16px;">
                                                     <span style="font-size:10px;color:#94a3b8;"><?= $r ?></span>
                                                 </label>
-                                                    <?php endfor; ?>
+                                            <?php endfor; ?>
                                         </div>
                                     </div>
-                                            <?php $i++; endforeach; ?>
+                                    <?php $i++; endforeach; ?>
                             </div>
                         <?php endforeach; ?>
                         <!-- ── PART II ── -->
@@ -4191,26 +4227,26 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                             <div
                                 style="background:#fff;border-radius:10px;padding:18px 22px;margin-bottom:14px;border:1px solid #e2e8f0;">
                                 <div style="font-weight:700;color:#29335C;margin-bottom:12px;font-size:14px;">
-                                        <?= $sectionTitle ?>
+                                    <?= $sectionTitle ?>
                                 </div>
-                                    <?php $i = 1;
-                                    foreach ($fields as $name => $label): ?>
+                                <?php $i = 1;
+                                foreach ($fields as $name => $label): ?>
                                     <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;
                  padding:8px 0;<?= $i > 1 ? 'border-top:1px solid #f1f5f9;' : '' ?>">
                                         <span style="font-size:13px;color:#374151;flex:1;"><?= $i ?>.
-                                                    <?= htmlspecialchars($label) ?></span>
+                                            <?= htmlspecialchars($label) ?></span>
                                         <div class="d-flex gap-2 flex-shrink-0">
-                                                    <?php for ($r = 1; $r <= 4; $r++): ?>
+                                            <?php for ($r = 1; $r <= 4; $r++): ?>
                                                 <label
                                                     style="cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;">
                                                     <input type="radio" name="<?= $name ?>" value="<?= $r ?>" required
                                                         style="accent-color:#29335C;width:16px;height:16px;">
                                                     <span style="font-size:10px;color:#94a3b8;"><?= $r ?></span>
                                                 </label>
-                                                    <?php endfor; ?>
+                                            <?php endfor; ?>
                                         </div>
                                     </div>
-                                            <?php $i++; endforeach; ?>
+                                    <?php $i++; endforeach; ?>
                             </div>
                         <?php endforeach; ?>
 
@@ -4291,14 +4327,14 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                                     <span
                                         style="font-size:13px;color:#374151;flex:1;"><?= htmlspecialchars($label) ?></span>
                                     <div class="d-flex gap-2 flex-shrink-0">
-                                            <?php for ($r = 1; $r <= 4; $r++): ?>
+                                        <?php for ($r = 1; $r <= 4; $r++): ?>
                                             <label
                                                 style="cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;">
                                                 <input type="radio" name="<?= $name ?>" value="<?= $r ?>" required
                                                     style="accent-color:#29335C;width:16px;height:16px;">
                                                 <span style="font-size:10px;color:#94a3b8;"><?= $r ?></span>
                                             </label>
-                                            <?php endfor; ?>
+                                        <?php endfor; ?>
                                     </div>
                                 </div>
                             <?php endforeach; ?>
@@ -4323,7 +4359,7 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                                 <div>
                                     <label
                                         style="font-size:13px;color:#374151;font-weight:500;margin-bottom:6px;display:block;">
-                                            <?= htmlspecialchars($label) ?>
+                                        <?= htmlspecialchars($label) ?>
                                     </label>
                                     <textarea name="<?= $name ?>" rows="3" class="form-control"
                                         style="font-size:13px;border-radius:8px;"
