@@ -3657,13 +3657,14 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                         </div>
                     </div>
                     <?php
-                        $fmtSched = fn($t) => $t ? date('h:i A', strtotime($t)) : null;
-                        $schedIn  = $fmtSched($ojtTimeIn);
-                        $schedOut = $fmtSched($ojtTimeOut);
+                    $fmtSched = fn($t) => $t ? date('h:i A', strtotime($t)) : null;
+                    $schedIn = $fmtSched($ojtTimeIn);
+                    $schedOut = $fmtSched($ojtTimeOut);
                     ?>
                     <div class="text-end">
                         <div class="d-flex align-items-center justify-content-end gap-2">
-                            <label style="font-size:15px; color:#555; font-weight:500; margin:0;">OJT Hours Required:</label>
+                            <label style="font-size:15px; color:#555; font-weight:500; margin:0;">OJT Hours
+                                Required:</label>
                             <span style="font-size:16px; font-weight:700; color:#272f54;"><?= $requiredHours ?> hrs</span>
                         </div>
                         <div style="font-size:13px; color:#64748b; margin-top:4px;">
@@ -3965,17 +3966,13 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
     <!-- PROGRESS REPORT SECTION -->
 
     <div class="section <?= $current_section === 'progress_report' ? 'active' : '' ?>">
-        <!-- <div class="main" style="padding-bottom:60px;">
-            <h3 class="fw-bold mb-1">Weekly Progress Report</h3>
-            <p class="text-muted mb-4">Upload your filled-out weekly report, or download the blank template below.</p> -->
-
         <div class="main" style="padding-bottom:60px;">
             <div class="pg-header">
                 <div class="pg-header-left">
                     <div class="pg-header-icon"><i class="fa-solid fa-file-lines"></i></div>
                     <div>
                         <h2>Weekly Progress Report</h2>
-                        <p>Upload your filled-out weekly report, or download the blank template below.</p>
+                        <p>Download the template, fill it out in Google Docs, then paste the link below.</p>
                     </div>
                 </div>
             </div>
@@ -3990,7 +3987,8 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                     </div>
                     <div>
                         <strong style="font-size:14px;">Weekly Report Template</strong>
-                        <div class="text-muted" style="font-size:12px;">DOCX · Download and fill out before uploading
+                        <div class="text-muted" style="font-size:12px;">DOCX · Download and fill out before sharing your
+                            link
                         </div>
                     </div>
                 </div>
@@ -4000,99 +3998,32 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                 </a>
             </div>
 
-            <!-- UPLOAD FORM -->
-            <form method="POST" action="progress-report-db.php" enctype="multipart/form-data">
+                <?php
+                $linkStmt = $pdo->prepare("SELECT link FROM report_links WHERE student_id = ?");
+                $linkStmt->execute([$student_id]);
+                $savedLink = $linkStmt->fetchColumn() ?: '';
+                ?>
+
+            <!-- LINK FORM -->
+            <form method="POST" action="progress-report-db.php">
                 <input type="hidden" name="room_id" value="<?= htmlspecialchars($current_room_id ?? '') ?>">
 
-                <div class="card shadow-sm rounded-3 p-4 mb-3" style="border:1px solid #e5e7eb;">
-                    <div class="d-flex gap-2 align-items-center mt-3">
-                        <span style="font-size:15px; font-weight: bold;">Week number</span>
-                        <input type="number" name="week_number" class="form-control form-control-sm"
-                            style="max-width:120px;" min="1" max="52" placeholder="e.g. 1" required>
-
+                <div class="card shadow-sm rounded-3 p-4" style="border:1px solid #e5e7eb;">
+                    <label for="reportLink" style="font-size:15px; font-weight:bold;">Google Document link</label>
+                    <input type="url" id="reportLink" name="report_link" class="form-control mt-2"
+                        value="<?= htmlspecialchars($savedLink) ?>" placeholder="https://docs.google.com/document/d/..."
+                        pattern="https://docs\.google\.com/document/.*"
+                        title="Please enter a valid Google Docs link (https://docs.google.com/document/...)" required>
+                    <div class="text-muted mt-1" style="font-size:12px;">
+                        Make sure sharing is set to "Anyone with the link can view" (or that your adviser has access).
                     </div>
-                    <br>
-                    <label id="prDropZone" for="prFileInput" style="
-                border: 2px dashed #ddd;
-                border-radius: 12px;
-                padding: 32px;
-                text-align: center;
-                cursor: pointer;
-                display: block;
-                transition: border-color .2s, background .2s;">
-                        <i class="fa-solid fa-cloud-arrow-up fa-2x mb-2" style="color:#ff6b2c;"></i>
-                        <div style="font-weight:600; font-size:14px;">Click to upload or drag and drop</div>
-                        <div class="text-muted" style="font-size:12px;">PDF or DOCX, up to 10MB</div>
-                        <div id="prFileName" style="margin-top:10px; font-size:13px; color:#272f54; font-weight:600;">
-                        </div>
-                    </label>
-                    <input type="file" id="prFileInput" name="report_file" accept=".pdf,.doc,.docx"
-                        style="display:none;" required onchange="prShowFileName(this)">
 
-                    <button type="submit" class="btn btn-sm fw-semibold ms-auto mt-3 align-self-start"
+                    <button type="submit" class="btn btn-sm fw-semibold mt-3 align-self-start"
                         style="background:#ff6b2c;color:#fff;border-radius:8px;padding:8px 18px;">
-                        <i class="fa-solid fa-paper-plane me-1"></i> Submit Report
+                        <i class="fa-solid fa-paper-plane me-1"></i> <?= $savedLink ? 'Update Link' : 'Submit Link' ?>
                     </button>
                 </div>
             </form>
-
-            <!-- SUBMITTED REPORTS LIST -->
-            <h6 class="fw-bold mb-2" style="font-size:14px;">Your Submitted Reports</h6>
-            <div class="card  shadow-sm rounded-3" style="overflow:hidden; border:1px solid #e5e7eb;">
-                <table class="w-100" style="font-size:13px; border-collapse:collapse;">
-                    <thead style="background:#f8f9fa;">
-                        <tr>
-                            <th class="p-3 text-start">Week</th>
-                            <th class="p-3 text-start">Submitted</th>
-                            <th class="p-3 text-start">File</th>
-                            <th class="p-3 text-start">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php
-                        $reportsStmt = $pdo->prepare("
-                        SELECT id, week_number, wr_filepath, created_at
-                        FROM weekly_reports
-                        WHERE student_id = ?
-                        ORDER BY week_number DESC
-                    ");
-                        $reportsStmt->execute([$student_id]);
-                        $reports = $reportsStmt->fetchAll(PDO::FETCH_ASSOC);
-                        ?>
-                        <?php if (empty($reports)): ?>
-                            <tr>
-                                <td colspan="4" class="text-center text-muted p-4">No reports submitted yet.</td>
-                            </tr>
-                        <?php else: ?>
-                            <?php foreach ($reports as $r): ?>
-                                <tr style="border-top:1px solid #f0f0f0;">
-                                    <td class="p-3">Week <?= (int) $r['week_number'] ?></td>
-                                    <td class="p-3"><?= date('M d, Y', strtotime($r['created_at'])) ?></td>
-                                    <td class="p-3">
-                                        <i class="fa-solid fa-file-lines me-1" style="color:#888;"></i>
-                                        <?= htmlspecialchars(basename($r['wr_filepath'])) ?>
-                                    </td>
-                                    <td class="p-3">
-                                        <a href="<?= htmlspecialchars($r['wr_filepath']) ?>" target="_blank" class="btn btn-sm"
-                                            style="background:#eef2ff;color:#272f54;border-radius:6px;">
-                                            <i class="fa-solid fa-eye me-1"></i> Preview
-                                        </a>
-                                        <form action="student-progress.php" method="POST" style="display:inline;"
-                                            onsubmit="return confirm('Are you sure?')">
-                                            <input type="hidden" name="action" value="delete-weekly-report">
-                                            <input type="hidden" name="report_id" value="<?= (int) $r['id'] ?>">
-                                            <button type="submit" class="btn btn-sm"
-                                                style="background:#fef2f2;color:#dc2626;border-radius:6px;">
-                                                <i class="fa-solid fa-trash me-1"></i>Delete
-                                            </button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
-            </div>
         </div>
     </div>
 
@@ -4207,26 +4138,26 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                             <div
                                 style="background:#fff;border-radius:10px;padding:18px 22px;margin-bottom:14px;border:1px solid #e2e8f0;">
                                 <div style="font-weight:700;color:#29335C;margin-bottom:12px;font-size:14px;">
-                                    <?= $sectionTitle ?>
+                                        <?= $sectionTitle ?>
                                 </div>
-                                <?php $i = 1;
-                                foreach ($fields as $name => $label): ?>
+                                    <?php $i = 1;
+                                    foreach ($fields as $name => $label): ?>
                                     <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;
                  padding:8px 0;<?= $i > 1 ? 'border-top:1px solid #f1f5f9;' : '' ?>">
                                         <span style="font-size:13px;color:#374151;flex:1;"><?= $i ?>.
-                                            <?= htmlspecialchars($label) ?></span>
+                                                    <?= htmlspecialchars($label) ?></span>
                                         <div class="d-flex gap-2 flex-shrink-0">
-                                            <?php for ($r = 1; $r <= 4; $r++): ?>
+                                                    <?php for ($r = 1; $r <= 4; $r++): ?>
                                                 <label
                                                     style="cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;">
                                                     <input type="radio" name="<?= $name ?>" value="<?= $r ?>" required
                                                         style="accent-color:#29335C;width:16px;height:16px;">
                                                     <span style="font-size:10px;color:#94a3b8;"><?= $r ?></span>
                                                 </label>
-                                            <?php endfor; ?>
+                                                    <?php endfor; ?>
                                         </div>
                                     </div>
-                                    <?php $i++; endforeach; ?>
+                                            <?php $i++; endforeach; ?>
                             </div>
                         <?php endforeach; ?>
                         <!-- ── PART II ── -->
@@ -4260,26 +4191,26 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                             <div
                                 style="background:#fff;border-radius:10px;padding:18px 22px;margin-bottom:14px;border:1px solid #e2e8f0;">
                                 <div style="font-weight:700;color:#29335C;margin-bottom:12px;font-size:14px;">
-                                    <?= $sectionTitle ?>
+                                        <?= $sectionTitle ?>
                                 </div>
-                                <?php $i = 1;
-                                foreach ($fields as $name => $label): ?>
+                                    <?php $i = 1;
+                                    foreach ($fields as $name => $label): ?>
                                     <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;
                  padding:8px 0;<?= $i > 1 ? 'border-top:1px solid #f1f5f9;' : '' ?>">
                                         <span style="font-size:13px;color:#374151;flex:1;"><?= $i ?>.
-                                            <?= htmlspecialchars($label) ?></span>
+                                                    <?= htmlspecialchars($label) ?></span>
                                         <div class="d-flex gap-2 flex-shrink-0">
-                                            <?php for ($r = 1; $r <= 4; $r++): ?>
+                                                    <?php for ($r = 1; $r <= 4; $r++): ?>
                                                 <label
                                                     style="cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;">
                                                     <input type="radio" name="<?= $name ?>" value="<?= $r ?>" required
                                                         style="accent-color:#29335C;width:16px;height:16px;">
                                                     <span style="font-size:10px;color:#94a3b8;"><?= $r ?></span>
                                                 </label>
-                                            <?php endfor; ?>
+                                                    <?php endfor; ?>
                                         </div>
                                     </div>
-                                    <?php $i++; endforeach; ?>
+                                            <?php $i++; endforeach; ?>
                             </div>
                         <?php endforeach; ?>
 
@@ -4360,14 +4291,14 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                                     <span
                                         style="font-size:13px;color:#374151;flex:1;"><?= htmlspecialchars($label) ?></span>
                                     <div class="d-flex gap-2 flex-shrink-0">
-                                        <?php for ($r = 1; $r <= 4; $r++): ?>
+                                            <?php for ($r = 1; $r <= 4; $r++): ?>
                                             <label
                                                 style="cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;">
                                                 <input type="radio" name="<?= $name ?>" value="<?= $r ?>" required
                                                     style="accent-color:#29335C;width:16px;height:16px;">
                                                 <span style="font-size:10px;color:#94a3b8;"><?= $r ?></span>
                                             </label>
-                                        <?php endfor; ?>
+                                            <?php endfor; ?>
                                     </div>
                                 </div>
                             <?php endforeach; ?>
@@ -4392,7 +4323,7 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                                 <div>
                                     <label
                                         style="font-size:13px;color:#374151;font-weight:500;margin-bottom:6px;display:block;">
-                                        <?= htmlspecialchars($label) ?>
+                                            <?= htmlspecialchars($label) ?>
                                     </label>
                                     <textarea name="<?= $name ?>" rows="3" class="form-control"
                                         style="font-size:13px;border-radius:8px;"
