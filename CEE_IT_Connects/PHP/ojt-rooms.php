@@ -1962,6 +1962,7 @@ $page = 'messages';
                 padding: 5px 10px;
                 width: 65%;
             }
+
             .sidebar,
             .sidebar .rooms-list {
                 overflow: visible !important;
@@ -2687,7 +2688,8 @@ $page = 'messages';
                         </div>
                         <div class="sysAdm-header-text">
                             <h2>Documents Available</h2>
-                            <p>Check which documents are available for each partner company, ready to be picked up by the student</p>
+                            <p>Check which documents are available for each partner company, ready to be picked up by the
+                                student</p>
                         </div>
                     </div>
                 </div>
@@ -3147,59 +3149,50 @@ $page = 'messages';
                         </div>
                         <div class="sysAdm-header-text">
                             <h2>Weekly Progress Reports</h2>
-                            <p>View weekly reports submitted by students in this room.</p>
+                            <p>View the Google Document report links submitted by students in this room.</p>
                         </div>
                     </div>
                 </div>
+
                 <?php
                 $reportsStmt = $pdo->prepare("
-                    SELECT wr.id, wr.student_id, wr.week_number, wr.wr_filepath, wr.created_at,
-                    s.full_name AS student_name
-                    FROM weekly_reports wr
-                    JOIN students s ON s.id = wr.student_id
-                    WHERE EXISTS (
-                        SELECT 1
-                        FROM room_members rm
-                        JOIN rooms r ON r.id = rm.room_id
-                        WHERE rm.user_id = s.id AND rm.user_type = 'student'
-                        AND r.adviser_id = ? AND r.is_archived = FALSE
-                    )
-                    ORDER BY s.full_name, wr.week_number
-                ");
+            SELECT rl.student_id, rl.link, rl.updated_at,
+                   s.full_name AS student_name
+            FROM report_links rl
+            JOIN students s ON s.id = rl.student_id
+            WHERE EXISTS (
+                SELECT 1
+                FROM room_members rm
+                JOIN rooms r ON r.id = rm.room_id
+                WHERE rm.user_id = s.id AND rm.user_type = 'student'
+                AND r.adviser_id = ? AND r.is_archived = FALSE
+            )
+            ORDER BY s.full_name
+        ");
                 $reportsStmt->execute([$adviser_id]);
+                $reportRows = $reportsStmt->fetchAll(PDO::FETCH_ASSOC);
 
-                // one entry per student, holding all of their reports
-                $byStudent = [];
-                foreach ($reportsStmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
-                    $sid = (int) $r['student_id'];
-                    $byStudent[$sid]['name'] = $r['student_name'];
-
-                    $byStudent[$sid]['reports'][] = [
-                        'week' => (int) $r['week_number'],
-                        'file' => $r['wr_filepath'],
-                        'mime' => $r['file_mime'] ?? '',
-                        'date' => date('M d, Y', strtotime($r['created_at'])),
-                    ];
+                // turn a normal Google Docs link into an embeddable /preview link
+                function gdocPreviewUrl(string $url): string
+                {
+                    $url = preg_replace('/[?#].*$/', '', $url);
+                    if (preg_match('#/(edit|view|preview)$#', $url)) {
+                        return preg_replace('#/(edit|view|preview)$#', '/preview', $url);
+                    }
+                    return rtrim($url, '/') . '/preview';
                 }
                 ?>
+
                 <div
                     style="display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap; align-items:center; justify-content:space-between;">
-                    <!-- <div class="search-box">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                        <input type="text" id="reportsSearchInput" placeholder="Search student"
-                            oninput="filterReportsTable()">
-                    </div> -->
-
                     <div style="position:relative; flex:1; min-width:200px;">
                         <i class="fa fa-search"
                             style="position:absolute; color: #f97316; left:10px; top:50%; transform:translateY(-50%); font-size:13px;"></i>
                         <input type="text" id="reportsSearchInput" placeholder="Search student..."
                             oninput="filterReportsTable()" style="width:50%; padding:8px 12px 8px 32px; border:1.5px solid #aeaeae; border-radius:22px;
-                            font-size:13px; font-family:inherit; outline:none; transition:border-color .2s;"
+                    font-size:13px; font-family:inherit; outline:none; transition:border-color .2s;"
                             onfocus="this.style.borderColor='#f97316'" onblur="this.style.borderColor='#e5e7eb'">
                     </div>
-
-
                 </div>
 
                 <div class="ojt-table-wrapper">
@@ -3207,41 +3200,47 @@ $page = 'messages';
                         <thead style="background:#f8f9fa;">
                             <tr>
                                 <th>Student</th>
-                                <th>Reports Submitted</th>
-                                <th>Latest Submission</th>
+                                <th>Last Updated</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody id="reports-tbody">
-                            <?php if (empty($byStudent)): ?>
+                            <?php if (empty($reportRows)): ?>
                                 <tr>
-                                    <td colspan="4" class="text-center text-muted py-4">No weekly reports submitted yet.</td>
+                                    <td colspan="3" class="text-center text-muted py-4">No report links submitted yet.</td>
                                 </tr>
                             <?php else: ?>
-                                <?php foreach ($byStudent as $sid => $st):
+                                <?php foreach ($reportRows as $row):
                                     $avatarColors = ['#ff2c8f', '#2c6fff', '#1abc9c', '#9b59b6', '#e67e22'];
-                                    $avatarColor = $avatarColors[crc32($st['name']) % count($avatarColors)];
-                                    $count = count($st['reports']);
-                                    $latest = end($st['reports'])['date'];
+                                    $avatarColor = $avatarColors[crc32($row['student_name']) % count($avatarColors)];
                                     ?>
                                     <tr>
                                         <td>
                                             <div class="student-cell">
                                                 <div class="avatar" style="background:<?= $avatarColor ?>;">
-                                                    <strong><?= strtoupper(substr($st['name'], 0, 1)) ?></strong>
+                                                    <strong><?= strtoupper(substr($row['student_name'], 0, 1)) ?></strong>
                                                 </div>
-                                                <span><?= htmlspecialchars($st['name']) ?></span>
+                                                <span><?= htmlspecialchars($row['student_name']) ?></span>
                                             </div>
                                         </td>
-                                        <td><?= $count ?> report<?= $count > 1 ? 's' : '' ?></td>
-                                        <td><?= $latest ?></td>
+                                        <td><?= date('M d, Y', strtotime($row['updated_at'])) ?></td>
                                         <td>
-                                            <button type="button" onclick="openReports(<?= (int) $sid ?>)"
+                                            <button type="button" data-name="<?= htmlspecialchars($row['student_name']) ?>"
+                                                data-link="<?= htmlspecialchars($row['link']) ?>"
+                                                data-preview="<?= htmlspecialchars(gdocPreviewUrl($row['link'])) ?>"
+                                                onclick="openReport(this)"
                                                 style="display:inline-flex; align-items:center; gap:5px; padding:5px 10px;
-                                                background:#dbeafe; color:#1e40af; border-radius:6px; font-size:11px;
-                                                font-weight:600; border:1px solid #93c5fd; cursor:pointer; white-space:nowrap;">
+                                        background:#dbeafe; color:#1e40af; border-radius:6px; font-size:11px;
+                                        font-weight:600; border:1px solid #93c5fd; cursor:pointer; white-space:nowrap;">
                                                 <i class="fa fa-eye"></i> View
                                             </button>
+                                            <a href="<?= htmlspecialchars($row['link']) ?>" target="_blank"
+                                                rel="noopener noreferrer"
+                                                style="display:inline-flex; align-items:center; gap:5px; padding:5px 10px;
+                                        background:#eef2ff; color:#272f54; border-radius:6px; font-size:11px;
+                                        font-weight:600; border:1px solid #c7d2fe; text-decoration:none; white-space:nowrap;">
+                                                <i class="fa fa-up-right-from-square"></i> Open
+                                            </a>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
@@ -3249,43 +3248,26 @@ $page = 'messages';
                         </tbody>
                     </table>
                 </div>
-                <div id="reportsModal" onclick="if(event.target===this) closeReports()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:2000;
-           align-items:center; justify-content:center; padding:16px;">
+
+                <!-- PREVIEW MODAL -->
+                <div id="reportsModal" onclick="if(event.target===this) closeReport()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:2000;
+            align-items:center; justify-content:center; padding:16px;">
                     <div style="background:#fff; border-radius:14px; width:100%; max-width:1000px; height:85vh;
                 display:flex; flex-direction:column; overflow:hidden;">
 
                         <div style="display:flex; justify-content:space-between; align-items:center;
-                    padding:14px 18px; border-bottom:1px solid #e5e7eb;">
+                    padding:14px 18px; border-bottom:1px solid #e5e7eb; gap:8px;">
                             <h5 id="reportsModalTitle" style="margin:0; color:#272f54;"></h5>
-                            <button type="button" onclick="closeReports()"
-                                style="border:none; background:none; font-size:24px; cursor:pointer;">&times;</button>
+                            <span style="display:flex; align-items:center; gap:10px;">
+                                <a id="reportsOpen" href="#" target="_blank" rel="noopener noreferrer"
+                                    class="btn btn-sm btn-outline-primary">
+                                    <i class="fa fa-up-right-from-square"></i> Open in Google Docs</a>
+                                <button type="button" onclick="closeReport()"
+                                    style="border:none; background:none; font-size:24px; cursor:pointer;">&times;</button>
+                            </span>
                         </div>
 
-                        <div style="display:flex; flex:1; min-height:0; flex-wrap:wrap;">
-                            <!-- week list -->
-                            <div id="reportsList" style="width:230px; max-width:100%; overflow:auto; padding:12px;
-                                         border-right:1px solid #e5e7eb; background:#f8f9fa;"></div>
-
-                            <!-- preview -->
-                            <div style="flex:1; min-width:280px; display:flex; flex-direction:column;">
-                                <div style="display:flex; justify-content:space-between; align-items:center;
-                            padding:8px 14px; border-bottom:1px solid #e5e7eb; gap:8px;">
-                                    <strong id="reportsCurrent" style="font-size:14px;"></strong>
-                                    <span>
-                                        <a id="reportsOpen" href="#" target="_blank" rel="noopener"
-                                            class="btn btn-sm btn-outline-primary"><i
-                                                class="fa fa-up-right-from-square"></i> Open</a>
-                                        <a id="reportsDl" href="#" class="btn btn-sm btn-outline-secondary">
-                                            <i class="fa fa-download"></i> Download</a>
-                                    </span>
-                                </div>
-                                <iframe id="reportsFrame" style="flex:1; border:0; width:100%;"></iframe>
-                                <div id="reportsNoPreview" style="display:none; flex:1; align-items:center;
-                     justify-content:center; text-align:center; color:#6b7280; padding:20px;">
-                                    This file type can't be previewed in the browser.<br>Use Download to open it.
-                                </div>
-                            </div>
-                        </div>
+                        <iframe id="reportsFrame" style="flex:1; border:0; width:100%;"></iframe>
                     </div>
                 </div>
             </div>
@@ -3851,60 +3833,72 @@ $page = 'messages';
             return d.innerHTML;
         }
 
-        function openReports(sid) {
-            const st = studentReports[sid];
-            if (!st) return;
-
-            currentReports = st.reports;
-            document.getElementById('reportsModalTitle').textContent = st.name + ' — Weekly Reports';
-
-            document.getElementById('reportsList').innerHTML = currentReports.map((r, i) => `
-        <button type="button" data-i="${i}" onclick="selectReport(${i})"
-            style="display:block; width:100%; text-align:left; padding:10px 12px; margin-bottom:6px;
-                   border:1px solid #e5e7eb; border-radius:10px; background:#fff; cursor:pointer;">
-            <strong>Week ${r.week}</strong><br>
-            <small style="color:#6b7280;">${escH(r.date)}</small>
-        </button>`).join('');
-
+        function openReport(btn) {
+            document.getElementById('reportsModalTitle').textContent = btn.dataset.name + "'s Weekly Report";
+            document.getElementById('reportsOpen').href = btn.dataset.link;
+            document.getElementById('reportsFrame').src = btn.dataset.preview;
             document.getElementById('reportsModal').style.display = 'flex';
-            selectReport(currentReports.length - 1);   // open the latest week first
         }
 
-        function selectReport(i) {
-            const r = currentReports[i];
-            if (!r) return;
-
-            document.querySelectorAll('#reportsList button').forEach(b => {
-                const on = Number(b.dataset.i) === i;
-                b.style.background = on ? '#dbeafe' : '#fff';
-                b.style.borderColor = on ? '#93c5fd' : '#e5e7eb';
-            });
-
-            const isDb = r.file.includes('view-report.php');
-            const dl = isDb ? r.file + '&download=1' : r.file;
-            const previewable = r.mime ? r.mime === 'application/pdf' : /\.pdf($|\?)/i.test(r.file) || isDb;
-
-            document.getElementById('reportsCurrent').textContent = 'Week ' + r.week;
-            document.getElementById('reportsOpen').href = r.file;
-            document.getElementById('reportsDl').href = dl;
-
-            const frame = document.getElementById('reportsFrame');
-            const none = document.getElementById('reportsNoPreview');
-            if (previewable) {
-                frame.style.display = 'block';
-                none.style.display = 'none';
-                frame.src = r.file;
-            } else {
-                frame.style.display = 'none';
-                frame.src = 'about:blank';
-                none.style.display = 'flex';
-            }
-        }
-
-        function closeReports() {
+        function closeReport() {
             document.getElementById('reportsModal').style.display = 'none';
             document.getElementById('reportsFrame').src = 'about:blank';
         }
+
+        // function openReports(sid) {
+        //     const st = studentReports[sid];
+        //     if (!st) return;
+
+        //     currentReports = st.reports;
+        //     document.getElementById('reportsModalTitle').textContent = st.name + ' — Weekly Reports';
+
+        //     document.getElementById('reportsList').innerHTML = currentReports.map((r, i) => `
+        // <button type="button" data-i="${i}" onclick="selectReport(${i})"
+        //     style="display:block; width:100%; text-align:left; padding:10px 12px; margin-bottom:6px;
+        //            border:1px solid #e5e7eb; border-radius:10px; background:#fff; cursor:pointer;">
+        //     <strong>Week ${r.week}</strong><br>
+        //     <small style="color:#6b7280;">${escH(r.date)}</small>
+        // </button>`).join('');
+
+        //     document.getElementById('reportsModal').style.display = 'flex';
+        //     selectReport(currentReports.length - 1);   // open the latest week first
+        // }
+
+        // function selectReport(i) {
+        //     const r = currentReports[i];
+        //     if (!r) return;
+
+        //     document.querySelectorAll('#reportsList button').forEach(b => {
+        //         const on = Number(b.dataset.i) === i;
+        //         b.style.background = on ? '#dbeafe' : '#fff';
+        //         b.style.borderColor = on ? '#93c5fd' : '#e5e7eb';
+        //     });
+
+        //     const isDb = r.file.includes('view-report.php');
+        //     const dl = isDb ? r.file + '&download=1' : r.file;
+        //     const previewable = r.mime ? r.mime === 'application/pdf' : /\.pdf($|\?)/i.test(r.file) || isDb;
+
+        //     document.getElementById('reportsCurrent').textContent = 'Week ' + r.week;
+        //     document.getElementById('reportsOpen').href = r.file;
+        //     document.getElementById('reportsDl').href = dl;
+
+        //     const frame = document.getElementById('reportsFrame');
+        //     const none = document.getElementById('reportsNoPreview');
+        //     if (previewable) {
+        //         frame.style.display = 'block';
+        //         none.style.display = 'none';
+        //         frame.src = r.file;
+        //     } else {
+        //         frame.style.display = 'none';
+        //         frame.src = 'about:blank';
+        //         none.style.display = 'flex';
+        //     }
+        // }
+
+        // function closeReports() {
+        //     document.getElementById('reportsModal').style.display = 'none';
+        //     document.getElementById('reportsFrame').src = 'about:blank';
+        // }
 
 
         const requirementsData = <?= json_encode((object) ($reqData ?? []), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
