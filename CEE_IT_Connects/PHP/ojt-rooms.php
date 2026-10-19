@@ -195,7 +195,7 @@ $stmt = $pdo->prepare("
         s.id,
         s.full_name,
         COALESCE(i.company, oa.company_name) AS company,
-        COALESCE(i.required_hours, 486),
+        COALESCE(i.required_hours, 486) AS required_hours,
         COALESCE((
     SELECT ROUND(SUM(
         GREATEST(0, EXTRACT(EPOCH FROM (h.m_out - h.m_in)) / 3600) +
