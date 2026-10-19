@@ -2077,19 +2077,6 @@ $page = 'messages';
             <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=ojt_applications"
                 class="<?= $section === 'ojt_applications' ? 'active' : '' ?>" data-tooltip="Requirements">
                 <i class="fa fa-list-ul me-2"></i> <span class="sidebar-text">Requirements</span>
-                <?php
-                $pendingStmt = $pdo->prepare("
-                SELECT COUNT(*) FROM ojt_applications oa 
-                JOIN room_members rm ON oa.student_id = rm.user_id AND rm.user_type = 'student'
-                WHERE rm.room_id = ? AND oa.status = 'pending'
-            ");
-                $pendingStmt->execute([$current_room_id]);
-                $pCount = $pendingStmt->fetchColumn();
-                if ($pCount > 0):
-                    ?>
-                    <span class="ms-auto badge rounded-pill"
-                        style="background:#ff6b2c;font-size:10px;"><?= $pCount ?></span>
-                <?php endif; ?>
             </a>
 
             <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=weekly_reports"

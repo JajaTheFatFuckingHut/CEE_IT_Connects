@@ -48,7 +48,7 @@ try {
     $stmt->bindValue(':link', $link);
     $stmt->execute();
 
-    $_SESSION['success'] = 'Report link saved successfully.';
+    $_SESSION['success'] = 'Report link revised successfully.';
 } catch (PDOException $e) {
     error_log('report link save failed: ' . $e->getMessage());
     $_SESSION['error'] = 'Unable to save your link. Please try again.';
