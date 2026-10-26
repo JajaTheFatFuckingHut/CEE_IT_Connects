@@ -2,6 +2,7 @@
 session_start();
 require 'db.php';
 require 'auth.php';
+require 'deact-guard.php';
 
 if (($_SESSION['role'] ?? '') === 'student') {
     $chk = $pdo->prepare("SELECT is_archived FROM students WHERE id = ?");
@@ -3692,10 +3693,7 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
     <!-- HOURS SECTION -->
     <div id="hours" class="section <?= $current_section === 'hours' ? 'active' : '' ?>">
         <div class="main" style="overflow-y:auto; height:calc(100vh - 70px);">
-            <div id="ojt-deact-banner" class="alert alert-warning d-none" role="alert">
-                You've completed your required hours. This account will be deactivated in
-                <b id="ojt-deact-count">10</b> seconds.
-            </div>
+
             <?php if (!$hasActiveProgress): ?>
                 <div class="text-center mt-5 py-5">
                     <i class="fa fa-lock fa-3x text-muted mb-3 d-block"></i>
@@ -4759,88 +4757,88 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
             return clone;
         }
 
-        const OJT_DEACTIVATE_DELAY = 20;
-        let ojtDeactTimer = null;
-        let ojtDeadline = 0;
+        // const OJT_DEACTIVATE_DELAY = 20;
+        // let ojtDeactTimer = null;
+        // let ojtDeadline = 0;
 
-        function ojtGetBanner() {
-            let banner = document.getElementById('ojt-deact-banner');
-            if (!banner) {
-                banner = document.createElement('div');
-                banner.id = 'ojt-deact-banner';
-                banner.className = 'alert alert-warning d-none';
-                banner.setAttribute('role', 'alert');
-                banner.style.cssText = 'position:fixed;top:80px;left:50%;transform:translateX(-50%);z-index:9999;min-width:360px;';
-                banner.innerHTML = "You've completed your required hours. This account will be deactivated in " +
-                    '<b id="ojt-deact-count">10</b> seconds.';
-                document.body.appendChild(banner);
-            }
-            return banner;
-        }
+        // function ojtGetBanner() {
+        //     let banner = document.getElementById('ojt-deact-banner');
+        //     if (!banner) {
+        //         banner = document.createElement('div');
+        //         banner.id = 'ojt-deact-banner';
+        //         banner.className = 'alert alert-warning d-none';
+        //         banner.setAttribute('role', 'alert');
+        //         banner.style.cssText = 'position:fixed;top:80px;left:50%;transform:translateX(-50%);z-index:9999;min-width:360px;';
+        //         banner.innerHTML = "You've completed your required hours. This account will be deactivated in " +
+        //             '<b id="ojt-deact-count">10</b> seconds.';
+        //         document.body.appendChild(banner);
+        //     }
+        //     return banner;
+        // }
 
-        function ojtCancelDeactivation() {
-            if (!ojtDeactTimer) return;
-            clearInterval(ojtDeactTimer);
-            ojtDeactTimer = null;
-            ojtGetBanner().classList.add('d-none');
-        }
+        // function ojtCancelDeactivation() {
+        //     if (!ojtDeactTimer) return;
+        //     clearInterval(ojtDeactTimer);
+        //     ojtDeactTimer = null;
+        //     ojtGetBanner().classList.add('d-none');
+        // }
 
-        function ojtStartDeactivation() {
-            if (ojtDeactTimer) return;
-            const banner = ojtGetBanner();
-            ojtDeadline = Date.now() + OJT_DEACTIVATE_DELAY * 1000;
-            banner.classList.remove('d-none');
+        // function ojtStartDeactivation() {
+        //     if (ojtDeactTimer) return;
+        //     const banner = ojtGetBanner();
+        //     ojtDeadline = Date.now() + OJT_DEACTIVATE_DELAY * 1000;
+        //     banner.classList.remove('d-none');
 
-            ojtDeactTimer = setInterval(async () => {
-                const left = Math.ceil((ojtDeadline - Date.now()) / 1000);
-                const countEl = document.getElementById('ojt-deact-count');
-                if (countEl) countEl.textContent = Math.max(left, 0);
-                if (left > 0) return;
+        //     ojtDeactTimer = setInterval(async () => {
+        //         const left = Math.ceil((ojtDeadline - Date.now()) / 1000);
+        //         const countEl = document.getElementById('ojt-deact-count');
+        //         if (countEl) countEl.textContent = Math.max(left, 0);
+        //         if (left > 0) return;
 
-                clearInterval(ojtDeactTimer);
-                try {
-                    const res = await fetch('deactivate-account.php', { method: 'POST' });
-                    const json = JSON.parse(await res.text());
-                    if (json.ok) { window.location.href = 'logout.php?deactivated=1'; return; }
-                    alert(json.error || 'Could not deactivate the account.');
-                } catch (e) {
-                    alert('Request failed: ' + e.message);
-                }
-                ojtDeactTimer = null;
-            }, 250);
-        }
+        //         clearInterval(ojtDeactTimer);
+        //         try {
+        //             const res = await fetch('deactivate-account.php', { method: 'POST' });
+        //             const json = JSON.parse(await res.text());
+        //             if (json.ok) { window.location.href = 'logout.php?deactivated=1'; return; }
+        //             alert(json.error || 'Could not deactivate the account.');
+        //         } catch (e) {
+        //             alert('Request failed: ' + e.message);
+        //         }
+        //         ojtDeactTimer = null;
+        //     }, 250);
+        // }
 
-        function ojtCancelDeactivation() {
-            if (!ojtDeactTimer) return;
-            clearInterval(ojtDeactTimer);
-            ojtDeactTimer = null;
-            document.getElementById('ojt-deact-banner')?.classList.add('d-none');
-        }
+        // function ojtCancelDeactivation() {
+        //     if (!ojtDeactTimer) return;
+        //     clearInterval(ojtDeactTimer);
+        //     ojtDeactTimer = null;
+        //     document.getElementById('ojt-deact-banner')?.classList.add('d-none');
+        // }
 
-        function ojtStartDeactivation() {
-            if (ojtDeactTimer) return;
-            const banner = document.getElementById('ojt-deact-banner');
-            const countEl = document.getElementById('ojt-deact-count');
-            ojtDeadline = Date.now() + OJT_DEACTIVATE_DELAY * 1000;
-            banner?.classList.remove('d-none');
+        // function ojtStartDeactivation() {
+        //     if (ojtDeactTimer) return;
+        //     const banner = document.getElementById('ojt-deact-banner');
+        //     const countEl = document.getElementById('ojt-deact-count');
+        //     ojtDeadline = Date.now() + OJT_DEACTIVATE_DELAY * 1000;
+        //     banner?.classList.remove('d-none');
 
-            ojtDeactTimer = setInterval(async () => {
-                const left = Math.ceil((ojtDeadline - Date.now()) / 1000);
-                if (countEl) countEl.textContent = Math.max(left, 0);
-                if (left > 0) return;
+        //     ojtDeactTimer = setInterval(async () => {
+        //         const left = Math.ceil((ojtDeadline - Date.now()) / 1000);
+        //         if (countEl) countEl.textContent = Math.max(left, 0);
+        //         if (left > 0) return;
 
-                clearInterval(ojtDeactTimer);
-                try {
-                    const res = await fetch('deactivate-account.php', { method: 'POST' });
-                    const json = JSON.parse(await res.text());
-                    if (json.ok) { window.location.href = 'logout.php?deactivated=1'; return; }
-                    alert(json.error || 'Could not deactivate the account.');
-                } catch (e) {
-                    alert('Request failed: ' + e.message);
-                }
-                ojtDeactTimer = null;
-            }, 250);
-        }
+        //         clearInterval(ojtDeactTimer);
+        //         try {
+        //             const res = await fetch('deactivate-account.php', { method: 'POST' });
+        //             const json = JSON.parse(await res.text());
+        //             if (json.ok) { window.location.href = 'logout.php?deactivated=1'; return; }
+        //             alert(json.error || 'Could not deactivate the account.');
+        //         } catch (e) {
+        //             alert('Request failed: ' + e.message);
+        //         }
+        //         ojtDeactTimer = null;
+        //     }, 250);
+        // }
 
         function ojtOnFieldChange(el) {
             const block = el.closest('.ojt-week-block');
@@ -5371,6 +5369,7 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
             render();
         });
     </script>
+    <?php require 'deact-banner.php'; ?>
 </body>
 
 </html>
