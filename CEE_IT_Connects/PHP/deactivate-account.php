@@ -48,10 +48,10 @@ try {
     // Deactivate
     $up = $pdo->prepare("
         UPDATE students
-        SET deactivate_at = NOW() + make_interval(secs => :s)
+        SET deactivate_at = NOW() + make_interval(days => :d)
         WHERE id = :id AND deactivate_at IS NULL
     ");
-    $up->bindValue(':s', 10, PDO::PARAM_INT);
+    $up->bindValue(':d', 30, PDO::PARAM_INT);   // days until deactivation
     $up->bindValue(':id', $uid, PDO::PARAM_INT);
     $up->execute();
 
