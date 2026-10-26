@@ -8,7 +8,7 @@
                 t = document.createElement('div');
                 t.id = 'ojt-deact-toast';
                 t.style.cssText =
-                    'position:fixed;top:80px;right:16px;display:none;z-index:2147483647;' +
+                    'position:fixed;top:80px;right:16px;display:none;z-index:900;' +
                     'background:#fff;color:#1b2a4e;border:1px solid #f5c2a8;border-left:4px solid #f26b3a;' +
                     'border-radius:8px;padding:8px 12px;font-size:13px;line-height:1.3;' +
                     'box-shadow:0 4px 14px rgba(0,0,0,.15);max-width:260px;';
