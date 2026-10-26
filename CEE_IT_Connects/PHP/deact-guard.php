@@ -13,8 +13,13 @@ if (($_SESSION['role'] ?? '') === 'student' && !empty($_SESSION['user_id'])) {
         FROM students
         WHERE id = ?
     ");
-    $chk->execute([$_SESSION['user_id']]);
-    $row = $chk->fetch(PDO::FETCH_ASSOC);
+    try {
+        $chk->execute([$_SESSION['user_id']]);
+        $row = $chk->fetch(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        error_log('deact-guard: ' . $e->getMessage());
+        return;   // skip the guard for this request
+    }
 
     // Deadline exists and has already passed
     $expired = $row && $row['secs'] !== null && (int) $row['secs'] <= 0;
@@ -38,11 +43,10 @@ if (($_SESSION['role'] ?? '') === 'student' && !empty($_SESSION['user_id'])) {
                 'Account auto-deactivated after completing required OJT hours'
             ]);
         }
-
-        session_destroy();
-        header('Location: login.php?deactivated=1');
-        exit;
     }
+    session_destroy();
+    header('Location: login.php?deactivated=1');
+    exit;
 
     // Still within the countdown: pass the remaining seconds to deact-banner.php
     if ($row['secs'] !== null) {
