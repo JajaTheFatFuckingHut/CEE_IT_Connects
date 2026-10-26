@@ -1,8 +1,5 @@
 <?php
 // deact-guard.php
-// Include on every student page, AFTER session_start() and require 'db.php',
-// and BEFORE any HTML output.
-
 $deactSecs = null;   // seconds left until deactivation (null = no deadline set)
 
 if (($_SESSION['role'] ?? '') === 'student' && !empty($_SESSION['user_id'])) {
@@ -43,10 +40,11 @@ if (($_SESSION['role'] ?? '') === 'student' && !empty($_SESSION['user_id'])) {
                 'Account auto-deactivated after completing required OJT hours'
             ]);
         }
-    }
-    session_destroy();
-    header('Location: login.php?deactivated=1');
-    exit;
+
+        session_destroy();
+        header('Location: login-ui.php?deactivated=1');
+        exit;
+    }   // <-- the block must close AFTER exit
 
     // Still within the countdown: pass the remaining seconds to deact-banner.php
     if ($row['secs'] !== null) {
