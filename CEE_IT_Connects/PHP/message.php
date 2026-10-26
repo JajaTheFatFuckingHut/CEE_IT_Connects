@@ -4750,8 +4750,9 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
             return clone;
         }
 
-        const OJT_DEACTIVATE_DELAY = 10; // seconds
+        const OJT_DEACTIVATE_DELAY = 10;
         let ojtDeactTimer = null;
+        let ojtDeadline = 0;
 
         function ojtCancelDeactivation() {
             if (!ojtDeactTimer) return;
@@ -4764,27 +4765,27 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
             if (ojtDeactTimer) return;
             const banner = document.getElementById('ojt-deact-banner');
             const countEl = document.getElementById('ojt-deact-count');
-            let left = OJT_DEACTIVATE_DELAY;
-
-            countEl.textContent = left;
+            ojtDeadline = Date.now() + OJT_DEACTIVATE_DELAY * 1000;
             banner.classList.remove('d-none');
 
             ojtDeactTimer = setInterval(async () => {
-                left--;
+                const left = Math.ceil((ojtDeadline - Date.now()) / 1000);
                 countEl.textContent = Math.max(left, 0);
                 if (left > 0) return;
 
                 clearInterval(ojtDeactTimer);
                 try {
                     const res = await fetch('deactivate-account.php', { method: 'POST' });
-                    const json = await res.json();
+                    const text = await res.text();
+                    console.log('deactivate response:', res.status, text);   // temporary
+                    const json = JSON.parse(text);
                     if (json.ok) { window.location.href = 'logout.php?deactivated=1'; return; }
                     alert(json.error || 'Could not deactivate the account.');
                 } catch (e) {
-                    alert('Request failed.');
+                    alert('Request failed: ' + e.message);
                 }
                 ojtDeactTimer = null;
-            }, 1000);
+            }, 250);
         }
 
         function ojtOnFieldChange(el) {
