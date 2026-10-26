@@ -60,13 +60,10 @@ try {
     $secs = max(0, (int) $q->fetchColumn());
 
     echo json_encode(['ok' => true, 'secs' => $secs]);
-
-    $au = $pdo->prepare("INSERT INTO audits (user_id, roles, activity, activity_date) VALUES (:u, 'student', :a, NOW())");
-    $au->execute([':u' => $uid, ':a' => 'Account auto-deactivated after completing required OJT hours']);
-
-    echo json_encode(['ok' => true]);
+    exit;
 } catch (PDOException $e) {
     error_log($e->getMessage());
     http_response_code(500);
     echo json_encode(['ok' => false, 'error' => 'Server error.']);
+    exit;
 }
