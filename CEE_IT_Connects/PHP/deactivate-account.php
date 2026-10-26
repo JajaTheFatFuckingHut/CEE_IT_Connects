@@ -29,8 +29,8 @@ try {
     }
 
     // Hours rendered: REPLACE table/column names with your real ones
-    $hs = $pdo->prepare("SELECT COALESCE(SUM(minutes), 0) FROM ojt_hours WHERE user_id = ? = user_type = 'student'");
-    $hs->execute([$uid]);
+    $hs = $pdo->prepare("SELECT COALESCE(SUM(minutes), 0) FROM ojt_hours WHERE user_id = :uid AND user_type = 'student'");
+    $hs->execute([':uid' => $uid]);
     $renderedMins = (int) $hs->fetchColumn();
 
     if ($renderedMins < ((int) $required) * 60) {

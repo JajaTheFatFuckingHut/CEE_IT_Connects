@@ -4652,9 +4652,6 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
             document.getElementById('ojt-pct-label').textContent = pct + '%';
 
             ojtWeeks.forEach((_, i) => ojtRenderWeek(i));
-
-            if (ojtIsComplete()) ojtStartDeactivation();
-            else ojtCancelDeactivation();
         }
 
         function ojtRenderWeek(wi) {
@@ -4883,9 +4880,12 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
 
                     // Check completion after save
                     ojtUpdateEvalButton();
-                    if (ojtIsComplete() && !window.ojtCompletionNotified) {
-                        window.ojtCompletionNotified = true;
-                        ojtTriggerCompletion();
+                    if (ojtIsComplete()) {
+                        ojtStartDeactivation();
+                        if (!window.ojtCompletionNotified) {
+                            window.ojtCompletionNotified = true;
+                            ojtTriggerCompletion();
+                        }
                     }
                 } else {
                     btn.innerHTML = '<i class="fa-solid fa-exclamation-triangle me-1"></i>Error';
