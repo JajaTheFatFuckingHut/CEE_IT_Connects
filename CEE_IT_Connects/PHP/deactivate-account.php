@@ -29,9 +29,16 @@ try {
     }
 
     // Hours rendered: REPLACE table/column names with your real ones
-    $hs = $pdo->prepare("SELECT COALESCE(SUM(minutes), 0) FROM ojt_hours WHERE user_id = :uid AND user_type = 'student'");
+    $hs = $pdo->prepare("
+        SELECT COALESCE(SUM(
+            GREATEST(0, COALESCE(EXTRACT(EPOCH FROM (m_out - m_in)) / 60, 0))
+        + GREATEST(0, COALESCE(EXTRACT(EPOCH FROM (a_out - a_in)) / 60, 0))
+        ), 0)
+        FROM ojt_hours
+        WHERE user_id = :uid AND user_type = 'student'
+    ");
     $hs->execute([':uid' => $uid]);
-    $renderedMins = (int) $hs->fetchColumn();
+    $renderedMins = (int) round($hs->fetchColumn());
 
     if ($renderedMins < ((int) $required) * 60) {
         echo json_encode(['ok' => false, 'error' => 'Required hours not yet completed.']);
@@ -51,5 +58,5 @@ try {
 } catch (PDOException $e) {
     error_log($e->getMessage());
     http_response_code(500);
-    echo json_encode(['ok' => false, 'error' => $e->getMessage()]);   // temporary
+    echo json_encode(['ok' => false, 'error' => 'Server error.']);
 }

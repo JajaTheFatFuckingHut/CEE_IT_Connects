@@ -4747,7 +4747,7 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
             return clone;
         }
 
-        const OJT_DEACTIVATE_DELAY = 10;
+        const OJT_DEACTIVATE_DELAY = 20;
         let ojtDeactTimer = null;
         let ojtDeadline = 0;
 
