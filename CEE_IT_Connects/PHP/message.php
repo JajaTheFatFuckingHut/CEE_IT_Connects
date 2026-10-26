@@ -4840,6 +4840,18 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
         //     }, 250);
         // }
 
+        async function ojtStartDeactivation() {
+            if (window.__deactRunning) return;
+            try {
+                const res = await fetch('deactivate-account.php', { method: 'POST' });
+                const json = JSON.parse(await res.text());
+                if (json.ok) startGlobalDeact(json.secs);
+                else console.warn(json.error);
+            } catch (e) {
+                console.error(e);
+            }
+        }
+        function ojtCancelDeactivation() { }   // stub so any leftover calls don't break
         function ojtOnFieldChange(el) {
             const block = el.closest('.ojt-week-block');
             if (!block) return;

@@ -8,6 +8,7 @@
 // ]);
 require 'db.php';
 require 'auth.php';
+require 'deact-guard.php';
 
 if (($_SESSION['role'] ?? '') === 'student') {
     $chk = $pdo->prepare("SELECT is_archived FROM students WHERE id = ?");
@@ -729,6 +730,7 @@ $now = new DateTime();
             document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
         });
     </script>
+    <?php require 'deact-banner.php' ?>
 </body>
 
 </html>
