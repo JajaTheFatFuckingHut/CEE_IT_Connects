@@ -1760,18 +1760,6 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
             /* pointer-events: none; */
         }
 
-        #ojt-deact-banner {
-            position: fixed;
-            top: 80px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 2000;
-            min-width: 360px;
-            max-width: 90vw;
-            box-shadow: 0 6px 24px rgba(0, 0, 0, .2);
-        }
-
-
         /* ── mobile tweaks ── */
         @media (max-width: 768px) {
             .rc-wrap {
