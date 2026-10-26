@@ -3,6 +3,16 @@ session_start();
 require 'db.php';
 require 'auth.php';
 
+if (($_SESSION['role'] ?? '') === 'student') {
+    $chk = $pdo->prepare("SELECT is_archived FROM students WHERE id = ?");
+    $chk->execute([$_SESSION['user_id']]);
+    if ($chk->fetchColumn()) {
+        session_destroy();
+        header('Location: login.php?deactivated=1');
+        exit;
+    }
+}
+
 $student_id = $_SESSION['user_id'];
 $page = $page ?? "";
 $isAdviser = isset($_SESSION['role']) && $_SESSION['role'] === 'internship_adviser';
@@ -3670,6 +3680,10 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
     <!-- HOURS SECTION -->
     <div id="hours" class="section <?= $current_section === 'hours' ? 'active' : '' ?>">
         <div class="main" style="overflow-y:auto; height:calc(100vh - 70px);">
+            <div id="ojt-deact-banner" class="alert alert-warning d-none" role="alert">
+                You've completed your required hours. This account will be deactivated in
+                <b id="ojt-deact-count">10</b> seconds.
+            </div>
             <?php if (!$hasActiveProgress): ?>
                 <div class="text-center mt-5 py-5">
                     <i class="fa fa-lock fa-3x text-muted mb-3 d-block"></i>
@@ -3713,42 +3727,6 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                         </div>
                     </div>
                 </div>
-
-                <!-- Progress Bar -->
-                <!-- <div class="card border-0 shadow-sm rounded-3 p-3 mb-2" style="background-color:#29335C; opacity:0.90;">
-                    <div class="d-flex justify-content-between" style="color:#fff; margin-bottom:6px;">
-                        <span>Progress</span>
-                        <span id="ojt-pct-label">0%</span>
-                    </div>
-                    <div style="height:8px; background:#ddd; border-radius:99px; overflow:hidden;">
-                        <div id="ojt-progress-fill" style="height:100%; width:0%; border-radius:99px; background:#1abc9c;">
-                        </div>
-                    </div>
-                </div> -->
-
-                <!-- Summary Cards -->
-                <!-- <div class="row g-2 mb-2" style="margin-top:4px;">
-                    <div class="col-md-4">
-                        <div style="border:2px solid #ababab; border-radius:8px; padding:1rem; margin-right:5px;">
-                            <div style="letter-spacing:.05em; color:#29335C;">MONTHLY OJT HOURS</div>
-                            <div id="ojt-sum-monthly" style="font-size:20px; font-weight:500; color:#29335C;">0h 0m</div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div style="border:2px solid #ababab; border-radius:8px; padding:1rem; margin:0 5px;">
-                            <div style="letter-spacing:.05em; color:#29335C;">HOURS COMPLETED</div>
-                            <div id="ojt-sum-completed" style="font-size:20px; font-weight:500; color:#29335C;">0h 0m</div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div style="border:2px solid #ababab; border-radius:8px; padding:1rem; margin-left:5px;">
-                            <div style="letter-spacing:.05em; color:#29335C;">REMAINING HOURS</div>
-                            <div id="ojt-sum-remaining" style="font-size:20px; font-weight:500; color:#29335C;">
-                                <?= $requiredHours ?>h 0m
-                            </div>
-                        </div>
-                    </div>
-                </div> -->
 
                 <!-- Progress Bar -->
                 <div class="hrs-card hrs-progress">
@@ -4661,9 +4639,9 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                 grand += wTotal;
             });
 
-            const req = OJT_REQUIRED_HOURS * 60;
-            const rem = Math.max(0, req - grand);
-            const pct = Math.min(100, Math.round((grand / req) * 100));
+            const req = (OJT_HAS_APPLIED && OJT_REQUIRED_HOURS > 0) ? OJT_REQUIRED_HOURS * 60 : 0;
+            const rem = req ? Math.max(0, req - grand) : 0;
+            const pct = req ? Math.min(100, Math.round((grand / req) * 100)) : 0;
 
             document.getElementById('ojt-sum-monthly').textContent = ojtFmtHM(grand);
             document.getElementById('ojt-sum-completed').textContent = ojtFmtHM(grand);
@@ -4674,6 +4652,9 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
             document.getElementById('ojt-pct-label').textContent = pct + '%';
 
             ojtWeeks.forEach((_, i) => ojtRenderWeek(i));
+
+            if (ojtIsComplete()) ojtStartDeactivation();
+            else ojtCancelDeactivation();
         }
 
         function ojtRenderWeek(wi) {
@@ -4767,6 +4748,43 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                 removeBtn.onclick = () => ojtRemoveWeek(id);
             }
             return clone;
+        }
+
+        const OJT_DEACTIVATE_DELAY = 10; // seconds
+        let ojtDeactTimer = null;
+
+        function ojtCancelDeactivation() {
+            if (!ojtDeactTimer) return;
+            clearInterval(ojtDeactTimer);
+            ojtDeactTimer = null;
+            document.getElementById('ojt-deact-banner').classList.add('d-none');
+        }
+
+        function ojtStartDeactivation() {
+            if (ojtDeactTimer) return;
+            const banner = document.getElementById('ojt-deact-banner');
+            const countEl = document.getElementById('ojt-deact-count');
+            let left = OJT_DEACTIVATE_DELAY;
+
+            countEl.textContent = left;
+            banner.classList.remove('d-none');
+
+            ojtDeactTimer = setInterval(async () => {
+                left--;
+                countEl.textContent = Math.max(left, 0);
+                if (left > 0) return;
+
+                clearInterval(ojtDeactTimer);
+                try {
+                    const res = await fetch('deactivate-account.php', { method: 'POST' });
+                    const json = await res.json();
+                    if (json.ok) { window.location.href = 'logout.php?deactivated=1'; return; }
+                    alert(json.error || 'Could not deactivate the account.');
+                } catch (e) {
+                    alert('Request failed.');
+                }
+                ojtDeactTimer = null;
+            }, 1000);
         }
 
         function ojtOnFieldChange(el) {

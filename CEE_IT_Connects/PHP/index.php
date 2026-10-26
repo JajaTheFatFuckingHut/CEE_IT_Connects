@@ -8,6 +8,17 @@
 // ]);
 require 'db.php';
 require 'auth.php';
+
+if (($_SESSION['role'] ?? '') === 'student') {
+    $chk = $pdo->prepare("SELECT is_archived FROM students WHERE id = ?");
+    $chk->execute([$_SESSION['user_id']]);
+    if ($chk->fetchColumn()) {
+        session_destroy();
+        header('Location: login.php?deactivated=1');
+        exit;
+    }
+}
+
 $stmt = $pdo->query("SELECT * FROM internships");
 $locations = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
