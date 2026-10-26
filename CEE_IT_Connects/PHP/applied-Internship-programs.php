@@ -1,7 +1,7 @@
 <?php
 require 'db.php';
 require 'auth.php';
-
+require 'deact-guard.php';  
 if (($_SESSION['role'] ?? '') === 'student') {
     $chk = $pdo->prepare("SELECT is_archived FROM students WHERE id = ?");
     $chk->execute([$_SESSION['user_id']]);
@@ -1387,6 +1387,7 @@ foreach ($internships as $loc) {
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../JS/index-script.js"></script>
+    <?php require 'deact-banner.php';?>
 </body>
 
 </html>

@@ -1,7 +1,7 @@
 <?php $page = 'announcements';
 require 'db.php';
 require 'auth.php';
-
+require 'deact-guard.php';
 $stmt = $pdo->query("SELECT * FROM announcements ORDER BY created_at DESC");
 
 $announcements = [
@@ -989,6 +989,7 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
             render();
         });
     </script>
+    <?php require 'deact-banner.php'; ?>
 </body>
 
 </html>

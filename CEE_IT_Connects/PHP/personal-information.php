@@ -2,6 +2,7 @@
 $page = 'profile';
 require 'auth.php';
 require 'db.php';
+require 'deact-guard.php';
 
 $user_id = (int) $_SESSION['user_id'];
 $roleRaw = trim($_SESSION['role'] ?? '');
@@ -645,6 +646,7 @@ $initials = strtoupper(
             }
         }, 4000);
     </script>
+    <?php require 'deact-banner.php'; ?>
 </body>
 
 </html>
