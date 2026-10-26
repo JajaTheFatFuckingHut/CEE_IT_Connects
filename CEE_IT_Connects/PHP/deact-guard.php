@@ -1,50 +1,53 @@
-<?php $deactSecs = $deactSecs ?? null; ?>
-<?php if (($_SESSION['role'] ?? '') === 'student'): ?>
-    <script>
-        (function () {
-            function getBanner() {
-                let b = document.getElementById('ojt-deact-banner');
-                if (!b) {
-                    b = document.createElement('div');
-                    b.id = 'ojt-deact-banner';
-                    b.setAttribute('role', 'alert');
-                    b.style.cssText =
-                        'position:fixed;top:80px;left:50%;transform:translateX(-50%);z-index:2000;' +
-                        'min-width:360px;max-width:90vw;padding:14px 20px;border-radius:10px;' +
-                        'background:#fff3cd;color:#664d03;border:1px solid #ffecb5;' +
-                        'box-shadow:0 6px 24px rgba(0,0,0,.2);font-size:14px;display:none;';
-                    b.innerHTML = "You've completed your required hours. This account will be deactivated in " +
-                        '<b id="ojt-deact-count">0</b> seconds.';
-                    document.body.appendChild(b);
-                }
-                return b;
-            }
+<?php
+// deact-guard.php
+$deactSecs = null;   // seconds left until deactivation (null = no deadline set)
 
-            window.startGlobalDeact = function (secs) {
-                if (window.__deactRunning) return;
-                window.__deactRunning = true;
+if (($_SESSION['role'] ?? '') === 'student' && !empty($_SESSION['user_id'])) {
 
-                const end = Date.now() + secs * 1000;
-                const banner = getBanner();
-                banner.style.display = 'block';
-                const countEl = banner.querySelector('#ojt-deact-count');
+    $chk = $pdo->prepare("
+        SELECT is_archived,
+               CEIL(EXTRACT(EPOCH FROM (deactivate_at - NOW()))) AS secs
+        FROM students
+        WHERE id = ?
+    ");
+    try {
+        $chk->execute([$_SESSION['user_id']]);
+        $row = $chk->fetch(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        error_log('deact-guard: ' . $e->getMessage());
+        return;   // skip the guard for this request
+    }
 
-                const t = setInterval(function () {
-                    const left = Math.ceil((end - Date.now()) / 1000);
-                    if (countEl) countEl.textContent = Math.max(left, 0);
-                    if (left <= 0) {
-                        clearInterval(t);
-                        // The server guard archives the account and redirects to login
-                        setTimeout(function () { location.reload(); }, 1000);
-                    }
-                }, 250);
-            };
+    // Deadline exists and has already passed
+    $expired = $row && $row['secs'] !== null && (int) $row['secs'] <= 0;
 
-            <?php if ($deactSecs !== null): ?>
-                document.addEventListener('DOMContentLoaded', function () {
-                    startGlobalDeact(<?= (int) $deactSecs ?>);
-                });
-            <?php endif; ?>
-        })();
-    </script>
-<?php endif; ?>
+    // Account missing, already archived, or deadline passed -> log out
+    if (!$row || $row['is_archived'] || $expired) {
+
+        // Deadline passed but not archived yet: archive now and write the audit row
+        if ($row && !$row['is_archived']) {
+            $a = $pdo->prepare("UPDATE students SET is_archived = :a WHERE id = :id");
+            $a->bindValue(':a', true, PDO::PARAM_BOOL);
+            $a->bindValue(':id', $_SESSION['user_id'], PDO::PARAM_INT);
+            $a->execute();
+
+            $au = $pdo->prepare("
+                INSERT INTO audits (user_id, roles, activity, activity_date)
+                VALUES (?, 'student', ?, NOW())
+            ");
+            $au->execute([
+                $_SESSION['user_id'],
+                'Account auto-deactivated after completing required OJT hours'
+            ]);
+        }
+
+        session_destroy();
+        header('Location: login-ui.php?deactivated=1');
+        exit;
+    }   // <-- the block must close AFTER exit
+
+    // Still within the countdown: pass the remaining seconds to deact-banner.php
+    if ($row['secs'] !== null) {
+        $deactSecs = (int) $row['secs'];
+    }
+}
