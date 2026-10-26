@@ -4893,6 +4893,7 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                     ojtShowMessage('Some changes failed to save. Please try again.', true);
                 }
             } catch (error) {
+                console.error(error);
                 btn.disabled = false;
                 btn.innerHTML = '<i class="fa-solid fa-exclamation-triangle me-1"></i>Error';
                 statusEl.innerHTML = '<i class="fa-solid fa-circle me-1" style="color:#dc2626;"></i>Save failed';
