@@ -4756,6 +4756,7 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
 
         function ojtCancelDeactivation() {
             if (!ojtDeactTimer) return;
+            console.trace('Deactivation cancelled');
             clearInterval(ojtDeactTimer);
             ojtDeactTimer = null;
             document.getElementById('ojt-deact-banner').classList.add('d-none');
