@@ -46,10 +46,20 @@ try {
     }
 
     // Deactivate
-    $up = $pdo->prepare("UPDATE students SET is_archived = :a AND deactivate_at = NOW() WHERE id = :id");
-    $up->bindValue(':a', true, PDO::PARAM_BOOL);
+    $up = $pdo->prepare("
+        UPDATE students
+        SET deactivate_at = NOW() + make_interval(secs => :s)
+        WHERE id = :id AND deactivate_at IS NULL
+    ");
+    $up->bindValue(':s', 10, PDO::PARAM_INT);
     $up->bindValue(':id', $uid, PDO::PARAM_INT);
     $up->execute();
+
+    $q = $pdo->prepare("SELECT CEIL(EXTRACT(EPOCH FROM (deactivate_at - NOW()))) FROM students WHERE id = ?");
+    $q->execute([$uid]);
+    $secs = max(0, (int) $q->fetchColumn());
+
+    echo json_encode(['ok' => true, 'secs' => $secs]);
 
     $au = $pdo->prepare("INSERT INTO audits (user_id, roles, activity, activity_date) VALUES (:u, 'student', :a, NOW())");
     $au->execute([':u' => $uid, ':a' => 'Account auto-deactivated after completing required OJT hours']);
