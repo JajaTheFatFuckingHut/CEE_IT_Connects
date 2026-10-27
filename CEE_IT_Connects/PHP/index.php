@@ -226,7 +226,7 @@ $now = new DateTime();
     <section class="features-section">
         <div class="container text-center">
             <p class="text-uppercase fw-bold small mb-2 animate-on-scroll animate-left"
-                style="color: #FFC23C; letter-spacing: 0.3em;">
+                style="color: #ff673a; letter-spacing: 0.3em;">
                 What you can do
             </p>
             <h2 class="features-title animate-on-scroll animate-left"
