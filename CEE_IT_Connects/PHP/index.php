@@ -187,7 +187,7 @@ $now = new DateTime();
 
     <!-- HERO SECTION -->
     <div class="hero-wrapper">
-        <div class="container-fluid px-5">
+        <div class="container-fluid px-3 px-lg-5">
             <div class="row align-items-center">
                 <div class="col-lg-9 hero-content">
                     <div class="welcome-overlay animate-on-scroll animate-scale">
