@@ -191,22 +191,18 @@ $now = new DateTime();
             <div class="row align-items-center">
                 <div class="col-lg-9 hero-content">
                     <div class="welcome-overlay animate-on-scroll animate-scale">
-                        <h5 class="welcome-text animate-on-scroll animate-left">Welcome to</h5>
+                        <h5 class="welcome-text animate-on-scroll animate-left">Welcome to CEE IT Connects</h5>
                         <h1 class="main-heading animate-on-scroll animate-right">CEE IT Connects</h1>
+                        <h3 class="animate-on-scroll animate-right">Your OJT Journey, Connected.</h3>
                         <div class="description-box animate-on-scroll animate-scale">
                             <p>
-                                &nbsp;&nbsp;&nbsp;&nbsp;CEE IT Connects is a web-based internship coordination platform
-                                developed for the College of Engineering and Information Technology
-                                (CEIT) of Pamantasan ng Lungsod ng Valenzuela (PLV). Designed to
-                                streamline and modernize the On-the-Job Training (OJT) process,
-                                CEE IT Connects bridges the gap between students, internship
-                                advisers, Human Training Establishment (HTE) advisers, and
-                                partner institutions.
+                                A centralized platform that connects CEIT students, internship
+                                advisers, HTE advisers, and partner institutions to streamline
+                                the On-the-Job Training process.
                             </p>
                         </div>
-                        <a href="applied-Internship-programs.php" class="btn-find animate-on-scroll animate-scale"
-                            style="color:white; background-color: #ff673a;">
-                            Browse for Internships
+                        <a href="applied-Internship-programs.php" class="btn-find animate-on-scroll animate-scale">
+                            Browse Internships <i class="fa-solid fa-arrow-right ms-2"></i>
                         </a>
                     </div>
                 </div>
@@ -214,6 +210,16 @@ $now = new DateTime();
             </div>
         </div>
         <img src="../Sources/suhay husay.png" class="statue-overlay animate-on-scroll animate-right">
+        <svg class="hero-wave" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true">
+            <defs>
+                <linearGradient id="heroWaveStroke" x1="0" x2="1" y1="0" y2="0">
+                    <stop offset="0" stop-color="#FFB62F" />
+                    <stop offset="1" stop-color="#E4572E" />
+                </linearGradient>
+            </defs>
+            <path d="M0,30 C300,40 500,80 760,78 C1050,76 1250,20 1440,12 L1440,120 L0,120 Z" />
+            <path d="M0,30 C300,40 500,80 760,78 C1050,76 1250,20 1440,12" />
+        </svg>
     </div>
 
     <!-- FEATURES -->
