@@ -193,7 +193,7 @@ $now = new DateTime();
                     <div class="welcome-overlay animate-on-scroll animate-scale">
                         <h5 class="welcome-text animate-on-scroll animate-left">Welcome to CEE IT Connects</h5>
                         <h1 class="main-heading animate-on-scroll animate-right">CEE IT Connects</h1>
-                        <h3 class="animate-on-scroll animate-right">Your OJT Journey, Connected.</h3>
+                        <h3 class="animate-on-scroll animate-right">One Platform, Shared Progress.</h3>
                         <div class="description-box animate-on-scroll animate-scale">
                             <p>
                                 A centralized platform that connects CEIT students, internship
