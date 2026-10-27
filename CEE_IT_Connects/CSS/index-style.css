@@ -27,7 +27,7 @@ body,html{
 .hero-wrapper{
     position:relative;
     width:100%;
-    padding-bottom:40px;
+    padding-bottom:120px;
     opacity: 0;
     transform: translateY(-20px);
     animation: fadeInUp 1s forwards 0.2s;
@@ -137,7 +137,7 @@ body,html{
     bottom:-0px;
     height:600px;
     width:auto;
-    z-index:20;
+    z-index:5;
     pointer-events:none;
     /* filter:drop-shadow(-15px 10px 20px rgba(0,0,0,0.3)); */
     opacity: 0;
