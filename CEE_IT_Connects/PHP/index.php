@@ -253,9 +253,9 @@ $now = new DateTime();
                 <div class="col-lg-4 col-md-6">
                     <div class="feature-item animate-on-scroll animate-scale">
                         <i class="fa-solid fa-filter feature-icon"></i>
-                        <h5>Smart Internship Matching</h5>
-                        <p>Search and filter listings by program, qualifications and preferred
-                            location to find the right fit faster.</p>
+                        <h5>Internship Matching</h5>
+                        <p>Search and filter listings by program and preferences 
+                            to find the right fit faster.</p>
                         <span class="feature-role">Students</span>
                     </div>
                 </div>
