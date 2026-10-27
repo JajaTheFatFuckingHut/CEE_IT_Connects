@@ -42,7 +42,7 @@ body,html{
 .welcome-overlay{
     margin-left: 20px;
     background:rgba(39,47,84,0.35);
-    padding:40px;
+    padding:40px 48px 56px;
     border-radius:12px;
     width: 920px;
     max-width:80%;
@@ -139,7 +139,7 @@ body,html{
     width:auto;
     z-index:20;
     pointer-events:none;
-    filter:drop-shadow(-15px 10px 20px rgba(0,0,0,0.3));
+    /* filter:drop-shadow(-15px 10px 20px rgba(0,0,0,0.3)); */
     opacity: 0;
     transform: translateX(50px);
     animation: fadeInRight 1s forwards 1.2s;
