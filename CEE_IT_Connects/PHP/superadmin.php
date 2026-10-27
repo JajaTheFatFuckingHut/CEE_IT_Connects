@@ -2071,7 +2071,7 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                                                 value="<?= htmlspecialchars($u['source']) ?>">
                                             <input type="hidden" name="restore" value="1">
                                             <button type="submit" class="btn btn-success btn-sm">
-                                                <i class="bi bi-check2-circle"></i> Restore
+                                                <i class="bi bi-check2-circle"></i>
                                             </button>
                                         </form>
                                         <form method="POST" action="superadmin-db.php"
@@ -2079,9 +2079,9 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                                             <input type="hidden" name="user_id" value="<?= $u['id'] ?>">
                                             <input type="hidden" name="source"
                                                 value="<?= htmlspecialchars($u['source']) ?>">
-                                            <input type="hidden" name="delete" value="1">
+                                            <input type="hidden" name="permanent_delete" value="1">
                                             <button type="submit" class="btn btn-danger btn-sm">
-                                                <i class="bi bi-check2-circle"></i> Delete
+                                                <i class="fa-solid fa-trash-can"></i>
                                             </button>
                                         </form>
                                     </td>

@@ -845,7 +845,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    if (isset($_POST['delete'])) {
+    if (isset($_POST['permanent_delete'])) {
 
         // die(print_r($_POST, true));
         $tables = ['students' => 'students', 'admins' => 'admins', 'advisers' => 'advisers'];
