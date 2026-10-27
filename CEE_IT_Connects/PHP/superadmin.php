@@ -666,9 +666,11 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                 margin: -20px -20px 20px -20px;
                 width: calc(100% + 40px);
                 border-radius: 0;
-                padding: 20px 110px 20px 20px; /* keep text clear of the stripes */
+                padding: 20px 110px 20px 20px;
+                /* keep text clear of the stripes */
             }
         }
+
         .sidebar {
             width: 240px;
             background: #272f54;
@@ -1587,7 +1589,8 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                 <div class="home-hero home-hero--flush">
                     <div class="home-hero-bar">
                         <h2>Welcome back, <?= htmlspecialchars($adminFullName) ?></h2>
-                        <p>Manage accounts and roles, monitor system activity, and keep the internship portal running — all in one place.</p>
+                        <p>Manage accounts and roles, monitor system activity, and keep the internship portal running —
+                            all in one place.</p>
                     </div>
                 </div>
 
@@ -1665,71 +1668,75 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                 </style>
 
                 <div class="row g-3 mb-4">
-                <!-- INTERNSHIPS (blue, unchanged) -->
-                <div class="col-md-4">
-                    <div class="card border-0 rounded-4 h-100 ojtc-stat-card" style="background:#EEF3FF;">
-                        <div class="card-body p-4">
-                            <div class="d-flex flex-wrap align-items-center gap-3">
-                                <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0"
-                                    style="width:44px;height:44px;background:#272f54;">
-                                    <i class="bi bi-briefcase-fill text-white fs-5"></i>
-                                </div>
-                                <div class="flex-grow-1" style="min-width:90px;">
-                                    <p class="small mb-1 fw-semibold text-uppercase"
-                                        style="letter-spacing:.05em; font-size:11px; color:#272f54;">Internships</p>
-                                    <h2 class="fw-bold mb-0" style="color:#272f54;"><?= (int) $totalInternships ?></h2>
+                    <!-- INTERNSHIPS (blue, unchanged) -->
+                    <div class="col-md-4">
+                        <div class="card border-0 rounded-4 h-100 ojtc-stat-card" style="background:#EEF3FF;">
+                            <div class="card-body p-4">
+                                <div class="d-flex flex-wrap align-items-center gap-3">
+                                    <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0"
+                                        style="width:44px;height:44px;background:#272f54;">
+                                        <i class="bi bi-briefcase-fill text-white fs-5"></i>
+                                    </div>
+                                    <div class="flex-grow-1" style="min-width:90px;">
+                                        <p class="small mb-1 fw-semibold text-uppercase"
+                                            style="letter-spacing:.05em; font-size:11px; color:#272f54;">Internships</p>
+                                        <h2 class="fw-bold mb-0" style="color:#272f54;"><?= (int) $totalInternships ?>
+                                        </h2>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- ACCOUNTS + ACTIVE ACCOUNTS (merged, orange) -->
-                <div class="col-md-4">
-                    <div class="card border-0 rounded-4 h-100 ojtc-stat-card" data-go="restore" style="background:#FDEEE8;">
-                        <div class="card-body p-4">
-                            <div class="d-flex flex-wrap align-items-center gap-3">
-                                <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0"
-                                    style="width:44px;height:44px;background:#E4572E;">
-                                    <i class="bi bi-people-fill text-white fs-5"></i>
-                                </div>
-                                <div class="flex-grow-1" style="min-width:90px;">
-                                    <p class="small mb-1 fw-semibold text-uppercase"
-                                        style="letter-spacing:.05em;font-size:11px;color:#a13d1f;">Accounts</p>
-                                    <h2 class="fw-bold mb-0" style="color:#a13d1f;"><?= (int) $totalAccounts ?></h2>
-                                    <p class="mb-0 mt-1 d-none d-md-block" style="font-size:11px;color:#a13d1f;">
-                                        <?= $saActivePct ?>% active &middot; <?= (int) $saArchived ?> archived
-                                    </p>
+                    <!-- ACCOUNTS + ACTIVE ACCOUNTS (merged, orange) -->
+                    <div class="col-md-4">
+                        <div class="card border-0 rounded-4 h-100 ojtc-stat-card" data-go="restore"
+                            style="background:#FDEEE8;">
+                            <div class="card-body p-4">
+                                <div class="d-flex flex-wrap align-items-center gap-3">
+                                    <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0"
+                                        style="width:44px;height:44px;background:#E4572E;">
+                                        <i class="bi bi-people-fill text-white fs-5"></i>
+                                    </div>
+                                    <div class="flex-grow-1" style="min-width:90px;">
+                                        <p class="small mb-1 fw-semibold text-uppercase"
+                                            style="letter-spacing:.05em;font-size:11px;color:#a13d1f;">Accounts</p>
+                                        <h2 class="fw-bold mb-0" style="color:#a13d1f;"><?= (int) $totalAccounts ?></h2>
+                                        <p class="mb-0 mt-1 d-none d-md-block" style="font-size:11px;color:#a13d1f;">
+                                            <?= $saActivePct ?>% active &middot; <?= (int) $saArchived ?> archived
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- SYSTEM ADMIN SEATS (yellow) -->
-                <div class="col-md-4">
-                    <div class="card border-0 rounded-4 h-100 ojtc-stat-card" data-go="roles" style="background:#FFF6E3;">
-                        <div class="card-body p-4">
-                            <div class="d-flex flex-wrap align-items-center gap-3">
-                                <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0"
-                                    style="width:44px;height:44px;background:#FFB62F;">
-                                    <i class="bi bi-shield-lock-fill fs-5" style="color:#3b2600;"></i>
-                                </div>
-                                <div class="flex-grow-1" style="min-width:90px;">
-                                    <p class="small mb-1 fw-semibold text-uppercase"
-                                        style="letter-spacing:.05em;font-size:11px;color:#7a5200;">System Admin Seats</p>
-                                    <h2 class="fw-bold mb-0" style="color:#3b2600;">
-                                        <?= (int) $saSeatsUsed ?> of <?= (int) $saSeatMax ?>
-                                    </h2>
-                                    <p class="mb-0 mt-1 d-none d-md-block" style="font-size:11px;color:#7a5200;">
-                                        <?= (int) $saSeatsOpen ?> open
-                                    </p>
+                    <!-- SYSTEM ADMIN SEATS (yellow) -->
+                    <div class="col-md-4">
+                        <div class="card border-0 rounded-4 h-100 ojtc-stat-card" data-go="roles"
+                            style="background:#FFF6E3;">
+                            <div class="card-body p-4">
+                                <div class="d-flex flex-wrap align-items-center gap-3">
+                                    <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0"
+                                        style="width:44px;height:44px;background:#FFB62F;">
+                                        <i class="bi bi-shield-lock-fill fs-5" style="color:#3b2600;"></i>
+                                    </div>
+                                    <div class="flex-grow-1" style="min-width:90px;">
+                                        <p class="small mb-1 fw-semibold text-uppercase"
+                                            style="letter-spacing:.05em;font-size:11px;color:#7a5200;">System Admin
+                                            Seats</p>
+                                        <h2 class="fw-bold mb-0" style="color:#3b2600;">
+                                            <?= (int) $saSeatsUsed ?> of <?= (int) $saSeatMax ?>
+                                        </h2>
+                                        <p class="mb-0 mt-1 d-none d-md-block" style="font-size:11px;color:#7a5200;">
+                                            <?= (int) $saSeatsOpen ?> open
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
                 <!-- Recent Internship Postings -->
                 <!-- ADMIN SUMMARY CARDS -->
@@ -1853,7 +1860,7 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
 
                 <!-- Bottom Row -->
                 <div class="row g-4">
-                    
+
                     <div class="col-lg-12">
                         <div class="card border-0 rounded-4 shadow-sm h-100">
                             <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
@@ -2019,20 +2026,6 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                     </div>
                 </div>
 
-                <!-- <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-                    <div class="d-flex gap-2 flex-wrap">
-                        <input type="text" id="search-delete" oninput="filterDelete()"
-                            placeholder="Search for a student"
-                            style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:220px;">
-                        <select id="filter-role" onchange="filterDelete()"
-                            style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:200px;">
-                            <option value="">All Roles</option>
-                            <option value="student">Student</option>
-                            <option value="adviser">Adviser</option>
-                            <option value="admin">Admin</option>
-                        </select>
-                    </div>
-                </div> -->
                 <div
                     style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
                     <div style="display:flex; align-items:center; flex-wrap:wrap; gap:10px;">
@@ -2079,6 +2072,16 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                                             <input type="hidden" name="restore" value="1">
                                             <button type="submit" class="btn btn-success btn-sm">
                                                 <i class="bi bi-check2-circle"></i> Restore
+                                            </button>
+                                        </form>
+                                        <form method="POST" action="superadmin-db.php"
+                                            onsubmit="return confirm('Delete this user permanently?')">
+                                            <input type="hidden" name="user_id" value="<?= $u['id'] ?>">
+                                            <input type="hidden" name="source"
+                                                value="<?= htmlspecialchars($u['source']) ?>">
+                                            <input type="hidden" name="delete" value="1">
+                                            <button type="submit" class="btn btn-danger btn-sm">
+                                                <i class="bi bi-check2-circle"></i> Delete
                                             </button>
                                         </form>
                                     </td>
@@ -3102,7 +3105,7 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                         </div>
                     </div>
                 </div>
-                
+
                 <div id="suspAdmin">
 
                     <div class="sa-panel">
@@ -3124,8 +3127,7 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                                 <select name="year" class="sa-input" onchange="this.form.submit()">
                                     <option value="all" <?= $filterYear === 'all' ? 'selected' : '' ?>>All years</option>
                                     <?php for ($y = (int) date('Y') - 1; $y <= (int) date('Y') + 5; $y++): ?>
-                                        <option value="<?= $y ?>" <?= (string) $y === (string) $filterYear ? 'selected' : '' ?>
-                                            >
+                                        <option value="<?= $y ?>" <?= (string) $y === (string) $filterYear ? 'selected' : '' ?>>
                                             <?= $y ?>
                                         </option>
                                     <?php endfor; ?>
@@ -3526,7 +3528,7 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                 options: { maintainAspectRatio: false, plugins: { legend } }
             });
 
-            
+
 
             // Students by program
             make('saProgramChart', {
@@ -3612,62 +3614,62 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
         });
 
         // For the calendar
-        // 
+        //
 
         // document.addEventListener('DOMContentLoaded', function () {
         //     const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         //     const esc = s => String(s).replace(/[&<>"']/g, c =>
         //         ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-            // const dateIn = document.getElementById('suspDate');
-            // const reasonIn = document.getElementById('suspReason');
-            // const addBtn = document.getElementById('suspAdd');
-            // const yearSel = document.getElementById('suspYear');
-            // const listEl = document.getElementById('suspList');
+        // const dateIn = document.getElementById('suspDate');
+        // const reasonIn = document.getElementById('suspReason');
+        // const addBtn = document.getElementById('suspAdd');
+        // const yearSel = document.getElementById('suspYear');
+        // const listEl = document.getElementById('suspList');
 
-            // const thisYear = new Date().getFullYear();
-            // yearSel.add(new Option('All years', 'all'));
-            // for (let y = thisYear - 1; y <= thisYear + 5; y++) yearSel.add(new Option(y, y));
-            // yearSel.value = thisYear;
+        // const thisYear = new Date().getFullYear();
+        // yearSel.add(new Option('All years', 'all'));
+        // for (let y = thisYear - 1; y <= thisYear + 5; y++) yearSel.add(new Option(y, y));
+        // yearSel.value = thisYear;
 
-            // function renderList() {
-            //     const f = yearSel.value;
-            //     const items = Object.entries(CAL_SUSPENDED)
-            //         .filter(([k]) => f === 'all' || k.startsWith(f + '-'))
-            //         .sort(([a], [b]) => a.localeCompare(b));
+        // function renderList() {
+        //     const f = yearSel.value;
+        //     const items = Object.entries(CAL_SUSPENDED)
+        //         .filter(([k]) => f === 'all' || k.startsWith(f + '-'))
+        //         .sort(([a], [b]) => a.localeCompare(b));
 
-            //     if (!items.length) {
-            //         listEl.innerHTML = `<div class="sa-empty">No suspended dates${f === 'all' ? '' : ' in ' + f}.</div>`;
-            //         return;
-            //     }
-            //     listEl.innerHTML = items.map(([k, reason]) => {
-            //         const [y, m, d] = k.split('-').map(Number);
-            //         return `<div class="sa-item">
-            //     <div class="sa-item-text"><b>${MONTHS[m - 1]} ${d}, ${y}</b><span>${esc(reason)}</span></div>
-            //     <button type="button" class="sa-del" data-date="${k}">Remove</button>
-            // </div>`;
-            //     }).join('');
-            // }
+        //     if (!items.length) {
+        //         listEl.innerHTML = `<div class="sa-empty">No suspended dates${f === 'all' ? '' : ' in ' + f}.</div>`;
+        //         return;
+        //     }
+        //     listEl.innerHTML = items.map(([k, reason]) => {
+        //         const [y, m, d] = k.split('-').map(Number);
+        //         return `<div class="sa-item">
+        //     <div class="sa-item-text"><b>${MONTHS[m - 1]} ${d}, ${y}</b><span>${esc(reason)}</span></div>
+        //     <button type="button" class="sa-del" data-date="${k}">Remove</button>
+        // </div>`;
+        //     }).join('');
+        // }
 
-            // async function save(dateStr, isSusp, reason) {
-            //     const [y, m, d] = dateStr.split('-').map(Number);
-            //     const body = new URLSearchParams({
-            //         day: d, month: m, year: y,
-            //         is_suspended: isSusp ? '1' : '0',
-            //         reason: reason || ''
-            //     });
-            //     let json;
-            //     try {
-            //         const res = await fetch('calendar-suspend.php', { method: 'POST', body });
-            //         json = await res.json();
-            //     } catch (e) {
-            //         json = { ok: false, error: 'Request failed' };
-            //     }
-            //     if (!json.ok) { alert(json.error || 'Failed to save'); return false; }
-            //     if (isSusp) CAL_SUSPENDED[dateStr] = reason;
-            //     else delete CAL_SUSPENDED[dateStr];
-            //     return true;
-            // }
+        // async function save(dateStr, isSusp, reason) {
+        //     const [y, m, d] = dateStr.split('-').map(Number);
+        //     const body = new URLSearchParams({
+        //         day: d, month: m, year: y,
+        //         is_suspended: isSusp ? '1' : '0',
+        //         reason: reason || ''
+        //     });
+        //     let json;
+        //     try {
+        //         const res = await fetch('calendar-suspend.php', { method: 'POST', body });
+        //         json = await res.json();
+        //     } catch (e) {
+        //         json = { ok: false, error: 'Request failed' };
+        //     }
+        //     if (!json.ok) { alert(json.error || 'Failed to save'); return false; }
+        //     if (isSusp) CAL_SUSPENDED[dateStr] = reason;
+        //     else delete CAL_SUSPENDED[dateStr];
+        //     return true;
+        // }
 
         //     addBtn.addEventListener('click', async () => {
         //         const dateStr = dateIn.value, reason = reasonIn.value.trim();
