@@ -225,33 +225,74 @@ $now = new DateTime();
     <!-- FEATURES -->
     <section class="features-section">
         <div class="container text-center">
+            <p class="text-uppercase fw-bold small mb-2 animate-on-scroll animate-left"
+                style="color: #FFC23C; letter-spacing: 0.3em;">
+                What you can do
+            </p>
             <h2 class="features-title animate-on-scroll animate-left"
-                style="font-family: 'Geogrotesque TRIAL', sans-serif; color: #ff673a; font-size: 3rem;">
+                style="font-family: 'Geogrotesque TRIAL', sans-serif; font-size: 2.75rem;">
                 CEE IT Connects Features
             </h2>
-            <div class="row g-5 mt-2">
-                <div class="col-md-4">
+            <p class="mx-auto animate-on-scroll animate-left" style="max-width: 620px; color: #d6dbeb;">
+                Everything students, advisers and partner companies need to run the
+                On-the-Job Training process in one place.
+            </p>
+            <div class="mx-auto mb-5"
+                style="width: 72px; height: 4px; border-radius: 4px; background: #ff673a;"></div>
+
+            <div class="row g-4">
+                <div class="col-lg-4 col-md-6">
+                    <div class="feature-item animate-on-scroll animate-scale">
+                        <i class="fa-solid fa-map-location-dot feature-icon"></i>
+                        <h5>Internship Map &amp; Listings</h5>
+                        <p>Explore partner companies on an interactive map, see open or closed status
+                            at a glance, and get directions in one tap.</p>
+                        <span class="feature-role">Students</span>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
                     <div class="feature-item animate-on-scroll animate-scale">
                         <i class="fa-solid fa-filter feature-icon"></i>
                         <h5>Smart Internship Matching</h5>
-                        <p>Find internship opportunities tailored to your program, qualifications,
-                            and preferred location through powerful filtering and automated listings.</p>
+                        <p>Search and filter listings by program, qualifications and preferred
+                            location to find the right fit faster.</p>
+                        <span class="feature-role">Students</span>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-lg-4 col-md-6">
                     <div class="feature-item animate-on-scroll animate-scale">
                         <i class="fa-regular fa-clock feature-icon"></i>
                         <h5>Real-Time Application Tracking</h5>
-                        <p>Track your application status from submission to approval with
-                            instant updates and automated notifications.</p>
+                        <p>Follow your application from submission to approval with instant
+                            status updates.</p>
+                        <span class="feature-role">Students</span>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-lg-4 col-md-6">
                     <div class="feature-item animate-on-scroll animate-scale">
                         <i class="fa-regular fa-rectangle-list feature-icon"></i>
-                        <h5>Virtual Rooms & OJT Monitoring</h5>
-                        <p>Advisers and HTE supervisors can monitor progress, evaluations,
-                            and internship logs through a structured virtual workspace.</p>
+                        <h5>Virtual Rooms &amp; OJT Monitoring</h5>
+                        <p>Follow progress, evaluations and internship logs together in one
+                            structured virtual workspace.</p>
+                        <span class="feature-role">Advisers &amp; HTE</span>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="feature-item animate-on-scroll animate-scale">
+                        <i class="fa-regular fa-bell feature-icon"></i>
+                        <h5>Announcements &amp; Notifications</h5>
+                        <p>Stay updated on department announcements and get notified when
+                            something needs your attention.</p>
+                        <span class="feature-role">Everyone</span>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="feature-item animate-on-scroll animate-scale">
+                        <i class="fa-solid fa-users feature-icon"></i>
+                        <h5>Role-Based Dashboards</h5>
+                        <p>Separate views for students, internship advisers, HTE advisers and
+                            admins, so everyone sees what they need.</p>
+                        <span class="feature-role">All roles</span>
                     </div>
                 </div>
             </div>
