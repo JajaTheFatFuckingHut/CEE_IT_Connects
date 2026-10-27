@@ -1576,10 +1576,12 @@ $rmFmtTime = function ($ts): string {
 <!-- TABS -->
 <div class="rm-tabs">
     <!-- addtl s / e &section=<?= $rmSec ?> -->
-    <a href="?room_id=<?= $room_id ?>&tab=updates&section=<?= $rmSec ?>" class="rm-tab <?= $tab === 'updates' ? 'on' : '' ?>">
+    <a href="?room_id=<?= $room_id ?>&tab=updates&section=<?= $rmSec ?>"
+        class="rm-tab <?= $tab === 'updates' ? 'on' : '' ?>">
         <i class="fa-solid fa-bullhorn"></i> Updates <span class="rm-cnt"><?= $rmPostCount ?></span>
     </a>
-    <a href="?room_id=<?= $room_id ?>&tab=members&section=<?= $rmSec ?>" class="rm-tab <?= $tab === 'members' ? 'on' : '' ?>">
+    <a href="?room_id=<?= $room_id ?>&tab=members&section=<?= $rmSec ?>"
+        class="rm-tab <?= $tab === 'members' ? 'on' : '' ?>">
         <i class="fa-solid fa-users"></i> Members <span class="rm-cnt"><?= $rmMemberCount ?></span>
     </a>
 </div>
@@ -1776,7 +1778,9 @@ $rmFmtTime = function ($ts): string {
                     <h6 class="rm-side-title">Room details</h6>
                     <div class="rm-dl">
                         <?php if ($rmProgram !== ''): ?>
-                            <div class="rm-dr"><span>Program</span><span><?= htmlspecialchars(ucwords(str_replace('_', ' ', $rmProgram))) ?></span></div>
+                            <div class="rm-dr">
+                                <span>Program</span><span><?= htmlspecialchars(ucwords(str_replace('_', ' ', $rmProgram))) ?></span>
+                            </div>
                         <?php endif; ?>
                         <?php if (!empty($room['year_level'])): ?>
                             <div class="rm-dr"><span>Year level</span><span><?= (int) $room['year_level'] ?></span></div>
@@ -1870,7 +1874,7 @@ $rmFmtTime = function ($ts): string {
                         continue; ?>
                     <div class="participant-item" data-id="<?= htmlspecialchars($user['id']) ?>"
                         data-type="<?= $user['role'] ?>" data-name="<?= htmlspecialchars($user['full_name']) ?>"
-                        onclick="toggleCheck(this)">
+                        data-email="<?= htmlspecialchars($user['email']) ?>" onclick="toggleCheck(this)">
                         <input type="checkbox">
                         <div class="participant-avatar"><?= strtoupper(substr($user['full_name'], 0, 2)) ?></div>
                         <div class="participant-info">
@@ -1926,6 +1930,7 @@ $rmFmtTime = function ($ts): string {
         q = q.toLowerCase();
         document.querySelectorAll('.participant-item').forEach(el => {
             el.style.display = el.dataset.name.toLowerCase().includes(q) ? 'flex' : 'none';
+            el.style.display = el.dataset.email.toLowerCase().includes(q) ? 'flex' : 'none';
         });
     }
 

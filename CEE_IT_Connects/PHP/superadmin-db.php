@@ -844,41 +844,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header("Location: superadmin.php#archived");
         exit;
     }
-
-    if (isset($_POST['permanent_delete'])) {
-
-        // die(print_r($_POST, true));
-        $tables = ['students' => 'students', 'admins' => 'admins', 'advisers' => 'advisers'];
-        $table = $tables[$_POST['source'] ?? ''] ?? null;
-        $userId = (int) ($_POST['user_id'] ?? 0);
-
-        if (!$table || !$userId) {
-            $_SESSION['error'] = "Invalid user.";
-            header("Location: superadmin.php");
-            exit;
-        }
-
-        try {
-            $pdo->prepare("DELETE FROM {$table} WHERE id = :id")
-                ->execute([':id' => $userId]);
-
-            $pdo->prepare("
-            INSERT INTO audits (user_id, roles, activity, activity_date)
-            VALUES (:admin, :roles, :activity, NOW())
-        ")->execute([
-                        ':admin' => $_SESSION['user_id'],
-                        ':roles' => 'superadmin',
-                        ':activity' => "Deleted {$table} user ID {$userId}",
-                    ]);
-
-            $_SESSION['success'] = "User deleted.";
-        } catch (Exception $e) {
-            $_SESSION['error'] = "Could not delete user: " . $e->getMessage();
-        }
-
-        header("Location: superadmin.php#deleted");
-        exit;
-    }
 }
 
 ?>
