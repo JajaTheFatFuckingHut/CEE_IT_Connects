@@ -1186,10 +1186,11 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
         }
 
         .rc-wrap {
+            position: relative;
             display: flex;
             height: calc(100vh - 70px);
+            height: calc(100dvh - 70px);
             margin: -20px;
-            /* cancel .main padding */
             overflow: hidden;
             background: #f5f6fa;
         }
@@ -1390,6 +1391,55 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
             font-size: 11px;
             color: #aaa;
             margin-top: 1px;
+        }
+
+                /* ── show / hide chat list (all screen sizes) ── */
+        .rc-toggle-list {
+            width: 36px;
+            height: 36px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            border-radius: 50%;
+            background: transparent;
+            color: #272f54;
+            font-size: 15px;
+            cursor: pointer;
+            transition: background .15s;
+        }
+
+        .rc-toggle-list:hover {
+            background: #eef1f7;
+        }
+
+        .rc-wrap:not(.rc-focus) .rc-toggle-list .i-back,
+        .rc-wrap.rc-focus .rc-toggle-list .i-collapse {
+            display: none;
+        }
+
+        .rc-wrap.rc-focus .rc-list {
+            display: none;
+        }
+
+        .rc-header > div:last-child {
+            min-width: 0;
+        }
+
+        .rc-header-name,
+        .rc-header-sub {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .rc-inputrow textarea {
+            min-width: 0;
+        }
+
+        @media (hover: none) {
+            .rc-row.me .rc-msg-delete { opacity: .6; }   /* no hover on touch screens */
         }
 
         /* messages body */
@@ -1982,17 +2032,21 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
             .rc-wrap {
                 margin: -15px;
                 height: calc(100vh - 70px);
+                height: calc(100dvh - 70px);
             }
 
             .rc-list {
                 width: 100%;
                 position: absolute;
+                top: 0;
+                left: 0;
                 z-index: 10;
                 height: 100%;
                 transition: transform .3s ease;
             }
 
-            .rc-list.slide-out {
+            .rc-wrap.rc-focus .rc-list {
+                display: flex;
                 transform: translateX(-100%);
             }
 
@@ -2000,29 +2054,16 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                 width: 100%;
             }
 
-            .rc-mobile-back {
-                display: flex !important;
-                align-items: center;
-                gap: 10px;
-                padding: 12px 16px;
-                border-bottom: 1px solid #eee;
-                background: #fff;
-                flex-shrink: 0;
-            }
+            .rc-header { padding: 10px 12px; gap: 8px; }
+            .rc-body { padding: 14px 12px; }
+            .rc-bwrap { max-width: 80%; }
+            .rc-attachment img,
+            .rc-attachment video { max-width: 100% !important; }
+            .rc-inputbar { padding: 8px 10px; }
+            .rc-inputrow { gap: 6px; }
 
-            .rc-mobile-back button {
-                background: none;
-                border: none;
-                font-size: 1.1rem;
-                color: #ff6b2c;
-                cursor: pointer;
-                padding: 0;
-            }
-
-            .rc-mobile-back span {
-                font-weight: 700;
-                font-size: 14px;
-            }
+            .has-deact-toast .rc-wrap { padding-top: 52px; }
+            .has-deact-toast .rc-list { top: 52px; height: calc(100% - 52px); }
 
             .hm-meter {
                 width: 100%;
@@ -2264,6 +2305,10 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                 align-items: center;
                 gap: 6px;
                 font-size: 1rem;
+            }
+
+            .rc-wrap {
+                margin: -10px;
             }
         }
 
@@ -3204,7 +3249,7 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                         <div>
                             <h2>Welcome, <?= htmlspecialchars($hmFirst) ?></h2>
                             <p><?= date('l, F j') ?> · <?= $hmDone === 3
-                                   ? 'Open your room from the sidebar.'
+                                   ? 'All set. Open your room to keep updated from announcements.'
                                    : 'Here is what you need to do to get started with your OJT.' ?></p>
                         </div>
                     </div>
@@ -3329,7 +3374,7 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
     <!-- CHATS SECTION -->
     <div id="chats" class="section <?= $current_section === 'chats' ? 'active' : '' ?>">
         <div class="main">
-            <div class="rc-wrap">
+            <div class="rc-wrap" id="rcWrap">
                 <!-- ── LEFT: contact list ── -->
                 <div class="rc-list" id="rcList">
 
@@ -3435,13 +3480,15 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                         ?>
 
                         <!-- Mobile back arrow -->
-                        <div class="rc-mobile-back" id="rcMobileBack">
-                            <button onclick="rcMobileGoBack()"><i class="fa-solid fa-arrow-left"></i></button>
-                            <span><?= htmlspecialchars($openName) ?></span>
-                        </div>
+                        <!--  -->
 
                         <!-- Header -->
                         <div class="rc-header">
+                            <button type="button" class="rc-toggle-list" id="rcToggleList" onclick="rcToggleList()"
+                                title="Hide chat list" aria-label="Hide chat list">
+                                <i class="fa-solid fa-angles-left i-collapse"></i>
+                                <i class="fa-solid fa-arrow-left i-back"></i>
+                            </button>
                             <div class="rc-header-avatar" style="background:<?= $openBg ?>;">
                                 <?= strtoupper(substr($openName, 0, 1)) ?>
                             </div>
@@ -5217,15 +5264,48 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
         })();
 
         /* ── mobile: slide list out when a chat is opened ── */
+        // function rcMobileOpenChat(el) {
+        //     if (window.innerWidth <= 768) {
+        //         document.getElementById('rcList').classList.add('slide-out');
+        //         document.getElementById('rcMobileBack') && (document.getElementById('rcMobileBack').style.display = 'flex');
+        //     }
+        // }
+        // function rcMobileGoBack() {
+        //     document.getElementById('rcList').classList.remove('slide-out');
+        // }
+
+        /* ── chat list: show / hide (works on every screen size) ── */
+        function rcSyncToggle() {
+            const wrap = document.getElementById('rcWrap');
+            const btn = document.getElementById('rcToggleList');
+            if (!wrap || !btn) return;
+            const label = wrap.classList.contains('rc-focus') ? 'Show chat list' : 'Hide chat list';
+            btn.title = label;
+            btn.setAttribute('aria-label', label);
+        }
+
+        function rcToggleList() {
+            const wrap = document.getElementById('rcWrap');
+            if (!wrap) return;
+            wrap.classList.toggle('rc-focus');
+            rcSyncToggle();
+        }
+
+        /* tapping a contact on a phone: slide the list away while the page loads */
         function rcMobileOpenChat(el) {
             if (window.innerWidth <= 768) {
-                document.getElementById('rcList').classList.add('slide-out');
-                document.getElementById('rcMobileBack') && (document.getElementById('rcMobileBack').style.display = 'flex');
+                document.getElementById('rcWrap').classList.add('rc-focus');
             }
         }
-        function rcMobileGoBack() {
-            document.getElementById('rcList').classList.remove('slide-out');
-        }
+
+        /* phone + chat already open: start with the list hidden */
+        (function () {
+            const wrap = document.getElementById('rcWrap');
+            if (wrap && document.getElementById('rcBody') && window.innerWidth <= 768) {
+                wrap.classList.add('rc-focus');
+            }
+            rcSyncToggle();
+        })();
 
         /* On mobile with a chat already open, slide list away immediately */
         (function () {
