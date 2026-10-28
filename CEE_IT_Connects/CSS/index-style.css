@@ -204,97 +204,215 @@ body,html{
 .map-section-wrapper{
     width: 95%;
     margin:40px auto;
-}
-.status.open { color: green; font-weight:bold; }
-.status.closed { color: red; font-weight:bold; }
-.main{
-    display:flex;
-    height:550px;
-    overflow: visible;
-    border:4px solid #272f54;
-    border-radius:12px;
-    background: transparent;
+    border-radius:20px;
+    overflow:hidden; 
+    background:#f6f7fb;
+    box-shadow:0 24px 60px rgba(28,36,66,0.4);
     opacity: 0;
     transform: translateY(30px);
     animation: fadeInUp 1s forwards 2s;
 }
 
+.map-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:16px;
+    padding:20px 28px;
+    background:linear-gradient(135deg,#272f54,#2d3b63);
+}
+
+.map-header-icon{
+    width:44px;
+    height:44px;
+    border-radius:50%;
+    background:rgba(255,255,255,0.1);
+    color:#fff;
+    font-size:20px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+}
+
+.map-header h2{
+    margin:0;
+    font-size:1.6rem;
+    font-weight:700;
+    color:#fff;
+}
+
+.map-header p{
+    margin:0;
+    font-size:14px;
+    color:#d6dbeb;
+}
+
+.status{
+    color:#fff;
+    font-weight:bold;
+    font-size:11px;
+    letter-spacing:0.06em;
+    padding:3px 9px;
+    border-radius:999px;
+}
+.status.open { background:#198754; }
+.status.closed { background:#dc3545; }
+
+.main{
+    position:relative;
+    display:flex;
+    gap:16px;
+    height:640px;
+    padding:16px;
+    overflow: visible;
+    background:#f6f7fb;
+}
+
 .panel {
-    width: 360px;
-    background: rgba(75, 69, 150, 0.9);
-    color: white;
-    padding: 15px;
+    width: 400px;
+    background: transparent;
+    color: #1c2442;
+    padding: 0 6px 0 0;
     overflow-y: auto;
     z-index: 2;
     position: relative;
+    flex-shrink:0;
 }
 
 .search-box{
-    margin-bottom:15px;
+    position:relative;
+    width:380px;
+    max-width:100%;
+}
+
+.search-box i{
+    position:absolute;
+    left:18px;
+    top:50%;
+    transform:translateY(-50%);
+    color:#fff;
+    font-size:16px;
+    pointer-events:none;
 }
 
 .search-box input{
     width:100%;
-    padding:10px 14px;
-    border-radius:20px;
+    padding:12px 20px 12px 46px;
+    border-radius:999px;
     border:none;
     outline:none;
     font-size:14px;
+    background:rgba(255,255,255,0.12);
+    color:#fff;
 }
 
+.search-box input::placeholder{ color:#d6dbeb; }
+.search-box input:focus{ background:rgba(255,255,255,0.2); }
+
 .listing{
-    background:#5A5FA8;
-    padding:12px;
-    border-radius:8px;
-    margin-bottom:12px;
     position:relative;
+    background:#fff;                     /* was #5A5FA8 */
+    border:1px solid #e3e6f0;            /* new */
+    padding:14px 14px 14px 72px;         /* was 12px */
+    border-radius:14px;                  /* was 8px */
+    margin-bottom:12px;
     opacity: 0;
     transform: translateX(-20px);
     animation: fadeInLeft 0.6s forwards;
 }
 
-.listing h3{
-    margin:0;
-    font-size:16px;
-    color:#FFA500;
+.listing:hover{
+    border-color:#ff673a;
+    background:#fff4ee;
 }
 
-.status{
-    color:#00FF00;
-    font-weight:bold;
-    font-size:12px;
-    margin-left:6px;
+.listing::before{                        /* building icon circle, no markup change */
+    content:"\f1ad";
+    font-family:"Font Awesome 6 Free";
+    font-weight:900;
+    position:absolute;
+    left:14px;
+    top:14px;
+    width:44px;
+    height:44px;
+    border-radius:50%;
+    background:#e6e9f5;
+    color:#272f54;
+    font-size:18px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.listing h3{
+    margin:0;
+    font-size:15px;
+    font-weight:700;
+    color:#1c2442;                       /* was #FFA500 */
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:8px;
 }
 
 .listing p{
     margin:4px 0;
-    font-size:13px;
+    font-size:12px;                      /* was 13px */
+    color:#4a5073;
+}
+
+.listing-header + p::before{             /* clock icon before "Opens daily" */
+    content:"\f017";
+    font-family:"Font Awesome 6 Free";
+    font-weight:400;
+    margin-right:6px;
 }
 
 .distance{
-    color:#FFD700;
-    font-size:13px;
+    color:#4a5073;                       /* was #FFD700 */
+    font-size:12px;
     display:flex;
     align-items:center;
 }
 
 .distance i{
-    margin-right:5px;
+    margin-right:6px;
+    color:#ff673a;
 }
 
 .icons{
     display:flex;
-    gap:12px;
+    gap:8px;
+    margin-top:8px;
 }
 
 .icons i{
+    width:36px;
+    height:36px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#e6e9f5;
+    color:#272f54;
     cursor:pointer;
-    font-size:16px;
-    transition: color 0.3s ease;
+    font-size:14px;
+    transition: background 0.3s ease;
 }
 
 .icons i:hover{
-    color:#FFA500;
+    background:#d5daee;
+}
+
+.icons i:last-child{                     /* directions button */
+    background:#ff673a;
+    color:#fff;
+}
+
+.icons i:last-child:hover{
+    background:#e4572e;
 }
 
 .phone-dropdown{
@@ -314,7 +432,32 @@ body,html{
     flex:1;
     height:100%;
     min-width: 0;
+    border-radius:14px;                  /* new */
+    overflow:hidden;                     /* new */
 }
+
+.map-legend{
+    position:absolute;
+    right:32px;
+    bottom:48px;
+    z-index:1000;                        /* above Leaflet panes */
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    padding:14px 18px;
+    border-radius:14px;
+    background:#fff;
+    box-shadow:0 6px 18px rgba(0,0,0,0.18);
+    font-size:13px;
+    font-weight:600;
+    color:#272f54;
+}
+
+.map-legend i{ font-size:10px; margin-right:8px; }
+
+/* stops the global "* { transition: all }" from interfering with Leaflet */
+.leaflet-container,
+.leaflet-container *{ transition:none; }
 
 /* Listers */
 .listing-header{
@@ -641,15 +784,16 @@ body,html{
     }
 
     /* MAP */
-    .map-section-wrapper {
+        .map-section-wrapper {
         width: 100%;
         margin: 20px auto;
+        border-radius: 14px;
     }
 
     .main {
         flex-direction: column;
         height: auto;
-        border-radius: 8px;
+        padding: 12px;
     }
 
     .panel {
@@ -657,7 +801,6 @@ body,html{
         width: 100%;
         max-height: 280px;
         overflow-y: auto;
-        border-radius: 8px 8px 0 0;
     }
 
     #map {
@@ -665,9 +808,13 @@ body,html{
         height: 300px !important;
         width: 100%;
         min-height: 300px;
-        border-radius: 0 0 8px 8px;
+        border-radius: 14px;
         display: block;
     }
+
+    .map-header { padding: 16px 18px; }
+    .map-header h2 { font-size: 1.25rem; }
+    .search-box { width: 100%; }
 
     /* FEATURES */
     .features-section {

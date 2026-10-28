@@ -300,15 +300,24 @@ $now = new DateTime();
     </section>
 
     <!-- MAP SECTION -->
-    <section class="map-section">
+        <section class="map-section">
         <div class="map-section-wrapper">
+            <div class="map-header">
+                <div class="d-flex align-items-center gap-3">
+                    <span class="map-header-icon"><i class="fas fa-map-marker-alt"></i></span>
+                    <div>
+                        <h2>Partner Institutions</h2>
+                        <p>Explore our partner companies and institutions for your OJT opportunities.</p>
+                    </div>
+                </div>
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Search for an internship listing"
+                        onkeyup="filterListings()">
+                </div>
+            </div>
             <div class="main">
                 <div class="panel">
-
-                    <div class="search-box">
-                        <input type="text" id="searchInput" placeholder="Search for an internship listing"
-                            onkeyup="filterListings()">
-                    </div>
 
                     <?php foreach ($locations as $loc):
                         $openTime = new DateTime($loc['time_open']);
@@ -350,6 +359,10 @@ $now = new DateTime();
 
                 </div>
                 <div id="map"></div>
+                <div class="map-legend">
+                    <span><i class="fas fa-circle text-success"></i> Open</span>
+                    <span><i class="fas fa-circle text-danger"></i> Closed</span>
+                </div>
             </div>
         </div>
     </section>
