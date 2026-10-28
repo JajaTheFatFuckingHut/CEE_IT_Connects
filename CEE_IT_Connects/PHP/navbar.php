@@ -618,10 +618,9 @@ function timeAgo($datetime)
         }
 
         @media (max-width: 575.98px) {
-            .brand-text {
-                font-size: 13px;
-                letter-spacing: 0;
-            }
+            /* .brand-text {
+                display: none;
+            } */
 
             .navbar-brand {
                 flex: 0 0 auto;
