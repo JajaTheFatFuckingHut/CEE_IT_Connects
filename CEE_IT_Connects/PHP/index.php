@@ -178,6 +178,10 @@ $now = new DateTime();
             .phone-backdrop.show {
                 display: block;
             } */
+
+            @media (max-width: 768px) {
+                body { background-attachment: scroll; }
+            }
     </style>
 </head>
 
@@ -367,40 +371,72 @@ $now = new DateTime();
         </div>
     </section>
 
-    <!-- ABOUT -->
+        <!-- ABOUT -->
     <section class="about-section">
-        <div class="container text-center">
-            <h2 class="about-title animate-on-scroll animate-left">About CEE IT Connects</h2>
-            <p class="about-text animate-on-scroll animate-right">
-                &nbsp;&nbsp;&nbsp;&nbsp;CEE IT Connects is an internship coordination platform developed
-                to support students from the College of Engineering and Information
-                Technology of Pamantasan ng Lungsod ng Valenzuela. The system
-                simplifies the internship process by connecting students,
-                advisers, and partner companies through a centralized digital platform.
-            </p>
-        </div>
-        <div class="about-info-bar">
-            <div class="container">
-                <div class="row text-center align-items-center">
-                    <div class="col-md-4" style="font-size: 1.15rem;"><i class="fas fa-map-marker-alt"></i> Tongco St.,
-                        Maysan, Valenzuela City
-                        <br><i class="fab fa-facebook"></i> CEE IT Connects
+        <div class="container">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-7">
+                    <p class="about-eyebrow animate-on-scroll animate-left">About Us</p>
+                    <h2 class="about-title animate-on-scroll animate-left">About <span>CEE IT Connects</span></h2>
+                    <p class="about-text animate-on-scroll animate-right">
+                        CEE IT Connects is an internship coordination platform developed
+                        to support students from the College of Engineering and Information
+                        Technology of Pamantasan ng Lungsod ng Valenzuela. The system
+                        simplifies the internship process by connecting students,
+                        advisers, and partner companies through a centralized digital platform.
+                    </p>
+                </div>
+                <div class="col-lg-5">
+                    <div class="about-pillar animate-on-scroll animate-scale">
+                        <span class="about-pillar-icon"><i class="fa-solid fa-users"></i></span>
+                        <div>
+                            <h5>Students</h5>
+                            <p>CEIT students of PLV</p>
+                        </div>
                     </div>
-                    <div class="col-md-4" style="color: #fff; font-weight: bolder; font-size: 1.25rem;"><strong>CEE
-                            IT CONNECTS</strong>
-                        <br>©2026 CEE IT Connects. All rights reserved
+                    <div class="about-pillar animate-on-scroll animate-scale">
+                        <span class="about-pillar-icon"><i class="fa-solid fa-user-tie"></i></span>
+                        <div>
+                            <h5>Advisers</h5>
+                            <p>Internship advisers and HTE advisers</p>
+                        </div>
                     </div>
-                    <div class="col-md-4" style="font-size: 1.15rem;"><i class="fas fa-envelope"></i>
-                        ceeitconnects@gmail.com
-                        <br><i class="fas fa-phone"></i> 09123456789
+                    <div class="about-pillar animate-on-scroll animate-scale">
+                        <span class="about-pillar-icon"><i class="fa-solid fa-building"></i></span>
+                        <div>
+                            <h5>Partner Companies</h5>
+                            <p>Partner institutions offering OJT</p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+
+        <div class="about-info-bar">
+            <div class="container">
+                <div class="row align-items-center g-4">
+                    <div class="col-lg-5 about-brand">
+                        <img src="../Sources/LOGO-FILE-NAME.png" alt="CEE IT Connects logo">
+                        <div>
+                            <strong>CEE IT <span>CONNECTS</span></strong>
+                            <small>Connecting Campus to Career.</small>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 about-col">
+                        <h6>Visit Us</h6>
+                        <p><i class="fas fa-map-marker-alt"></i> Tongco St., Maysan, Valenzuela City</p>
+                        <p><i class="fab fa-facebook"></i> CEE IT Connects</p>
+                    </div>
+                    <div class="col-lg-3 about-col">
+                        <h6>Contact</h6>
+                        <p><i class="fas fa-envelope"></i> ceeitconnects@gmail.com</p>
+                        <p><i class="fas fa-phone"></i> 09123456789</p>
+                    </div>
+                </div>
+                <p class="about-copy">&copy; 2026 CEE IT Connects. All rights reserved.</p>
+            </div>
+        </div>
     </section>
-    <!-- 
-    <div id="phoneBackdrop" class="phone-backdrop"></div>
-    <div id="phoneDropdown" class="phone-dropdown"></div> -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 

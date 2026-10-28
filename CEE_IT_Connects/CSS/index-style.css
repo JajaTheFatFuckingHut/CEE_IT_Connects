@@ -552,39 +552,165 @@ body,html{
 }
 /* ABOUT US */
 .about-section{
-    background: linear-gradient(90deg, rgba(255,182,47,0.9) 10%, rgba(228,87,46,0.9) 70%);
-    padding: 60px 0 0 0;
+    background:#0f2050;                 /* was orange gradient */
+    padding:96px 0 0 0;                 /* was 60px 0 0 0 */
     position: relative;
     overflow: hidden;
 }
 
-.about-title{
-    font-weight:700;
-    font-size:2.2rem;
-    margin-bottom:25px;
-    color: #fff;
+.about-eyebrow{
+    display:flex;
+    align-items:center;
+    gap:16px;
+    margin-bottom:8px;
+    color:#fff;
+    font-size:1.1rem;
+    font-weight:600;
+    letter-spacing:0.3em;
+    text-transform:uppercase;
 }
 
+.about-eyebrow::before{
+    content:"";
+    width:48px;
+    height:4px;
+    border-radius:4px;
+    background:#ff673a;
+}
+
+.about-title{
+    font-weight:800;
+    font-size:3.5rem;                   /* was 2.2rem */
+    margin-bottom:28px;                 /* was 25px */
+    color:#fff;
+}
+
+.about-title span{ color:#ff673a; }
+
 .about-text{
-    background: rgba(39,47,84,0.55);
-    max-width:700px;
-    margin:0 auto 40px auto;
-    line-height:1.7;
-    text-align: left;
-    color: #fff;
-    font-weight: 400;
-    font-size: 1rem;
-    padding: 28px 32px;
-    border-radius: 12px;
-    backdrop-filter: blur(3px);
+    max-width:640px;
+    margin:0;                           /* was 0 auto 40px auto */
+    line-height:1.9;
+    text-align:left;
+    color:#e6e9f5;
+    font-weight:400;
+    font-size:1.1rem;                   /* was 1rem */
+    /* removed: background, padding, border-radius, backdrop-filter */
+}
+
+.about-pillar{
+    display:flex;
+    align-items:center;
+    gap:20px;
+    margin-bottom:36px;
+}
+
+.about-pillar:last-child{ margin-bottom:0; }
+
+.about-pillar-icon{
+    width:80px;
+    height:80px;
+    flex-shrink:0;
+    border:2px solid #ff673a;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#ff673a;
+    font-size:30px;
+}
+
+.about-pillar > div{
+    border-left:2px solid #ff673a;
+    padding-left:20px;
+}
+
+.about-pillar h5{
+    margin:0 0 2px;
+    font-size:1.4rem;
+    font-weight:700;
+    color:#fff;
+}
+
+.about-pillar p{
+    margin:0;
+    font-size:1.05rem;
+    color:#aeb8dc;
 }
 
 .about-info-bar{
-    background: linear-gradient(135deg,#272f54,#1e2647);
-    color: #fff;
-    padding: 28px 0;
-    border-top-left-radius: 16px;
-    border-top-right-radius: 16px;
+    margin-top:72px;
+    background:transparent;
+    color:#fff;
+    padding:40px 0 0;
+    border-top:1px solid rgba(255,255,255,0.2);
+}
+
+.about-brand{
+    display:flex;
+    align-items:center;
+    gap:18px;
+}
+
+.about-brand img{
+    height:88px;
+    width:auto;
+}
+
+.about-brand strong{
+    display:block;
+    font-size:2.2rem;
+    font-weight:800;
+    line-height:1.1;
+    color:#fff;
+}
+
+.about-brand strong span{ color:#ff673a; }
+
+.about-brand small{
+    display:block;
+    margin-top:6px;
+    font-size:0.75rem;
+    letter-spacing:0.35em;
+    text-transform:uppercase;
+    color:#aeb8dc;
+}
+
+.about-col{
+    border-left:1px solid rgba(255,255,255,0.25);
+    padding-left:40px;
+}
+
+.about-col h6{
+    margin-bottom:18px;
+    font-size:0.9rem;
+    font-weight:700;
+    letter-spacing:0.2em;
+    text-transform:uppercase;
+    color:#ff673a;
+}
+
+.about-col p{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    margin:0 0 14px;
+    font-size:1.05rem;
+}
+
+.about-col i{
+    width:22px;
+    text-align:center;
+    font-size:1.3rem;
+}
+
+.about-copy{
+    margin:40px 0 0;
+    padding:28px 0;
+    border-top:1px solid rgba(255,255,255,0.2);
+    text-align:center;
+    font-size:0.9rem;
+    color:#aeb8dc;
 }
 
 /* Dissappear */
@@ -650,7 +776,6 @@ body,html{
 }
 
 /*susu*/
-/*TABLET (max-width: 992px)*/
 @media (max-width: 992px) {
 
     /* HERO */
@@ -702,18 +827,21 @@ body,html{
         margin-bottom: 0;
     }
 
-    /* ABOUT */
+        /* ABOUT */
     .about-title {
-        font-size: 2.2rem;
+        font-size: 2.8rem;
     }
 
     .about-text {
         font-size: 1rem;
-        padding: 0 20px;
+    }
+
+    .about-col {
+        border-left: 0;
+        padding-left: calc(var(--bs-gutter-x) * .5);
     }
 }
 
-/*MOBILE (max-width: 768px)*/
 @media (max-width: 768px) {
 
     body {
@@ -829,31 +957,27 @@ body,html{
         font-size: 40px;
     }
 
-    /* ABOUT */
+        /* ABOUT */
     .about-section {
-        padding: 30px 0 0 0;
+        padding: 56px 0 0 0;
     }
 
     .about-title {
-        font-size: 1.8rem;
+        font-size: 2.2rem;
     }
 
-    .about-text {
-        font-size: 0.95rem;
-        padding: 0 15px;
-        margin-bottom: 30px;
+    .about-pillar-icon {
+        width: 64px;
+        height: 64px;
+        font-size: 24px;
     }
 
-    .about-info-bar .row {
-        gap: 10px;
-        flex-wrap: nowrap;
+    .about-brand img {
+        height: 64px;
     }
 
-    .about-info-bar .col-md-4 {
-        font-size: 0.75rem !important;
-        flex: 0 0 33.3%;
-        max-width: 33.3%;
-        padding: 8px 4px;
+    .about-brand strong {
+        font-size: 1.6rem;
     }
 }
 
@@ -901,6 +1025,25 @@ body,html{
         height: 250px !important;
     }
 
+    .map-legend {
+        right: 20px;
+        bottom: 36px;
+        padding: 8px 12px;
+        gap: 6px;
+        font-size: 11px;
+    }
+
+    .listing {
+        padding-left: 64px;
+    }
+
+    .listing::before {
+        left: 10px;
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+
     .listing h3 {
         font-size: 13px;
     }
@@ -911,10 +1054,10 @@ body,html{
 
     /* ABOUT */
     .about-title {
-        font-size: 1.5rem;
+        font-size: 1.9rem;
     }
 
     .about-text {
-        font-size: 0.85rem;
+        font-size: 0.95rem;
     }
 }
