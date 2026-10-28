@@ -2051,6 +2051,8 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
             .pg-header h2 {
                 font-size: 20px;
             }
+
+            .hm-meter { width: 100%; flex: 1 1 100%; }
         }
 
         .rc-mobile-back {
@@ -2976,6 +2978,51 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                 width: 100%;
                 margin-left: 0;
             }
+
+            .pg-header { padding: 14px; gap: 12px; }
+            .pg-header-icon { display: none; }
+            .pg-header h2 { font-size: 18px; }
+            .pg-header p { font-size: 12px; }
+            .hm-meter { min-width: 0; }
+            .hm-meter-top { font-size: 12px; }
+            .hm-meter-track { height: 6px; }
+
+            /* Stat cards: 3 in a row, no icon, smaller text */
+            .hm-stats { --bs-gutter-x: .5rem; --bs-gutter-y: .5rem; }
+            .hm-stats > [class*="col-"] { width: 33.3333%; }
+            .hrs-card { padding: 12px 10px; border-radius: 12px; }
+            .hrs-stat { display: block; text-align: center; }
+            .hrs-stat-icon { display: none; }
+            .hrs-stat-label { font-size: 10px; line-height: 1.2; }
+            .hrs-stat-value { font-size: 18px; }
+            .hrs-stat-value .text-muted { font-size: 11px !important; }
+
+            /* Checklist: dot on top, text full width, no "Done" tag */
+            .hm-card { padding: 14px 16px 4px; }
+            .hm-step {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+                padding: 14px 0;
+            }
+            .hm-step.current { margin: 0 -16px; padding-left: 16px; padding-right: 16px; }
+            .hm-dot { width: 26px; height: 26px; min-width: 26px; font-size: 12px; }
+            .hm-step.current .hm-dot { box-shadow: 0 0 0 3px #fdeee6; }
+            .hm-text { flex: none; width: 100%; }
+            .hm-text strong { font-size: 14px; }
+            .hm-text span { font-size: 12px; overflow-wrap: anywhere; }
+            .hm-tag.ok { display: none; }
+            .hm-btn { display: block; width: 100%; text-align: center; }
+
+            /* Room cards: single column, no icon */
+            .hm-rooms { grid-template-columns: 1fr; }
+            .hm-room { padding: 12px; }
+            .hm-room-ic { display: none; }
+        }
+
+        @media (max-width: 400px) {
+            .hm-stats > [class*="col-"]:first-child { display: none; }
+            .hm-stats > [class*="col-"] { width: 50%; }
         }
     </style>
 </head>
@@ -3171,7 +3218,7 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                     </div>
                 </div>
 
-                <div class="row g-3 mb-3">
+                <div class="row g-3 mb-3 hm-stats">
                     <div class="col-md-4">
                         <div class="hrs-card hrs-stat">
                             <div class="hrs-stat-icon blue"><i class="fa-solid fa-list-check"></i></div>
@@ -3725,7 +3772,7 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                 </div>
 
                 <!-- Summary Cards -->
-                <div class="row g-3 mb-3">
+                <div class="row g-3 mb-3 hm-stats">
                     <div class="col-md-4">
                         <div class="hrs-card hrs-stat">
                             <div class="hrs-stat-icon blue"><i class="fa-solid fa-calendar-days"></i></div>
