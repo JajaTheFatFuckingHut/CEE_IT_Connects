@@ -618,9 +618,9 @@ function timeAgo($datetime)
         }
 
         @media (max-width: 575.98px) {
-            /* .brand-text {
+            .brand-text {
                 display: none;
-            } */
+            }
 
             .navbar-brand {
                 flex: 0 0 auto;
@@ -628,7 +628,11 @@ function timeAgo($datetime)
 
             .navbar-icons {
                 flex: 1;
-                gap: 14px;
+                gap: 12px;
+            }
+
+            #mobileMenuToggle {
+                flex-shrink: 0;
             }
         }
 
