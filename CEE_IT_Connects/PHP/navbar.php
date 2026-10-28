@@ -610,13 +610,6 @@ function timeAgo($datetime)
                 flex-shrink: 0;
             }
 
-            .brand-text {
-                min-width: 0;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-            }
-
             .navbar-icons {
                 flex: 0 0 auto;
                 padding-right: 0;
@@ -624,18 +617,18 @@ function timeAgo($datetime)
             }
         }
 
-        @media (max-width: 400px) {
+        @media (max-width: 575.98px) {
             .brand-text {
-                font-size: 15px;
-                letter-spacing: 0;
+                display: none;
             }
 
-            .nav-logo {
-                height: 36px;
+            .navbar-brand {
+                flex: 0 0 auto;
             }
 
-            #mobileMenuToggle {
-                padding: 0;
+            .navbar-icons {
+                flex: 1;
+                gap: 14px;
             }
         }
 
