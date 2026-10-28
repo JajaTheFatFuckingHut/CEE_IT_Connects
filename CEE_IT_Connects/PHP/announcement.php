@@ -47,6 +47,12 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
     <link href="../CSS/index-style.css" rel="stylesheet">
 
     <style>
+        #calendar .main {
+            height: auto;
+            padding: 0;
+            background: transparent;
+        }
+
         body {
             background: #fff5f0 !important;
         }
@@ -334,34 +340,23 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
         }
 
         @media (max-width: 768px) {
-            .announcement-wrapper {
-                padding: 17px 10px;
-            }
+            .announcement-wrapper { padding: 17px 10px; }
 
-            .prep-banner {
-                grid-template-columns: 1fr;
-            }
+            .prep-banner { grid-template-columns: 1fr; }
 
             .prep-col {
-                display: flex;
-                align-items: flex-start;
-                gap: 16px;
+                display: grid;
+                grid-template-columns: 36px 1fr;
+                column-gap: 14px;
+                align-items: start;
+                padding: 16px;
                 border-right: none;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+                border-bottom: 1px solid #eee;
             }
-
-            .prep-letter {
-                margin: 0;
-                flex-shrink: 0;
-            }
-
-            .prep-content {
-                flex: 1;
-            }
-
-            .prep-col:last-child {
-                border-bottom: none;
-            }
+            .prep-icon { grid-row: 1 / span 2; margin-bottom: 0; }
+            .prep-tip-title { font-size: 15px; margin: 0 0 4px; }
+            .prep-tip-desc { margin: 0; }
+            .prep-col:last-child { border-bottom: none; }
         }
 
         /* AVAILABLE DOCS TABLE */
@@ -369,7 +364,7 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
             background: #fff;
             border: 1px solid #919191;
             border-radius: 10px;
-            overflow: hidden;
+            overflow-x: auto;
         }
 
         .docs-table {
@@ -689,16 +684,43 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
             overflow-wrap: anywhere;
         }
 
-        @media (max-width: 576px) {
-            #calendar .tc-day {
-                min-height: 54px;
-                padding: 5px;
-            }
+        #calendar .tc-susp-list { display: none; margin-top: 12px; font-size: .8rem; }
+        #calendar .tc-susp-item {
+            padding: 8px 10px;
+            margin-top: 6px;
+            background: var(--c-warn-soft);
+            border-left: 3px solid var(--c-warn);
+            border-radius: 6px;
+            color: var(--c-text);
+        }
 
-            #calendar .tc-readout {
-                width: 100%;
-                margin-left: 0;
+        @media (max-width: 576px) {
+            #calendar .tc-panel { padding: 10px; }
+            #calendar .tc-grid { gap: 3px; }
+            #calendar .tc-day { min-height: 44px; padding: 4px; border-radius: 8px; }
+            #calendar .tc-num { font-size: .75rem; }
+            #calendar .tc-hrs { font-size: .6rem; }
+
+            #calendar .tc-susp { display: none; }
+            #calendar .tc-day.suspended::after {
+                content: '';
+                display: block;
+                width: 6px;
+                height: 6px;
+                margin-top: 4px;
+                border-radius: 50%;
+                background: var(--c-warn);
             }
+            #calendar .tc-susp-list { display: block; }
+
+            #calendar .tc-toolbar { gap: 6px; }
+            #calendar .tc-select { flex: 1; min-width: 0; }
+            #calendar .tc-readout { width: 100%; margin-left: 0; }
+        
+            .docs-table thead th { padding: 10px 8px; font-size: 10px; }
+            .docs-table tbody td { padding: 10px 8px; font-size: 12px; }
+            .docs-table .company-cell { font-size: 11px; }
+            .doc-status { font-size: 11px; padding: 2px 8px; }
         }
     </style>
 </head>
@@ -760,7 +782,7 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                     <tbody>
                         <?php if (empty($docAvailability)): ?>
                             <tr>
-                                <td colspan="6" class="docs-empty-state">No document availability announced yet.</td>
+                                <td colspan="4" class="docs-empty-state">No document availability announced yet.</td>
                             </tr>
                         <?php else: ?>
                             <?php foreach ($docAvailability as $d): ?>
@@ -811,6 +833,7 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                         </div>
 
                         <div id="calGrid" class="tc-grid"></div>
+                        <div id="calSuspList" class="tc-susp-list"></div>
                     </div>
                 </div>
             </div>
@@ -961,6 +984,17 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                 }
 
                 calEl.innerHTML = html;
+
+                const listEl = document.getElementById('calSuspList');
+                if (listEl) {
+                    const prefix = `${year}-${String(month + 1).padStart(2, '0')}-`;
+                    listEl.innerHTML = Object.keys(susp)
+                        .filter(k => k.startsWith(prefix))
+                        .sort()
+                        .map(k => `<div class="tc-susp-item"><b>${MONTHS[month].slice(0, 3)} ${parseInt(k.slice(8), 10)}</b> · ${esc(susp[k] || 'Suspended')}</div>`)
+                        .join('');
+                }
+                
                 readout.textContent = `${MONTHS[month].slice(0, 3).toUpperCase()} // ${year}`;
             }
 

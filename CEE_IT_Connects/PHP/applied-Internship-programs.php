@@ -922,36 +922,6 @@ foreach ($internships as $loc) {
                                 <?php endforeach; ?>
                             </div>
 
-                            <!-- Deadline -->
-                            <!-- <div class="filter-section">
-                                <span class="filter-label">Deadline</span>
-                                <?php
-                                // $deadlines = ['week' => 'Due this week', 'month' => 'Due this month', 'future' => 'Upcoming'];
-                                // foreach ($deadlines as $val => $label):
-                                //     $checked = (isset($_GET['deadline']) && $_GET['deadline'] == $val) ? 'checked' : '';
-                                ?>
-                                    <label class="fc-item">
-                                        <input type="radio" name="deadline" value="<?= $val ?>" <?= $checked ?>>
-                                        <?= $label ?>
-                                    </label>
-                                <?php //endforeach; ?>
-                            </div> -->
-
-                            <!-- Internship Type -->
-                            <!-- <div class="filter-section">
-                                <span class="filter-label">Internship Type</span>
-                                <?php
-                                // $types = ['All' => 'All types', 'paid' => 'With stipend', 'unpaid' => 'Without stipend'];
-                                // foreach ($types as $val => $label):
-                                //     $checked = (isset($_GET['internship_type']) && $_GET['internship_type'] == $val) ? 'checked' : '';
-                                ?>
-                                    <label class="fc-item">
-                                        <input type="radio" name="internship_type" value="<?= $val ?>" <?= $checked ?>>
-                                        <?= $label ?>
-                                    </label>
-                                <?php //endforeach; ?>
-                            </div> -->
-
                             <!-- Company Classification -->
                             <div class="filter-section">
                                 <span class="filter-label">Company Type</span>
@@ -1250,8 +1220,6 @@ foreach ($internships as $loc) {
         }
         function applyFilters() {
             const search = document.getElementById('search-internship').value.toLowerCase();
-            const dlRadio = document.querySelector('input[name="deadline"]:checked');
-            const tyRadio = document.querySelector('input[name="internship_type"]:checked');
             const ccSel = document.querySelector('select[name="company_classification"]');
 
             const deadline = dlRadio ? dlRadio.value : '';
