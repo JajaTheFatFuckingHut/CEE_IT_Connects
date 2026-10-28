@@ -160,28 +160,10 @@ $now = new DateTime();
             background: #f2f2f2;
         }
 
-        /* 
-            .phone-backdrop {
-                display: none;
-                position: fixed;
-                inset: 0;
-                background: rgba(0, 0, 0, 0.25);
-                backdrop-filter: blur(3px);
-                -webkit-backdrop-filter: blur(3px);
-                z-index: 9999;
-            }
 
-            .phone-backdrop.show {
-                display: block;
-            }
-
-            .phone-backdrop.show {
-                display: block;
-            } */
-
-            @media (max-width: 768px) {
-                body { background-attachment: scroll; }
-            }
+        @media (max-width: 768px) {
+            body { background-attachment: scroll; }
+        }
     </style>
 </head>
 
@@ -416,7 +398,7 @@ $now = new DateTime();
             <div class="container">
                 <div class="row align-items-center g-4">
                     <div class="col-lg-5 about-brand">
-                        <img src="../Sources/LOGO-FILE-NAME.png" alt="CEE IT Connects logo">
+                        <img src="../Sources/CEE IT Connects Logo.png" alt="CEE IT Connects logo">
                         <div>
                             <strong>CEE IT <span>CONNECTS</span></strong>
                             <small>Connecting Campus to Career.</small>
