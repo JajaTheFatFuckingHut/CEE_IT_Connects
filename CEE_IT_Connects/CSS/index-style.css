@@ -2,6 +2,13 @@
     --gradient-start:#FFB62F;
     --gradient-end:#E4572E;
     --primary-dark-blue:#272f54;
+    --navy-light:#2d3b63;
+    --navy-deep:#1e2647;
+    --navy-soft:#d6dbeb;
+    --navy-tint:#e6e9f5;
+    --navy-wash:#f6f7fb;
+    --accent:#ff673a;
+    --gold:#FFC23C;
 }
 
 body{
@@ -59,7 +66,7 @@ body,html{
     color:#ededed;
     text-transform:uppercase;
     letter-spacing:0.3em;
-    border-left:4px solid #ff673a;
+    border-left:4px solid var(--accent);
     padding-left:14px;
 }
 
@@ -71,7 +78,7 @@ body,html{
     transform: translateY(-10px);
     animation: fadeInDown 1s forwards 0.7s;
     font-family: 'Geogrotesque TRIAL', sans-serif; 
-    color: #1c2442;
+    color: var(--primary-dark-blue);
 }
 
 .description-box{
@@ -93,7 +100,7 @@ body,html{
 /* BUTTON */
 .btn-find{
     display:inline-block;
-    background:#ff673a; 
+    background:var(--accent); 
     box-shadow:0 6px 18px rgba(255,103,58,0.45);
     color:#fff;
     font-weight:700;
@@ -127,7 +134,7 @@ body,html{
     pointer-events:none;
     display:block;
 }
-.hero-wave path:first-of-type{ fill:#2d3b63; }
+.hero-wave path:first-of-type{ fill: var(--navy-light); }
 .hero-wave path:last-of-type{ fill:none; stroke:url(#heroWaveStroke); stroke-width:4; }
 
 /* STATUE */
@@ -206,7 +213,7 @@ body,html{
     margin:40px auto;
     border-radius:20px;
     overflow:hidden; 
-    background:#f6f7fb;
+    background:var(--navy-wash);
     box-shadow:0 24px 60px rgba(28,36,66,0.4);
     opacity: 0;
     transform: translateY(30px);
@@ -220,7 +227,7 @@ body,html{
     flex-wrap:wrap;
     gap:16px;
     padding:20px 28px;
-    background:linear-gradient(135deg,#272f54,#2d3b63);
+    background:linear-gradient(135deg,var(--primary-dark-blue), var(--navy-light));
 }
 
 .map-header-icon{
@@ -246,7 +253,7 @@ body,html{
 .map-header p{
     margin:0;
     font-size:14px;
-    color:#d6dbeb;
+    color:	var(--navy-soft);
 }
 
 .status{
@@ -267,13 +274,13 @@ body,html{
     height:640px;
     padding:16px;
     overflow: visible;
-    background:#f6f7fb;
+    background:var(--navy-wash);
 }
 
 .panel {
     width: 400px;
     background: transparent;
-    color: #1c2442;
+    color: var(--primary-dark-blue);
     padding: 0 6px 0 0;
     overflow-y: auto;
     z-index: 2;
@@ -308,13 +315,13 @@ body,html{
     color:#fff;
 }
 
-.search-box input::placeholder{ color:#d6dbeb; }
+.search-box input::placeholder{ color: var(--navy-soft); }
 .search-box input:focus{ background:rgba(255,255,255,0.2); }
 
 .listing{
     position:relative;
     background:#fff;                     /* was #5A5FA8 */
-    border:1px solid #e3e6f0;            /* new */
+    border:1px solid var(--navy-tint);            /* new */
     padding:14px 14px 14px 72px;         /* was 12px */
     border-radius:14px;                  /* was 8px */
     margin-bottom:12px;
@@ -324,7 +331,7 @@ body,html{
 }
 
 .listing:hover{
-    border-color:#ff673a;
+    border-color:var(--accent);
     background:#fff4ee;
 }
 
@@ -338,7 +345,7 @@ body,html{
     width:44px;
     height:44px;
     border-radius:50%;
-    background:#e6e9f5;
+    background:var(--navy-tint);
     color:#272f54;
     font-size:18px;
     display:flex;
@@ -350,7 +357,7 @@ body,html{
     margin:0;
     font-size:15px;
     font-weight:700;
-    color:#1c2442;                       /* was #FFA500 */
+    color:var(--primary-dark-blue);
     display:flex;
     flex-wrap:wrap;
     align-items:center;
@@ -360,7 +367,7 @@ body,html{
 .listing p{
     margin:4px 0;
     font-size:12px;                      /* was 13px */
-    color:#4a5073;
+    color:var(--primary-dark-blue);
 }
 
 .listing-header + p::before{             /* clock icon before "Opens daily" */
@@ -371,7 +378,7 @@ body,html{
 }
 
 .distance{
-    color:#4a5073;                       /* was #FFD700 */
+    color:var(--primary-dark-blue);                       /* was #FFD700 */
     font-size:12px;
     display:flex;
     align-items:center;
@@ -379,7 +386,7 @@ body,html{
 
 .distance i{
     margin-right:6px;
-    color:#ff673a;
+    color:var(--accent);
 }
 
 .icons{
@@ -395,7 +402,7 @@ body,html{
     display:flex;
     align-items:center;
     justify-content:center;
-    background:#e6e9f5;
+    background:var(--navy-tint);
     color:#272f54;
     cursor:pointer;
     font-size:14px;
@@ -403,16 +410,16 @@ body,html{
 }
 
 .icons i:hover{
-    background:#d5daee;
+    background: var(--navy-soft);
 }
 
 .icons i:last-child{                     /* directions button */
-    background:#ff673a;
+    background:var(--accent);
     color:#fff;
 }
 
 .icons i:last-child:hover{
-    background:#e4572e;
+    background:var(--gradient-end);
 }
 
 .phone-dropdown{
@@ -548,11 +555,11 @@ body,html{
     font-weight:700;
     letter-spacing:0.12em;
     text-transform:uppercase;
-    color:#ff673a;
+    color:var(--accent);
 }
 /* ABOUT US */
 .about-section{
-    background:#0f2050;                 /* was orange gradient */
+    background:var(--navy-deep);                 /* was orange gradient */
     padding:96px 0 0 0;                 /* was 60px 0 0 0 */
     position: relative;
     overflow: hidden;
@@ -575,7 +582,7 @@ body,html{
     width:48px;
     height:4px;
     border-radius:4px;
-    background:#ff673a;
+    background:var(--accent);
 }
 
 .about-title{
@@ -585,14 +592,14 @@ body,html{
     color:#fff;
 }
 
-.about-title span{ color:#ff673a; }
+.about-title span{ color:var(--accent); }
 
 .about-text{
     max-width:640px;
     margin:0;                           /* was 0 auto 40px auto */
     line-height:1.9;
     text-align:left;
-    color:#e6e9f5;
+    color: var(--navy-soft);
     font-weight:400;
     font-size:1.1rem;                   /* was 1rem */
     /* removed: background, padding, border-radius, backdrop-filter */
@@ -611,17 +618,17 @@ body,html{
     width:80px;
     height:80px;
     flex-shrink:0;
-    border:2px solid #ff673a;
+    border:2px solid var(--accent);
     border-radius:50%;
     display:flex;
     align-items:center;
     justify-content:center;
-    color:#ff673a;
+    color:var(--accent);
     font-size:30px;
 }
 
 .about-pillar > div{
-    border-left:2px solid #ff673a;
+    border-left:2px solid var(--accent);
     padding-left:20px;
 }
 
@@ -635,7 +642,7 @@ body,html{
 .about-pillar p{
     margin:0;
     font-size:1.05rem;
-    color:#aeb8dc;
+    color:var(--navy-soft);
 }
 
 .about-info-bar{
@@ -665,7 +672,7 @@ body,html{
     color:#fff;
 }
 
-.about-brand strong span{ color:#ff673a; }
+.about-brand strong span{ color:var(--accent); }
 
 .about-brand small{
     display:block;
@@ -673,7 +680,7 @@ body,html{
     font-size:0.75rem;
     letter-spacing:0.35em;
     text-transform:uppercase;
-    color:#aeb8dc;
+    color: var(--navy-soft);
 }
 
 .about-col{
@@ -687,7 +694,7 @@ body,html{
     font-weight:700;
     letter-spacing:0.2em;
     text-transform:uppercase;
-    color:#ff673a;
+    color:var(--accent);
 }
 
 .about-col p{
