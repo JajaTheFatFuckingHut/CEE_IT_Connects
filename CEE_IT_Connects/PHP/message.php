@@ -806,33 +806,6 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
             cursor: default;
         }
 
-        /* people icon + chevron on desktop only (tablet/mobile keep the letter bubbles) */
-        @media (min-width: 1025px) {
-            .room-item {
-                display: flex;
-                align-items: center;
-                gap: 14px;
-            }
-
-            .room-item::before {
-                content: "\f0c0";
-                font-family: "Font Awesome 6 Free";
-                font-weight: 900;
-                width: 22px;
-                text-align: center;
-                font-size: 16px;
-            }
-
-            .room-item::after {
-                content: "\f054";
-                font-family: "Font Awesome 6 Free";
-                font-weight: 900;
-                font-size: 11px;
-                margin-left: auto;
-                color: #9aa3bd;
-            }
-        }
-
         /* MAIN */
         .main {
             margin-left: 240px;
@@ -897,24 +870,6 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
             font-size: 14px;
             margin: 0;
         }
-
-        @media (max-width: 768px) {
-            .pg-header {
-                padding: 16px 18px;
-            }
-
-            .pg-header-icon {
-                width: 48px;
-                height: 48px;
-                min-width: 48px;
-                font-size: 1.1rem;
-            }
-
-            .pg-header h2 {
-                font-size: 20px;
-            }
-        }
-
         /* addtl e */
 
         /* CHAT DESIGN */
@@ -1131,7 +1086,7 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
         .room-initial {
             display: none;
         }
-/* 
+
         .ojt-week-block {
             background: #fafafa;
             border-radius: 10px;
@@ -1157,7 +1112,7 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
 
         .ojt-table td {
             padding: 4px;
-        }*/
+        }
 
         .ojt-table input[type="date"],
         .ojt-table input[type="time"],
@@ -1176,7 +1131,7 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
             border-color: #2563eb;
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
         }
-/* 
+
         .ojt-group {
             background: rgb(185, 186, 237);
             border: 1px solid #e5e7eb;
@@ -1207,7 +1162,7 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
             border-radius: 999px;
             font-size: 13px;
             font-weight: 600;
-        } */
+        }
 
         .ojt-week-header {
             display: flex;
@@ -1760,61 +1715,49 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
             /* pointer-events: none; */
         }
 
+        /* people icon + chevron on desktop only (tablet/mobile keep the letter bubbles) */
+        @media (min-width: 1025px) {
+            .room-item {
+                display: flex;
+                align-items: center;
+                gap: 14px;
+            }
+
+            .room-item::before {
+                content: "\f0c0";
+                font-family: "Font Awesome 6 Free";
+                font-weight: 900;
+                width: 22px;
+                text-align: center;
+                font-size: 16px;
+            }
+
+            .room-item::after {
+                content: "\f054";
+                font-family: "Font Awesome 6 Free";
+                font-weight: 900;
+                font-size: 11px;
+                margin-left: auto;
+                color: #9aa3bd;
+            }
+
+            .chat-container {
+                display: flex;
+            }
+
+            .message-area {
+                flex: 1;
+            }
+
+            .profile-sidebar {
+                width: 300px;
+                border-left: 1px solid #eee;
+                background: #fff;
+            }
+        }
+
         /* ── mobile tweaks ── */
         @media (max-width: 768px) {
-            .rc-wrap {
-                margin: -15px;
-                height: calc(100vh - 70px);
-            }
-
-            .rc-list {
-                width: 100%;
-                position: absolute;
-                z-index: 10;
-                height: 100%;
-                transition: transform .3s ease;
-            }
-
-            .rc-list.slide-out {
-                transform: translateX(-100%);
-            }
-
-            .rc-panel {
-                width: 100%;
-            }
-
-            .rc-mobile-back {
-                display: flex !important;
-                align-items: center;
-                gap: 10px;
-                padding: 12px 16px;
-                border-bottom: 1px solid #eee;
-                background: #fff;
-                flex-shrink: 0;
-            }
-
-            .rc-mobile-back button {
-                background: none;
-                border: none;
-                font-size: 1.1rem;
-                color: #ff6b2c;
-                cursor: pointer;
-                padding: 0;
-            }
-
-            .rc-mobile-back span {
-                font-weight: 700;
-                font-size: 14px;
-            }
-        }
-
-        .rc-mobile-back {
-            display: none;
-        }
-
-
-        @media (max-width: 768px) {
-
             .sidebar {
                 width: 60px;
                 padding: 10px 0;
@@ -2035,6 +1978,83 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                 color: #ff6b2c;
                 cursor: pointer;
             }
+
+            .rc-wrap {
+                margin: -15px;
+                height: calc(100vh - 70px);
+            }
+
+            .rc-list {
+                width: 100%;
+                position: absolute;
+                z-index: 10;
+                height: 100%;
+                transition: transform .3s ease;
+            }
+
+            .rc-list.slide-out {
+                transform: translateX(-100%);
+            }
+
+            .rc-panel {
+                width: 100%;
+            }
+
+            .rc-mobile-back {
+                display: flex !important;
+                align-items: center;
+                gap: 10px;
+                padding: 12px 16px;
+                border-bottom: 1px solid #eee;
+                background: #fff;
+                flex-shrink: 0;
+            }
+
+            .rc-mobile-back button {
+                background: none;
+                border: none;
+                font-size: 1.1rem;
+                color: #ff6b2c;
+                cursor: pointer;
+                padding: 0;
+            }
+
+            .rc-mobile-back span {
+                font-weight: 700;
+                font-size: 14px;
+            }
+
+            .hm-meter {
+                width: 100%;
+                flex-basis: 100%;
+            }
+
+            .hm-step {
+                flex-wrap: wrap;
+            }
+
+            .hm-text {
+                flex-basis: calc(100% - 60px);
+            }
+
+            .pg-header {
+                padding: 16px 18px;
+            }
+
+            .pg-header-icon {
+                width: 48px;
+                height: 48px;
+                min-width: 48px;
+                font-size: 1.1rem;
+            }
+
+            .pg-header h2 {
+                font-size: 20px;
+            }
+        }
+
+        .rc-mobile-back {
+            display: none;
         }
 
         /* =========================
@@ -2242,23 +2262,6 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                 align-items: center;
                 gap: 6px;
                 font-size: 1rem;
-            }
-        }
-
-        @media (min-width: 1025px) {
-
-            .chat-container {
-                display: flex;
-            }
-
-            .message-area {
-                flex: 1;
-            }
-
-            .profile-sidebar {
-                width: 300px;
-                border-left: 1px solid #eee;
-                background: #fff;
             }
         }
 
@@ -2763,21 +2766,6 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
         .hm-room-go {
             font-size: 12px;
             color: #9aa3bd;
-        }
-
-        @media (max-width: 768px) {
-            .hm-meter {
-                width: 100%;
-                flex-basis: 100%;
-            }
-
-            .hm-step {
-                flex-wrap: wrap;
-            }
-
-            .hm-text {
-                flex-basis: calc(100% - 60px);
-            }
         }
 
         /* Home polish */
@@ -4101,7 +4089,6 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                                     value="<?= htmlspecialchars($student['supervisor_name'] ?? '') ?>" readonly>
                             </div>
                         </div>
-                        <?= var_dump($current_room_id) ?>
                         <!-- Rating legend -->
                         <div
                             style="background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:12px 18px;margin-bottom:20px;font-size:13px;">
