@@ -613,6 +613,7 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
             border: 1px solid var(--c-line);
             border-radius: 10px;
             transition: border-color .15s, background .15s;
+            overflow: hidden;
         }
 
         #calendar .tc-day.empty {
@@ -673,8 +674,9 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
         }
 
         #calendar .tc-susp b {
-            display: block;
-            letter-spacing: .08em;
+            letter-spacing: .02em;
+            font-size: .6rem;
+            overflow-wrap: anywhere;
         }
 
         #calendar .tc-susp span {
@@ -994,7 +996,7 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                         .map(k => `<div class="tc-susp-item"><b>${MONTHS[month].slice(0, 3)} ${parseInt(k.slice(8), 10)}</b> · ${esc(susp[k] || 'Suspended')}</div>`)
                         .join('');
                 }
-                
+
                 readout.textContent = `${MONTHS[month].slice(0, 3).toUpperCase()} // ${year}`;
             }
 
