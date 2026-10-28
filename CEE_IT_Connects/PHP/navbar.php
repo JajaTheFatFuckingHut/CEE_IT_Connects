@@ -600,6 +600,45 @@ function timeAgo($datetime)
             }
         }
 
+        @media (max-width: 991.98px) {
+            .navbar-brand {
+                min-width: 0;
+                margin-right: 8px;
+            }
+
+            .nav-logo {
+                flex-shrink: 0;
+            }
+
+            .brand-text {
+                min-width: 0;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            .navbar-icons {
+                flex: 0 0 auto;
+                padding-right: 0;
+                gap: 12px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .brand-text {
+                font-size: 15px;
+                letter-spacing: 0;
+            }
+
+            .nav-logo {
+                height: 36px;
+            }
+
+            #mobileMenuToggle {
+                padding: 0;
+            }
+        }
+
         .hg-hero{display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,#272f54,#33448f);color:#fff;border-radius:14px;padding:18px 20px;border-left:4px solid #FFB62F;margin-bottom:18px}
         .hg-hero-icon{width:46px;height:46px;border-radius:12px;background:rgba(255,255,255,.14);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
         .hg-hero-title{font-size:17px;font-weight:700}
