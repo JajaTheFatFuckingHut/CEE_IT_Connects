@@ -1291,9 +1291,8 @@ $backLink = getDashboardByRole($_SESSION['role']);
         }
 
                 /* ── ROOM PAGE: phones ── */
-        @media (max-width: 576px) {
+        /* @media (max-width: 576px) {
 
-            /* hero */
             .rm-hero {
                 padding: 14px;
                 gap: 12px;
@@ -1313,7 +1312,6 @@ $backLink = getDashboardByRole($_SESSION['role']);
                 padding: 3px 10px;
             }
 
-            /* progress ring on the left, hours on the right */
             .rm-hero-right .text-end .text-end {
                 display: flex;
                 align-items: center;
@@ -1336,7 +1334,6 @@ $backLink = getDashboardByRole($_SESSION['role']);
 
             .rm-hero-right .text-end small { font-size: 13px; }
 
-            /* adviser and admin: Members and Posts counts side by side */
             .rm-hero-right { gap: 8px; }
 
             .rm-count {
@@ -1345,14 +1342,12 @@ $backLink = getDashboardByRole($_SESSION['role']);
                 padding: 8px 10px;
             }
 
-            /* HTE adviser: View MOU buttons (overrides the inline style) */
             .rm-hero-right .btn-update {
                 width: 100% !important;
                 padding: 10px 16px !important;
                 font-size: 14px !important;
             }
 
-            /* tabs */
             .rm-tabs {
                 gap: 18px;
                 margin: 12px 0;
@@ -1364,7 +1359,6 @@ $backLink = getDashboardByRole($_SESSION['role']);
                 white-space: nowrap;
             }
 
-            /* updates */
             .rm-card { padding: 14px; }
             .rm-post-body { font-size: 13.5px; }
             .rm-composer textarea { min-width: 0; }
@@ -1382,7 +1376,6 @@ $backLink = getDashboardByRole($_SESSION['role']);
             .rm-hint { text-align: center; }
             .rm-dr span:last-child { overflow-wrap: anywhere; }
 
-            /* members toolbar */
             .rm-search {
                 flex: 1 1 100%;
                 max-width: none;
@@ -1406,7 +1399,6 @@ $backLink = getDashboardByRole($_SESSION['role']);
                 flex: 1;
             }
 
-            /* member cards: avatar, then name and details, with the role pill underneath */
             .rm-mgrid { grid-template-columns: minmax(0, 1fr); }
 
             .rm-mcard {
@@ -1427,9 +1419,65 @@ $backLink = getDashboardByRole($_SESSION['role']);
 
             .rm-remove-form { top: 4px; right: 4px; }
 
-            /* add participant modal */
             #addParticipantModal .participant-info { min-width: 0; }
             #addParticipantModal .participant-info small { overflow-wrap: anywhere; }
+        } */
+
+                /* ── ROOM PAGE: compact hero on phones ── */
+        @media (max-width: 576px) {
+
+            .rm-hero {
+                gap: 10px;
+                padding: 14px 14px 12px;
+            }
+
+            .rm-hero h5 {
+                font-size: 20px;
+                margin-bottom: 4px;
+            }
+
+            /* chips become one quiet line: BSIT 4-5 · S.Y. 2026-2027 · Norma Castillo */
+            .rm-chips { gap: 2px 0; }
+
+            .rm-chip {
+                padding: 0;
+                background: none;
+                font-size: 12.5px;
+                color: rgba(255, 255, 255, .8);
+            }
+
+            .rm-chip i { display: none; }
+
+            .rm-chip + .rm-chip::before {
+                content: "·";
+                margin: 0 8px;
+                font-weight: 700;
+            }
+
+            /* progress / counts get their own divided row */
+            .rm-hero-right {
+                padding-top: 10px;
+                border-top: 1px solid rgba(255, 255, 255, .15);
+            }
+
+            .circle-progress {
+                width: 46px;
+                height: 46px;
+            }
+
+            .circle-progress span {
+                width: 36px;
+                height: 36px;
+                font-size: 10px;
+            }
+
+            .rm-hero-right .text-end small {
+                font-size: 13px;
+                font-weight: 600;
+            }
+
+            /* "Room details" repeats what the hero already shows */
+            .rm-grid > .rm-col:last-child > .rm-card:first-child { display: none; }
         }
 
         /* addtl e */
