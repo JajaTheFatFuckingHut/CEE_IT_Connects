@@ -1288,6 +1288,45 @@ $backLink = getDashboardByRole($_SESSION['role']);
             .rm-composer-foot {
                 padding-left: 0;
             }
+
+            .rm-hero:has(.circle-progress) {
+                flex-direction: row;
+                flex-wrap: nowrap;
+                align-items: center;
+                justify-content: space-between;
+            }
+
+            .rm-hero:has(.circle-progress) > div:first-child {
+                flex: 1;
+                min-width: 0;
+                width: auto;
+            }
+
+            .rm-hero:has(.circle-progress) .rm-hero-right {
+                width: auto;
+                flex-shrink: 0;
+                padding-top: 0;
+                border-top: none;
+            }
+
+            .circle-progress {
+                width: 60px;
+                height: 60px;
+                margin: 0 auto 4px;
+            }
+
+            .circle-progress span {
+                width: 46px;
+                height: 46px;
+            }
+
+            .rm-hero-right .text-end small {
+                display: block;
+                text-align: center;
+                white-space: nowrap;
+                font-size: 13px;
+                font-weight: 600;
+            }
         }
 
                 /* ── ROOM PAGE: phones ── */
@@ -1437,7 +1476,15 @@ $backLink = getDashboardByRole($_SESSION['role']);
             }
 
             /* chips become one quiet line: BSIT 4-5 · S.Y. 2026-2027 · Norma Castillo */
-            .rm-chips { gap: 2px 0; }
+            .rm-chips {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 2px;
+            }
+
+            .rm-chip + .rm-chip::before {
+                content: none;
+            }
 
             .rm-chip {
                 padding: 0;
@@ -1624,6 +1671,14 @@ $backLink = getDashboardByRole($_SESSION['role']);
         #addParticipantModal .modal-footer .btn-light {
             padding: 8px 16px;
             border-radius: 8px;
+        }
+
+        @media (min-width: 577px) and (max-width: 992px) {
+            .rm-grid > .rm-col:last-child {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                align-items: start;
+            }
         }
     </style>
 </head>
