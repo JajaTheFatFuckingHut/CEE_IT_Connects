@@ -3114,6 +3114,8 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
         /* ── RENDERED HOURS: phones ── */
         @media (max-width: 576px) {
 
+            #hours .main { padding: 12px; }
+
             /* header meta */
             .hrs-meta { flex: 1 1 100%; text-align: left; }
             .hrs-meta-row { justify-content: space-between; }
@@ -3131,13 +3133,14 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
 
             .hrs-meta-sub b { white-space: nowrap; }
 
-            /* summary cards: keep the time on one line */
+            /* summary cards */
             #ojt-sum-monthly,
             #ojt-sum-completed,
             #ojt-sum-remaining { white-space: nowrap; }
 
             /* week card */
-            .ojt-week-block { padding: 14px; }
+            .ojt-week-block { padding: 10px; }
+            .ojt-week-header { margin-bottom: 10px; }
             .ojt-week-label[readonly] { font-size: 17px; }
 
             /* DTR: one card per day */
@@ -3152,22 +3155,89 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
             .ojt-table tbody tr:nth-child(even) {
                 display: grid;
                 grid-template-columns: repeat(6, minmax(0, 1fr));
-                gap: 10px 8px;
-                padding: 12px;
+                gap: 8px 6px;
+                align-items: center;
+                padding: 10px;
                 margin-bottom: 10px;
                 background: #fff;
                 border: 1px solid #e8ebf3;
                 border-radius: 12px;
             }
 
-            .ojt-table tbody td {
+            .ojt-table tbody tr:last-child { margin-bottom: 0; }
+
+            .ojt-table tbody td,
+            .ojt-table tbody td.td-morning,
+            .ojt-table tbody td.td-afternoon {
                 display: block;
                 min-width: 0 !important;
-                padding: 0;
+                padding: 0 !important;
                 text-align: left !important;
+                background: transparent;
             }
 
-            .ojt-table tbody td::before {
+            /* placement */
+            .ojt-table tbody td:nth-child(2)  { grid-row: 1; grid-column: 1; }
+            .ojt-table tbody td:nth-child(1)  { grid-row: 1; grid-column: 2 / span 3; }
+            .ojt-table tbody td:nth-child(10) { grid-row: 1; grid-column: 5 / span 2; justify-self: end; }
+            .ojt-table tbody td:nth-child(5)  { grid-row: 2; grid-column: 1 / -1; }
+            .ojt-table tbody td:nth-child(3)  { grid-row: 3; grid-column: 1 / span 3; }
+            .ojt-table tbody td:nth-child(4)  { grid-row: 3; grid-column: 4 / span 3; }
+            .ojt-table tbody td:nth-child(8)  { grid-row: 4; grid-column: 1 / -1; }
+            .ojt-table tbody td:nth-child(6)  { grid-row: 5; grid-column: 1 / span 3; }
+            .ojt-table tbody td:nth-child(7)  { grid-row: 5; grid-column: 4 / span 3; }
+            .ojt-table tbody td:nth-child(9)  { grid-row: 6; grid-column: 1 / -1; }
+
+            /* Morning / Afternoon / Daily total lines */
+            .ojt-table tbody td:nth-child(5),
+            .ojt-table tbody td:nth-child(8),
+            .ojt-table tbody td:nth-child(9) {
+                display: flex;
+                justify-content: space-between;
+                align-items: baseline;
+            }
+
+            .ojt-table tbody td:nth-child(8) { margin-top: 4px; }
+
+            .ojt-table tbody td:nth-child(9) {
+                margin-top: 2px;
+                padding-top: 8px !important;
+                border-top: 1px dashed #e3e7ef;
+            }
+
+            .ojt-table tbody td:nth-child(5)::before { content: "Morning"; }
+            .ojt-table tbody td:nth-child(8)::before { content: "Afternoon"; }
+            .ojt-table tbody td:nth-child(9)::before { content: "Daily total"; }
+
+            .ojt-table tbody td:nth-child(5)::before,
+            .ojt-table tbody td:nth-child(8)::before,
+            .ojt-table tbody td:nth-child(9)::before {
+                font-size: 11px;
+                font-weight: 600;
+                letter-spacing: .05em;
+                text-transform: uppercase;
+                color: #8b93ab;
+            }
+
+            .ojt-table tbody td:nth-child(5) .ojt-hrs-val,
+            .ojt-table tbody td:nth-child(8) .ojt-hrs-val,
+            .ojt-table tbody td:nth-child(9) .ojt-daily-val {
+                font-size: 14px;
+                font-weight: 600;
+                color: #1f2a55;
+            }
+
+            /* In / Out captions */
+            .ojt-table tbody td:nth-child(3)::before,
+            .ojt-table tbody td:nth-child(6)::before { content: "In"; }
+
+            .ojt-table tbody td:nth-child(4)::before,
+            .ojt-table tbody td:nth-child(7)::before { content: "Out"; }
+
+            .ojt-table tbody td:nth-child(3)::before,
+            .ojt-table tbody td:nth-child(4)::before,
+            .ojt-table tbody td:nth-child(6)::before,
+            .ojt-table tbody td:nth-child(7)::before {
                 display: block;
                 margin-bottom: 3px;
                 font-size: 10px;
@@ -3177,35 +3247,28 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                 color: #8b93ab;
             }
 
-            .ojt-table tbody td:nth-child(1)::before  { content: "Date"; }
-            .ojt-table tbody td:nth-child(2)::before  { content: "Day"; }
-            .ojt-table tbody td:nth-child(3)::before  { content: "Morning in"; }
-            .ojt-table tbody td:nth-child(4)::before  { content: "Morning out"; }
-            .ojt-table tbody td:nth-child(5)::before  { content: "Morning"; }
-            .ojt-table tbody td:nth-child(6)::before  { content: "Afternoon in"; }
-            .ojt-table tbody td:nth-child(7)::before  { content: "Afternoon out"; }
-            .ojt-table tbody td:nth-child(8)::before  { content: "Afternoon"; }
-            .ojt-table tbody td:nth-child(9)::before  { content: "Daily"; }
-            .ojt-table tbody td:nth-child(10)::before { content: "Status"; }
-
-            .ojt-table tbody td:nth-child(1)  { grid-row: 1; grid-column: 1 / span 4; }
-            .ojt-table tbody td:nth-child(2)  { grid-row: 1; grid-column: 5 / span 2; text-align: right !important; }
-            .ojt-table tbody td:nth-child(3)  { grid-row: 2; grid-column: 1 / span 3; }
-            .ojt-table tbody td:nth-child(4)  { grid-row: 2; grid-column: 4 / span 3; }
-            .ojt-table tbody td:nth-child(6)  { grid-row: 3; grid-column: 1 / span 3; }
-            .ojt-table tbody td:nth-child(7)  { grid-row: 3; grid-column: 4 / span 3; }
-            .ojt-table tbody td:nth-child(5)  { grid-row: 4; grid-column: 1 / span 2; }
-            .ojt-table tbody td:nth-child(8)  { grid-row: 4; grid-column: 3 / span 2; }
-            .ojt-table tbody td:nth-child(9)  { grid-row: 4; grid-column: 5 / span 2; }
-            .ojt-table tbody td:nth-child(10) { grid-row: 5; grid-column: 1 / span 6; }
-
+            /* inputs */
             .ojt-table tbody td input[type="date"],
             .ojt-table tbody td input[type="time"] {
                 width: 100%;
-                padding: 8px;
+                height: 38px;
+                padding: 6px;
                 font-size: 13px;
+                text-align: left;
                 border: 1px solid #e3e7ef;
+                border-radius: 8px;
                 background: #fff;
+            }
+
+            .ojt-day-badge { font-size: 12px; font-weight: 600; }
+
+            /* status pill (its colors come from the inline style your JS sets) */
+            .ojt-status-badge {
+                padding: 3px 10px;
+                font-size: 11.5px;
+                font-weight: 600;
+                background: #f1f3f8;
+                color: #6b7390;
             }
         }
 
