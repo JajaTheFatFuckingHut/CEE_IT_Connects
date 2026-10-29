@@ -3100,14 +3100,15 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
 
         /* ── DTR table: tablet scroll with pinned Date column ── */
         @media (min-width: 577px) {
-            .ojt-table th:first-child,
-            .ojt-table td:first-child {
+            .ojt-table thead tr:first-child th:first-child,
+            .ojt-table tbody td:first-child {
                 position: sticky;
                 left: 0;
-                z-index: 1;
+                box-shadow: 1px 0 0 #e3e7ef;
             }
 
-            .ojt-table tbody td:first-child { background: #fff; }
+            .ojt-table thead tr:first-child th:first-child { z-index: 3; }
+            .ojt-table tbody td:first-child { z-index: 2; background: #fff; }
             .ojt-table tbody tr:nth-child(even) td:first-child { background: #f8f9fc; }
         }
 
