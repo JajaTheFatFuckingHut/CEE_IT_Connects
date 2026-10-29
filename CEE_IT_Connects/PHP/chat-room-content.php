@@ -1455,25 +1455,50 @@ $backLink = getDashboardByRole($_SESSION['role']);
             }
 
             /* progress / counts get their own divided row */
-            .rm-hero-right {
-                padding-top: 10px;
-                border-top: 1px solid rgba(255, 255, 255, .15);
+            /* title block on the left, progress circle on the far right */
+            .rm-hero:has(.circle-progress) {
+                flex-direction: row;
+                flex-wrap: nowrap;
+                align-items: center;
+                justify-content: space-between;
+            }
+
+            .rm-hero:has(.circle-progress) > div:first-child {
+                flex: 1;
+                min-width: 0;
+            }
+
+            .rm-hero:has(.circle-progress) .rm-hero-right {
+                width: auto;
+                flex-shrink: 0;
+                padding-top: 0;
+                border-top: none;
             }
 
             .circle-progress {
-                width: 46px;
-                height: 46px;
+                width: 52px;
+                height: 52px;
+                margin: 0 auto 4px;   /* centered above the hours text */
             }
 
             .circle-progress span {
-                width: 36px;
-                height: 36px;
+                width: 40px;
+                height: 40px;
                 font-size: 10px;
             }
 
             .rm-hero-right .text-end small {
-                font-size: 13px;
+                display: block;
+                text-align: center;
+                font-size: 12px;
                 font-weight: 600;
+                white-space: nowrap;
+            }
+
+            /* adviser/admin view (no circle) keeps the divided row */
+            .rm-hero:not(:has(.circle-progress)) .rm-hero-right {
+                padding-top: 10px;
+                border-top: 1px solid rgba(255, 255, 255, .15);
             }
 
             /* "Room details" repeats what the hero already shows */
@@ -1713,8 +1738,7 @@ $rmFmtTime = function ($ts): string {
                         <?= htmlspecialchars($room['school_year']) ?></span>
                 <?php endif; ?>
             <?php elseif (!empty($room['section'])): ?>
-                <span class="rm-chip"><i class="fa-solid fa-graduation-cap"></i>
-                    <?= htmlspecialchars($rmClassLabel) ?></span>
+                
                 <?php if (!empty($room['school_year'])): ?>
                     <span class="rm-chip"><i class="fa-solid fa-calendar"></i> S.Y.
                         <?= htmlspecialchars($room['school_year']) ?></span>
