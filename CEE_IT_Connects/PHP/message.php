@@ -3069,6 +3069,153 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
             .hm-stats > [class*="col-"]:first-child { display: none; }
             .hm-stats > [class*="col-"] { width: 50%; }
         }
+
+                /* ── RENDERED HOURS: header meta ── */
+        .hrs-meta { text-align: right; }
+
+        .hrs-meta-row {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .hrs-meta-label { font-size: 15px; font-weight: 500; color: #555; }
+        .hrs-meta-value { font-size: 16px; font-weight: 700; color: #272f54; }
+
+        .hrs-meta-office {
+            display: flex;
+            align-items: flex-start;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 4px;
+            font-size: 13px;
+            color: #64748b;
+            text-align: left;
+        }
+
+        .hrs-meta-office > i { color: #f26b3a; margin-top: 3px; }
+        .hrs-meta-office b { color: #272f54; }
+        .hrs-meta-sub { display: block; }
+
+        /* ── DTR table: tablet scroll with pinned Date column ── */
+        @media (min-width: 577px) {
+            .ojt-table th:first-child,
+            .ojt-table td:first-child {
+                position: sticky;
+                left: 0;
+                z-index: 1;
+            }
+
+            .ojt-table tbody td:first-child { background: #fff; }
+            .ojt-table tbody tr:nth-child(even) td:first-child { background: #f8f9fc; }
+        }
+
+        /* ── RENDERED HOURS: phones ── */
+        @media (max-width: 576px) {
+
+            /* header meta */
+            .hrs-meta { flex: 1 1 100%; text-align: left; }
+            .hrs-meta-row { justify-content: space-between; }
+            .hrs-meta-label { font-size: 13px; }
+            .hrs-meta-value { font-size: 15px; }
+
+            .hrs-meta-office {
+                justify-content: flex-start;
+                margin-top: 8px;
+                padding: 8px 10px;
+                background: rgba(255, 255, 255, .65);
+                border-radius: 10px;
+                font-size: 12px;
+            }
+
+            .hrs-meta-sub b { white-space: nowrap; }
+
+            /* summary cards: keep the time on one line */
+            #ojt-sum-monthly,
+            #ojt-sum-completed,
+            #ojt-sum-remaining { white-space: nowrap; }
+
+            /* week card */
+            .ojt-week-block { padding: 14px; }
+            .ojt-week-label[readonly] { font-size: 17px; }
+
+            /* DTR: one card per day */
+            .ojt-table-scroll { overflow: visible; border: none; }
+
+            .ojt-table,
+            .ojt-table tbody { display: block; min-width: 0; }
+
+            .ojt-table thead { display: none; }
+
+            .ojt-table tbody tr,
+            .ojt-table tbody tr:nth-child(even) {
+                display: grid;
+                grid-template-columns: repeat(6, minmax(0, 1fr));
+                gap: 10px 8px;
+                padding: 12px;
+                margin-bottom: 10px;
+                background: #fff;
+                border: 1px solid #e8ebf3;
+                border-radius: 12px;
+            }
+
+            .ojt-table tbody td {
+                display: block;
+                min-width: 0 !important;
+                padding: 0;
+                text-align: left !important;
+            }
+
+            .ojt-table tbody td::before {
+                display: block;
+                margin-bottom: 3px;
+                font-size: 10px;
+                font-weight: 600;
+                letter-spacing: .05em;
+                text-transform: uppercase;
+                color: #8b93ab;
+            }
+
+            .ojt-table tbody td:nth-child(1)::before  { content: "Date"; }
+            .ojt-table tbody td:nth-child(2)::before  { content: "Day"; }
+            .ojt-table tbody td:nth-child(3)::before  { content: "Morning in"; }
+            .ojt-table tbody td:nth-child(4)::before  { content: "Morning out"; }
+            .ojt-table tbody td:nth-child(5)::before  { content: "Morning"; }
+            .ojt-table tbody td:nth-child(6)::before  { content: "Afternoon in"; }
+            .ojt-table tbody td:nth-child(7)::before  { content: "Afternoon out"; }
+            .ojt-table tbody td:nth-child(8)::before  { content: "Afternoon"; }
+            .ojt-table tbody td:nth-child(9)::before  { content: "Daily"; }
+            .ojt-table tbody td:nth-child(10)::before { content: "Status"; }
+
+            .ojt-table tbody td:nth-child(1)  { grid-row: 1; grid-column: 1 / span 4; }
+            .ojt-table tbody td:nth-child(2)  { grid-row: 1; grid-column: 5 / span 2; text-align: right !important; }
+            .ojt-table tbody td:nth-child(3)  { grid-row: 2; grid-column: 1 / span 3; }
+            .ojt-table tbody td:nth-child(4)  { grid-row: 2; grid-column: 4 / span 3; }
+            .ojt-table tbody td:nth-child(6)  { grid-row: 3; grid-column: 1 / span 3; }
+            .ojt-table tbody td:nth-child(7)  { grid-row: 3; grid-column: 4 / span 3; }
+            .ojt-table tbody td:nth-child(5)  { grid-row: 4; grid-column: 1 / span 2; }
+            .ojt-table tbody td:nth-child(8)  { grid-row: 4; grid-column: 3 / span 2; }
+            .ojt-table tbody td:nth-child(9)  { grid-row: 4; grid-column: 5 / span 2; }
+            .ojt-table tbody td:nth-child(10) { grid-row: 5; grid-column: 1 / span 6; }
+
+            .ojt-table tbody td input[type="date"],
+            .ojt-table tbody td input[type="time"] {
+                width: 100%;
+                padding: 8px;
+                font-size: 13px;
+                border: 1px solid #e3e7ef;
+                background: #fff;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .hrs-card { padding: 10px 8px; }
+
+            #ojt-sum-monthly,
+            #ojt-sum-completed,
+            #ojt-sum-remaining { font-size: 16px; }
+        }
     </style>
 </head>
 
@@ -3790,19 +3937,34 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                     $schedIn = $fmtSched($ojtTimeIn);
                     $schedOut = $fmtSched($ojtTimeOut);
                     ?>
-                    <div class="text-end">
+                    <!-- <div class="text-end">
                         <div class="d-flex align-items-center justify-content-end gap-2">
                             <label style="font-size:15px; color:#555; font-weight:500; margin:0;">OJT Hours
                                 Required:</label>
-                            <span style="font-size:16px; font-weight:700; color:#272f54;"><?= $requiredHours ?> hrs</span>
+                            <span style="font-size:16px; font-weight:700; color:#272f54;"> hrs</span>
                         </div>
                         <div style="font-size:13px; color:#64748b; margin-top:4px;">
                             <i class="fa-solid fa-clock" style="color:#f26b3a;"></i>
-                            <b style="color:#272f54;"><?= htmlspecialchars($student['company_name'] ?? 'No company') ?></b>
+                            <b style="color:#272f54;"></b>
                             office hours:
                             <b style="color:#272f54;">
-                                <?= ($schedIn && $schedOut) ? "$schedIn – $schedOut" : 'Not set' ?>
                             </b>
+                        </div>
+                    </div> -->
+
+                    <div class="hrs-meta">
+                        <div class="hrs-meta-row">
+                            <span class="hrs-meta-label">OJT hours required</span>
+                            <span class="hrs-meta-value"><?= $requiredHours ?> hrs</span>
+                        </div>
+                        <div class="hrs-meta-office">
+                            <i class="fa-solid fa-clock"></i>
+                            <div>
+                                <b><?= htmlspecialchars($student['company_name'] ?? 'No company') ?></b>
+                                <span class="hrs-meta-sub">Office hours:
+                                    <b><?= ($schedIn && $schedOut) ? "$schedIn – $schedOut" : 'Not set' ?></b>
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </div>
