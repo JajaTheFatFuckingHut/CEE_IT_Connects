@@ -4300,7 +4300,7 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
             <div class="card shadow-sm rounded-3 p-3 mb-3 d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center justify-content-between gap-3"
                 style="border:1px solid #e5e7eb;">
                 <div class="d-flex align-items-center gap-3">
-                    <div
+                    <div class="flex-shrink-0"
                         style="width:42px;height:42px;border-radius:10px;background:#fde3d8;display:flex;align-items:center;justify-content:center;">
                         <i class="fa-solid fa-file-lines" style="color:#ff6b2c;"></i>
                     </div>
