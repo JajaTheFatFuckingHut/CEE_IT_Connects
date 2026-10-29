@@ -2062,8 +2062,8 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
             .rc-inputbar { padding: 8px 10px; }
             .rc-inputrow { gap: 6px; }
 
-            .has-deact-toast .rc-wrap { padding-top: 52px; }
-            .has-deact-toast .rc-list { top: 52px; height: calc(100% - 52px); }
+            .has-deact-toast .rc-wrap { padding-top: 40px; }
+            .has-deact-toast .rc-list { top: 40px; height: calc(100% - 40px); }
 
             .hm-meter {
                 width: 100%;

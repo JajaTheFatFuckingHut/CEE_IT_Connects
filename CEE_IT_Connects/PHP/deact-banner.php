@@ -19,12 +19,14 @@
                 const mq = window.matchMedia('(max-width: 768px)');
                 const place = () => {
                     if (mq.matches) {
-                        t.style.left = '68px';     // clears the 60px mobile sidebar
+                        t.style.left = 'auto';
                         t.style.right = '8px';
                         t.style.top = '76px';
-                        t.style.maxWidth = 'none';
-                        t.style.fontSize = '11.5px';
-                        t.style.padding = '6px 10px';
+                        t.style.maxWidth = '190px';
+                        t.style.fontSize = '10.5px';
+                        t.style.lineHeight = '1.25';
+                        t.style.padding = '4px 8px';
+                        t.style.borderLeftWidth = '3px';
                     } else {
                         t.style.left = 'auto';
                         t.style.right = '16px';
@@ -32,6 +34,8 @@
                         t.style.maxWidth = '260px';
                         t.style.fontSize = '13px';
                         t.style.padding = '8px 12px';
+                        t.style.lineHeight = '1.3';
+                        t.style.borderLeftWidth = '4px';
                     }
                 };
                 place();
