@@ -242,7 +242,7 @@ function uploadBlock(string $step_key, string $label, array $progress, ?int $int
         .page-wrap {
             max-width: 100%;
             margin: 0 auto;
-            padding: 20px 16px 64px;
+            padding: 0 0 64px;
         }
 
         .page-header {
@@ -707,6 +707,83 @@ function uploadBlock(string $step_key, string $label, array $progress, ?int $int
             .progress-bar-thin {
                 display: none;
             }
+        }
+
+                @media (max-width: 768px) {
+            /* progress summary */
+            .progress-summary {
+                padding: 14px;
+                gap: 12px;
+                margin-bottom: 14px;
+            }
+
+            .progress-ring-wrap,
+            .progress-ring-wrap svg {
+                width: 46px;
+                height: 46px;
+            }
+
+            .ring-pct { font-size: 11px; }
+            .progress-text h3 { font-size: 13.5px; }
+            .progress-text p { font-size: 11.5px; }
+
+            .checklist-note {
+                padding: 10px 12px;
+                font-size: 12px;
+                margin-bottom: 14px;
+            }
+
+            /* rows: icon + title + chevron (N/A pill stays) */
+            .step-header {
+                padding: 12px;
+                gap: 10px;
+            }
+
+            .step-num {
+                width: 28px;
+                height: 28px;
+                font-size: 11px;
+            }
+
+            .step-meta h3 {
+                font-size: 13px;
+                line-height: 1.3;
+                overflow-wrap: anywhere;
+            }
+
+            .step-right { gap: 0; }
+
+            .step-right .pill-done,
+            .step-right .pill-active {
+                display: none;
+            }
+
+            /* expanded content */
+            .step-body { padding: 12px; }
+
+            .info-box {
+                padding: 10px 12px;
+                gap: 8px;
+                font-size: 12.5px;
+            }
+
+            .info-box span { overflow-wrap: anywhere; }
+
+            .action-row .btn-action,
+            .mark-done-block .btn-action {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .doc-row { flex-wrap: wrap; }
+            .doc-row .doc-name { flex: 1 1 100%; }
+
+            .doc-row .btn-action {
+                flex: 1;
+                justify-content: center;
+            }
+
+            .sup-modal-box { padding: 20px; }
         }
     </style>    
 </head>
