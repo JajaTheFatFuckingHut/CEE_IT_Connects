@@ -1290,6 +1290,148 @@ $backLink = getDashboardByRole($_SESSION['role']);
             }
         }
 
+                /* ── ROOM PAGE: phones ── */
+        @media (max-width: 576px) {
+
+            /* hero */
+            .rm-hero {
+                padding: 14px;
+                gap: 12px;
+            }
+
+            .rm-hero > div:first-child { width: 100%; }
+
+            .rm-hero h5 {
+                font-size: 19px;
+                margin-bottom: 8px;
+            }
+
+            .rm-chips { gap: 6px; }
+
+            .rm-chip {
+                font-size: 12px;
+                padding: 3px 10px;
+            }
+
+            /* progress ring on the left, hours on the right */
+            .rm-hero-right .text-end .text-end {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                text-align: left !important;
+            }
+
+            .circle-progress {
+                width: 52px;
+                height: 52px;
+                margin: 0;
+                flex-shrink: 0;
+            }
+
+            .circle-progress span {
+                width: 40px;
+                height: 40px;
+                font-size: 10px;
+            }
+
+            .rm-hero-right .text-end small { font-size: 13px; }
+
+            /* adviser and admin: Members and Posts counts side by side */
+            .rm-hero-right { gap: 8px; }
+
+            .rm-count {
+                flex: 1;
+                min-width: 0;
+                padding: 8px 10px;
+            }
+
+            /* HTE adviser: View MOU buttons (overrides the inline style) */
+            .rm-hero-right .btn-update {
+                width: 100% !important;
+                padding: 10px 16px !important;
+                font-size: 14px !important;
+            }
+
+            /* tabs */
+            .rm-tabs {
+                gap: 18px;
+                margin: 12px 0;
+                overflow-x: auto;
+            }
+
+            .rm-tab {
+                font-size: 13px;
+                white-space: nowrap;
+            }
+
+            /* updates */
+            .rm-card { padding: 14px; }
+            .rm-post-body { font-size: 13.5px; }
+            .rm-composer textarea { min-width: 0; }
+
+            .rm-composer-foot {
+                flex-direction: column-reverse;
+                align-items: stretch;
+            }
+
+            .rm-post-btn {
+                width: 100%;
+                padding: 10px 16px;
+            }
+
+            .rm-hint { text-align: center; }
+            .rm-dr span:last-child { overflow-wrap: anywhere; }
+
+            /* members toolbar */
+            .rm-search {
+                flex: 1 1 100%;
+                max-width: none;
+                min-width: 0;
+            }
+
+            .rm-filters {
+                flex: 1 1 100%;
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                padding-bottom: 2px;
+            }
+
+            .rm-filter {
+                flex-shrink: 0;
+                white-space: nowrap;
+            }
+
+            #memberCount {
+                margin-left: 0 !important;
+                flex: 1;
+            }
+
+            /* member cards: avatar, then name and details, with the role pill underneath */
+            .rm-mgrid { grid-template-columns: minmax(0, 1fr); }
+
+            .rm-mcard {
+                display: grid;
+                grid-template-columns: 38px minmax(0, 1fr);
+                gap: 2px 12px;
+                align-items: center;
+                padding: 12px 36px 12px 12px;
+            }
+
+            .rm-mcard .rm-avatar { grid-row: 1 / span 2; }
+
+            .rm-mcard .rm-pill {
+                grid-column: 2;
+                justify-self: start;
+                margin-top: 4px;
+            }
+
+            .rm-remove-form { top: 4px; right: 4px; }
+
+            /* add participant modal */
+            #addParticipantModal .participant-info { min-width: 0; }
+            #addParticipantModal .participant-info small { overflow-wrap: anywhere; }
+        }
+
         /* addtl e */
 
         /* ── ADD PARTICIPANT (spacing fix) ── */
