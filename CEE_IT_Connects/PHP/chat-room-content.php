@@ -1550,6 +1550,51 @@ $backLink = getDashboardByRole($_SESSION['role']);
 
             /* "Room details" repeats what the hero already shows */
             .rm-grid > .rm-col:last-child > .rm-card:first-child { display: none; }
+
+            .rm-tabs {
+                gap: 0;
+                overflow-x: auto;
+            }
+
+            .rm-tab {
+                flex: 1 1 0;
+                min-width: 0;
+                justify-content: center;
+                gap: 6px;
+                font-size: 13px;
+                white-space: nowrap;
+            }
+
+            .rm-cnt {
+                font-size: 10px;
+                padding: 1px 6px;
+            }
+        }
+
+        /* this mq is for a very narrow screen just in case .. */
+        @media (max-width: 380px) {
+            /* drop the tab icons so the label + count fit */
+            .rm-tab i {
+                display: none;
+            }
+
+            /* the title was wrapping to 3 lines; stack the progress under it instead */
+            .rm-hero:has(.circle-progress) {
+                flex-wrap: wrap;
+            }
+
+            .rm-hero:has(.circle-progress) > div:first-child {
+                flex: 1 1 100%;
+            }
+
+            .rm-hero:has(.circle-progress) .rm-hero-right {
+                width: 100%;
+                justify-content: flex-start;
+            }
+
+            .rm-hero-right .text-end small {
+                text-align: left;
+            }
         }
 
         /* addtl e */
