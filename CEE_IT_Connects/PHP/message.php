@@ -4297,7 +4297,7 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
             </div>
 
             <!-- TEMPLATE DOWNLOAD -->
-            <div class="card shadow-sm rounded-3 p-3 mb-3 d-flex flex-row align-items-center justify-content-between"
+            <div class="card shadow-sm rounded-3 p-3 mb-3 d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center justify-content-between gap-3"
                 style="border:1px solid #e5e7eb;">
                 <div class="d-flex align-items-center gap-3">
                     <div
@@ -4327,8 +4327,7 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
             <form method="POST" action="progress-report-db.php">
                 <input type="hidden" name="room_id" value="<?= htmlspecialchars($current_room_id ?? '') ?>">
 
-                <div class="card shadow-sm rounded-3 p-4" style="border:1px solid #e5e7eb;">
-                    <label for="reportLink" style="font-size:15px; font-weight:bold;">Google Document link</label>
+                <div class="card shadow-sm rounded-3 p-3 p-sm-4" style="border:1px solid #e5e7eb;">                    <label for="reportLink" style="font-size:15px; font-weight:bold;">Google Document link</label>
                     <input type="url" id="reportLink" name="report_link" class="form-control mt-2"
                         value="<?= htmlspecialchars($savedLink) ?>" placeholder="https://docs.google.com/document/d/..."
                         pattern="https://docs\.google\.com/document/.*"
@@ -4337,8 +4336,7 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                         Make sure sharing is set to "Anyone with the link can view" (or that your adviser has access).
                     </div>
 
-                    <button type="submit" class="btn btn-sm fw-semibold mt-3 align-self-start"
-                        style="background:#ff6b2c;color:#fff;border-radius:8px;padding:8px 18px;">
+                    <button type="submit" class="btn btn-sm fw-semibold mt-3 align-self-stretch align-self-sm-start"                        style="background:#ff6b2c;color:#fff;border-radius:8px;padding:8px 18px;">
                         <i class="fa-solid fa-paper-plane me-1"></i> <?= $savedLink ? 'Update Link' : 'Submit Link' ?>
                     </button>
                 </div>
