@@ -595,8 +595,15 @@ function timeAgo($datetime)
             }
 
             .notif-popup {
-                width: 260px;
-                right: -60px;
+                /* width: 260px;
+                right: -60px; */
+
+                position: fixed;
+                top: 70px;
+                left: 8px;
+                right: 8px;
+                width: auto;
+                max-height: calc(100dvh - 70px - 80px);
             }
         }
 
