@@ -847,6 +847,79 @@ foreach ($internships as $loc) {
             justify-content: center;
             width: 100%;
         }
+
+                /* map inside Read More: undo the home-page map card styling from index-style.css */
+        .details-panel .map-section-wrapper {
+            width: 100%;
+            margin: 0;
+            border-radius: 12px;
+            box-shadow: none;
+            background: transparent;
+            opacity: 1;
+            transform: none;
+            animation: none;
+        }
+
+        @media (max-width: 640px) {
+            .details-grid { grid-template-columns: minmax(0, 1fr); }
+        }
+
+        @media (max-width: 576px) {
+            .page-banner { margin: 16px 12px 0; }
+
+            .listing-card {
+                padding: 16px;
+                border-radius: 14px;
+            }
+
+            .card-title { font-size: 1.15rem; }
+            .card-desc { font-size: .85rem; line-height: 1.55; }
+
+            .card-meta { gap: 6px 12px; }
+
+            .card-meta-item {
+                align-items: flex-start;
+                min-width: 0;
+                font-size: .75rem;
+                overflow-wrap: anywhere;
+            }
+
+            .card-meta-item i { margin-top: 3px; }
+
+            /* Read More panel */
+            .details-panel {
+                margin-top: 14px;
+                padding-top: 14px;
+            }
+
+            .details-grid { gap: 12px; }
+
+            .detail-row {
+                flex-direction: column;
+                gap: 2px;
+            }
+
+            .detail-label {
+                min-width: 0;
+                font-size: .7rem;
+                letter-spacing: .06em;
+                text-transform: uppercase;
+                color: var(--muted);
+            }
+
+            .detail-val {
+                min-width: 0;
+                overflow-wrap: anywhere;
+            }
+
+            .internship-map { height: 260px; }
+
+            .internship-map .leaflet-popup-content {
+                max-width: 170px;
+                margin: 10px 12px;
+                font-size: 12px;
+            }
+        }
     </style>
 </head>
 
@@ -889,7 +962,7 @@ foreach ($internships as $loc) {
     </div>
 
     <section class="listing-wrapper">
-        <div class="container-fluid px-5">
+        <div class="container-fluid px-3 px-lg-5">
             <div class="row g-4">
 
                 <!-- ── Sidebar ── -->
