@@ -1783,6 +1783,8 @@ $page = 'messages';
             .dash-stat-icon { width: 36px; height: 36px; min-width: 36px; font-size: 15px; }
             .dash-stat-label { font-size: 10px; }
             .dash-stat-value { font-size: 22px; }
+
+            #docs-availability-table { min-width: 0; }
         }
 
         @media (max-width: 576px) {
@@ -1807,6 +1809,14 @@ $page = 'messages';
             .dash-side-card { padding: 12px 14px; gap: 8px; }
             .dash-side-meta { padding-top: 8px; font-size: 11px; }
             .quick-card-icon { width: 36px; height: 36px; font-size: 14px; }
+
+            #docsSearchInput { width: 100% !important; }
+
+            .sysAdm-header--danger { padding: 16px 18px; }
+            .sysAdm-header-left { gap: 12px; }
+            .sysAdm-header-icon { width: 44px; height: 44px; min-width: 44px; font-size: 1rem; }
+            .sysAdm-header--danger h2 { font-size: 20px; }
+            .sysAdm-header--danger p { font-size: 13px; }
         }
 
         /* addtl e */
@@ -2026,6 +2036,48 @@ $page = 'messages';
             .sidebar a:hover::after {
                 opacity: 1;
             }
+
+            #docs-availability-table thead { display: none; }
+
+            #docs-availability-table,
+            #docs-availability-tbody,
+            #docs-availability-tbody tr,
+            #docs-availability-tbody td { display: block; width: 100%; }
+
+            #docs-availability-tbody tr {
+                padding: 12px 14px;
+                border-bottom: 1px solid #edf2f7;
+            }
+
+            #docs-availability-tbody tr:last-child { border-bottom: none; }
+
+            #docs-availability-tbody td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: 10px;
+                padding: 6px 0;
+                border-bottom: none;
+            }
+
+            /* company name = card title */
+            #docs-availability-tbody td:first-child {
+                padding-bottom: 10px;
+                margin-bottom: 4px;
+                border-bottom: 1px solid #edf2f7;
+            }
+
+            #docs-availability-tbody td[data-label]::before {
+                content: attr(data-label);
+                font-size: 11px;
+                font-weight: 700;
+                color: #64748b;
+                text-transform: uppercase;
+                letter-spacing: .04em;
+            }
+
+            /* keep the "No document availability announced yet" row centered */
+            #docs-availability-tbody td[colspan] { display: block; }
         }
     </style>
 </head>
@@ -2772,9 +2824,9 @@ $page = 'messages';
                                                     <span><?= htmlspecialchars($d['company']) ?></span>
                                                 </div>
                                             </td>
-                                            <td><?= $docPill(!empty($d['mou_available'])) ?></td>
-                                            <td><?= $docPill(!empty($d['recommendation_letter_available'])) ?></td>
-                                            <td><?= $docPill(!empty($d['waiver_available'])) ?></td>
+                                            <td data-label="MOU"><?= $docPill(!empty($d['mou_available'])) ?></td>
+                                            <td data-label="Reco Letter"><?= $docPill(!empty($d['recommendation_letter_available'])) ?></td>
+                                            <td data-label="Waiver"><?= $docPill(!empty($d['waiver_available'])) ?></td>
                                         </tr>
                                     <?php endforeach; ?>
                                 <?php endif; ?>
