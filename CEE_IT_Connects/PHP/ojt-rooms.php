@@ -381,8 +381,7 @@ $page = 'messages';
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OJT Adviser | CEE IT Connects</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">    <title>OJT Adviser | CEE IT Connects</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -1874,6 +1873,55 @@ $page = 'messages';
 
         /* addtl e */
 
+        .rm-section { margin-bottom: 20px; }
+        .rm-head { margin-bottom: 12px; }
+        .rm-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 12px;
+        }
+        .rm-card {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: #fff;
+            border-radius: 12px;
+            padding: 14px 16px;
+            text-decoration: none;
+            color: inherit;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, .05);
+            transition: transform .15s ease;
+        }
+        .rm-card:hover { transform: translateY(-2px); color: inherit; }
+        .rm-ic {
+            width: 44px; height: 44px; min-width: 44px;
+            border-radius: 12px;
+            background: #fdeee6; color: #f26b3a;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 17px;
+        }
+        .rm-info { flex: 1; min-width: 0; }
+        .rm-info strong { display: block; font-size: 15px; color: #272f54; }
+        .rm-info small { font-size: 12px; color: #8b93ab; }
+        .rm-go { font-size: 12px; color: #9aa3bd; }
+        .rm-card:hover .rm-go { color: #f26b3a; }
+
+        .room-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 14px;
+            padding: 8px 14px;
+            background: #fff;
+            border-radius: 20px;
+            color: #272f54;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, .08);
+        }
+        .room-back:hover { color: #ff6b2c; }
+
         /*===(MEDIA QUERY)===*/
         @media (max-width: 768px) {
             .sidebar {
@@ -2199,6 +2247,78 @@ $page = 'messages';
             /* "No ... yet" empty-state rows */
             :is(.sysAdm-table, .ojt-status-table) td[colspan] { display: block; }
         }
+
+        /* ===== bottom nav: phones + tablet portrait ===== */
+        .bottom-nav { display: none; }
+
+        @media (max-width: 768px), (max-width: 1024px) and (orientation: portrait) {
+            :root { --bn-h: 60px; }
+
+            /* hide the sidebar completely */
+            .sidebar { display: none !important; }
+
+            .bottom-nav {
+                display: flex;
+                position: fixed;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                z-index: 100;
+                background: #272f54;
+                padding-bottom: env(safe-area-inset-bottom);
+                box-shadow: 0 -2px 10px rgba(0, 0, 0, .15);
+            }
+
+            .bottom-nav a {
+                flex: 1;
+                min-width: 0;
+                height: var(--bn-h);
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 3px;
+                color: #aab1d4;
+                text-decoration: none;
+                font-size: 10px;
+                font-weight: 500;
+                border-top: 3px solid transparent;
+            }
+
+            .bottom-nav a i { font-size: 18px; }
+
+            .bottom-nav a span {
+                max-width: 100%;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            .bottom-nav a.active {
+                color: #fff;
+                border-top-color: #ff6b2c;
+            }
+
+            .bottom-nav a.active i { color: #ff6b2c; }
+
+            /* content uses the full width, with room for the nav */
+            .main {
+                margin-left: 0 !important;
+                padding-bottom: calc(var(--bn-h) + env(safe-area-inset-bottom) + 20px) !important;
+            }
+
+            /* chat fills the space between navbar and bottom nav */
+            .room-chat-wrap {
+                position: fixed;
+                top: 70px;
+                left: 0;
+                right: 0;
+                bottom: calc(var(--bn-h) + env(safe-area-inset-bottom));
+                height: auto;
+                margin: 0;
+                z-index: 1;
+            }
+        }
     </style>
 </head>
 
@@ -2310,6 +2430,34 @@ $page = 'messages';
             </div>
         </div>
     </div>
+
+    <!-- BOTTOM NAV (mobile / tablet portrait) -->
+    <nav class="bottom-nav">
+        <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=home"
+            class="<?= in_array($section, ['', 'home', 'room', 'rooms']) ? 'active' : '' ?>">
+            <i class="fa-solid fa-house"></i><span>Home</span>
+        </a>
+        <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=announcements"
+            class="<?= $section === 'announcements' ? 'active' : '' ?>">
+            <i class="fa-solid fa-folder-open"></i><span>Docs</span>
+        </a>
+        <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=status"
+            class="<?= $section === 'status' ? 'active' : '' ?>">
+            <i class="fa-solid fa-calendar-check"></i><span>Status</span>
+        </a>
+        <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=ojt_applications"
+            class="<?= $section === 'ojt_applications' ? 'active' : '' ?>">
+            <i class="fa fa-list-ul"></i><span>Reqs</span>
+        </a>
+        <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=weekly_reports"
+            class="<?= $section === 'weekly_reports' ? 'active' : '' ?>">
+            <i class="fa-solid fa-file-lines"></i><span>Reports</span>
+        </a>
+        <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=chats"
+            class="<?= $section === 'chats' ? 'active' : '' ?>">
+            <i class="fa-solid fa-comments"></i><span>Chats</span>
+        </a>
+    </nav>
 
     <!-- MAIN CONTENT -->
     <div class="main">
@@ -2549,6 +2697,39 @@ $page = 'messages';
                     <h2>Welcome back, <?= htmlspecialchars($userFullName) ?></h2>
                     <p>Stay connected, track updates, and monitor your interns' progress — all in one place.</p>
                 </div>
+            </div>
+
+            <!-- MY ROOMS -->
+            <div class="rm-section">
+                <div class="rm-head">
+                    <h5 class="fw-bold mb-0"><i class="fa-solid fa-users me-2" style="color:#ff6b2c;"></i>My Rooms</h5>
+                    <small class="text-muted">Open a room to post announcements and see its members.</small>
+                </div>
+
+                <?php if (empty($myRooms)): ?>
+                    <div class="home-empty">You're not in any rooms yet.</div>
+                <?php else: ?>
+                    <div class="rm-grid">
+                        <?php foreach ($myRooms as $r):
+                            $meta = array_filter([
+                                !empty($r['school_year']) ? 'S.Y. ' . $r['school_year'] : '',
+                                $r['year_level'] ?? '',
+                                $r['section'] ?? '',
+                            ]);
+                            ?>
+                            <a href="ojt-rooms.php?room_id=<?= (int) $r['id'] ?>&section=room" class="rm-card">
+                                <div class="rm-ic"><i class="fa-solid fa-users"></i></div>
+                                <div class="rm-info">
+                                    <strong><?= htmlspecialchars($r['room_name']) ?></strong>
+                                    <?php if ($meta): ?>
+                                        <small><?= htmlspecialchars(implode(' · ', $meta)) ?></small>
+                                    <?php endif; ?>
+                                </div>
+                                <i class="fa-solid fa-chevron-right rm-go"></i>
+                            </a>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
             </div>
 
             <div class="row g-3">
@@ -2858,6 +3039,9 @@ $page = 'messages';
             <!-- addtl e -->
         <?php elseif ($section === 'room' || $section === 'rooms'): ?>
             <?php if ($current_room_id): ?>
+                <a href="ojt-rooms.php?room_id=<?= (int) $current_room_id ?>&section=home" class="room-back">
+                    <i class="fa-solid fa-arrow-left"></i> Back to Home
+                </a>
                 <?php include 'chat-room-content.php'; ?>
             <?php endif; ?>
         <?php elseif ($section === 'announcements'): ?>
