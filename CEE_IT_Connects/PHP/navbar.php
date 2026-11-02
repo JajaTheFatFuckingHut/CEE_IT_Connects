@@ -598,12 +598,15 @@ function timeAgo($datetime)
                 /* width: 260px;
                 right: -60px; */
 
-                position: fixed;
+                width: 260px;
+                right: 8px;
+
+                /* position: fixed;
                 top: 70px;
                 left: 8px;
                 right: 8px;
                 width: auto;
-                max-height: calc(100dvh - 70px - 80px);
+                max-height: calc(100dvh - 70px - 80px); */
             }
         }
 
