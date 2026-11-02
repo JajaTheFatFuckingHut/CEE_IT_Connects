@@ -2690,8 +2690,8 @@ foreach ($roomStatuses as $s) {
                                             <span><?= htmlspecialchars($s['full_name']) ?></span>
                                         </div>
                                     </td>
-                                    <td>
-                                        <?php if (<td data-label="Company">): ?>
+                                    <td data-label="Company">
+                                        <?php if (empty($s['company'])): ?>
                                             <span class="rounded-pill px-3 py-1"
                                                 style="background:#f8d7da; color:#721c24; font-size:12px; font-weight:500;">
                                                 No company
@@ -2700,7 +2700,7 @@ foreach ($roomStatuses as $s) {
                                             <?= htmlspecialchars($s['company']) ?>
                                         <?php endif; ?>
                                     </td>
-                                    <td><td data-label="Hours"> / <?= $requiredHours ?></td>
+                                    <td data-label="Hours"><strong><?= round($s['total_hours'], 2) ?></strong> / <?= $requiredHours ?></td>
                                     <td data-label="Progress">
                                         <div style="display:flex; align-items:center; gap:8px;">
                                             <div class="progress-bar-bg">
