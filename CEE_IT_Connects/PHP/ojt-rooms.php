@@ -2008,10 +2008,17 @@ $page = 'messages';
             }
 
             .room-chat-wrap {
-                margin: -15px;              /* .main uses 15px padding on mobile */
-                display: block;             /* stop relying on flex sizing */
-                position: relative;
+                position: fixed;
+                top: 70px;
+                left: 60px;
+                right: 0;
+                bottom: 0;
+                width: auto;
+                height: auto;
+                margin: 0;
+                display: block;
                 overflow: hidden;
+                z-index: 1;
             }
 
             /* both panels fill the wrapper exactly */
