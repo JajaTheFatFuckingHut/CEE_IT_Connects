@@ -1559,6 +1559,7 @@ $page = 'messages';
             gap: 16px;
             margin-bottom: 16px;
             margin-top: 16px;
+            width: 100%;
         }
 
         .dash-stat {
@@ -1570,6 +1571,7 @@ $page = 'messages';
             text-decoration: none;
             color: inherit;
             transition: transform .15s ease;
+            min-width: 0;
         }
 
         .dash-stat:hover {
@@ -1776,12 +1778,20 @@ $page = 'messages';
                 display: grid;
                 grid-template-columns: repeat(2, minmax(0, 1fr));
             }
+
+            .dash-stats { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+            .dash-stat { padding: 12px 14px; gap: 10px; }
+            .dash-stat-icon { width: 36px; height: 36px; min-width: 36px; font-size: 15px; }
+            .dash-stat-label { font-size: 10px; }
+            .dash-stat-value { font-size: 22px; }
         }
 
         @media (max-width: 576px) {
-            .dash-stats {
-                grid-template-columns: 1fr;
-            }
+            .dash-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+            .dash-stat { flex-direction: column; align-items: flex-start; gap: 8px; padding: 12px; }
+            .dash-stat-icon { width: 32px; height: 32px; min-width: 32px; font-size: 14px; }
+            .dash-stat-label { font-size: 10px; }
+            .dash-stat-value { font-size: 22px; }
 
             .dash-hours {
                 display: none;
@@ -1793,10 +1803,11 @@ $page = 'messages';
             .dash-head { flex-wrap: wrap; gap: 8px; }
             .dash-head .btn { white-space: nowrap; }
             .dash-side { grid-template-columns: 1fr; }
-            .dash-stat { padding: 12px 14px; }
-            .dash-stat-value { font-size: 22px; }
             .dash-bar { width: 60px; }
             .dash-pct { width: 32px; }
+            .dash-side-card { padding: 12px 14px; gap: 8px; }
+            .dash-side-meta { padding-top: 8px; font-size: 11px; }
+            .quick-card-icon { width: 36px; height: 36px; font-size: 14px; }
         }
 
         /* addtl e */
@@ -1809,7 +1820,7 @@ $page = 'messages';
                 left: 0 !important;
                 bottom: 0 !important;
                 width: 60px !important;
-                height: calc(100vh - 70px) !important;
+                height: auto !important;
                 padding: 10px 0 !important;
                 border-radius: 0 !important;
                 display: flex !important;
