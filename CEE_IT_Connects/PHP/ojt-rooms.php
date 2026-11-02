@@ -187,7 +187,7 @@ if (!isset($_GET['room_id'])) {
 }
 
 // changed
-$section = $_GET['section'] ?? 'room';
+$section = $_GET['section'] ?? 'home';
 
 // Load statuses for the status section
 $stmt = $pdo->prepare("
@@ -2741,7 +2741,7 @@ $page = 'messages';
                                         style="color:#ff6b2c;"></i>Announcements</h5>
                                 <small class="text-muted">Latest updates and important notices for your room.</small>
                             </div>
-                            <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>" class="btn btn-sm"
+                            <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=room" class="btn btn-sm"
                                 style="background:#eef1fb;color:#272f54;border-radius:20px;font-weight:600;">
                                 View All <i class="fa-solid fa-arrow-right ms-1"></i>
                             </a>
