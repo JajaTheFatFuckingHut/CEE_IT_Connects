@@ -1388,6 +1388,56 @@ $page = 'messages';
             border-color: #ff6b2c;
         }
 
+        /* ── chat list show/hide (all screen sizes) ── */
+        .room-chat-wrap {
+            position: relative;
+            height: calc(100vh - 70px);
+            height: calc(100dvh - 70px);
+        }
+
+        .room-toggle-list {
+            width: 36px;
+            height: 36px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            border-radius: 50%;
+            background: transparent;
+            color: #272f54;
+            font-size: 15px;
+            cursor: pointer;
+            transition: background .15s;
+        }
+
+        .room-toggle-list:hover {
+            background: #eef1f7;
+        }
+
+        .room-chat-wrap:not(.rc-focus) .room-toggle-list .i-back,
+        .room-chat-wrap.rc-focus .room-toggle-list .i-collapse {
+            display: none;
+        }
+
+        .room-chat-wrap.rc-focus .room-chat-list {
+            display: none;
+        }
+
+        .room-message-header > div:last-child {
+            min-width: 0;
+        }
+
+        .room-message-header > div:last-child > div {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .room-message-input-row textarea {
+            min-width: 0;
+        }
+
         .room-initial {
             display: none;
         }
@@ -1955,6 +2005,46 @@ $page = 'messages';
 
             .room-initial {
                 display: flex !important;
+            }
+
+            .room-chat-wrap {
+                margin: -15px;
+            }
+
+            .room-chat-list {
+                width: 100%;
+                position: absolute;
+                top: 0;
+                left: 0;
+                height: 100%;
+                z-index: 10;
+                transition: transform .3s ease;
+            }
+
+            .room-chat-wrap.rc-focus .room-chat-list {
+                display: flex;
+                transform: translateX(-100%);
+            }
+
+            .room-message-panel {
+                width: 100%;
+            }
+
+            .room-message-header {
+                padding: 10px 12px;
+                gap: 8px;
+            }
+
+            .room-message-body {
+                padding: 14px 12px;
+            }
+
+            .room-msg-bubble-wrap {
+                max-width: 80%;
+            }
+
+            .room-message-input-bar {
+                padding: 8px 10px;
             }
 
             /* Push main content past the sidebar */
@@ -3369,10 +3459,10 @@ $page = 'messages';
             $avatarColors = ['#ff2c8f', '#2c6fff', '#1abc9c', '#9b59b6', '#e67e22', '#e74c3c', '#16a085'];
             ?>
 
-            <div class="room-chat-wrap">
+            <div class="room-chat-wrap" id="roomChatWrap">
 
                 <!-- Left: chat list -->
-                <div class="room-chat-list">
+                <div class="room-chat-list" id="roomChatList">
                     <div class="room-chat-list-header">
                         <h5>Chats</h5>
                     </div>
@@ -3442,6 +3532,12 @@ $page = 'messages';
 
                         <!-- Header -->
                         <div class="room-message-header">
+                            <div class="room-message-header">
+                                <button type="button" class="room-toggle-list" id="roomToggleList" onclick="roomToggleList()"
+                                    title="Hide chat list" aria-label="Hide chat list">
+                                    <i class="fa-solid fa-angles-left i-collapse"></i>
+                                    <i class="fa-solid fa-arrow-left i-back"></i>
+                                </button>
                             <div class="room-chat-avatar"
                                 style="background:<?= $openColor ?>; width:36px; height:36px; font-size:14px;">
                                 <?= strtoupper(substr($openName, 0, 1)) ?>
@@ -3697,6 +3793,41 @@ $page = 'messages';
                 el.style.display = el.dataset.name.includes(q) ? '' : 'none';
             });
         }
+
+        /* ── chat list: show / hide (back button on mobile) ── */
+        function roomSyncToggle() {
+            const wrap = document.getElementById('roomChatWrap');
+            const btn = document.getElementById('roomToggleList');
+            if (!wrap || !btn) return;
+            const label = wrap.classList.contains('rc-focus') ? 'Show chat list' : 'Hide chat list';
+            btn.title = label;
+            btn.setAttribute('aria-label', label);
+        }
+
+        function roomToggleList() {
+            const wrap = document.getElementById('roomChatWrap');
+            if (!wrap) return;
+            wrap.classList.toggle('rc-focus');
+            roomSyncToggle();
+        }
+
+        /* tapping a contact on a phone: slide the list away while the page loads */
+        document.querySelectorAll('#roomChatEntries .room-chat-entry').forEach(a => {
+            a.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    document.getElementById('roomChatWrap')?.classList.add('rc-focus');
+                }
+            });
+        });
+
+        /* phone + chat already open: start with the list hidden */
+        (function () {
+            const wrap = document.getElementById('roomChatWrap');
+            if (wrap && document.getElementById('roomMsgBody') && window.innerWidth <= 768) {
+                wrap.classList.add('rc-focus');
+            }
+            roomSyncToggle();
+        })();
 
         // Auto-scroll to bottom
         const msgBody = document.getElementById('roomMsgBody');
