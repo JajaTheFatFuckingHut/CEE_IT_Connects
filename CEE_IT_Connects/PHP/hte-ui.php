@@ -1808,6 +1808,17 @@ foreach ($roomStatuses as $s) {
             .dash-bottom {
                 grid-template-columns: 1fr;
             }
+
+            .dash-side { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+            .sysAdm-table,
+            .ojt-status-table { min-width: 0; }
+
+            .dash-stats { gap: 12px; }
+            .dash-stat { padding: 12px 14px; gap: 10px; }
+            .dash-stat-icon { width: 36px; height: 36px; min-width: 36px; font-size: 15px; }
+            .dash-stat-label { font-size: 10px; }
+            .dash-stat-value { font-size: 22px; }
         }
 
         @media (max-width: 576px) {
@@ -1818,6 +1829,36 @@ foreach ($roomStatuses as $s) {
             .dash-hours {
                 display: none;
             }
+
+            .dash-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+            .dash-stat { flex-direction: column; align-items: flex-start; gap: 8px; padding: 12px; }
+            .dash-stat:nth-child(odd):last-child { grid-column: 1 / -1; }
+            .dash-stat-icon { width: 32px; height: 32px; min-width: 32px; font-size: 14px; }
+            .dash-stat-label { font-size: 10px; }
+            .dash-stat-value { font-size: 22px; }
+
+            .home-hero::before,
+            .home-hero::after { display: none; }
+            .home-card { padding: 16px; }
+            .dash-head { flex-wrap: wrap; gap: 8px; }
+            .dash-head .btn { white-space: nowrap; }
+            .dash-side { grid-template-columns: 1fr; }
+            .dash-side-card { padding: 12px 14px; gap: 8px; }
+            .dash-side-meta { padding-top: 8px; font-size: 11px; }
+            .quick-card-icon { width: 36px; height: 36px; font-size: 14px; }
+            .dash-bar { width: 60px; }
+            .dash-pct { width: 32px; }
+
+            #searchInput,
+            #searchDtr,
+            #searchInfo,
+            #reportsSearchInput { width: 100% !important; }
+
+            .sysAdm-header--danger { padding: 16px 18px; }
+            .sysAdm-header-left { gap: 12px; }
+            .sysAdm-header-icon { width: 44px; height: 44px; min-width: 44px; font-size: 1rem; }
+            .sysAdm-header--danger h2 { font-size: 20px; }
+            .sysAdm-header--danger p { font-size: 13px; }
         }
 
         /* addtl e */
@@ -1829,7 +1870,7 @@ foreach ($roomStatuses as $s) {
                 left: 0 !important;
                 bottom: 0 !important;
                 width: 70px !important;
-                height: calc(100vh - 70px) !important;
+                height: auto !important;
                 padding: 10px 0 !important;
                 border-radius: 0 !important;
                 display: flex !important;
@@ -2076,6 +2117,57 @@ foreach ($roomStatuses as $s) {
             .sidebar a:hover::after {
                 opacity: 1;
             }
+
+            .home-hero { padding: 20px 18px; }
+            .home-hero h2 { font-size: 20px; }
+            .home-hero p { font-size: 13px; }
+            .home-hero::before { right: 50px; width: 36px; }
+            .home-hero::after { right: 12px; width: 36px; }
+
+            :is(.sysAdm-table, .ojt-status-table) thead { display: none; }
+
+            :is(.sysAdm-table, .ojt-status-table),
+            :is(.sysAdm-table, .ojt-status-table) :is(tbody, tr, td) {
+                display: block;
+                width: 100%;
+            }
+
+            :is(.sysAdm-table, .ojt-status-table) tr {
+                padding: 12px 14px;
+                border-bottom: 1px solid #edf2f7;
+            }
+
+            :is(.sysAdm-table, .ojt-status-table) tr:last-child { border-bottom: none; }
+
+            :is(.sysAdm-table, .ojt-status-table) td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: 10px;
+                padding: 6px 0;
+                border-bottom: none;
+            }
+
+            :is(.sysAdm-table, .ojt-status-table) td:first-child {
+                justify-content: flex-start;
+                padding-bottom: 10px;
+                margin-bottom: 4px;
+                border-bottom: 1px solid #edf2f7;
+            }
+
+            :is(.sysAdm-table, .ojt-status-table) td:not([data-label]) { justify-content: flex-start; }
+
+            :is(.sysAdm-table, .ojt-status-table) td[data-label]::before {
+                content: attr(data-label);
+                font-size: 11px;
+                font-weight: 700;
+                color: #64748b;
+                text-transform: uppercase;
+                letter-spacing: .04em;
+                flex-shrink: 0;
+            }
+
+            :is(.sysAdm-table, .ojt-status-table) td[colspan] { display: block; }
         }
 
 
@@ -2115,6 +2207,12 @@ foreach ($roomStatuses as $s) {
         #dtr-view-modal .ojt-daily-val { font-size:13px; font-weight:500; color:#2b3a67; }
         #dtr-view-modal .ojt-status-badge { display:inline-block; padding:3px 16px; border-radius:999px; font-size:12px; font-weight:600; white-space:nowrap; }
         /* addtl e */
+
+        @media (max-width: 360px) {
+            .dash-stats { grid-template-columns: minmax(0, 1fr); }
+            .dash-stat { flex-direction: row; align-items: center; }
+            .dash-stat-label { overflow-wrap: anywhere; }
+        }
     </style>
 </head>
 
@@ -2457,7 +2555,7 @@ foreach ($roomStatuses as $s) {
 
             <!-- Charts -->
             <div class="row g-3 mt-1">
-                <div class="col-lg-5">
+                <div class="col-md-6 col-lg-5">
                     <div class="home-card accent-blue h-100">
                         <div class="dash-head">
                             <div>
@@ -2472,7 +2570,7 @@ foreach ($roomStatuses as $s) {
                     </div>
                 </div>
 
-                <div class="col-lg-4">
+                <div class="col-md-6 col-lg-4">
                     <div class="home-card accent-amber h-100">
                         <div class="dash-head">
                             <div>
@@ -2593,7 +2691,7 @@ foreach ($roomStatuses as $s) {
                                         </div>
                                     </td>
                                     <td>
-                                        <?php if (empty($s['company'])): ?>
+                                        <?php if (<td data-label="Company">): ?>
                                             <span class="rounded-pill px-3 py-1"
                                                 style="background:#f8d7da; color:#721c24; font-size:12px; font-weight:500;">
                                                 No company
@@ -2602,8 +2700,8 @@ foreach ($roomStatuses as $s) {
                                             <?= htmlspecialchars($s['company']) ?>
                                         <?php endif; ?>
                                     </td>
-                                    <td><strong><?= round($s['total_hours'], 2) ?></strong> / <?= $requiredHours ?></td>
-                                    <td>
+                                    <td><td data-label="Hours"> / <?= $requiredHours ?></td>
+                                    <td data-label="Progress">
                                         <div style="display:flex; align-items:center; gap:8px;">
                                             <div class="progress-bar-bg">
                                                 <div class="progress-bar-fill" style="width:<?= $progressWidth ?>%"></div>
@@ -2773,9 +2871,9 @@ foreach ($roomStatuses as $s) {
                                             <span><?= htmlspecialchars($r['student_name']) ?></span>
                                         </div>
                                     </td>
-                                    <td><?= htmlspecialchars($r['room_name']) ?></td>
-                                    <td><?= date('M d, Y', strtotime($r['week_start'])) ?></td>
-                                    <td><?= date('M d, Y', strtotime($r['submitted_at'])) ?></td>
+                                    <td data-label="Room"><?= htmlspecialchars($r['room_name']) ?></td>
+                                    <td data-label="Week"><?= date('M d, Y', strtotime($r['week_start'])) ?></td>
+                                    <td data-label="Submitted"><?= date('M d, Y', strtotime($r['submitted_at'])) ?></td>
                                     <td>
                                         <a href="#" style="display:inline-flex;align-items:center;gap:5px;padding:5px 10px;
                                     background:#dbeafe;color:#1e40af;border-radius:6px;font-size:11px;
@@ -2855,11 +2953,11 @@ foreach ($roomStatuses as $s) {
                                             <?= htmlspecialchars($row['full_name']) ?>
                                         </div>
                                     </td>
-                                    <td><?= htmlspecialchars($row['company']) ?></td>
-                                    <td><?= number_format($row['required_hours'], 1) ?> hrs</td>
-                                    <td><?= number_format($row['total_hours'], 1) ?> hrs</td>
-                                    <td><?= number_format($row['remaining'], 1) ?> hrs</td>
-                                    <td>
+                                    <td data-label="Company"><?= htmlspecialchars($row['company']) ?></td>
+                                    <td data-label="Required"><?= number_format($row['required_hours'], 1) ?> hrs</td>
+                                    <td data-label="Completed"><?= number_format($row['total_hours'], 1) ?> hrs</td>
+                                    <td data-label="Remaining"><?= number_format($row['remaining'], 1) ?> hrs</td>
+                                    <td data-label="Progress">
                                         <div class="d-flex align-items-center gap-2">
                                             <div class="progress-bar-bg">
                                                 <div class="progress-bar-fill" style="width:<?= $row['percent'] ?>%;"></div>
@@ -2960,18 +3058,18 @@ foreach ($roomStatuses as $s) {
                             <?php foreach ($students as $s): ?>
                                 <tr>
                                     <td><?= htmlspecialchars($s['student_id']) ?></td>
-                                    <td>
+                                    <td data-label="Name">
                                         <div class="student-cell">
                                             <p> <?= htmlspecialchars($s['student_name']) ?> </p>
 
                                         </div>
                                     </td>
-                                    <td><?= htmlspecialchars($s['email']) ?></td>
-                                    <td><?= htmlspecialchars(ucwords($s['program'])) ?></td>
-                                    <td><?= htmlspecialchars($s['year_level'] . '-' . $s['section']) ?></td>
-                                    <td><?= htmlspecialchars($s['contact_number'] ?? '') ?></td>
-                                    <td><?= htmlspecialchars($s['company'] ?? '—') ?></td>
-                                    <td><?= htmlspecialchars($s['adviser_name'] ?? '—') ?></td>
+                                    <td data-label="Email"><?= htmlspecialchars($s['email']) ?></td>
+                                    <td data-label="Program"><?= htmlspecialchars(ucwords($s['program'])) ?></td>
+                                    <td data-label="Year & Section"><?= htmlspecialchars($s['year_level'] . '-' . $s['section']) ?></td>
+                                    <td data-label="Contact"><?= htmlspecialchars($s['contact_number'] ?? '') ?></td>
+                                    <td data-label="Company"><?= htmlspecialchars($s['company'] ?? '—') ?></td>
+                                    <td data-label="Adviser"><?= htmlspecialchars($s['adviser_name'] ?? '—') ?></td>
                                 </tr>
                             <?php endforeach; ?>
                         <?php endif; ?>
@@ -3671,7 +3769,17 @@ foreach ($roomStatuses as $s) {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
-                    scales: { x: { beginAtZero: true } }
+                    scales: {
+                        x: { beginAtZero: true },
+                        y: {
+                            ticks: {
+                                callback: function (v) {
+                                    const l = this.getLabelForValue(v);
+                                    return l.length > 12 ? l.slice(0, 12) + '…' : l;
+                                }
+                            }
+                        }
+                    }
                 }
             });
         }
