@@ -1771,6 +1771,11 @@ $page = 'messages';
             .dash-bottom {
                 grid-template-columns: 1fr;
             }
+
+            .dash-side {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
         }
 
         @media (max-width: 576px) {
@@ -1781,6 +1786,17 @@ $page = 'messages';
             .dash-hours {
                 display: none;
             }
+
+            .home-hero::before,
+            .home-hero::after { display: none; }
+            .home-card { padding: 16px; }
+            .dash-head { flex-wrap: wrap; gap: 8px; }
+            .dash-head .btn { white-space: nowrap; }
+            .dash-side { grid-template-columns: 1fr; }
+            .dash-stat { padding: 12px 14px; }
+            .dash-stat-value { font-size: 22px; }
+            .dash-bar { width: 60px; }
+            .dash-pct { width: 32px; }
         }
 
         /* addtl e */
@@ -1846,6 +1862,12 @@ $page = 'messages';
             .sidebar>div>a i {
                 margin: 0 !important;
             }
+
+            .home-hero { padding: 20px 18px; }
+            .home-hero h2 { font-size: 20px; }
+            .home-hero p { font-size: 13px; }
+            .home-hero::before { right: 50px; width: 36px; }
+            .home-hero::after { right: 12px; width: 36px; }
 
             /* Rooms list */
             .rooms-list {
@@ -1948,7 +1970,8 @@ $page = 'messages';
                 left: 60px !important;
                 right: 0 !important;
                 bottom: 0 !important;
-                height: calc(100vh - 70px) !important;
+                /* height: calc(100vh - 70px) !important; */
+                height: 100dvh;
                 border-radius: 0 !important;
                 border: none !important;
             }
@@ -2349,7 +2372,7 @@ $page = 'messages';
             <div class="row g-3">
                 <div class="col-lg-8">
                     <div class="home-card accent-orange">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="dash-head">
                             <div>
                                 <h5 class="fw-bold mb-0"><i class="fa-solid fa-bullhorn me-2"
                                         style="color:#ff6b2c;"></i>Announcements</h5>
@@ -2605,7 +2628,7 @@ $page = 'messages';
             </div>
 
             <div class="row g-3 mt-1">
-                <div class="col-lg-5">
+                <div class="col-md-6 col-lg-5">
                     <div class="home-card accent-blue h-100">
                         <div class="dash-head">
                             <div>
@@ -2620,7 +2643,7 @@ $page = 'messages';
                     </div>
                 </div>
 
-                <div class="col-lg-4">
+                <div class="col-md-6 col-lg-4">
                     <div class="home-card accent-amber h-100">
                         <div class="dash-head">
                             <div>
@@ -3561,7 +3584,17 @@ $page = 'messages';
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
-                    scales: { x: { beginAtZero: true } }
+                    scales: {
+                        x: { beginAtZero: true },
+                        y: {
+                            ticks: {
+                                callback: function (v) {
+                                    const l = this.getLabelForValue(v);
+                                    return l.length > 12 ? l.slice(0, 12) + '…' : l;
+                                }
+                            }
+                        }
+                    }
                 }
             });
         }
