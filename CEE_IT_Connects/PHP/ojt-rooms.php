@@ -626,6 +626,7 @@ $page = 'messages';
             border-radius: 12px;
             padding: 20px 22px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            min-width: 0;
         }
 
         .home-empty {
@@ -1559,7 +1560,6 @@ $page = 'messages';
             gap: 16px;
             margin-bottom: 16px;
             margin-top: 16px;
-            width: 100%;
         }
 
         .dash-stat {
@@ -1571,7 +1571,6 @@ $page = 'messages';
             text-decoration: none;
             color: inherit;
             transition: transform .15s ease;
-            min-width: 0;
         }
 
         .dash-stat:hover {
@@ -1771,7 +1770,7 @@ $page = 'messages';
 
         @media (max-width: 992px) {
             .dash-bottom {
-                grid-template-columns: 1fr;
+                grid-template-columns: minmax(0, 1fr);
             }
 
             .dash-side {
