@@ -599,7 +599,7 @@ function timeAgo($datetime)
                 right: -60px; */
 
                 width: 260px;
-                right: 8px;
+                right: 4px;
 
                 /* position: fixed;
                 top: 70px;
