@@ -1388,11 +1388,17 @@ $page = 'messages';
             border-color: #ff6b2c;
         }
 
-        /* ── chat list show/hide (all screen sizes) ── */
-        .room-chat-wrap {
-            position: relative;
-            height: calc(100vh - 70px);
-            height: calc(100dvh - 70px);
+        /* ── chat list show/hide ── */
+        .room-message-body {
+            min-height: 0;
+        }
+
+        .room-message-header > div:last-child {
+            min-width: 0;
+        }
+
+        .room-message-input-row textarea {
+            min-width: 0;
         }
 
         .room-toggle-list {
@@ -1424,18 +1430,11 @@ $page = 'messages';
             display: none;
         }
 
-        .room-message-header > div:last-child {
-            min-width: 0;
-        }
-
-        .room-message-header > div:last-child > div {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .room-message-input-row textarea {
-            min-width: 0;
+        /* tablet: slightly narrower list */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .room-chat-list {
+                width: 240px;
+            }
         }
 
         .room-initial {
@@ -3553,12 +3552,11 @@ $page = 'messages';
 
                         <!-- Header -->
                         <div class="room-message-header">
-                            <div class="room-message-header">
-                                <button type="button" class="room-toggle-list" id="roomToggleList" onclick="roomToggleList()"
-                                    title="Hide chat list" aria-label="Hide chat list">
-                                    <i class="fa-solid fa-angles-left i-collapse"></i>
-                                    <i class="fa-solid fa-arrow-left i-back"></i>
-                                </button>
+                            <button type="button" class="room-toggle-list" id="roomToggleList" onclick="roomToggleList()"
+                                title="Hide chat list" aria-label="Hide chat list">
+                                <i class="fa-solid fa-angles-left i-collapse"></i>
+                                <i class="fa-solid fa-arrow-left i-back"></i>
+                            </button>
                             <div class="room-chat-avatar"
                                 style="background:<?= $openColor ?>; width:36px; height:36px; font-size:14px;">
                                 <?= strtoupper(substr($openName, 0, 1)) ?>
@@ -3570,7 +3568,6 @@ $page = 'messages';
                                 </div>
                             </div>
                         </div>
-
                         <!-- Messages -->
                         <div class="room-message-body" id="roomMsgBody">
                             <?php if (empty($chatMessages)): ?>
