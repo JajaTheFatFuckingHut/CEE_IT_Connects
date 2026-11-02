@@ -1784,7 +1784,8 @@ $page = 'messages';
             .dash-stat-label { font-size: 10px; }
             .dash-stat-value { font-size: 22px; }
 
-            #docs-availability-table { min-width: 0; }
+            .sysAdm-table,
+            .ojt-status-table { min-width: 0; }
         }
 
         @media (max-width: 576px) {
@@ -1810,13 +1811,16 @@ $page = 'messages';
             .dash-side-meta { padding-top: 8px; font-size: 11px; }
             .quick-card-icon { width: 36px; height: 36px; font-size: 14px; }
 
-            #docsSearchInput { width: 100% !important; }
-
             .sysAdm-header--danger { padding: 16px 18px; }
             .sysAdm-header-left { gap: 12px; }
             .sysAdm-header-icon { width: 44px; height: 44px; min-width: 44px; font-size: 1rem; }
             .sysAdm-header--danger h2 { font-size: 20px; }
             .sysAdm-header--danger p { font-size: 13px; }
+
+            #docsSearchInput,
+            #searchInput,
+            #search-input,
+            #reportsSearchInput { width: 100% !important; }
         }
 
         /* addtl e */
@@ -2037,21 +2041,22 @@ $page = 'messages';
                 opacity: 1;
             }
 
-            #docs-availability-table thead { display: none; }
+            :is(.sysAdm-table, .ojt-status-table) thead { display: none; }
 
-            #docs-availability-table,
-            #docs-availability-tbody,
-            #docs-availability-tbody tr,
-            #docs-availability-tbody td { display: block; width: 100%; }
+            :is(.sysAdm-table, .ojt-status-table),
+            :is(.sysAdm-table, .ojt-status-table) :is(tbody, tr, td) {
+                display: block;
+                width: 100%;
+            }
 
-            #docs-availability-tbody tr {
+            :is(.sysAdm-table, .ojt-status-table) tr {
                 padding: 12px 14px;
                 border-bottom: 1px solid #edf2f7;
             }
 
-            #docs-availability-tbody tr:last-child { border-bottom: none; }
+            :is(.sysAdm-table, .ojt-status-table) tr:last-child { border-bottom: none; }
 
-            #docs-availability-tbody td {
+            :is(.sysAdm-table, .ojt-status-table) td {
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
@@ -2060,24 +2065,29 @@ $page = 'messages';
                 border-bottom: none;
             }
 
-            /* company name = card title */
-            #docs-availability-tbody td:first-child {
+            /* first cell (name / company) = card title */
+            :is(.sysAdm-table, .ojt-status-table) td:first-child {
+                justify-content: flex-start;
                 padding-bottom: 10px;
                 margin-bottom: 4px;
                 border-bottom: 1px solid #edf2f7;
             }
 
-            #docs-availability-tbody td[data-label]::before {
+            /* cells without a label (e.g. multi-button Actions) sit left */
+            :is(.sysAdm-table, .ojt-status-table) td:not([data-label]) { justify-content: flex-start; }
+
+            :is(.sysAdm-table, .ojt-status-table) td[data-label]::before {
                 content: attr(data-label);
                 font-size: 11px;
                 font-weight: 700;
                 color: #64748b;
                 text-transform: uppercase;
                 letter-spacing: .04em;
+                flex-shrink: 0;
             }
 
-            /* keep the "No document availability announced yet" row centered */
-            #docs-availability-tbody td[colspan] { display: block; }
+            /* "No ... yet" empty-state rows */
+            :is(.sysAdm-table, .ojt-status-table) td[colspan] { display: block; }
         }
     </style>
 </head>
