@@ -2008,15 +2008,23 @@ $page = 'messages';
             }
 
             .room-chat-wrap {
-                margin: -15px;
+                margin: -15px;              /* .main uses 15px padding on mobile */
+                display: block;             /* stop relying on flex sizing */
+                position: relative;
+                overflow: hidden;
+            }
+
+            /* both panels fill the wrapper exactly */
+            .room-chat-list,
+            .room-message-panel {
+                position: absolute;
+                inset: 0;
+                width: 100%;
+                min-width: 0;
+                max-width: 100%;
             }
 
             .room-chat-list {
-                width: 100%;
-                position: absolute;
-                top: 0;
-                left: 0;
-                height: 100%;
                 z-index: 10;
                 transition: transform .3s ease;
             }
@@ -2026,10 +2034,6 @@ $page = 'messages';
                 transform: translateX(-100%);
             }
 
-            .room-message-panel {
-                width: 100%;
-            }
-
             .room-message-header {
                 padding: 10px 12px;
                 gap: 8px;
@@ -2037,10 +2041,20 @@ $page = 'messages';
 
             .room-message-body {
                 padding: 14px 12px;
+                min-width: 0;
+            }
+
+            .room-msg-row {
+                min-width: 0;
             }
 
             .room-msg-bubble-wrap {
                 max-width: 80%;
+                min-width: 0;
+            }
+
+            .room-msg-bubble {
+                overflow-wrap: anywhere;
             }
 
             .room-message-input-bar {
