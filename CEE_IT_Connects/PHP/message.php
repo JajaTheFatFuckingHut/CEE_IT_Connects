@@ -620,8 +620,7 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rooms</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">    <title>Rooms</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -3280,6 +3279,55 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
             #ojt-sum-completed,
             #ojt-sum-remaining { font-size: 16px; }
         }
+
+        /* ===== bottom nav: phones + tablet portrait ===== */
+        .bottom-nav { display: none; }
+
+        @media (max-width: 768px), (max-width: 1024px) and (orientation: portrait) {
+            :root { --bn-h: 60px; }
+
+            .sidebar { display: none !important; }
+
+            .bottom-nav {
+                display: flex;
+                position: fixed;
+                left: 0; right: 0; bottom: 0;
+                z-index: 100;
+                background: #272f54;
+                padding-bottom: env(safe-area-inset-bottom);
+                box-shadow: 0 -2px 10px rgba(0, 0, 0, .15);
+            }
+
+            .bottom-nav a {
+                flex: 1; min-width: 0; height: var(--bn-h);
+                display: flex; flex-direction: column; align-items: center; justify-content: center;
+                gap: 3px; color: #aab1d4; text-decoration: none;
+                font-size: 10px; font-weight: 500; border-top: 3px solid transparent;
+            }
+            .bottom-nav a i { font-size: 18px; }
+            .bottom-nav a span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+            .bottom-nav a.active { color: #fff; border-top-color: #ff6b2c; }
+            .bottom-nav a.active i { color: #ff6b2c; }
+            .bottom-nav a.ojt-locked { opacity: .4; cursor: not-allowed; }
+
+            .main {
+                margin-left: 0 !important;
+                padding-bottom: calc(var(--bn-h) + env(safe-area-inset-bottom) + 20px) !important;
+            }
+
+            /* Hours has an inline 100vh height, which would hide its last rows behind the nav */
+            #hours .main { height: auto !important; }
+
+            /* chat fills the space between navbar and bottom nav */
+            .rc-wrap {
+                position: fixed;
+                top: 70px; left: 0; right: 0;
+                bottom: calc(var(--bn-h) + env(safe-area-inset-bottom));
+                height: auto;
+                margin: 0;
+                z-index: 1;
+            }
+        }
     </style>
 </head>
 
@@ -3408,6 +3456,44 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
             <?php endforeach; ?>
         </div>
     </div>
+
+    <!-- BOTTOM NAV (mobile / tablet portrait) -->
+    <nav class="bottom-nav">
+        <a href="?section=home" class="<?= $current_section === 'home' ? 'active' : '' ?>">
+            <i class="fa-solid fa-house"></i><span>Home</span>
+        </a>
+        <a href="?section=chats<?php if ($current_room_id) echo "&room_id=$current_room_id"; ?>"
+            class="<?= $current_section === 'chats' ? 'active' : '' ?>">
+            <i class="fa-solid fa-comments"></i><span>Chats</span>
+        </a>
+        <a href="?section=application<?php if ($current_room_id) echo "&room_id=$current_room_id"; ?>"
+            class="<?= $current_section === 'application' ? 'active' : '' ?>">
+            <i class="fa fa-list-ul"></i><span>Checklist</span>
+        </a>
+
+        <?php if ($hasActiveProgress): ?>
+            <a href="?section=hours<?php if ($current_room_id) echo "&room_id=$current_room_id"; ?>"
+                class="<?= $current_section === 'hours' ? 'active' : '' ?>">
+                <i class="fa-solid fa-clock"></i><span>Hours</span>
+            </a>
+            <a href="?section=progress_report<?php if ($current_room_id) echo "&room_id=$current_room_id"; ?>"
+                class="<?= $current_section === 'progress_report' ? 'active' : '' ?>">
+                <i class="fa-solid fa-file-lines"></i><span>Report</span>
+            </a>
+        <?php else: ?>
+            <a href="#" class="ojt-locked" onclick="return false;">
+                <i class="fa-solid fa-clock"></i><span>Hours</span>
+            </a>
+            <a href="#" class="ojt-locked" onclick="return false;">
+                <i class="fa-solid fa-file-lines"></i><span>Report</span>
+            </a>
+        <?php endif; ?>
+
+        <a href="#" id="bnEvalBtn" class="ojt-locked"
+            onclick="event.preventDefault(); if (this.classList.contains('ojt-locked')) return false; ojtShowEvalModal();">
+            <i class="fa-solid fa-clipboard-check"></i><span>Eval</span>
+        </a>
+    </nav>
 
     <!-- HOME SECTION -->
     <!-- addtl s dashboard ni student -->
@@ -5309,6 +5395,7 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
             if (!btn) return;
 
             const done = ojtIsComplete();
+            document.getElementById('bnEvalBtn')?.classList.toggle('ojt-locked', !done);
             btn.classList.toggle('ojt-locked', !done);
             btn.setAttribute('aria-disabled', String(!done));
             btn.tabIndex = done ? 0 : -1;
