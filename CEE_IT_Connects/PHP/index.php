@@ -160,24 +160,10 @@ $now = new DateTime();
             background: #f2f2f2;
         }
 
-        /* 
-            .phone-backdrop {
-                display: none;
-                position: fixed;
-                inset: 0;
-                background: rgba(0, 0, 0, 0.25);
-                backdrop-filter: blur(3px);
-                -webkit-backdrop-filter: blur(3px);
-                z-index: 9999;
-            }
 
-            .phone-backdrop.show {
-                display: block;
-            }
-
-            .phone-backdrop.show {
-                display: block;
-            } */
+        @media (max-width: 768px) {
+            body { background-attachment: scroll; }
+        }
     </style>
 </head>
 
@@ -187,26 +173,22 @@ $now = new DateTime();
 
     <!-- HERO SECTION -->
     <div class="hero-wrapper">
-        <div class="container-fluid px-5">
+        <div class="container-fluid px-3 px-lg-5">
             <div class="row align-items-center">
                 <div class="col-lg-9 hero-content">
                     <div class="welcome-overlay animate-on-scroll animate-scale">
-                        <h5 class="welcome-text animate-on-scroll animate-left">Welcome to</h5>
+                        <h5 class="welcome-text animate-on-scroll animate-left">Welcome to CEE IT Connects</h5>
                         <h1 class="main-heading animate-on-scroll animate-right">CEE IT Connects</h1>
+                        <h3 class="animate-on-scroll animate-right">One Platform, Shared Progress.</h3>
                         <div class="description-box animate-on-scroll animate-scale">
                             <p>
-                                &nbsp;&nbsp;&nbsp;&nbsp;CEE IT Connects is a web-based internship coordination platform
-                                developed for the College of Engineering and Information Technology
-                                (CEIT) of Pamantasan ng Lungsod ng Valenzuela (PLV). Designed to
-                                streamline and modernize the On-the-Job Training (OJT) process,
-                                CEE IT Connects bridges the gap between students, internship
-                                advisers, Human Training Establishment (HTE) advisers, and
-                                partner institutions.
+                                A centralized platform that connects CEIT students, internship
+                                advisers, HTE advisers, and partner institutions to streamline
+                                the On-the-Job Training process.
                             </p>
                         </div>
-                        <a href="applied-Internship-programs.php" class="btn-find animate-on-scroll animate-scale"
-                            style="color:white; background-color: #ff673a;">
-                            Browse for Internships
+                        <a href="applied-Internship-programs.php" class="btn-find animate-on-scroll animate-scale">
+                            Browse Internships <i class="fa-solid fa-arrow-right ms-2"></i>
                         </a>
                     </div>
                 </div>
@@ -214,38 +196,89 @@ $now = new DateTime();
             </div>
         </div>
         <img src="../Sources/suhay husay.png" class="statue-overlay animate-on-scroll animate-right">
+        <svg class="hero-wave" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true">
+            <defs>
+                <linearGradient id="heroWaveStroke" x1="0" x2="1" y1="0" y2="0">
+                    <stop offset="0" stop-color="#FFB62F" />
+                    <stop offset="1" stop-color="#E4572E" />
+                </linearGradient>
+            </defs>
+            <path d="M0,30 C300,40 500,80 760,78 C1050,76 1250,20 1440,12 L1440,120 L0,120 Z" />
+            <path d="M0,30 C300,40 500,80 760,78 C1050,76 1250,20 1440,12" />
+        </svg>
     </div>
 
     <!-- FEATURES -->
     <section class="features-section">
         <div class="container text-center">
+            <p class="text-uppercase fw-bold small mb-2 animate-on-scroll animate-left"
+                style="color: #ff673a; letter-spacing: 0.3em;">
+                What you can do
+            </p>
             <h2 class="features-title animate-on-scroll animate-left"
-                style="font-family: 'Geogrotesque TRIAL', sans-serif; color: #ff673a; font-size: 3rem;">
+                style="font-family: 'Geogrotesque TRIAL', sans-serif; font-size: 2.75rem;">
                 CEE IT Connects Features
             </h2>
-            <div class="row g-5 mt-2">
-                <div class="col-md-4">
+            <p class="mx-auto animate-on-scroll animate-left" style="max-width: 620px; color: #d6dbeb;">
+                Everything students, advisers and partner companies need to run the
+                On-the-Job Training process in one place.
+            </p>
+            <div class="mx-auto mb-5"
+                style="width: 72px; height: 4px; border-radius: 4px; background: #ff673a;"></div>
+
+            <div class="row g-4">
+                <div class="col-lg-4 col-md-6">
                     <div class="feature-item animate-on-scroll animate-scale">
-                        <i class="fa-solid fa-filter feature-icon"></i>
-                        <h5>Smart Internship Matching</h5>
-                        <p>Find internship opportunities tailored to your program, qualifications,
-                            and preferred location through powerful filtering and automated listings.</p>
+                        <i class="fa-solid fa-map-location-dot feature-icon"></i>
+                        <h5>Internship Map &amp; Listings</h5>
+                        <p>Explore partner companies on an interactive map, see open or closed status
+                            at a glance, and get directions in one tap.</p>
+                        <span class="feature-role">Students</span>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-lg-4 col-md-6">
+                    <div class="feature-item animate-on-scroll animate-scale">
+                        <i class="fa-solid fa-filter feature-icon"></i>
+                        <h5>Internship Matching</h5>
+                        <p>Search and filter listings by program and preferences 
+                            to find the right fit faster.</p>
+                        <span class="feature-role">Students</span>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
                     <div class="feature-item animate-on-scroll animate-scale">
                         <i class="fa-regular fa-clock feature-icon"></i>
                         <h5>Real-Time Application Tracking</h5>
-                        <p>Track your application status from submission to approval with
-                            instant updates and automated notifications.</p>
+                        <p>Follow your application from submission to approval with instant
+                            status updates.</p>
+                        <span class="feature-role">Students</span>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-lg-4 col-md-6">
                     <div class="feature-item animate-on-scroll animate-scale">
                         <i class="fa-regular fa-rectangle-list feature-icon"></i>
-                        <h5>Virtual Rooms & OJT Monitoring</h5>
-                        <p>Advisers and HTE supervisors can monitor progress, evaluations,
-                            and internship logs through a structured virtual workspace.</p>
+                        <h5>Virtual Rooms &amp; OJT Monitoring</h5>
+                        <p>Follow progress, evaluations and internship logs together in one
+                            structured virtual workspace.</p>
+                        <span class="feature-role">Advisers &amp; HTE</span>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="feature-item animate-on-scroll animate-scale">
+                        <i class="fa-regular fa-bell feature-icon"></i>
+                        <h5>Announcements &amp; Notifications</h5>
+                        <p>Stay updated on department announcements and get notified when
+                            something needs your attention.</p>
+                        <span class="feature-role">Everyone</span>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="feature-item animate-on-scroll animate-scale">
+                        <i class="fa-solid fa-users feature-icon"></i>
+                        <h5>Role-Based Dashboards</h5>
+                        <p>Separate views for students, internship advisers, HTE advisers and
+                            admins, so everyone sees what they need.</p>
+                        <span class="feature-role">All roles</span>
                     </div>
                 </div>
             </div>
@@ -253,15 +286,24 @@ $now = new DateTime();
     </section>
 
     <!-- MAP SECTION -->
-    <section class="map-section">
+        <section class="map-section">
         <div class="map-section-wrapper">
+            <div class="map-header">
+                <div class="d-flex align-items-center gap-3">
+                    <span class="map-header-icon"><i class="fas fa-map-marker-alt"></i></span>
+                    <div>
+                        <h2>Partner Institutions</h2>
+                        <p>Explore our partner companies and institutions for your OJT opportunities.</p>
+                    </div>
+                </div>
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Search for an internship listing"
+                        onkeyup="filterListings()">
+                </div>
+            </div>
             <div class="main">
                 <div class="panel">
-
-                    <div class="search-box">
-                        <input type="text" id="searchInput" placeholder="Search for an internship listing"
-                            onkeyup="filterListings()">
-                    </div>
 
                     <?php foreach ($locations as $loc):
                         $openTime = new DateTime($loc['time_open']);
@@ -303,44 +345,80 @@ $now = new DateTime();
 
                 </div>
                 <div id="map"></div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ABOUT -->
-    <section class="about-section">
-        <div class="container text-center">
-            <h2 class="about-title animate-on-scroll animate-left">About CEE IT Connects</h2>
-            <p class="about-text animate-on-scroll animate-right">
-                &nbsp;&nbsp;&nbsp;&nbsp;CEE IT Connects is an internship coordination platform developed
-                to support students from the College of Engineering and Information
-                Technology of Pamantasan ng Lungsod ng Valenzuela. The system
-                simplifies the internship process by connecting students,
-                advisers, and partner companies through a centralized digital platform.
-            </p>
-        </div>
-        <div class="about-info-bar">
-            <div class="container">
-                <div class="row text-center align-items-center">
-                    <div class="col-md-4" style="font-size: 1.15rem;"><i class="fas fa-map-marker-alt"></i> Tongco St.,
-                        Maysan, Valenzuela City
-                        <br><i class="fab fa-facebook"></i> CEE IT Connects
-                    </div>
-                    <div class="col-md-4" style="color: #fff; font-weight: bolder; font-size: 1.25rem;"><strong>CEE
-                            IT CONNECTS</strong>
-                        <br>©2026 CEE IT Connects. All rights reserved
-                    </div>
-                    <div class="col-md-4" style="font-size: 1.15rem;"><i class="fas fa-envelope"></i>
-                        ceeitconnects@gmail.com
-                        <br><i class="fas fa-phone"></i> 09123456789
-                    </div>
+                <div class="map-legend">
+                    <span><i class="fas fa-circle text-success"></i> Open</span>
+                    <span><i class="fas fa-circle text-danger"></i> Closed</span>
                 </div>
             </div>
         </div>
     </section>
-    <!-- 
-    <div id="phoneBackdrop" class="phone-backdrop"></div>
-    <div id="phoneDropdown" class="phone-dropdown"></div> -->
+
+        <!-- ABOUT -->
+    <section class="about-section">
+        <div class="container">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-7">
+                    <p class="about-eyebrow animate-on-scroll animate-left">About Us</p>
+                    <h2 class="about-title animate-on-scroll animate-left">About <span>CEE IT Connects</span></h2>
+                    <p class="about-text animate-on-scroll animate-right">
+                        CEE IT Connects is an internship coordination platform developed
+                        to support students from the College of Engineering and Information
+                        Technology of Pamantasan ng Lungsod ng Valenzuela. The system
+                        simplifies the internship process by connecting students,
+                        advisers, and partner companies through a centralized digital platform.
+                    </p>
+                </div>
+                <div class="col-lg-5">
+                    <div class="about-pillar animate-on-scroll animate-scale">
+                        <span class="about-pillar-icon"><i class="fa-solid fa-users"></i></span>
+                        <div>
+                            <h5>Students</h5>
+                            <p>CEIT students of PLV</p>
+                        </div>
+                    </div>
+                    <div class="about-pillar animate-on-scroll animate-scale">
+                        <span class="about-pillar-icon"><i class="fa-solid fa-user-tie"></i></span>
+                        <div>
+                            <h5>Advisers</h5>
+                            <p>Internship advisers and HTE advisers</p>
+                        </div>
+                    </div>
+                    <div class="about-pillar animate-on-scroll animate-scale">
+                        <span class="about-pillar-icon"><i class="fa-solid fa-building"></i></span>
+                        <div>
+                            <h5>Partner Companies</h5>
+                            <p>Partner institutions offering OJT</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="about-info-bar">
+            <div class="container">
+                <div class="row align-items-center g-4">
+                    <div class="col-lg-5 about-brand">
+                        <img src="../Sources/CEE IT Connects Logo.png" alt="CEE IT Connects logo">
+                        <div>
+                            <strong>CEE IT <span>CONNECTS</span></strong>
+                            <small>Connecting Campus to Career.</small>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 about-col">
+                        <h6>Visit Us</h6>
+                        <p><i class="fas fa-map-marker-alt"></i> Tongco St., Maysan, Valenzuela City</p>
+                        <p><i class="fab fa-facebook"></i> CEE IT Connects</p>
+                    </div>
+                    <div class="col-lg-3 about-col">
+                        <h6>Contact</h6>
+                        <p><i class="fas fa-envelope"></i> ceeitconnects@gmail.com</p>
+                        <p><i class="fas fa-phone"></i> 09123456789</p>
+                    </div>
+                </div>
+                <p class="about-copy">&copy; 2026 CEE IT Connects. All rights reserved.</p>
+            </div>
+        </div>
+    </section>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 

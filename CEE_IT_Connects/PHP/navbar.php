@@ -595,8 +595,53 @@ function timeAgo($datetime)
             }
 
             .notif-popup {
+                /* width: 260px;
+                right: -60px; */
+
                 width: 260px;
-                right: -60px;
+
+                /* position: fixed;
+                top: 70px;
+                left: 8px;
+                right: 8px;
+                width: auto;
+                max-height: calc(100dvh - 70px - 80px); */
+            }
+        }
+
+        @media (max-width: 991.98px) {
+            .navbar-brand {
+                min-width: 0;
+                margin-right: 8px;
+            }
+
+            .nav-logo {
+                flex-shrink: 0;
+            }
+
+            .navbar-icons {
+                flex: 0 0 auto;
+                padding-right: 0;
+                gap: 12px;
+            }
+        }
+
+        @media (max-width: 575.98px) {
+            .brand-text {
+                display: none;
+            }
+
+            .navbar-brand {
+                flex: 0 0 auto;
+            }
+
+            .navbar-icons {
+                flex: 1;
+                gap: 12px;
+            }
+
+            #mobileMenuToggle {
+                flex-shrink: 0;
             }
         }
 

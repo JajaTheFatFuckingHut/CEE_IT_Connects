@@ -187,7 +187,7 @@ if (!isset($_GET['room_id'])) {
 }
 
 // changed
-$section = $_GET['section'] ?? 'room';
+$section = $_GET['section'] ?? 'home';
 
 // Load statuses for the status section
 $stmt = $pdo->prepare("
@@ -381,8 +381,7 @@ $page = 'messages';
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OJT Adviser | CEE IT Connects</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">    <title>OJT Adviser | CEE IT Connects</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -626,6 +625,7 @@ $page = 'messages';
             border-radius: 12px;
             padding: 20px 22px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            min-width: 0;
         }
 
         .home-empty {
@@ -1387,6 +1387,55 @@ $page = 'messages';
             border-color: #ff6b2c;
         }
 
+        /* ── chat list show/hide ── */
+        .room-message-body {
+            min-height: 0;
+        }
+
+        .room-message-header > div:last-child {
+            min-width: 0;
+        }
+
+        .room-message-input-row textarea {
+            min-width: 0;
+        }
+
+        .room-toggle-list {
+            width: 36px;
+            height: 36px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            border-radius: 50%;
+            background: transparent;
+            color: #272f54;
+            font-size: 15px;
+            cursor: pointer;
+            transition: background .15s;
+        }
+
+        .room-toggle-list:hover {
+            background: #eef1f7;
+        }
+
+        .room-chat-wrap:not(.rc-focus) .room-toggle-list .i-back,
+        .room-chat-wrap.rc-focus .room-toggle-list .i-collapse {
+            display: none;
+        }
+
+        .room-chat-wrap.rc-focus .room-chat-list {
+            display: none;
+        }
+
+        /* tablet: slightly narrower list */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .room-chat-list {
+                width: 240px;
+            }
+        }
+
         .room-initial {
             display: none;
         }
@@ -1769,21 +1818,109 @@ $page = 'messages';
 
         @media (max-width: 992px) {
             .dash-bottom {
-                grid-template-columns: 1fr;
+                grid-template-columns: minmax(0, 1fr);
             }
+
+            .dash-side {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .dash-stats { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+            .dash-stat { padding: 12px 14px; gap: 10px; }
+            .dash-stat-icon { width: 36px; height: 36px; min-width: 36px; font-size: 15px; }
+            .dash-stat-label { font-size: 10px; }
+            .dash-stat-value { font-size: 22px; }
+
+            .sysAdm-table,
+            .ojt-status-table { min-width: 0; }
         }
 
         @media (max-width: 576px) {
-            .dash-stats {
-                grid-template-columns: 1fr;
-            }
+            .dash-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+            .dash-stat { flex-direction: column; align-items: flex-start; gap: 8px; padding: 12px; }
+            .dash-stat-icon { width: 32px; height: 32px; min-width: 32px; font-size: 14px; }
+            .dash-stat-label { font-size: 10px; }
+            .dash-stat-value { font-size: 22px; }
 
             .dash-hours {
                 display: none;
             }
+
+            .home-hero::before,
+            .home-hero::after { display: none; }
+            .home-card { padding: 16px; }
+            .dash-head { flex-wrap: wrap; gap: 8px; }
+            .dash-head .btn { white-space: nowrap; }
+            .dash-side { grid-template-columns: 1fr; }
+            .dash-bar { width: 60px; }
+            .dash-pct { width: 32px; }
+            .dash-side-card { padding: 12px 14px; gap: 8px; }
+            .dash-side-meta { padding-top: 8px; font-size: 11px; }
+            .quick-card-icon { width: 36px; height: 36px; font-size: 14px; }
+
+            .sysAdm-header--danger { padding: 16px 18px; }
+            .sysAdm-header-left { gap: 12px; }
+            .sysAdm-header-icon { width: 44px; height: 44px; min-width: 44px; font-size: 1rem; }
+            .sysAdm-header--danger h2 { font-size: 20px; }
+            .sysAdm-header--danger p { font-size: 13px; }
+
+            #docsSearchInput,
+            #searchInput,
+            #search-input,
+            #reportsSearchInput { width: 100% !important; }
         }
 
         /* addtl e */
+
+        .rm-section { margin-bottom: 20px; }
+        .rm-head { margin-bottom: 12px; }
+        .rm-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 12px;
+        }
+        .rm-card {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: #fff;
+            border-radius: 12px;
+            padding: 14px 16px;
+            text-decoration: none;
+            color: inherit;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, .05);
+            transition: transform .15s ease;
+        }
+        .rm-card:hover { transform: translateY(-2px); color: inherit; }
+        .rm-ic {
+            width: 44px; height: 44px; min-width: 44px;
+            border-radius: 12px;
+            background: #fdeee6; color: #f26b3a;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 17px;
+        }
+        .rm-info { flex: 1; min-width: 0; }
+        .rm-info strong { display: block; font-size: 15px; color: #272f54; }
+        .rm-info small { font-size: 12px; color: #8b93ab; }
+        .rm-go { font-size: 12px; color: #9aa3bd; }
+        .rm-card:hover .rm-go { color: #f26b3a; }
+
+        .room-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 14px;
+            padding: 8px 14px;
+            background: #fff;
+            border-radius: 20px;
+            color: #272f54;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, .08);
+        }
+        .room-back:hover { color: #ff6b2c; }
 
         /*===(MEDIA QUERY)===*/
         @media (max-width: 768px) {
@@ -1793,7 +1930,7 @@ $page = 'messages';
                 left: 0 !important;
                 bottom: 0 !important;
                 width: 60px !important;
-                height: calc(100vh - 70px) !important;
+                height: auto !important;
                 padding: 10px 0 !important;
                 border-radius: 0 !important;
                 display: flex !important;
@@ -1846,6 +1983,12 @@ $page = 'messages';
             .sidebar>div>a i {
                 margin: 0 !important;
             }
+
+            .home-hero { padding: 20px 18px; }
+            .home-hero h2 { font-size: 20px; }
+            .home-hero p { font-size: 13px; }
+            .home-hero::before { right: 50px; width: 36px; }
+            .home-hero::after { right: 12px; width: 36px; }
 
             /* Rooms list */
             .rooms-list {
@@ -1911,6 +2054,67 @@ $page = 'messages';
                 display: flex !important;
             }
 
+            .room-chat-wrap {
+                position: fixed;
+                top: 70px;
+                left: 60px;
+                right: 0;
+                bottom: 0;
+                width: auto;
+                height: auto;
+                margin: 0;
+                display: block;
+                overflow: hidden;
+                z-index: 1;
+            }
+
+            /* both panels fill the wrapper exactly */
+            .room-chat-list,
+            .room-message-panel {
+                position: absolute;
+                inset: 0;
+                width: 100%;
+                min-width: 0;
+                max-width: 100%;
+            }
+
+            .room-chat-list {
+                z-index: 10;
+                transition: transform .3s ease;
+            }
+
+            .room-chat-wrap.rc-focus .room-chat-list {
+                display: flex;
+                transform: translateX(-100%);
+            }
+
+            .room-message-header {
+                padding: 10px 12px;
+                gap: 8px;
+            }
+
+            .room-message-body {
+                padding: 14px 12px;
+                min-width: 0;
+            }
+
+            .room-msg-row {
+                min-width: 0;
+            }
+
+            .room-msg-bubble-wrap {
+                max-width: 80%;
+                min-width: 0;
+            }
+
+            .room-msg-bubble {
+                overflow-wrap: anywhere;
+            }
+
+            .room-message-input-bar {
+                padding: 8px 10px;
+            }
+
             /* Push main content past the sidebar */
             .main {
                 margin-left: 65px !important;
@@ -1948,7 +2152,8 @@ $page = 'messages';
                 left: 60px !important;
                 right: 0 !important;
                 bottom: 0 !important;
-                height: calc(100vh - 70px) !important;
+                /* height: calc(100vh - 70px) !important; */
+                height: 100dvh;
                 border-radius: 0 !important;
                 border: none !important;
             }
@@ -1992,6 +2197,126 @@ $page = 'messages';
 
             .sidebar a:hover::after {
                 opacity: 1;
+            }
+
+            :is(.sysAdm-table, .ojt-status-table) thead { display: none; }
+
+            :is(.sysAdm-table, .ojt-status-table),
+            :is(.sysAdm-table, .ojt-status-table) :is(tbody, tr, td) {
+                display: block;
+                width: 100%;
+            }
+
+            :is(.sysAdm-table, .ojt-status-table) tr {
+                padding: 12px 14px;
+                border-bottom: 1px solid #edf2f7;
+            }
+
+            :is(.sysAdm-table, .ojt-status-table) tr:last-child { border-bottom: none; }
+
+            :is(.sysAdm-table, .ojt-status-table) td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: 10px;
+                padding: 6px 0;
+                border-bottom: none;
+            }
+
+            /* first cell (name / company) = card title */
+            :is(.sysAdm-table, .ojt-status-table) td:first-child {
+                justify-content: flex-start;
+                padding-bottom: 10px;
+                margin-bottom: 4px;
+                border-bottom: 1px solid #edf2f7;
+            }
+
+            /* cells without a label (e.g. multi-button Actions) sit left */
+            :is(.sysAdm-table, .ojt-status-table) td:not([data-label]) { justify-content: flex-start; }
+
+            :is(.sysAdm-table, .ojt-status-table) td[data-label]::before {
+                content: attr(data-label);
+                font-size: 11px;
+                font-weight: 700;
+                color: #64748b;
+                text-transform: uppercase;
+                letter-spacing: .04em;
+                flex-shrink: 0;
+            }
+
+            /* "No ... yet" empty-state rows */
+            :is(.sysAdm-table, .ojt-status-table) td[colspan] { display: block; }
+        }
+
+        /* ===== bottom nav: phones + tablet portrait ===== */
+        .bottom-nav { display: none; }
+
+        @media (max-width: 768px), (max-width: 1024px) and (orientation: portrait) {
+            :root { --bn-h: 60px; }
+
+            /* hide the sidebar completely */
+            .sidebar { display: none !important; }
+
+            .bottom-nav {
+                display: flex;
+                position: fixed;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                z-index: 100;
+                background: #272f54;
+                padding-bottom: env(safe-area-inset-bottom);
+                box-shadow: 0 -2px 10px rgba(0, 0, 0, .15);
+            }
+
+            .bottom-nav a {
+                flex: 1;
+                min-width: 0;
+                height: var(--bn-h);
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 3px;
+                color: #aab1d4;
+                text-decoration: none;
+                font-size: 10px;
+                font-weight: 500;
+                border-top: 3px solid transparent;
+            }
+
+            .bottom-nav a i { font-size: 18px; }
+
+            .bottom-nav a span {
+                max-width: 100%;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            .bottom-nav a.active {
+                color: #fff;
+                border-top-color: #ff6b2c;
+            }
+
+            .bottom-nav a.active i { color: #ff6b2c; }
+
+            /* content uses the full width, with room for the nav */
+            .main {
+                margin-left: 0 !important;
+                padding-bottom: calc(var(--bn-h) + env(safe-area-inset-bottom) + 20px) !important;
+            }
+
+            /* chat fills the space between navbar and bottom nav */
+            .room-chat-wrap {
+                position: fixed;
+                top: 70px;
+                left: 0;
+                right: 0;
+                bottom: calc(var(--bn-h) + env(safe-area-inset-bottom));
+                height: auto;
+                margin: 0;
+                z-index: 1;
             }
         }
     </style>
@@ -2105,6 +2430,34 @@ $page = 'messages';
             </div>
         </div>
     </div>
+
+    <!-- BOTTOM NAV (mobile / tablet portrait) -->
+    <nav class="bottom-nav">
+        <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=home"
+            class="<?= in_array($section, ['', 'home', 'room', 'rooms']) ? 'active' : '' ?>">
+            <i class="fa-solid fa-house"></i><span>Home</span>
+        </a>
+        <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=announcements"
+            class="<?= $section === 'announcements' ? 'active' : '' ?>">
+            <i class="fa-solid fa-folder-open"></i><span>Docs</span>
+        </a>
+        <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=status"
+            class="<?= $section === 'status' ? 'active' : '' ?>">
+            <i class="fa-solid fa-calendar-check"></i><span>Status</span>
+        </a>
+        <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=ojt_applications"
+            class="<?= $section === 'ojt_applications' ? 'active' : '' ?>">
+            <i class="fa fa-list-ul"></i><span>Reqs</span>
+        </a>
+        <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=weekly_reports"
+            class="<?= $section === 'weekly_reports' ? 'active' : '' ?>">
+            <i class="fa-solid fa-file-lines"></i><span>Reports</span>
+        </a>
+        <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=chats"
+            class="<?= $section === 'chats' ? 'active' : '' ?>">
+            <i class="fa-solid fa-comments"></i><span>Chats</span>
+        </a>
+    </nav>
 
     <!-- MAIN CONTENT -->
     <div class="main">
@@ -2346,16 +2699,49 @@ $page = 'messages';
                 </div>
             </div>
 
+            <!-- MY ROOMS -->
+            <div class="rm-section">
+                <div class="rm-head">
+                    <h5 class="fw-bold mb-0"><i class="fa-solid fa-users me-2" style="color:#ff6b2c;"></i>My Rooms</h5>
+                    <small class="text-muted">Open a room to post announcements and see its members.</small>
+                </div>
+
+                <?php if (empty($myRooms)): ?>
+                    <div class="home-empty">You're not in any rooms yet.</div>
+                <?php else: ?>
+                    <div class="rm-grid">
+                        <?php foreach ($myRooms as $r):
+                            $meta = array_filter([
+                                !empty($r['school_year']) ? 'S.Y. ' . $r['school_year'] : '',
+                                $r['year_level'] ?? '',
+                                $r['section'] ?? '',
+                            ]);
+                            ?>
+                            <a href="ojt-rooms.php?room_id=<?= (int) $r['id'] ?>&section=room" class="rm-card">
+                                <div class="rm-ic"><i class="fa-solid fa-users"></i></div>
+                                <div class="rm-info">
+                                    <strong><?= htmlspecialchars($r['room_name']) ?></strong>
+                                    <?php if ($meta): ?>
+                                        <small><?= htmlspecialchars(implode(' · ', $meta)) ?></small>
+                                    <?php endif; ?>
+                                </div>
+                                <i class="fa-solid fa-chevron-right rm-go"></i>
+                            </a>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
+            </div>
+
             <div class="row g-3">
                 <div class="col-lg-8">
                     <div class="home-card accent-orange">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="dash-head">
                             <div>
                                 <h5 class="fw-bold mb-0"><i class="fa-solid fa-bullhorn me-2"
                                         style="color:#ff6b2c;"></i>Announcements</h5>
                                 <small class="text-muted">Latest updates and important notices for your room.</small>
                             </div>
-                            <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>" class="btn btn-sm"
+                            <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=room" class="btn btn-sm"
                                 style="background:#eef1fb;color:#272f54;border-radius:20px;font-weight:600;">
                                 View All <i class="fa-solid fa-arrow-right ms-1"></i>
                             </a>
@@ -2605,7 +2991,7 @@ $page = 'messages';
             </div>
 
             <div class="row g-3 mt-1">
-                <div class="col-lg-5">
+                <div class="col-md-6 col-lg-5">
                     <div class="home-card accent-blue h-100">
                         <div class="dash-head">
                             <div>
@@ -2620,7 +3006,7 @@ $page = 'messages';
                     </div>
                 </div>
 
-                <div class="col-lg-4">
+                <div class="col-md-6 col-lg-4">
                     <div class="home-card accent-amber h-100">
                         <div class="dash-head">
                             <div>
@@ -2653,6 +3039,9 @@ $page = 'messages';
             <!-- addtl e -->
         <?php elseif ($section === 'room' || $section === 'rooms'): ?>
             <?php if ($current_room_id): ?>
+                <a href="ojt-rooms.php?room_id=<?= (int) $current_room_id ?>&section=home" class="room-back">
+                    <i class="fa-solid fa-arrow-left"></i> Back to Home
+                </a>
                 <?php include 'chat-room-content.php'; ?>
             <?php endif; ?>
         <?php elseif ($section === 'announcements'): ?>
@@ -2739,9 +3128,9 @@ $page = 'messages';
                                                     <span><?= htmlspecialchars($d['company']) ?></span>
                                                 </div>
                                             </td>
-                                            <td><?= $docPill(!empty($d['mou_available'])) ?></td>
-                                            <td><?= $docPill(!empty($d['recommendation_letter_available'])) ?></td>
-                                            <td><?= $docPill(!empty($d['waiver_available'])) ?></td>
+                                            <td data-label="MOU"><?= $docPill(!empty($d['mou_available'])) ?></td>
+                                            <td data-label="Reco Letter"><?= $docPill(!empty($d['recommendation_letter_available'])) ?></td>
+                                            <td data-label="Waiver"><?= $docPill(!empty($d['waiver_available'])) ?></td>
                                         </tr>
                                     <?php endforeach; ?>
                                 <?php endif; ?>
@@ -3274,10 +3663,10 @@ $page = 'messages';
             $avatarColors = ['#ff2c8f', '#2c6fff', '#1abc9c', '#9b59b6', '#e67e22', '#e74c3c', '#16a085'];
             ?>
 
-            <div class="room-chat-wrap">
+            <div class="room-chat-wrap" id="roomChatWrap">
 
                 <!-- Left: chat list -->
-                <div class="room-chat-list">
+                <div class="room-chat-list" id="roomChatList">
                     <div class="room-chat-list-header">
                         <h5>Chats</h5>
                     </div>
@@ -3347,6 +3736,11 @@ $page = 'messages';
 
                         <!-- Header -->
                         <div class="room-message-header">
+                            <button type="button" class="room-toggle-list" id="roomToggleList" onclick="roomToggleList()"
+                                title="Hide chat list" aria-label="Hide chat list">
+                                <i class="fa-solid fa-angles-left i-collapse"></i>
+                                <i class="fa-solid fa-arrow-left i-back"></i>
+                            </button>
                             <div class="room-chat-avatar"
                                 style="background:<?= $openColor ?>; width:36px; height:36px; font-size:14px;">
                                 <?= strtoupper(substr($openName, 0, 1)) ?>
@@ -3358,7 +3752,6 @@ $page = 'messages';
                                 </div>
                             </div>
                         </div>
-
                         <!-- Messages -->
                         <div class="room-message-body" id="roomMsgBody">
                             <?php if (empty($chatMessages)): ?>
@@ -3561,7 +3954,17 @@ $page = 'messages';
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
-                    scales: { x: { beginAtZero: true } }
+                    scales: {
+                        x: { beginAtZero: true },
+                        y: {
+                            ticks: {
+                                callback: function (v) {
+                                    const l = this.getLabelForValue(v);
+                                    return l.length > 12 ? l.slice(0, 12) + '…' : l;
+                                }
+                            }
+                        }
+                    }
                 }
             });
         }
@@ -3592,6 +3995,41 @@ $page = 'messages';
                 el.style.display = el.dataset.name.includes(q) ? '' : 'none';
             });
         }
+
+        /* ── chat list: show / hide (back button on mobile) ── */
+        function roomSyncToggle() {
+            const wrap = document.getElementById('roomChatWrap');
+            const btn = document.getElementById('roomToggleList');
+            if (!wrap || !btn) return;
+            const label = wrap.classList.contains('rc-focus') ? 'Show chat list' : 'Hide chat list';
+            btn.title = label;
+            btn.setAttribute('aria-label', label);
+        }
+
+        function roomToggleList() {
+            const wrap = document.getElementById('roomChatWrap');
+            if (!wrap) return;
+            wrap.classList.toggle('rc-focus');
+            roomSyncToggle();
+        }
+
+        /* tapping a contact on a phone: slide the list away while the page loads */
+        document.querySelectorAll('#roomChatEntries .room-chat-entry').forEach(a => {
+            a.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    document.getElementById('roomChatWrap')?.classList.add('rc-focus');
+                }
+            });
+        });
+
+        /* phone + chat already open: start with the list hidden */
+        (function () {
+            const wrap = document.getElementById('roomChatWrap');
+            if (wrap && document.getElementById('roomMsgBody') && window.innerWidth <= 768) {
+                wrap.classList.add('rc-focus');
+            }
+            roomSyncToggle();
+        })();
 
         // Auto-scroll to bottom
         const msgBody = document.getElementById('roomMsgBody');

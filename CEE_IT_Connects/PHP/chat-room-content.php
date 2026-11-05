@@ -1288,6 +1288,313 @@ $backLink = getDashboardByRole($_SESSION['role']);
             .rm-composer-foot {
                 padding-left: 0;
             }
+
+            .rm-hero:has(.circle-progress) {
+                flex-direction: row;
+                flex-wrap: nowrap;
+                align-items: center;
+                justify-content: space-between;
+            }
+
+            .rm-hero:has(.circle-progress) > div:first-child {
+                flex: 1;
+                min-width: 0;
+                width: auto;
+            }
+
+            .rm-hero:has(.circle-progress) .rm-hero-right {
+                width: auto;
+                flex-shrink: 0;
+                padding-top: 0;
+                border-top: none;
+            }
+
+            .circle-progress {
+                width: 60px;
+                height: 60px;
+                margin: 0 auto 4px;
+            }
+
+            .circle-progress span {
+                width: 46px;
+                height: 46px;
+            }
+
+            .rm-hero-right .text-end small {
+                display: block;
+                text-align: center;
+                white-space: nowrap;
+                font-size: 13px;
+                font-weight: 600;
+            }
+        }
+
+                /* ── ROOM PAGE: phones ── */
+        /* @media (max-width: 576px) {
+
+            .rm-hero {
+                padding: 14px;
+                gap: 12px;
+            }
+
+            .rm-hero > div:first-child { width: 100%; }
+
+            .rm-hero h5 {
+                font-size: 19px;
+                margin-bottom: 8px;
+            }
+
+            .rm-chips { gap: 6px; }
+
+            .rm-chip {
+                font-size: 12px;
+                padding: 3px 10px;
+            }
+
+            .rm-hero-right .text-end .text-end {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                text-align: left !important;
+            }
+
+            .circle-progress {
+                width: 52px;
+                height: 52px;
+                margin: 0;
+                flex-shrink: 0;
+            }
+
+            .circle-progress span {
+                width: 40px;
+                height: 40px;
+                font-size: 10px;
+            }
+
+            .rm-hero-right .text-end small { font-size: 13px; }
+
+            .rm-hero-right { gap: 8px; }
+
+            .rm-count {
+                flex: 1;
+                min-width: 0;
+                padding: 8px 10px;
+            }
+
+            .rm-hero-right .btn-update {
+                width: 100% !important;
+                padding: 10px 16px !important;
+                font-size: 14px !important;
+            }
+
+            .rm-tabs {
+                gap: 18px;
+                margin: 12px 0;
+                overflow-x: auto;
+            }
+
+            .rm-tab {
+                font-size: 13px;
+                white-space: nowrap;
+            }
+
+            .rm-card { padding: 14px; }
+            .rm-post-body { font-size: 13.5px; }
+            .rm-composer textarea { min-width: 0; }
+
+            .rm-composer-foot {
+                flex-direction: column-reverse;
+                align-items: stretch;
+            }
+
+            .rm-post-btn {
+                width: 100%;
+                padding: 10px 16px;
+            }
+
+            .rm-hint { text-align: center; }
+            .rm-dr span:last-child { overflow-wrap: anywhere; }
+
+            .rm-search {
+                flex: 1 1 100%;
+                max-width: none;
+                min-width: 0;
+            }
+
+            .rm-filters {
+                flex: 1 1 100%;
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                padding-bottom: 2px;
+            }
+
+            .rm-filter {
+                flex-shrink: 0;
+                white-space: nowrap;
+            }
+
+            #memberCount {
+                margin-left: 0 !important;
+                flex: 1;
+            }
+
+            .rm-mgrid { grid-template-columns: minmax(0, 1fr); }
+
+            .rm-mcard {
+                display: grid;
+                grid-template-columns: 38px minmax(0, 1fr);
+                gap: 2px 12px;
+                align-items: center;
+                padding: 12px 36px 12px 12px;
+            }
+
+            .rm-mcard .rm-avatar { grid-row: 1 / span 2; }
+
+            .rm-mcard .rm-pill {
+                grid-column: 2;
+                justify-self: start;
+                margin-top: 4px;
+            }
+
+            .rm-remove-form { top: 4px; right: 4px; }
+
+            #addParticipantModal .participant-info { min-width: 0; }
+            #addParticipantModal .participant-info small { overflow-wrap: anywhere; }
+        } */
+
+                /* ── ROOM PAGE: compact hero on phones ── */
+        @media (max-width: 576px) {
+
+            .rm-hero {
+                gap: 10px;
+                padding: 14px 14px 12px;
+            }
+
+            .rm-hero h5 {
+                font-size: 20px;
+                margin-bottom: 4px;
+            }
+
+            /* chips become one quiet line: BSIT 4-5 · S.Y. 2026-2027 · Norma Castillo */
+            .rm-chips {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 2px;
+            }
+
+            .rm-chip + .rm-chip::before {
+                content: none;
+            }
+
+            .rm-chip {
+                padding: 0;
+                background: none;
+                font-size: 12.5px;
+                color: rgba(255, 255, 255, .8);
+            }
+
+            .rm-chip i { display: none; }
+
+            .rm-chip + .rm-chip::before {
+                content: "·";
+                margin: 0 8px;
+                font-weight: 700;
+            }
+
+            /* progress / counts get their own divided row */
+            /* title block on the left, progress circle on the far right */
+            .rm-hero:has(.circle-progress) {
+                flex-direction: row;
+                flex-wrap: nowrap;
+                align-items: center;
+                justify-content: space-between;
+            }
+
+            .rm-hero:has(.circle-progress) > div:first-child {
+                flex: 1;
+                min-width: 0;
+            }
+
+            .rm-hero:has(.circle-progress) .rm-hero-right {
+                width: auto;
+                flex-shrink: 0;
+                padding-top: 0;
+                border-top: none;
+            }
+
+            .circle-progress {
+                width: 52px;
+                height: 52px;
+                margin: 0 auto 4px;   /* centered above the hours text */
+            }
+
+            .circle-progress span {
+                width: 40px;
+                height: 40px;
+                font-size: 10px;
+            }
+
+            .rm-hero-right .text-end small {
+                display: block;
+                text-align: center;
+                font-size: 12px;
+                font-weight: 600;
+                white-space: nowrap;
+            }
+
+            /* adviser/admin view (no circle) keeps the divided row */
+            .rm-hero:not(:has(.circle-progress)) .rm-hero-right {
+                padding-top: 10px;
+                border-top: 1px solid rgba(255, 255, 255, .15);
+            }
+
+            /* "Room details" repeats what the hero already shows */
+            .rm-grid > .rm-col:last-child > .rm-card:first-child { display: none; }
+
+            .rm-tabs {
+                gap: 0;
+                overflow-x: auto;
+            }
+
+            .rm-tab {
+                flex: 1 1 0;
+                min-width: 0;
+                justify-content: center;
+                gap: 6px;
+                font-size: 13px;
+                white-space: nowrap;
+            }
+
+            .rm-cnt {
+                font-size: 10px;
+                padding: 1px 6px;
+            }
+        }
+
+        /* this mq is for a very narrow screen just in case .. */
+        @media (max-width: 380px) {
+            /* drop the tab icons so the label + count fit */
+            .rm-tab i {
+                display: none;
+            }
+
+            /* the title was wrapping to 3 lines; stack the progress under it instead */
+            .rm-hero:has(.circle-progress) {
+                flex-wrap: wrap;
+            }
+
+            .rm-hero:has(.circle-progress) > div:first-child {
+                flex: 1 1 100%;
+            }
+
+            .rm-hero:has(.circle-progress) .rm-hero-right {
+                width: 100%;
+                justify-content: flex-start;
+            }
+
+            .rm-hero-right .text-end small {
+                text-align: left;
+            }
         }
 
         /* addtl e */
@@ -1410,6 +1717,14 @@ $backLink = getDashboardByRole($_SESSION['role']);
             padding: 8px 16px;
             border-radius: 8px;
         }
+
+        @media (min-width: 577px) and (max-width: 992px) {
+            .rm-grid > .rm-col:last-child {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                align-items: start;
+            }
+        }
     </style>
 </head>
 
@@ -1523,8 +1838,7 @@ $rmFmtTime = function ($ts): string {
                         <?= htmlspecialchars($room['school_year']) ?></span>
                 <?php endif; ?>
             <?php elseif (!empty($room['section'])): ?>
-                <span class="rm-chip"><i class="fa-solid fa-graduation-cap"></i>
-                    <?= htmlspecialchars($rmClassLabel) ?></span>
+                
                 <?php if (!empty($room['school_year'])): ?>
                     <span class="rm-chip"><i class="fa-solid fa-calendar"></i> S.Y.
                         <?= htmlspecialchars($room['school_year']) ?></span>

@@ -14,6 +14,32 @@
                     'box-shadow:0 4px 14px rgba(0,0,0,.15);max-width:260px;';
                 t.innerHTML = 'Hours completed. Account deactivates in <b id="ojt-deact-count">…</b>';
                 document.documentElement.appendChild(t);
+
+                // small screens: sit beside the sidebar, shrink, don't cover content
+                const mq = window.matchMedia('(max-width: 768px)');
+                const place = () => {
+                    if (mq.matches) {
+                        t.style.left = 'auto';
+                        t.style.right = '8px';
+                        t.style.top = '76px';
+                        t.style.maxWidth = '190px';
+                        t.style.fontSize = '10.5px';
+                        t.style.lineHeight = '1.25';
+                        t.style.padding = '4px 8px';
+                        t.style.borderLeftWidth = '3px';
+                    } else {
+                        t.style.left = 'auto';
+                        t.style.right = '16px';
+                        t.style.top = '80px';
+                        t.style.maxWidth = '260px';
+                        t.style.fontSize = '13px';
+                        t.style.padding = '8px 12px';
+                        t.style.lineHeight = '1.3';
+                        t.style.borderLeftWidth = '4px';
+                    }
+                };
+                place();
+                mq.addEventListener('change', place);
                 return t;
             }
 
