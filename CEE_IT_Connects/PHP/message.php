@@ -4138,26 +4138,28 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                                                     <?= nl2br(htmlspecialchars($msg['message'])) ?>
                                                 <?php endif; ?>
 
-                                                <?php if (!empty($msg['attachment_path'])): ?>
+                                                <?php if (!empty($msg['has_attachment'])):
+                                                    $fileUrl = 'file.php?id=' . (int) $msg['id']; ?>
                                                     <div class="rc-attachment"
                                                         style="<?= !empty($msg['message']) ? 'margin-top:8px;' : '' ?>">
+
                                                         <?php if ($msg['attachment_type'] === 'image'): ?>
-                                                            <a href="<?= htmlspecialchars($msg['attachment_path']) ?>" target="_blank">
-                                                                <img src="<?= htmlspecialchars($msg['attachment_path']) ?>" alt="attachment"
+                                                            <a href="<?= $fileUrl ?>" target="_blank">
+                                                                <img src="<?= $fileUrl ?>" alt="attachment"
                                                                     style="max-width:220px; border-radius:10px; display:block;">
                                                             </a>
 
                                                         <?php elseif ($msg['attachment_type'] === 'video'): ?>
                                                             <video controls style="max-width:240px; border-radius:10px;">
-                                                                <source src="<?= htmlspecialchars($msg['attachment_path']) ?>">
+                                                                <source src="<?= $fileUrl ?>">
                                                                 Your browser does not support video playback.
                                                             </video>
 
                                                         <?php else: /* pdf or doc */ ?>
-                                                            <a href="<?= htmlspecialchars($msg['attachment_path']) ?>" target="_blank"
+                                                            <a href="<?= $fileUrl ?>" target="_blank"
                                                                 style="display:flex; align-items:center; gap:8px; padding:8px 12px;
-                                                                        background:#fff; border:1px solid #e5e7eb; border-radius:10px;
-                                                                        text-decoration:none; color:#333; font-size:12.5px;">
+                                                                    background:#fff; border:1px solid #e5e7eb; border-radius:10px;
+                                                                    text-decoration:none; color:#333; font-size:12.5px;">
                                                                 <i class="fa-solid <?= $msg['attachment_type'] === 'pdf' ? 'fa-file-pdf' : 'fa-file-word' ?>"
                                                                     style="font-size:18px; color:<?= $msg['attachment_type'] === 'pdf' ? '#dc2626' : '#2563eb' ?>;"></i>
                                                                 <span><?= htmlspecialchars($msg['attachment_name']) ?></span>
