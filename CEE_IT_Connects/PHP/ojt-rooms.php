@@ -3,11 +3,46 @@ session_start();
 require 'db.php';
 require 'auth.php';
 
+if (!function_exists('chatPreview')) {
+    function chatPreview(?array $row): string
+    {
+        if (!$row)
+            return 'No messages yet';
+        $text = trim($row['last_message'] ?? '');
+        if ($text !== '')
+            return $text;
+        switch ($row['attachment_type'] ?? '') {
+            case 'image':
+                return 'Photo';
+            case 'video':
+                return 'Video';
+            case 'pdf':
+                return 'Pdf' . ($row['attachment_name'] ?: 'PDF');
+            case 'doc':
+                return 'Docs' . ($row['attachment_name'] ?: 'Document');
+            default:
+                return 'No messages yet';
+        }
+    }
+}
+
 $role = $_SESSION['role'] ?? null;
 $isAdviser = isset($_SESSION['role']) && $_SESSION['role'] === 'internship_adviser';
 $adviser_id = $_SESSION['user_id'];
 $current_room_id = $_GET['room_id'] ?? null;
 
+$chatSection_id = isset($_GET['chat_id']) ? (int) $_GET['chat_id'] : null;
+$chatSection_type = $_GET['chat_type'] ?? null;
+if (!in_array($chatSection_type, ['student', 'adviser'], true)) {
+    $chatSection_id = $chatSection_type = null;
+}
+if ($chatSection_id) {
+    $allowed = array_filter($chattableUsers, fn($u) =>
+        (int) $u['user_id'] === $chatSection_id && $u['user_type'] === $chatSection_type);
+    if (!$allowed) {
+        $chatSection_id = $chatSection_type = null;
+    }
+}
 $roleMap = [
     'hte_adviser' => ['user_type' => 'adviser', 'table' => 'advisers'],
     'internship_adviser' => ['user_type' => 'adviser', 'table' => 'advisers'],
@@ -311,42 +346,41 @@ $chattableUsers = $chattableStmt->fetchAll(PDO::FETCH_ASSOC);
 
 // ── Fetch existing chat conversations for this adviser ────────────────────────
 $adviserChatStmt = $pdo->prepare("
-    SELECT
-        CASE WHEN sender_id = :uid THEN receiver_id ELSE sender_id END AS chat_user_id,
-        CASE WHEN sender_id = :uid THEN receiver_type ELSE sender_type END AS chat_user_type,
-        MAX(created_at) AS last_message_at,
-        (SELECT message FROM messages m2
-         WHERE (m2.sender_id = :uid AND m2.receiver_id = CASE WHEN sender_id = :uid THEN receiver_id ELSE sender_id END)
-            OR (m2.receiver_id = :uid AND m2.sender_id = CASE WHEN sender_id = :uid THEN receiver_id ELSE sender_id END)
-         ORDER BY m2.created_at DESC LIMIT 1) AS last_message
-    FROM messages
-    WHERE (sender_id = :uid AND sender_type = 'adviser')
-       OR (receiver_id = :uid AND receiver_type = 'adviser')
-    GROUP BY chat_user_id, chat_user_type
-    ORDER BY last_message_at DESC
+    SELECT DISTINCT ON (chat_user_id, chat_user_type)
+           chat_user_id, chat_user_type, last_message,
+           attachment_type, attachment_name, last_message_at
+    FROM (
+        SELECT
+            CASE WHEN sender_id = ? AND sender_type = 'adviser' THEN receiver_id   ELSE sender_id   END AS chat_user_id,
+            CASE WHEN sender_id = ? AND sender_type = 'adviser' THEN receiver_type ELSE sender_type END AS chat_user_type,
+            message AS last_message,
+            attachment_type, attachment_name,
+            created_at AS last_message_at,
+            id
+        FROM messages
+        WHERE (sender_id = ? AND sender_type = 'adviser')
+           OR (receiver_id = ? AND receiver_type = 'adviser')
+    ) t
+    ORDER BY chat_user_id, chat_user_type, last_message_at DESC, id DESC
 ");
-$adviserChatStmt->execute(['uid' => $adviser_id]);
+$adviserChatStmt->execute([$adviser_id, $adviser_id, $adviser_id, $adviser_id]);
 $adviserChats = $adviserChatStmt->fetchAll(PDO::FETCH_ASSOC);
-
-// ── Fetch messages if a chat is open ─────────────────────────────────────────
-$chatSection_id = $_GET['chat_id'] ?? null;
-$chatSection_type = $_GET['chat_type'] ?? null;
 $chatMessages = [];
 
 if ($chatSection_id && $section === 'chats') {
     $msgStmt = $pdo->prepare("
-        SELECT m.*, 
-            COALESCE(s.full_name, a.full_name) AS sender_name
+        SELECT m.id, m.sender_id, m.sender_type, m.message, m.created_at,
+               m.attachment_name, m.attachment_type,
+               CASE WHEN m.attachment_data IS NOT NULL THEN 1 ELSE 0 END AS has_attachment,
+               COALESCE(s.full_name, a.full_name) AS sender_name
         FROM messages m
-        LEFT JOIN students s  ON m.sender_id = s.id AND m.sender_type = 'student'
-        LEFT JOIN advisers a  ON m.sender_id = a.id AND m.sender_type = 'adviser'
-        WHERE
-            (m.sender_id = ? AND m.sender_type = 'adviser'
-             AND m.receiver_id = ? AND m.receiver_type = ?)
-            OR
-            (m.sender_id = ? AND m.sender_type = ?
-             AND m.receiver_id = ? AND m.receiver_type = 'adviser')
-        ORDER BY m.created_at ASC
+        LEFT JOIN students s ON m.sender_id = s.id AND m.sender_type = 'student'
+        LEFT JOIN advisers a ON m.sender_id = a.id AND m.sender_type = 'adviser'
+        WHERE (m.sender_id = ? AND m.sender_type = 'adviser'
+               AND m.receiver_id = ? AND m.receiver_type = ?)
+           OR (m.sender_id = ? AND m.sender_type = ?
+               AND m.receiver_id = ? AND m.receiver_type = 'adviser')
+        ORDER BY m.created_at ASC, m.id ASC
     ");
     $msgStmt->execute([
         $adviser_id,
@@ -381,7 +415,8 @@ $page = 'messages';
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">    <title>OJT Adviser | CEE IT Connects</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>OJT Adviser | CEE IT Connects</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -1392,7 +1427,7 @@ $page = 'messages';
             min-height: 0;
         }
 
-        .room-message-header > div:last-child {
+        .room-message-header>div:last-child {
             min-width: 0;
         }
 
@@ -1826,60 +1861,162 @@ $page = 'messages';
                 grid-template-columns: repeat(2, minmax(0, 1fr));
             }
 
-            .dash-stats { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
-            .dash-stat { padding: 12px 14px; gap: 10px; }
-            .dash-stat-icon { width: 36px; height: 36px; min-width: 36px; font-size: 15px; }
-            .dash-stat-label { font-size: 10px; }
-            .dash-stat-value { font-size: 22px; }
+            .dash-stats {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+                gap: 12px;
+            }
+
+            .dash-stat {
+                padding: 12px 14px;
+                gap: 10px;
+            }
+
+            .dash-stat-icon {
+                width: 36px;
+                height: 36px;
+                min-width: 36px;
+                font-size: 15px;
+            }
+
+            .dash-stat-label {
+                font-size: 10px;
+            }
+
+            .dash-stat-value {
+                font-size: 22px;
+            }
 
             .sysAdm-table,
-            .ojt-status-table { min-width: 0; }
+            .ojt-status-table {
+                min-width: 0;
+            }
         }
 
         @media (max-width: 576px) {
-            .dash-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-            .dash-stat { flex-direction: column; align-items: flex-start; gap: 8px; padding: 12px; }
-            .dash-stat-icon { width: 32px; height: 32px; min-width: 32px; font-size: 14px; }
-            .dash-stat-label { font-size: 10px; }
-            .dash-stat-value { font-size: 22px; }
+            .dash-stats {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 10px;
+            }
+
+            .dash-stat {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+                padding: 12px;
+            }
+
+            .dash-stat-icon {
+                width: 32px;
+                height: 32px;
+                min-width: 32px;
+                font-size: 14px;
+            }
+
+            .dash-stat-label {
+                font-size: 10px;
+            }
+
+            .dash-stat-value {
+                font-size: 22px;
+            }
 
             .dash-hours {
                 display: none;
             }
 
             .home-hero::before,
-            .home-hero::after { display: none; }
-            .home-card { padding: 16px; }
-            .dash-head { flex-wrap: wrap; gap: 8px; }
-            .dash-head .btn { white-space: nowrap; }
-            .dash-side { grid-template-columns: 1fr; }
-            .dash-bar { width: 60px; }
-            .dash-pct { width: 32px; }
-            .dash-side-card { padding: 12px 14px; gap: 8px; }
-            .dash-side-meta { padding-top: 8px; font-size: 11px; }
-            .quick-card-icon { width: 36px; height: 36px; font-size: 14px; }
+            .home-hero::after {
+                display: none;
+            }
 
-            .sysAdm-header--danger { padding: 16px 18px; }
-            .sysAdm-header-left { gap: 12px; }
-            .sysAdm-header-icon { width: 44px; height: 44px; min-width: 44px; font-size: 1rem; }
-            .sysAdm-header--danger h2 { font-size: 20px; }
-            .sysAdm-header--danger p { font-size: 13px; }
+            .home-card {
+                padding: 16px;
+            }
+
+            .dash-head {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .dash-head .btn {
+                white-space: nowrap;
+            }
+
+            .dash-side {
+                grid-template-columns: 1fr;
+            }
+
+            .dash-bar {
+                width: 60px;
+            }
+
+            .dash-pct {
+                width: 32px;
+            }
+
+            .dash-side-card {
+                padding: 12px 14px;
+                gap: 8px;
+            }
+
+            .dash-side-meta {
+                padding-top: 8px;
+                font-size: 11px;
+            }
+
+            .quick-card-icon {
+                width: 36px;
+                height: 36px;
+                font-size: 14px;
+            }
+
+            .sysAdm-header--danger {
+                padding: 16px 18px;
+            }
+
+            .sysAdm-header-left {
+                gap: 12px;
+            }
+
+            .sysAdm-header-icon {
+                width: 44px;
+                height: 44px;
+                min-width: 44px;
+                font-size: 1rem;
+            }
+
+            .sysAdm-header--danger h2 {
+                font-size: 20px;
+            }
+
+            .sysAdm-header--danger p {
+                font-size: 13px;
+            }
 
             #docsSearchInput,
             #searchInput,
             #search-input,
-            #reportsSearchInput { width: 100% !important; }
+            #reportsSearchInput {
+                width: 100% !important;
+            }
         }
 
         /* addtl e */
 
-        .rm-section { margin-bottom: 20px; }
-        .rm-head { margin-bottom: 12px; }
+        .rm-section {
+            margin-bottom: 20px;
+        }
+
+        .rm-head {
+            margin-bottom: 12px;
+        }
+
         .rm-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
             gap: 12px;
         }
+
         .rm-card {
             display: flex;
             align-items: center;
@@ -1892,19 +2029,49 @@ $page = 'messages';
             box-shadow: 0 2px 10px rgba(0, 0, 0, .05);
             transition: transform .15s ease;
         }
-        .rm-card:hover { transform: translateY(-2px); color: inherit; }
+
+        .rm-card:hover {
+            transform: translateY(-2px);
+            color: inherit;
+        }
+
         .rm-ic {
-            width: 44px; height: 44px; min-width: 44px;
+            width: 44px;
+            height: 44px;
+            min-width: 44px;
             border-radius: 12px;
-            background: #fdeee6; color: #f26b3a;
-            display: flex; align-items: center; justify-content: center;
+            background: #fdeee6;
+            color: #f26b3a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-size: 17px;
         }
-        .rm-info { flex: 1; min-width: 0; }
-        .rm-info strong { display: block; font-size: 15px; color: #272f54; }
-        .rm-info small { font-size: 12px; color: #8b93ab; }
-        .rm-go { font-size: 12px; color: #9aa3bd; }
-        .rm-card:hover .rm-go { color: #f26b3a; }
+
+        .rm-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .rm-info strong {
+            display: block;
+            font-size: 15px;
+            color: #272f54;
+        }
+
+        .rm-info small {
+            font-size: 12px;
+            color: #8b93ab;
+        }
+
+        .rm-go {
+            font-size: 12px;
+            color: #9aa3bd;
+        }
+
+        .rm-card:hover .rm-go {
+            color: #f26b3a;
+        }
 
         .room-back {
             display: inline-flex;
@@ -1920,7 +2087,10 @@ $page = 'messages';
             text-decoration: none;
             box-shadow: 0 1px 4px rgba(0, 0, 0, .08);
         }
-        .room-back:hover { color: #ff6b2c; }
+
+        .room-back:hover {
+            color: #ff6b2c;
+        }
 
         /*===(MEDIA QUERY)===*/
         @media (max-width: 768px) {
@@ -1984,11 +2154,27 @@ $page = 'messages';
                 margin: 0 !important;
             }
 
-            .home-hero { padding: 20px 18px; }
-            .home-hero h2 { font-size: 20px; }
-            .home-hero p { font-size: 13px; }
-            .home-hero::before { right: 50px; width: 36px; }
-            .home-hero::after { right: 12px; width: 36px; }
+            .home-hero {
+                padding: 20px 18px;
+            }
+
+            .home-hero h2 {
+                font-size: 20px;
+            }
+
+            .home-hero p {
+                font-size: 13px;
+            }
+
+            .home-hero::before {
+                right: 50px;
+                width: 36px;
+            }
+
+            .home-hero::after {
+                right: 12px;
+                width: 36px;
+            }
 
             /* Rooms list */
             .rooms-list {
@@ -2199,7 +2385,9 @@ $page = 'messages';
                 opacity: 1;
             }
 
-            :is(.sysAdm-table, .ojt-status-table) thead { display: none; }
+            :is(.sysAdm-table, .ojt-status-table) thead {
+                display: none;
+            }
 
             :is(.sysAdm-table, .ojt-status-table),
             :is(.sysAdm-table, .ojt-status-table) :is(tbody, tr, td) {
@@ -2212,7 +2400,9 @@ $page = 'messages';
                 border-bottom: 1px solid #edf2f7;
             }
 
-            :is(.sysAdm-table, .ojt-status-table) tr:last-child { border-bottom: none; }
+            :is(.sysAdm-table, .ojt-status-table) tr:last-child {
+                border-bottom: none;
+            }
 
             :is(.sysAdm-table, .ojt-status-table) td {
                 display: flex;
@@ -2232,7 +2422,9 @@ $page = 'messages';
             }
 
             /* cells without a label (e.g. multi-button Actions) sit left */
-            :is(.sysAdm-table, .ojt-status-table) td:not([data-label]) { justify-content: flex-start; }
+            :is(.sysAdm-table, .ojt-status-table) td:not([data-label]) {
+                justify-content: flex-start;
+            }
 
             :is(.sysAdm-table, .ojt-status-table) td[data-label]::before {
                 content: attr(data-label);
@@ -2245,17 +2437,26 @@ $page = 'messages';
             }
 
             /* "No ... yet" empty-state rows */
-            :is(.sysAdm-table, .ojt-status-table) td[colspan] { display: block; }
+            :is(.sysAdm-table, .ojt-status-table) td[colspan] {
+                display: block;
+            }
         }
 
         /* ===== bottom nav: phones + tablet portrait ===== */
-        .bottom-nav { display: none; }
+        .bottom-nav {
+            display: none;
+        }
 
-        @media (max-width: 768px), (max-width: 1024px) and (orientation: portrait) {
-            :root { --bn-h: 60px; }
+        @media (max-width: 768px),
+        (max-width: 1024px) and (orientation: portrait) {
+            :root {
+                --bn-h: 60px;
+            }
 
             /* hide the sidebar completely */
-            .sidebar { display: none !important; }
+            .sidebar {
+                display: none !important;
+            }
 
             .bottom-nav {
                 display: flex;
@@ -2285,7 +2486,9 @@ $page = 'messages';
                 border-top: 3px solid transparent;
             }
 
-            .bottom-nav a i { font-size: 18px; }
+            .bottom-nav a i {
+                font-size: 18px;
+            }
 
             .bottom-nav a span {
                 max-width: 100%;
@@ -2299,7 +2502,9 @@ $page = 'messages';
                 border-top-color: #ff6b2c;
             }
 
-            .bottom-nav a.active i { color: #ff6b2c; }
+            .bottom-nav a.active i {
+                color: #ff6b2c;
+            }
 
             /* content uses the full width, with room for the nav */
             .main {
@@ -3129,7 +3334,9 @@ $page = 'messages';
                                                 </div>
                                             </td>
                                             <td data-label="MOU"><?= $docPill(!empty($d['mou_available'])) ?></td>
-                                            <td data-label="Reco Letter"><?= $docPill(!empty($d['recommendation_letter_available'])) ?></td>
+                                            <td data-label="Reco Letter">
+                                                <?= $docPill(!empty($d['recommendation_letter_available'])) ?>
+                                            </td>
                                             <td data-label="Waiver"><?= $docPill(!empty($d['waiver_available'])) ?></td>
                                         </tr>
                                     <?php endforeach; ?>
@@ -3649,17 +3856,12 @@ $page = 'messages';
 
         <?php elseif ($section === 'chats'): ?>
             <?php
-            // Build a lookup of existing chats keyed by user_id+type for last message preview
             $chatLookup = [];
             foreach ($adviserChats as $ac) {
-                $key = $ac['chat_user_id'] . '-' . $ac['chat_user_type'];
-                $chatLookup[$key] = $ac;
+                $chatLookup[$ac['chat_user_id'] . '-' . $ac['chat_user_type']] = $ac;
             }
-
-            // Separate chattable users into students and HTE advisers
             $chatStudents = array_filter($chattableUsers, fn($u) => $u['user_type'] === 'student');
             $chatHteAdvisers = array_filter($chattableUsers, fn($u) => $u['user_type'] === 'adviser');
-
             $avatarColors = ['#ff2c8f', '#2c6fff', '#1abc9c', '#9b59b6', '#e67e22', '#e74c3c', '#16a085'];
             ?>
 
@@ -3675,48 +3877,50 @@ $page = 'messages';
                     </div>
                     <div class="room-chat-entries" id="roomChatEntries">
 
-                        <!-- Students -->
                         <div class="room-chat-divider">Students</div>
                         <?php foreach ($chatStudents as $u):
-                            $key = $u['user_id'] . '-student';
-                            $preview = $chatLookup[$key]['last_message'] ?? 'No messages yet';
+                            $preview = chatPreview($chatLookup[$u['user_id'] . '-student'] ?? null);
                             $avatarColor = $avatarColors[crc32($u['full_name']) % count($avatarColors)];
                             $isActive = ($chatSection_id == $u['user_id'] && $chatSection_type === 'student');
                             ?>
-                            <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=chats&chat_id=<?= $u['user_id'] ?>&chat_type=student"
+                            <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=chats&chat_id=<?= (int) $u['user_id'] ?>&chat_type=student"
                                 class="room-chat-entry <?= $isActive ? 'active' : '' ?>"
                                 data-name="<?= strtolower(htmlspecialchars($u['full_name'])) ?>">
                                 <div class="room-chat-avatar" style="background:<?= $avatarColor ?>;">
-                                    <?= strtoupper(substr($u['full_name'], 0, 1)) ?>
+                                    <?= strtoupper(mb_substr($u['full_name'], 0, 1)) ?>
                                 </div>
                                 <div class="room-chat-entry-meta">
                                     <div class="room-chat-entry-name"><?= htmlspecialchars($u['full_name']) ?></div>
-                                    <div class="room-chat-entry-preview"><?= htmlspecialchars(substr($preview, 0, 40)) ?></div>
+                                    <div class="room-chat-entry-preview"><?= htmlspecialchars(mb_substr($preview, 0, 40)) ?>
+                                    </div>
                                 </div>
-                                <span class="room-chat-badge" style="background:#dbeafe; color:#1e40af;">Student</span>
+                                <span class="room-chat-badge" style="background:#dbeafe;color:#1e40af;">Student</span>
                             </a>
                         <?php endforeach; ?>
 
-                        <!-- HTE Advisers -->
+                        <?php if (empty($chatStudents)): ?>
+                            <div style="padding:14px 18px;font-size:12px;color:#bbb;">No students in your rooms yet.</div>
+                        <?php endif; ?>
+
                         <?php if (!empty($chatHteAdvisers)): ?>
                             <div class="room-chat-divider" style="margin-top:4px;">HTE Supervisors</div>
                             <?php foreach ($chatHteAdvisers as $u):
-                                $key = $u['user_id'] . '-adviser';
-                                $preview = $chatLookup[$key]['last_message'] ?? 'No messages yet';
+                                $preview = chatPreview($chatLookup[$u['user_id'] . '-adviser'] ?? null);
                                 $avatarColor = $avatarColors[crc32($u['full_name']) % count($avatarColors)];
                                 $isActive = ($chatSection_id == $u['user_id'] && $chatSection_type === 'adviser');
                                 ?>
-                                <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=chats&chat_id=<?= $u['user_id'] ?>&chat_type=adviser"
+                                <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=chats&chat_id=<?= (int) $u['user_id'] ?>&chat_type=adviser"
                                     class="room-chat-entry <?= $isActive ? 'active' : '' ?>"
                                     data-name="<?= strtolower(htmlspecialchars($u['full_name'])) ?>">
                                     <div class="room-chat-avatar" style="background:<?= $avatarColor ?>;">
-                                        <?= strtoupper(substr($u['full_name'], 0, 1)) ?>
+                                        <?= strtoupper(mb_substr($u['full_name'], 0, 1)) ?>
                                     </div>
                                     <div class="room-chat-entry-meta">
                                         <div class="room-chat-entry-name"><?= htmlspecialchars($u['full_name']) ?></div>
-                                        <div class="room-chat-entry-preview"><?= htmlspecialchars(substr($preview, 0, 40)) ?></div>
+                                        <div class="room-chat-entry-preview"><?= htmlspecialchars(mb_substr($preview, 0, 40)) ?>
+                                        </div>
                                     </div>
-                                    <span class="room-chat-badge" style="background:#d1fae5; color:#065f46;">HTE</span>
+                                    <span class="room-chat-badge" style="background:#d1fae5;color:#065f46;">HTE</span>
                                 </a>
                             <?php endforeach; ?>
                         <?php endif; ?>
@@ -3742,57 +3946,114 @@ $page = 'messages';
                                 <i class="fa-solid fa-arrow-left i-back"></i>
                             </button>
                             <div class="room-chat-avatar"
-                                style="background:<?= $openColor ?>; width:36px; height:36px; font-size:14px;">
-                                <?= strtoupper(substr($openName, 0, 1)) ?>
+                                style="background:<?= $openColor ?>;width:36px;height:36px;font-size:14px;">
+                                <?= strtoupper(mb_substr($openName, 0, 1)) ?>
                             </div>
                             <div>
-                                <div style="font-weight:700; font-size:14px;"><?= htmlspecialchars($openName) ?></div>
-                                <div style="font-size:11px; color:#aaa;">
-                                    <?= $isHte ? 'HTE Supervisor' : 'Student' ?>
-                                </div>
+                                <div style="font-weight:700;font-size:14px;"><?= htmlspecialchars($openName) ?></div>
+                                <div style="font-size:11px;color:#aaa;"><?= $isHte ? 'HTE Supervisor' : 'Student' ?></div>
                             </div>
                         </div>
+
                         <!-- Messages -->
                         <div class="room-message-body" id="roomMsgBody">
                             <?php if (empty($chatMessages)): ?>
-                                <div style="text-align:center; color:#ccc; margin:auto; font-size:13px;">
+                                <div style="text-align:center;color:#ccc;margin:auto;font-size:13px;">
                                     <i class="fa fa-comments fa-2x d-block mb-2"></i>
                                     No messages yet. Say hello!
                                 </div>
-                            <?php else: ?>
-                                <?php foreach ($chatMessages as $msg):
+                            <?php else:
+                                $lastDay = '';
+                                foreach ($chatMessages as $msg):
                                     $isMe = ($msg['sender_id'] == $adviser_id && $msg['sender_type'] === 'adviser');
                                     $bubbleColor = $avatarColors[crc32($msg['sender_name'] ?? '') % count($avatarColors)];
-                                    ?>
+                                    $msgDay = date('F j, Y', strtotime($msg['created_at']));
+                                    if ($msgDay !== $lastDay):
+                                        $lastDay = $msgDay; ?>
+                                        <div class="room-day-sep"><?= $msgDay ?></div>
+                                    <?php endif; ?>
+
                                     <div class="room-msg-row <?= $isMe ? 'me' : '' ?>">
                                         <?php if (!$isMe): ?>
                                             <div class="room-msg-avatar" style="background:<?= $bubbleColor ?>;">
-                                                <?= strtoupper(substr($msg['sender_name'] ?? '?', 0, 1)) ?>
+                                                <?= strtoupper(mb_substr($msg['sender_name'] ?? '?', 0, 1)) ?>
                                             </div>
                                         <?php endif; ?>
+
                                         <div class="room-msg-bubble-wrap">
                                             <?php if (!$isMe): ?>
                                                 <div class="room-msg-sender"><?= htmlspecialchars($msg['sender_name'] ?? '') ?></div>
                                             <?php endif; ?>
-                                            <div class="room-msg-bubble"><?= htmlspecialchars($msg['message']) ?></div>
-                                            <div class="room-msg-time">
-                                                <?= date('M d, g:i A', strtotime($msg['created_at'])) ?>
+
+                                            <div class="room-msg-bubble">
+                                                <?php if (!empty($msg['message'])): ?>
+                                                    <?= nl2br(htmlspecialchars($msg['message'])) ?>
+                                                <?php endif; ?>
+
+                                                <?php if (!empty($msg['has_attachment'])):
+                                                    $fileUrl = 'file.php?id=' . (int) $msg['id']; ?>
+                                                    <div style="<?= !empty($msg['message']) ? 'margin-top:8px;' : '' ?>">
+                                                        <?php if ($msg['attachment_type'] === 'image'): ?>
+                                                            <a href="<?= $fileUrl ?>" target="_blank">
+                                                                <img src="<?= $fileUrl ?>" alt="attachment"
+                                                                    style="max-width:220px;border-radius:10px;display:block;">
+                                                            </a>
+                                                        <?php elseif ($msg['attachment_type'] === 'video'): ?>
+                                                            <video controls style="max-width:240px;border-radius:10px;">
+                                                                <source src="<?= $fileUrl ?>">
+                                                                Your browser does not support video playback.
+                                                            </video>
+                                                        <?php else: ?>
+                                                            <a href="<?= $fileUrl ?>" target="_blank" style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:#fff;
+                                                          border:1px solid #e5e7eb;border-radius:10px;text-decoration:none;
+                                                          color:#333;font-size:12.5px;">
+                                                                <i class="fa-solid <?= $msg['attachment_type'] === 'pdf' ? 'fa-file-pdf' : 'fa-file-word' ?>"
+                                                                    style="font-size:18px;color:<?= $msg['attachment_type'] === 'pdf' ? '#dc2626' : '#2563eb' ?>;"></i>
+                                                                <span><?= htmlspecialchars($msg['attachment_name']) ?></span>
+                                                            </a>
+                                                        <?php endif; ?>
+                                                    </div>
+                                                <?php endif; ?>
                                             </div>
+
+                                            <div class="room-msg-time"><?= date('g:i A', strtotime($msg['created_at'])) ?></div>
                                         </div>
+
+                                        <?php if ($isMe): ?>
+                                            <button type="button" class="room-msg-delete"
+                                                onclick="roomDeleteMessage(<?= (int) $msg['id'] ?>, this)" title="Delete message">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                        <?php endif; ?>
                                     </div>
-                                <?php endforeach; ?>
-                            <?php endif; ?>
+                                <?php endforeach;
+                            endif; ?>
                         </div>
 
                         <!-- Input bar -->
                         <div class="room-message-input-bar">
-                            <form method="POST" action="message-db.php" id="roomChatForm">
-                                <input type="hidden" name="receiver_id" value="<?= $chatSection_id ?>">
-                                <input type="hidden" name="receiver_type" value="<?= $chatSection_type ?>">
+                            <form method="POST" action="message-db.php" id="roomChatForm" enctype="multipart/form-data">
+                                <input type="hidden" name="receiver_id" value="<?= (int) $chatSection_id ?>">
+                                <input type="hidden" name="receiver_type" value="<?= htmlspecialchars($chatSection_type) ?>">
                                 <input type="hidden" name="redirect"
-                                    value="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=chats&chat_id=<?= $chatSection_id ?>&chat_type=<?= $chatSection_type ?>">
+                                    value="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=chats&chat_id=<?= (int) $chatSection_id ?>&chat_type=<?= htmlspecialchars($chatSection_type) ?>">
+
+                                <div id="roomAttachName" style="display:none;font-size:12px;color:#666;padding:4px 8px;">
+                                    <i class="fa-solid fa-paperclip"></i>
+                                    <span id="roomAttachText"></span>
+                                    <button type="button" onclick="roomClearAttachment()"
+                                        style="border:0;background:none;color:#dc2626;font-size:16px;">×</button>
+                                </div>
+
                                 <div class="room-message-input-row">
-                                    <textarea name="message" id="roomChatInput" rows="1" placeholder="Type a message…" required
+                                    <label for="roomAttachInput"
+                                        style="cursor:pointer;display:flex;align-items:center;padding:0 6px;">
+                                        <i class="fa-solid fa-paperclip" style="font-size:16px;color:#888;"></i>
+                                    </label>
+                                    <input type="file" id="roomAttachInput" name="attachment" style="display:none;"
+                                        accept=".pdf,.doc,.docx,image/*,video/mp4" onchange="roomShowAttachment(this)">
+
+                                    <textarea name="message" id="roomChatInput" rows="1" placeholder="Type a message…"
                                         onkeydown="roomChatEnterSend(event)"></textarea>
                                     <button type="submit" class="room-chat-send-btn" id="roomChatSendBtn">
                                         <i class="fa fa-paper-plane"></i>
