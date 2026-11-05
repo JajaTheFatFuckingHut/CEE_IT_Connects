@@ -4139,7 +4139,7 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                                                 <?php endif; ?>
 
                                                 <?php if (!empty($msg['has_attachment'])):
-                                                    $fileUrl = 'file.php?id=' . (int) $msg['id']; ?>
+                                                    $fileUrl = 'chat-file.php?id=' . (int) $msg['id']; ?>
                                                     <div class="rc-attachment"
                                                         style="<?= !empty($msg['message']) ? 'margin-top:8px;' : '' ?>">
 
