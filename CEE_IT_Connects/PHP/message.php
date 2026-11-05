@@ -334,35 +334,30 @@ $chatSection_id = $_GET['chat_id'] ?? null;
 $chatSection_type = $_GET['chat_type'] ?? null;
 $chatMessages = [];
 
-// var_dump($current_user_type, $_SESSION['role'], $chatSection_id, $chatSection_type);
-// exit;
-
-if ($chatSection_id && $current_section === 'chats') {
-    $msgStmt = $pdo->prepare("
-        SELECT m.*,
+if ($chatSection_id) {
+    $stmt = $pdo->prepare("
+        SELECT m.id, m.sender_id, m.sender_type, m.message, m.created_at,
+               m.attachment_name, m.attachment_type,
+               CASE WHEN m.attachment_data IS NOT NULL THEN 1 ELSE 0 END AS has_attachment,
                COALESCE(s.full_name, a.full_name) AS sender_name
-        FROM   messages m
-        LEFT JOIN students s ON m.sender_id = s.id AND m.sender_type = 'student'
-        LEFT JOIN advisers a ON m.sender_id = a.id AND m.sender_type = 'adviser'
-        WHERE
-            (m.sender_id = ? AND m.sender_type = ?
-             AND m.receiver_id = ? AND m.receiver_type = ?)
-            OR
-            (m.sender_id = ? AND m.sender_type = ?
-             AND m.receiver_id = ? AND m.receiver_type = ?)
-        ORDER BY m.created_at ASC
+        FROM messages m
+        LEFT JOIN students s ON m.sender_type = 'student' AND s.id = m.sender_id
+        LEFT JOIN advisers a ON m.sender_type = 'adviser' AND a.id = m.sender_id
+        WHERE (m.sender_id = ? AND m.sender_type = ? AND m.receiver_id = ? AND m.receiver_type = ?)
+           OR (m.sender_id = ? AND m.sender_type = ? AND m.receiver_id = ? AND m.receiver_type = ?)
+        ORDER BY m.created_at ASC, m.id ASC
     ");
-    $msgStmt->execute([
+    $stmt->execute([
         $_SESSION['user_id'],
-        $current_user_type,
+        $currentUserType,
         $chatSection_id,
         $chatSection_type,
         $chatSection_id,
         $chatSection_type,
         $_SESSION['user_id'],
-        $current_user_type,
+        $currentUserType
     ]);
-    $chatMessages = $msgStmt->fetchAll(PDO::FETCH_ASSOC);
+    $chatMessages = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
 $chatLookup = [];

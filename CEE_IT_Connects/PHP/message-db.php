@@ -10,78 +10,61 @@ $receiver_id = $_POST['receiver_id'];
 $receiver_type = getUserType($_POST['receiver_type']);
 $message = trim($_POST['message'] ?? '');
 
-$attachment_path = null;
+$attachment_stream = null;
 $attachment_name = null;
 $attachment_type = null;
+$attachment_mime = null;
 
-// ── Handle file upload (optional) ──
 if (!empty($_FILES['attachment']['name']) && $_FILES['attachment']['error'] === UPLOAD_ERR_OK) {
 
-    $allowedExt = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'mp4', 'mov', 'avi', 'pdf', 'doc', 'docx'];
+    $allowedExt = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'mp4', 'pdf', 'doc', 'docx'];
     $originalName = $_FILES['attachment']['name'];
     $ext = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
 
-    if (!in_array($ext, $allowedExt)) {
+    if (!in_array($ext, $allowedExt, true))
         die('Invalid file type.');
-    }
+    if ($_FILES['attachment']['size'] > 10 * 1024 * 1024)
+        die('File too large (10MB max).');
 
-    $maxBytes = 25 * 1024 * 1024; // 25MB
-    if ($_FILES['attachment']['size'] > $maxBytes) {
-        die('File too large.');
-    }
-
-    if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
+    if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp']))
         $attachment_type = 'image';
-    } elseif (in_array($ext, ['mp4', 'mov', 'avi'])) {
+    elseif ($ext === 'mp4')
         $attachment_type = 'video';
-    } elseif ($ext === 'pdf') {
+    elseif ($ext === 'pdf')
         $attachment_type = 'pdf';
-    } else {
+    else
         $attachment_type = 'doc';
-    }
 
-    $uploadDir = __DIR__ . '.../uploads/chat/';
-    if (!is_dir($uploadDir)) {
-        mkdir($uploadDir, 0755, true);
-    }
-
-    $safeName = bin2hex(random_bytes(8)) . '_' . preg_replace('/[^A-Za-z0-9._-]/', '_', $originalName);
-    $destPath = $uploadDir . $safeName;
-
-    if (!move_uploaded_file($_FILES['attachment']['tmp_name'], $destPath)) {
-        die('Upload failed.');
-    }
-
-    $webBase = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'])), '/');
-
-    $attachment_path = $webBase . '/uploads/chat/' . $safeName;
-    $attachment_name = $originalName;
+    $attachment_mime = (new finfo(FILEINFO_MIME_TYPE))->file($_FILES['attachment']['tmp_name']);
+    $attachment_stream = fopen($_FILES['attachment']['tmp_name'], 'rb');   // stream, not file_get_contents
     $attachment_name = $originalName;
 }
 
-// Require at least a message OR an attachment
-if ($message === '' && !$attachment_path) {
+if ($message === '' && $attachment_stream === null) {
     header("Location: " . $_SERVER['HTTP_REFERER']);
     exit;
 }
 
 $stmt = $pdo->prepare("
-    INSERT INTO messages 
+    INSERT INTO messages
     (sender_id, sender_type, receiver_id, receiver_type, message,
-     attachment_path, attachment_name, attachment_type, created_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
+     attachment_name, attachment_type, attachment_mime, attachment_data, created_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
 ");
-
-$stmt->execute([
-    $sender_id,
-    $sender_type,
-    $receiver_id,
-    $receiver_type,
-    $message,
-    $attachment_path,
-    $attachment_name,
-    $attachment_type
-]);
+$stmt->bindValue(1, $sender_id);
+$stmt->bindValue(2, $sender_type);
+$stmt->bindValue(3, $receiver_id);
+$stmt->bindValue(4, $receiver_type);
+$stmt->bindValue(5, $message);
+$stmt->bindValue(6, $attachment_name);
+$stmt->bindValue(7, $attachment_type);
+$stmt->bindValue(8, $attachment_mime);
+if ($attachment_stream !== null) {
+    $stmt->bindParam(9, $attachment_stream, PDO::PARAM_LOB);
+} else {
+    $stmt->bindValue(9, null, PDO::PARAM_NULL);
+}
+$stmt->execute();
 
 header("Location: " . $_SERVER['HTTP_REFERER']);
 exit;
