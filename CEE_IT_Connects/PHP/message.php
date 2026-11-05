@@ -267,22 +267,46 @@ if (!empty($_GET['room_id']) && ctype_digit((string) $_GET['room_id'])) {
 //     exit;
 // }
 
-if ($current_room_id !== null) {
-    $chatStudentsStmt = $pdo->prepare("
-        SELECT
-            s.id AS user_id,
-            s.full_name,
-            'student' AS user_type
-        FROM students s
-        JOIN room_members rm
-            ON s.id = rm.user_id
-           AND rm.user_type = 'student'
-        WHERE rm.room_id = ?
-        ORDER BY s.full_name
-    ");
+$current_user_type = $_SESSION['user_type'];
 
-    $chatStudentsStmt->execute([$current_room_id]);
-    $chatStudents = $chatStudentsStmt->fetchAll(PDO::FETCH_ASSOC);
+$chatStudents = [];
+
+if ($current_room_id === null && $current_user_type === 'student') {
+    $roomStmt = $pdo->prepare("
+        SELECT room_id
+        FROM room_members
+        WHERE user_id = ? AND user_type = 'student'
+        ORDER BY room_id
+        LIMIT 1
+    ");
+    $roomStmt->execute([$student_id]);
+    $current_room_id = $roomStmt->fetchColumn() ?: null;
+}
+
+if ($current_room_id !== null) {
+    $memberCheck = $pdo->prepare("
+        SELECT 1
+        FROM room_members
+        WHERE room_id = ? AND user_id = ? AND user_type = ?
+    ");
+    $memberCheck->execute([$current_room_id, $student_id, $current_user_type]);
+
+    if ($memberCheck->fetchColumn()) {
+        $chatStudentsStmt = $pdo->prepare("
+            SELECT
+                s.id AS user_id,
+                s.full_name,
+                'student' AS user_type
+            FROM students s
+            JOIN room_members rm
+                ON s.id = rm.user_id
+               AND rm.user_type = 'student'
+            WHERE rm.room_id = ?
+            ORDER BY s.full_name
+        ");
+        $chatStudentsStmt->execute([$current_room_id]);
+        $chatStudents = $chatStudentsStmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
 
 $chatHteAdvisersStmt = $pdo->prepare("
@@ -620,7 +644,8 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">    <title>Rooms</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Rooms</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -869,6 +894,7 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
             font-size: 14px;
             margin: 0;
         }
+
         /* addtl e */
 
         /* CHAT DESIGN */
@@ -1095,7 +1121,7 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
             border: 1px solid #c0c0c0;
             text-align: center;
-        } 
+        }
 
         .ojt-table {
             width: 100%;
@@ -1107,7 +1133,7 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
             font-size: 14px;
             font-weight: 600;
             color: #29303b;
-        } 
+        }
 
         .ojt-table td {
             padding: 4px;
@@ -1134,7 +1160,7 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
         .ojt-group {
             background: rgb(185, 186, 237);
             border: 1px solid #e5e7eb;
-        } 
+        }
 
         .th-morning,
         .sub-morning,
@@ -1392,7 +1418,7 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
             margin-top: 1px;
         }
 
-                /* ── show / hide chat list (all screen sizes) ── */
+        /* ── show / hide chat list (all screen sizes) ── */
         .rc-toggle-list {
             width: 36px;
             height: 36px;
@@ -1422,7 +1448,7 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
             display: none;
         }
 
-        .rc-header > div:last-child {
+        .rc-header>div:last-child {
             min-width: 0;
         }
 
@@ -1438,7 +1464,11 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
         }
 
         @media (hover: none) {
-            .rc-row.me .rc-msg-delete { opacity: .6; }   /* no hover on touch screens */
+            .rc-row.me .rc-msg-delete {
+                opacity: .6;
+            }
+
+            /* no hover on touch screens */
         }
 
         /* messages body */
@@ -2053,16 +2083,40 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                 width: 100%;
             }
 
-            .rc-header { padding: 10px 12px; gap: 8px; }
-            .rc-body { padding: 14px 12px; }
-            .rc-bwrap { max-width: 80%; }
-            .rc-attachment img,
-            .rc-attachment video { max-width: 100% !important; }
-            .rc-inputbar { padding: 8px 10px; }
-            .rc-inputrow { gap: 6px; }
+            .rc-header {
+                padding: 10px 12px;
+                gap: 8px;
+            }
 
-            .has-deact-toast .rc-wrap { padding-top: 40px; }
-            .has-deact-toast .rc-list { top: 40px; height: calc(100% - 40px); }
+            .rc-body {
+                padding: 14px 12px;
+            }
+
+            .rc-bwrap {
+                max-width: 80%;
+            }
+
+            .rc-attachment img,
+            .rc-attachment video {
+                max-width: 100% !important;
+            }
+
+            .rc-inputbar {
+                padding: 8px 10px;
+            }
+
+            .rc-inputrow {
+                gap: 6px;
+            }
+
+            .has-deact-toast .rc-wrap {
+                padding-top: 40px;
+            }
+
+            .has-deact-toast .rc-list {
+                top: 40px;
+                height: calc(100% - 40px);
+            }
 
             .hm-meter {
                 width: 100%;
@@ -2092,7 +2146,10 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                 font-size: 20px;
             }
 
-            .hm-meter { width: 100%; flex: 1 1 100%; }
+            .hm-meter {
+                width: 100%;
+                flex: 1 1 100%;
+            }
         }
 
         .rc-mobile-back {
@@ -3023,54 +3080,153 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                 margin-left: 0;
             }
 
-            .pg-header { padding: 14px; gap: 12px; }
-            .pg-header-icon { display: none; }
-            .pg-header h2 { font-size: 18px; }
-            .pg-header p { font-size: 12px; }
-            .hm-meter { min-width: 0; }
-            .hm-meter-top { font-size: 12px; }
-            .hm-meter-track { height: 6px; }
+            .pg-header {
+                padding: 14px;
+                gap: 12px;
+            }
+
+            .pg-header-icon {
+                display: none;
+            }
+
+            .pg-header h2 {
+                font-size: 18px;
+            }
+
+            .pg-header p {
+                font-size: 12px;
+            }
+
+            .hm-meter {
+                min-width: 0;
+            }
+
+            .hm-meter-top {
+                font-size: 12px;
+            }
+
+            .hm-meter-track {
+                height: 6px;
+            }
 
             /* Stat cards: 3 in a row, no icon, smaller text */
-            .hm-stats { --bs-gutter-x: .5rem; --bs-gutter-y: .5rem; }
-            .hm-stats > [class*="col-"] { width: 33.3333%; }
-            .hrs-card { padding: 12px 10px; border-radius: 12px; }
-            .hrs-stat { display: block; text-align: center; }
-            .hrs-stat-icon { display: none; }
-            .hrs-stat-label { font-size: 10px; line-height: 1.2; }
-            .hrs-stat-value { font-size: 18px; }
-            .hrs-stat-value .text-muted { font-size: 11px !important; }
+            .hm-stats {
+                --bs-gutter-x: .5rem;
+                --bs-gutter-y: .5rem;
+            }
+
+            .hm-stats>[class*="col-"] {
+                width: 33.3333%;
+            }
+
+            .hrs-card {
+                padding: 12px 10px;
+                border-radius: 12px;
+            }
+
+            .hrs-stat {
+                display: block;
+                text-align: center;
+            }
+
+            .hrs-stat-icon {
+                display: none;
+            }
+
+            .hrs-stat-label {
+                font-size: 10px;
+                line-height: 1.2;
+            }
+
+            .hrs-stat-value {
+                font-size: 18px;
+            }
+
+            .hrs-stat-value .text-muted {
+                font-size: 11px !important;
+            }
 
             /* Checklist: dot on top, text full width, no "Done" tag */
-            .hm-card { padding: 14px 16px 4px; }
+            .hm-card {
+                padding: 14px 16px 4px;
+            }
+
             .hm-step {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 8px;
                 padding: 14px 0;
             }
-            .hm-step.current { margin: 0 -16px; padding-left: 16px; padding-right: 16px; }
-            .hm-dot { width: 26px; height: 26px; min-width: 26px; font-size: 12px; }
-            .hm-step.current .hm-dot { box-shadow: 0 0 0 3px #fdeee6; }
-            .hm-text { flex: none; width: 100%; }
-            .hm-text strong { font-size: 14px; }
-            .hm-text span { font-size: 12px; overflow-wrap: anywhere; }
-            .hm-tag.ok { display: none; }
-            .hm-btn { display: block; width: 100%; text-align: center; }
+
+            .hm-step.current {
+                margin: 0 -16px;
+                padding-left: 16px;
+                padding-right: 16px;
+            }
+
+            .hm-dot {
+                width: 26px;
+                height: 26px;
+                min-width: 26px;
+                font-size: 12px;
+            }
+
+            .hm-step.current .hm-dot {
+                box-shadow: 0 0 0 3px #fdeee6;
+            }
+
+            .hm-text {
+                flex: none;
+                width: 100%;
+            }
+
+            .hm-text strong {
+                font-size: 14px;
+            }
+
+            .hm-text span {
+                font-size: 12px;
+                overflow-wrap: anywhere;
+            }
+
+            .hm-tag.ok {
+                display: none;
+            }
+
+            .hm-btn {
+                display: block;
+                width: 100%;
+                text-align: center;
+            }
 
             /* Room cards: single column, no icon */
-            .hm-rooms { grid-template-columns: 1fr; }
-            .hm-room { padding: 12px; }
-            .hm-room-ic { display: none; }
+            .hm-rooms {
+                grid-template-columns: 1fr;
+            }
+
+            .hm-room {
+                padding: 12px;
+            }
+
+            .hm-room-ic {
+                display: none;
+            }
         }
 
         @media (max-width: 400px) {
-            .hm-stats > [class*="col-"]:first-child { display: none; }
-            .hm-stats > [class*="col-"] { width: 50%; }
+            .hm-stats>[class*="col-"]:first-child {
+                display: none;
+            }
+
+            .hm-stats>[class*="col-"] {
+                width: 50%;
+            }
         }
 
-                /* ── RENDERED HOURS: header meta ── */
-        .hrs-meta { text-align: right; }
+        /* ── RENDERED HOURS: header meta ── */
+        .hrs-meta {
+            text-align: right;
+        }
 
         .hrs-meta-row {
             display: flex;
@@ -3079,8 +3235,17 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
             gap: 8px;
         }
 
-        .hrs-meta-label { font-size: 15px; font-weight: 500; color: #555; }
-        .hrs-meta-value { font-size: 16px; font-weight: 700; color: #272f54; }
+        .hrs-meta-label {
+            font-size: 15px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .hrs-meta-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: #272f54;
+        }
 
         .hrs-meta-office {
             display: flex;
@@ -3093,12 +3258,22 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
             text-align: left;
         }
 
-        .hrs-meta-office > i { color: #f26b3a; margin-top: 3px; }
-        .hrs-meta-office b { color: #272f54; }
-        .hrs-meta-sub { display: block; }
+        .hrs-meta-office>i {
+            color: #f26b3a;
+            margin-top: 3px;
+        }
+
+        .hrs-meta-office b {
+            color: #272f54;
+        }
+
+        .hrs-meta-sub {
+            display: block;
+        }
 
         /* ── DTR table: tablet scroll with pinned Date column ── */
         @media (min-width: 577px) {
+
             .ojt-table thead tr:first-child th:first-child,
             .ojt-table tbody td:first-child {
                 position: sticky;
@@ -3106,21 +3281,44 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                 box-shadow: 1px 0 0 #e3e7ef;
             }
 
-            .ojt-table thead tr:first-child th:first-child { z-index: 3; }
-            .ojt-table tbody td:first-child { z-index: 2; background: #fff; }
-            .ojt-table tbody tr:nth-child(even) td:first-child { background: #f8f9fc; }
+            .ojt-table thead tr:first-child th:first-child {
+                z-index: 3;
+            }
+
+            .ojt-table tbody td:first-child {
+                z-index: 2;
+                background: #fff;
+            }
+
+            .ojt-table tbody tr:nth-child(even) td:first-child {
+                background: #f8f9fc;
+            }
         }
 
         /* ── RENDERED HOURS: phones ── */
         @media (max-width: 576px) {
 
-            #hours .main { padding: 12px; }
+            #hours .main {
+                padding: 12px;
+            }
 
             /* header meta */
-            .hrs-meta { flex: 1 1 100%; text-align: left; }
-            .hrs-meta-row { justify-content: space-between; }
-            .hrs-meta-label { font-size: 13px; }
-            .hrs-meta-value { font-size: 15px; }
+            .hrs-meta {
+                flex: 1 1 100%;
+                text-align: left;
+            }
+
+            .hrs-meta-row {
+                justify-content: space-between;
+            }
+
+            .hrs-meta-label {
+                font-size: 13px;
+            }
+
+            .hrs-meta-value {
+                font-size: 15px;
+            }
 
             .hrs-meta-office {
                 justify-content: flex-start;
@@ -3131,25 +3329,45 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                 font-size: 12px;
             }
 
-            .hrs-meta-sub b { white-space: nowrap; }
+            .hrs-meta-sub b {
+                white-space: nowrap;
+            }
 
             /* summary cards */
             #ojt-sum-monthly,
             #ojt-sum-completed,
-            #ojt-sum-remaining { white-space: nowrap; }
+            #ojt-sum-remaining {
+                white-space: nowrap;
+            }
 
             /* week card */
-            .ojt-week-block { padding: 10px; }
-            .ojt-week-header { margin-bottom: 10px; }
-            .ojt-week-label[readonly] { font-size: 17px; }
+            .ojt-week-block {
+                padding: 10px;
+            }
+
+            .ojt-week-header {
+                margin-bottom: 10px;
+            }
+
+            .ojt-week-label[readonly] {
+                font-size: 17px;
+            }
 
             /* DTR: one card per day */
-            .ojt-table-scroll { overflow: visible; border: none; }
+            .ojt-table-scroll {
+                overflow: visible;
+                border: none;
+            }
 
             .ojt-table,
-            .ojt-table tbody { display: block; min-width: 0; }
+            .ojt-table tbody {
+                display: block;
+                min-width: 0;
+            }
 
-            .ojt-table thead { display: none; }
+            .ojt-table thead {
+                display: none;
+            }
 
             .ojt-table tbody tr,
             .ojt-table tbody tr:nth-child(even) {
@@ -3164,7 +3382,9 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                 border-radius: 12px;
             }
 
-            .ojt-table tbody tr:last-child { margin-bottom: 0; }
+            .ojt-table tbody tr:last-child {
+                margin-bottom: 0;
+            }
 
             .ojt-table tbody td,
             .ojt-table tbody td.td-morning,
@@ -3177,16 +3397,56 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
             }
 
             /* placement */
-            .ojt-table tbody td:nth-child(2)  { grid-row: 1; grid-column: 1; }
-            .ojt-table tbody td:nth-child(1)  { grid-row: 1; grid-column: 2 / span 3; }
-            .ojt-table tbody td:nth-child(10) { grid-row: 1; grid-column: 5 / span 2; justify-self: end; }
-            .ojt-table tbody td:nth-child(5)  { grid-row: 2; grid-column: 1 / -1; }
-            .ojt-table tbody td:nth-child(3)  { grid-row: 3; grid-column: 1 / span 3; }
-            .ojt-table tbody td:nth-child(4)  { grid-row: 3; grid-column: 4 / span 3; }
-            .ojt-table tbody td:nth-child(8)  { grid-row: 4; grid-column: 1 / -1; }
-            .ojt-table tbody td:nth-child(6)  { grid-row: 5; grid-column: 1 / span 3; }
-            .ojt-table tbody td:nth-child(7)  { grid-row: 5; grid-column: 4 / span 3; }
-            .ojt-table tbody td:nth-child(9)  { grid-row: 6; grid-column: 1 / -1; }
+            .ojt-table tbody td:nth-child(2) {
+                grid-row: 1;
+                grid-column: 1;
+            }
+
+            .ojt-table tbody td:nth-child(1) {
+                grid-row: 1;
+                grid-column: 2 / span 3;
+            }
+
+            .ojt-table tbody td:nth-child(10) {
+                grid-row: 1;
+                grid-column: 5 / span 2;
+                justify-self: end;
+            }
+
+            .ojt-table tbody td:nth-child(5) {
+                grid-row: 2;
+                grid-column: 1 / -1;
+            }
+
+            .ojt-table tbody td:nth-child(3) {
+                grid-row: 3;
+                grid-column: 1 / span 3;
+            }
+
+            .ojt-table tbody td:nth-child(4) {
+                grid-row: 3;
+                grid-column: 4 / span 3;
+            }
+
+            .ojt-table tbody td:nth-child(8) {
+                grid-row: 4;
+                grid-column: 1 / -1;
+            }
+
+            .ojt-table tbody td:nth-child(6) {
+                grid-row: 5;
+                grid-column: 1 / span 3;
+            }
+
+            .ojt-table tbody td:nth-child(7) {
+                grid-row: 5;
+                grid-column: 4 / span 3;
+            }
+
+            .ojt-table tbody td:nth-child(9) {
+                grid-row: 6;
+                grid-column: 1 / -1;
+            }
 
             /* Morning / Afternoon / Daily total lines */
             .ojt-table tbody td:nth-child(5),
@@ -3197,7 +3457,9 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                 align-items: baseline;
             }
 
-            .ojt-table tbody td:nth-child(8) { margin-top: 4px; }
+            .ojt-table tbody td:nth-child(8) {
+                margin-top: 4px;
+            }
 
             .ojt-table tbody td:nth-child(9) {
                 margin-top: 2px;
@@ -3205,9 +3467,17 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                 border-top: 1px dashed #e3e7ef;
             }
 
-            .ojt-table tbody td:nth-child(5)::before { content: "Morning"; }
-            .ojt-table tbody td:nth-child(8)::before { content: "Afternoon"; }
-            .ojt-table tbody td:nth-child(9)::before { content: "Daily total"; }
+            .ojt-table tbody td:nth-child(5)::before {
+                content: "Morning";
+            }
+
+            .ojt-table tbody td:nth-child(8)::before {
+                content: "Afternoon";
+            }
+
+            .ojt-table tbody td:nth-child(9)::before {
+                content: "Daily total";
+            }
 
             .ojt-table tbody td:nth-child(5)::before,
             .ojt-table tbody td:nth-child(8)::before,
@@ -3229,10 +3499,14 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
 
             /* In / Out captions */
             .ojt-table tbody td:nth-child(3)::before,
-            .ojt-table tbody td:nth-child(6)::before { content: "In"; }
+            .ojt-table tbody td:nth-child(6)::before {
+                content: "In";
+            }
 
             .ojt-table tbody td:nth-child(4)::before,
-            .ojt-table tbody td:nth-child(7)::before { content: "Out"; }
+            .ojt-table tbody td:nth-child(7)::before {
+                content: "Out";
+            }
 
             .ojt-table tbody td:nth-child(3)::before,
             .ojt-table tbody td:nth-child(4)::before,
@@ -3260,7 +3534,10 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                 background: #fff;
             }
 
-            .ojt-day-badge { font-size: 12px; font-weight: 600; }
+            .ojt-day-badge {
+                font-size: 12px;
+                font-weight: 600;
+            }
 
             /* status pill (its colors come from the inline style your JS sets) */
             .ojt-status-badge {
@@ -3273,25 +3550,38 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
         }
 
         @media (max-width: 400px) {
-            .hrs-card { padding: 10px 8px; }
+            .hrs-card {
+                padding: 10px 8px;
+            }
 
             #ojt-sum-monthly,
             #ojt-sum-completed,
-            #ojt-sum-remaining { font-size: 16px; }
+            #ojt-sum-remaining {
+                font-size: 16px;
+            }
         }
 
         /* ===== bottom nav: phones + tablet portrait ===== */
-        .bottom-nav { display: none; }
+        .bottom-nav {
+            display: none;
+        }
 
-        @media (max-width: 768px), (max-width: 1024px) and (orientation: portrait) {
-            :root { --bn-h: 60px; }
+        @media (max-width: 768px),
+        (max-width: 1024px) and (orientation: portrait) {
+            :root {
+                --bn-h: 60px;
+            }
 
-            .sidebar { display: none !important; }
+            .sidebar {
+                display: none !important;
+            }
 
             .bottom-nav {
                 display: flex;
                 position: fixed;
-                left: 0; right: 0; bottom: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
                 z-index: 100;
                 background: #272f54;
                 padding-bottom: env(safe-area-inset-bottom);
@@ -3299,16 +3589,45 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
             }
 
             .bottom-nav a {
-                flex: 1; min-width: 0; height: var(--bn-h);
-                display: flex; flex-direction: column; align-items: center; justify-content: center;
-                gap: 3px; color: #aab1d4; text-decoration: none;
-                font-size: 10px; font-weight: 500; border-top: 3px solid transparent;
+                flex: 1;
+                min-width: 0;
+                height: var(--bn-h);
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 3px;
+                color: #aab1d4;
+                text-decoration: none;
+                font-size: 10px;
+                font-weight: 500;
+                border-top: 3px solid transparent;
             }
-            .bottom-nav a i { font-size: 18px; }
-            .bottom-nav a span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-            .bottom-nav a.active { color: #fff; border-top-color: #ff6b2c; }
-            .bottom-nav a.active i { color: #ff6b2c; }
-            .bottom-nav a.ojt-locked { opacity: .4; cursor: not-allowed; }
+
+            .bottom-nav a i {
+                font-size: 18px;
+            }
+
+            .bottom-nav a span {
+                max-width: 100%;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            .bottom-nav a.active {
+                color: #fff;
+                border-top-color: #ff6b2c;
+            }
+
+            .bottom-nav a.active i {
+                color: #ff6b2c;
+            }
+
+            .bottom-nav a.ojt-locked {
+                opacity: .4;
+                cursor: not-allowed;
+            }
 
             .main {
                 margin-left: 0 !important;
@@ -3316,12 +3635,16 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
             }
 
             /* Hours has an inline 100vh height, which would hide its last rows behind the nav */
-            #hours .main { height: auto !important; }
+            #hours .main {
+                height: auto !important;
+            }
 
             /* chat fills the space between navbar and bottom nav */
             .rc-wrap {
                 position: fixed;
-                top: 70px; left: 0; right: 0;
+                top: 70px;
+                left: 0;
+                right: 0;
                 bottom: calc(var(--bn-h) + env(safe-area-inset-bottom));
                 height: auto;
                 margin: 0;
@@ -3462,21 +3785,22 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
         <a href="?section=home" class="<?= $current_section === 'home' ? 'active' : '' ?>">
             <i class="fa-solid fa-house"></i><span>Home</span>
         </a>
-        <a href="?section=chats<?php if ($current_room_id) echo "&room_id=$current_room_id"; ?>"
-            class="<?= $current_section === 'chats' ? 'active' : '' ?>">
+        <a href="?section=chats<?php if ($current_room_id)
+            echo "&room_id=$current_room_id"; ?>" class="<?= $current_section === 'chats' ? 'active' : '' ?>">
             <i class="fa-solid fa-comments"></i><span>Chats</span>
         </a>
-        <a href="?section=application<?php if ($current_room_id) echo "&room_id=$current_room_id"; ?>"
-            class="<?= $current_section === 'application' ? 'active' : '' ?>">
+        <a href="?section=application<?php if ($current_room_id)
+            echo "&room_id=$current_room_id"; ?>" class="<?= $current_section === 'application' ? 'active' : '' ?>">
             <i class="fa fa-list-ul"></i><span>Checklist</span>
         </a>
 
         <?php if ($hasActiveProgress): ?>
-            <a href="?section=hours<?php if ($current_room_id) echo "&room_id=$current_room_id"; ?>"
-                class="<?= $current_section === 'hours' ? 'active' : '' ?>">
+            <a href="?section=hours<?php if ($current_room_id)
+                echo "&room_id=$current_room_id"; ?>" class="<?= $current_section === 'hours' ? 'active' : '' ?>">
                 <i class="fa-solid fa-clock"></i><span>Hours</span>
             </a>
-            <a href="?section=progress_report<?php if ($current_room_id) echo "&room_id=$current_room_id"; ?>"
+            <a href="?section=progress_report<?php if ($current_room_id)
+                echo "&room_id=$current_room_id"; ?>"
                 class="<?= $current_section === 'progress_report' ? 'active' : '' ?>">
                 <i class="fa-solid fa-file-lines"></i><span>Report</span>
             </a>
@@ -4413,7 +4737,8 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
             <form method="POST" action="progress-report-db.php">
                 <input type="hidden" name="room_id" value="<?= htmlspecialchars($current_room_id ?? '') ?>">
 
-                <div class="card shadow-sm rounded-3 p-3 p-sm-4" style="border:1px solid #e5e7eb;">                    <label for="reportLink" style="font-size:15px; font-weight:bold;">Google Document link</label>
+                <div class="card shadow-sm rounded-3 p-3 p-sm-4" style="border:1px solid #e5e7eb;"> <label
+                        for="reportLink" style="font-size:15px; font-weight:bold;">Google Document link</label>
                     <input type="url" id="reportLink" name="report_link" class="form-control mt-2"
                         value="<?= htmlspecialchars($savedLink) ?>" placeholder="https://docs.google.com/document/d/..."
                         pattern="https://docs\.google\.com/document/.*"
@@ -4422,7 +4747,8 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                         Make sure sharing is set to "Anyone with the link can view" (or that your adviser has access).
                     </div>
 
-                    <button type="submit" class="btn btn-sm fw-semibold mt-3 align-self-stretch align-self-sm-start"                        style="background:#ff6b2c;color:#fff;border-radius:8px;padding:8px 18px;">
+                    <button type="submit" class="btn btn-sm fw-semibold mt-3 align-self-stretch align-self-sm-start"
+                        style="background:#ff6b2c;color:#fff;border-radius:8px;padding:8px 18px;">
                         <i class="fa-solid fa-paper-plane me-1"></i> <?= $savedLink ? 'Update Link' : 'Submit Link' ?>
                     </button>
                 </div>
