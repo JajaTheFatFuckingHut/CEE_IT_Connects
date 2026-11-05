@@ -21,7 +21,7 @@ require 'db.php';
 
 // // echo "Passwords updated!";
 
-$id = 1;
+$id = 2;
 $newPassword = "12345";
 
 $hashed = password_hash($newPassword, PASSWORD_DEFAULT);
@@ -35,4 +35,4 @@ $update = $pdo->prepare("
 $update->execute([$hashed, $id]);
 
 echo "Passwords updated!";
-echo "<p>back<p><a href='login-ui.php'>Back to Home</a>";
+echo "<a href='login-ui.php'>Back to Home</a>";
