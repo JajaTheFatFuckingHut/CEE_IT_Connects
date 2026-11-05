@@ -175,33 +175,23 @@ $current_chat_id = $_GET['chat_id'] ?? null;
 $current_chat_type = $_GET['chat_type'] ?? null;
 $current_user_type = getUserType($_SESSION['role']);
 
+$utype = 'student';
+
 $stmt = $pdo->prepare("
-    SELECT 
-        CASE 
-            WHEN sender_id = :uid THEN receiver_id
-            ELSE sender_id
-        END as chat_user_id,
-        CASE 
-            WHEN sender_id = :uid THEN receiver_type
-            ELSE sender_type
-        END as chat_user_type,
-        CONCAT(
-            LEAST(sender_id, receiver_id), '-',
-            GREATEST(sender_id, receiver_id), '-',
-            CASE 
-                WHEN sender_id = :uid THEN receiver_type
-                ELSE sender_type
-            END
-        ) AS chat_key
+    SELECT
+        CASE WHEN sender_id = ? AND sender_type = ? THEN receiver_id   ELSE sender_id   END AS chat_user_id,
+        CASE WHEN sender_id = ? AND sender_type = ? THEN receiver_type ELSE sender_type END AS chat_user_type,
+        message AS last_message,   -- change 'message' to your actual column name
+        created_at
     FROM messages
-    WHERE sender_id = :uid OR receiver_id = :uid
-    GROUP BY chat_key, chat_user_id, chat_user_type
-    ORDER BY MAX(created_at) DESC
+    WHERE (sender_id = ? AND sender_type = ?)
+       OR (receiver_id = ? AND receiver_type = ?)
+    ORDER BY created_at DESC, id DESC
 ");
-$stmt->execute(['uid' => $_SESSION['user_id']]);
+$stmt->execute([$student_id, $utype, $student_id, $utype, $student_id, $utype, $student_id, $utype]);
 $chatUsers = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-$chatStudents = [];
+
 
 if (!empty($_GET['room_id']) && ctype_digit((string) $_GET['room_id'])) {
     $room_id = (int) $_GET['room_id'];
@@ -269,7 +259,6 @@ if (!empty($_GET['room_id']) && ctype_digit((string) $_GET['room_id'])) {
 
 $chatStudents = [];
 
-// 1. Get the room for this student if none is selected yet
 if ($current_room_id === null && $current_user_type === 'student') {
     $roomStmt = $pdo->prepare("
         SELECT room_id
@@ -283,7 +272,6 @@ if ($current_room_id === null && $current_user_type === 'student') {
 }
 
 if ($current_room_id !== null) {
-    // 2. Make sure the viewer is actually a member of this room
     $memberCheck = $pdo->prepare("
         SELECT 1
         FROM room_members
@@ -292,7 +280,6 @@ if ($current_room_id !== null) {
     $memberCheck->execute([$current_room_id, $student_id, $current_user_type]);
 
     if ($memberCheck->fetchColumn()) {
-        // 3. Fetch every student in that room
         $chatStudentsStmt = $pdo->prepare("
             SELECT
                 s.id AS user_id,
@@ -381,9 +368,10 @@ if ($chatSection_id && $current_section === 'chats') {
 $chatLookup = [];
 foreach ($chatUsers as $cu) {
     $key = $cu['chat_user_id'] . '-' . $cu['chat_user_type'];
-    $chatLookup[$key] = $cu;
+    if (!isset($chatLookup[$key])) {
+        $chatLookup[$key] = $cu;
+    }
 }
-
 // Helper – get display name for the open chat header
 function getRoomChatName($pdo, $id, $type)
 {
