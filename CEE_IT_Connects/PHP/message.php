@@ -267,10 +267,9 @@ if (!empty($_GET['room_id']) && ctype_digit((string) $_GET['room_id'])) {
 //     exit;
 // }
 
-$current_user_type = $_SESSION['user_type'];
-
 $chatStudents = [];
 
+// 1. Get the room for this student if none is selected yet
 if ($current_room_id === null && $current_user_type === 'student') {
     $roomStmt = $pdo->prepare("
         SELECT room_id
@@ -284,6 +283,7 @@ if ($current_room_id === null && $current_user_type === 'student') {
 }
 
 if ($current_room_id !== null) {
+    // 2. Make sure the viewer is actually a member of this room
     $memberCheck = $pdo->prepare("
         SELECT 1
         FROM room_members
@@ -292,6 +292,7 @@ if ($current_room_id !== null) {
     $memberCheck->execute([$current_room_id, $student_id, $current_user_type]);
 
     if ($memberCheck->fetchColumn()) {
+        // 3. Fetch every student in that room
         $chatStudentsStmt = $pdo->prepare("
             SELECT
                 s.id AS user_id,
