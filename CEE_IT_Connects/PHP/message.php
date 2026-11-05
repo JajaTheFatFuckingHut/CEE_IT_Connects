@@ -4208,7 +4208,8 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                                         <i class="fa-solid fa-paperclip" style="font-size:16px;color:#888;"></i>
                                     </label>
                                     <input type="file" id="rcAttachInput" name="attachment" style="display:none;"
-                                        accept=".pdf,.doc,.docx,image/*,video/*" onchange="rcShowAttachment(this)">
+                                        accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.gif,.webp,.mp4"
+                                        onchange="rcShowAttachment(this)">
 
                                     <textarea name="message" id="rcTextarea" rows="1" placeholder="Type a message…"
                                         onkeydown="rcEnterSend(event)"></textarea>
@@ -5097,6 +5098,26 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
             }
         }
 
+        const RC_MAX_MB = 10;
+        const RC_ALLOWED = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'mp4', 'pdf', 'doc', 'docx'];
+        let rcPreviewUrl = null;
+
+        function rcResetPreview() {
+            const imgEl = document.getElementById('rcAttachThumbImg');
+            const vidEl = document.getElementById('rcAttachThumbVideo');
+            const iconEl = document.getElementById('rcAttachThumbIcon');
+
+            imgEl.style.display = vidEl.style.display = iconEl.style.display = 'none';
+            imgEl.removeAttribute('src');
+            vidEl.removeAttribute('src');
+            vidEl.load();
+
+            if (rcPreviewUrl) {
+                URL.revokeObjectURL(rcPreviewUrl);
+                rcPreviewUrl = null;
+            }
+        }
+
         function rcShowAttachment(input) {
             const preview = document.getElementById('rcAttachPreview');
             const nameEl = document.getElementById('rcAttachName');
@@ -5104,61 +5125,61 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
             const vidEl = document.getElementById('rcAttachThumbVideo');
             const iconEl = document.getElementById('rcAttachThumbIcon');
 
-            imgEl.style.display = 'none';
-            vidEl.style.display = 'none';
-            iconEl.style.display = 'none';
-            imgEl.src = '';
-            vidEl.src = '';
+            rcResetPreview();
 
-            if (input.files && input.files[0]) {
-                const file = input.files[0];
-                const maxMB = 25;
-                if (file.size > maxMB * 1024 * 1024) {
-                    alert(`File too large. Max ${maxMB}MB.`);
-                    input.value = '';
-                    preview.style.display = 'none';
-                    return;
-                }
-
-                const url = URL.createObjectURL(file);
-
-                if (file.type.startsWith('image/')) {
-                    imgEl.src = url;
-                    imgEl.style.display = 'block';
-                } else if (file.type.startsWith('video/')) {
-                    vidEl.src = url;
-                    vidEl.style.display = 'block';
-                } else {
-                    let icon = 'fa-file';
-                    if (/\.pdf$/i.test(file.name)) icon = 'fa-file-pdf';
-                    else if (/\.docx?$/i.test(file.name)) icon = 'fa-file-word';
-                    iconEl.innerHTML = `<i class="fa-solid ${icon}" style="font-size:20px;color:#888;"></i>`;
-                    iconEl.style.display = 'flex';
-                }
-
-                nameEl.textContent = file.name;
-                preview.style.display = 'flex';
+            if (!input.files || !input.files[0]) {
+                preview.style.display = 'none';
+                return;
             }
+
+            const file = input.files[0];
+            const ext = file.name.split('.').pop().toLowerCase();
+
+            if (!RC_ALLOWED.includes(ext)) {
+                alert('File type not allowed. Use an image, MP4 video, PDF or Word document.');
+                input.value = '';
+                preview.style.display = 'none';
+                return;
+            }
+
+            if (file.size > RC_MAX_MB * 1024 * 1024) {
+                alert(`File too large. Max ${RC_MAX_MB}MB.`);
+                input.value = '';
+                preview.style.display = 'none';
+                return;
+            }
+
+            rcPreviewUrl = URL.createObjectURL(file);
+
+            if (file.type.startsWith('image/')) {
+                imgEl.src = rcPreviewUrl;
+                imgEl.style.display = 'block';
+            } else if (file.type.startsWith('video/')) {
+                vidEl.src = rcPreviewUrl;
+                vidEl.style.display = 'block';
+            } else {
+                const icon = ext === 'pdf' ? 'fa-file-pdf' : 'fa-file-word';
+                iconEl.innerHTML = `<i class="fa-solid ${icon}" style="font-size:20px;color:#888;"></i>`;
+                iconEl.style.display = 'flex';
+            }
+
+            nameEl.textContent = file.name;
+            preview.style.display = 'flex';
         }
 
         function rcClearAttachment() {
             document.getElementById('rcAttachInput').value = '';
             document.getElementById('rcAttachPreview').style.display = 'none';
+            rcResetPreview();
         }
 
         /* ── send on Enter (Shift+Enter = newline) ── */
         function rcEnterSend(e) {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
-                const ta = document.getElementById('rcTextarea');
-                const fileInput = document.getElementById('rcAttachInput');
-                const btn = document.getElementById('rcSendBtn');
-                const hasText = ta && ta.value.trim();
-                const hasFile = fileInput && fileInput.files.length > 0;
-                if (hasText || hasFile) {
-                    btn.disabled = true;
-                    document.getElementById('rcForm').submit();
-                }
+                const hasText = document.getElementById('rcTextarea').value.trim() !== '';
+                const hasFile = document.getElementById('rcAttachInput').files.length > 0;
+                if (hasText || hasFile) document.getElementById('rcForm').submit();
             }
         }
 

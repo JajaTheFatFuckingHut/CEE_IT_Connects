@@ -727,6 +727,56 @@ $page = 'messages';
             margin-top: 20px;
         }
 
+        .room-attach-preview {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+        }
+
+        .room-attach-thumb-wrap {
+            position: relative;
+            width: 56px;
+            height: 56px;
+            border-radius: 10px;
+            background: #f3f4f6;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .room-attach-thumb-wrap img,
+        .room-attach-thumb-wrap video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .room-attach-remove {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            width: 18px;
+            height: 18px;
+            border: 0;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, .6);
+            color: #fff;
+            font-size: 12px;
+            line-height: 1;
+            cursor: pointer;
+        }
+
+        .room-attach-filename {
+            font-size: 12px;
+            color: #666;
+            max-width: 220px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
         .room-item {
             border-radius: 10px;
             font-size: 14px;
@@ -2531,39 +2581,39 @@ $page = 'messages';
 <body>
     <?php include 'navbar.php'; ?>
     <?php if (isset($_SESSION['success'])): ?>
-        <div class="alert alert-success alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3"
-            style="z-index:9999; min-width:350px;" role="alert" id="flashAlert">
-            <i class="fa fa-circle-check me-1"></i><?= $_SESSION['success'] ?>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-        <?php unset($_SESSION['success']); ?>
+            <div class="alert alert-success alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3"
+                style="z-index:9999; min-width:350px;" role="alert" id="flashAlert">
+                <i class="fa fa-circle-check me-1"></i><?= $_SESSION['success'] ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            <?php unset($_SESSION['success']); ?>
     <?php endif; ?>
 
     <?php if (isset($_SESSION['warning'])): ?>
-        <div class="alert alert-warning alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3"
-            style="z-index:9999; min-width:400px;" role="alert" id="flashAlert">
-            <i class="fa fa-triangle-exclamation me-1"></i><?= $_SESSION['warning'] ?>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-        <?php unset($_SESSION['warning']); ?>
+            <div class="alert alert-warning alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3"
+                style="z-index:9999; min-width:400px;" role="alert" id="flashAlert">
+                <i class="fa fa-triangle-exclamation me-1"></i><?= $_SESSION['warning'] ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            <?php unset($_SESSION['warning']); ?>
     <?php endif; ?>
 
     <?php if (isset($_SESSION['error'])): ?>
-        <div class="alert alert-danger alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3"
-            style="z-index:9999; min-width:350px;" role="alert" id="flashAlert">
-            <i class="fa fa-circle-xmark me-1"></i><?= $_SESSION['error'] ?>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-        <?php unset($_SESSION['error']); ?>
+            <div class="alert alert-danger alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3"
+                style="z-index:9999; min-width:350px;" role="alert" id="flashAlert">
+                <i class="fa fa-circle-xmark me-1"></i><?= $_SESSION['error'] ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            <?php unset($_SESSION['error']); ?>
     <?php endif; ?>
 
     <?php if (isset($_SESSION['info'])): ?>
-        <div class="alert alert-info alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3"
-            style="z-index:9999; min-width:350px;" role="alert" id="flashAlert">
-            <i class="fa fa-circle-info me-1"></i><?= $_SESSION['info'] ?>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-        <?php unset($_SESSION['info']); ?>
+            <div class="alert alert-info alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3"
+                style="z-index:9999; min-width:350px;" role="alert" id="flashAlert">
+                <i class="fa fa-circle-info me-1"></i><?= $_SESSION['info'] ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            <?php unset($_SESSION['info']); ?>
     <?php endif; ?>
 
     <!-- SIDEBAR -->
@@ -2571,14 +2621,14 @@ $page = 'messages';
         <div class="rooms-list" style="margin-top: 0;">
             <h6>ROOMS</h6>
             <?php foreach ($myRooms as $room): ?>
-                <a href="ojt-rooms.php?room_id=<?= $room['id'] ?>&section=room"
-                    class="<?= ((int) $current_room_id === (int) $room['id']) ? 'active' : '' ?>"
-                    data-tooltip="<?= htmlspecialchars($room['room_name']) ?>">
-                    <i class="bi bi-people-fill me-2"></i>
-                    <span class="sidebar-text">
-                        <?= htmlspecialchars($room['room_name']) ?>
-                    </span>
-                </a>
+                    <a href="ojt-rooms.php?room_id=<?= $room['id'] ?>&section=room"
+                        class="<?= ((int) $current_room_id === (int) $room['id']) ? 'active' : '' ?>"
+                        data-tooltip="<?= htmlspecialchars($room['room_name']) ?>">
+                        <i class="bi bi-people-fill me-2"></i>
+                        <span class="sidebar-text">
+                            <?= htmlspecialchars($room['room_name']) ?>
+                        </span>
+                    </a>
             <?php endforeach; ?>
         </div>
 
@@ -2621,7 +2671,7 @@ $page = 'messages';
             <hr style="border-top: 2px solid rgba(255,255,255,0.59); margin: 16px auto; width: calc(100% - 32px);">
 
             <?php if ($isAdviser): ?>
-                <!-- <button class="sidebar-action-btn" data-bs-toggle="modal" data-bs-target="#csvUploadModal">
+                    <!-- <button class="sidebar-action-btn" data-bs-toggle="modal" data-bs-target="#csvUploadModal">
                     <i class="fa fa-file-csv me-2"></i> <span class="sidebar-text">Import Students</span>
                 </button> -->
             <?php endif; ?>
@@ -2669,19 +2719,19 @@ $page = 'messages';
     <div class="main">
         <!-- addtl s -->
         <?php if ($section === '' || $section === 'home'): ?>
-            <?php
-            // ── HOME DASHBOARD DATA (added) ──
-            $latestPostStmt = $pdo->prepare("SELECT * FROM room_posts WHERE room_id = ? ORDER BY created_at DESC LIMIT 1");
-            $latestPostStmt->execute([$current_room_id]);
-            $latestPost = $latestPostStmt->fetch(PDO::FETCH_ASSOC);
+                <?php
+                // ── HOME DASHBOARD DATA (added) ──
+                $latestPostStmt = $pdo->prepare("SELECT * FROM room_posts WHERE room_id = ? ORDER BY created_at DESC LIMIT 1");
+                $latestPostStmt->execute([$current_room_id]);
+                $latestPost = $latestPostStmt->fetch(PDO::FETCH_ASSOC);
 
-            // addtl s
-            // ── DASHBOARD DATA ──
-            $dashRoomId = (int) $current_room_id;
-            $dashUrl = "ojt-rooms.php?room_id={$dashRoomId}&section=";
+                // addtl s
+                // ── DASHBOARD DATA ──
+                $dashRoomId = (int) $current_room_id;
+                $dashUrl = "ojt-rooms.php?room_id={$dashRoomId}&section=";
 
-            // Students in any active room owned by this adviser (same rule as the other sections)
-            $myStudentsSql = "
+                // Students in any active room owned by this adviser (same rule as the other sections)
+                $myStudentsSql = "
                 SELECT rm.user_id
                 FROM room_members rm
                 JOIN rooms r ON r.id = rm.room_id
@@ -2690,78 +2740,78 @@ $page = 'messages';
                 AND r.is_archived = FALSE
             ";
 
-            // same 10 steps as the Requirements page
-            $dashSteps = [
-                'resume',
-                'mou',
-                'company_profile',
-                'addendum',
-                'reco_letter',
-                'waiver',
-                'medical_cert',
-                'internship_plan',
-                'vicinity_map',
-                'oath'
-            ];
-            $totalSteps = count($dashSteps);
+                // same 10 steps as the Requirements page
+                $dashSteps = [
+                    'resume',
+                    'mou',
+                    'company_profile',
+                    'addendum',
+                    'reco_letter',
+                    'waiver',
+                    'medical_cert',
+                    'internship_plan',
+                    'vicinity_map',
+                    'oath'
+                ];
+                $totalSteps = count($dashSteps);
 
-            // Students in this room
-            // $q = $pdo->prepare("SELECT COUNT(*) FROM room_members WHERE room_id = ? AND user_type = 'student'");
-            // $q->execute([$dashRoomId]);
-            // $totalStudents = (int) $q->fetchColumn();
-        
-            // ^^ Students under this adviser
-            $q = $pdo->prepare("SELECT COUNT(*) FROM ($myStudentsSql) x");
-            $q->execute([$adviser_id]);
-            $totalStudents = (int) $q->fetchColumn();
+                // Students in this room
+                // $q = $pdo->prepare("SELECT COUNT(*) FROM room_members WHERE room_id = ? AND user_type = 'student'");
+                // $q->execute([$dashRoomId]);
+                // $totalStudents = (int) $q->fetchColumn();
+            
+                // ^^ Students under this adviser
+                $q = $pdo->prepare("SELECT COUNT(*) FROM ($myStudentsSql) x");
+                $q->execute([$adviser_id]);
+                $totalStudents = (int) $q->fetchColumn();
 
-            // // Weekly reports from this room's students (total + latest 5)
-            // $q = $pdo->prepare("
-            //     SELECT s.full_name, wr.week_number, wr.created_at
-            //     FROM weekly_reports wr
-            //     JOIN students s ON s.id = wr.student_id
-            //     JOIN room_members rm ON rm.user_id = s.id AND rm.user_type = 'student'
-            //     WHERE rm.room_id = ?
-            //     ORDER BY wr.created_at DESC
-            // ");
-            // $q->execute([$dashRoomId]);
-            // $dashReportsAll = $q->fetchAll(PDO::FETCH_ASSOC);
-            // $totalReports   = count($dashReportsAll);
-            // $dashReports    = array_slice($dashReportsAll, 0, 5);
-        
-            // ^^ Weekly reports from this adviser's students (total + latest 5)
-            $q = $pdo->prepare("
+                // // Weekly reports from this room's students (total + latest 5)
+                // $q = $pdo->prepare("
+                //     SELECT s.full_name, wr.week_number, wr.created_at
+                //     FROM weekly_reports wr
+                //     JOIN students s ON s.id = wr.student_id
+                //     JOIN room_members rm ON rm.user_id = s.id AND rm.user_type = 'student'
+                //     WHERE rm.room_id = ?
+                //     ORDER BY wr.created_at DESC
+                // ");
+                // $q->execute([$dashRoomId]);
+                // $dashReportsAll = $q->fetchAll(PDO::FETCH_ASSOC);
+                // $totalReports   = count($dashReportsAll);
+                // $dashReports    = array_slice($dashReportsAll, 0, 5);
+            
+                // ^^ Weekly reports from this adviser's students (total + latest 5)
+                $q = $pdo->prepare("
                 SELECT s.full_name, wr.week_number, wr.created_at
                 FROM weekly_reports wr
                 JOIN students s ON s.id = wr.student_id
                 WHERE s.id IN ($myStudentsSql)
                 ORDER BY wr.created_at DESC
             ");
-            $q->execute([$adviser_id]);
-            $dashReportsAll = $q->fetchAll(PDO::FETCH_ASSOC);
-            $totalReports = count($dashReportsAll);
-            $dashReports = array_slice($dashReportsAll, 0, 5);
+                $q->execute([$adviser_id]);
+                $dashReportsAll = $q->fetchAll(PDO::FETCH_ASSOC);
+                $totalReports = count($dashReportsAll);
+                $dashReports = array_slice($dashReportsAll, 0, 5);
 
-            // Requirements checklist progress per student (lowest first)
-            // $placeholders = implode(',', array_fill(0, $totalSteps, '?'));
-            // $q = $pdo->prepare("
-            //     SELECT s.id, s.full_name,
-            //         COUNT(DISTINCT sp.step_key) FILTER (WHERE sp.is_done) AS done_count
-            //     FROM students s
-            //     JOIN room_members rm ON rm.user_id = s.id AND rm.user_type = 'student'
-            //     LEFT JOIN student_progress sp ON sp.student_id = s.id AND sp.step_key IN ($placeholders)
-            //     WHERE rm.room_id = ?
-            //     GROUP BY s.id, s.full_name
-            //     ORDER BY done_count ASC, s.full_name
-            // ");
-            // $q->execute([...$dashSteps, $dashRoomId]);
-            // $dashReqAll      = $q->fetchAll(PDO::FETCH_ASSOC);
-            // $incompleteCount = count(array_filter($dashReqAll, fn($r) => (int) $r['done_count'] < $totalSteps));
-            // $dashReq         = array_slice($dashReqAll, 0, 5);
-        
-            // ^^ Requirements checklist progress per student (lowest first)
-            $placeholders = implode(',', array_fill(0, $totalSteps, '?'));
-            $q = $pdo->prepare("
+                // Requirements checklist progress per student (lowest first)
+                // $placeholders = implode(',', array_fill(0, $totalSteps, '?'));
+                // $q = $pdo->prepare("
+                //     SELECT s.id, s.full_name,
+                //         COUNT(DISTINCT sp.step_key) FILTER (WHERE sp.is_done) AS done_count
+                //     FROM students s
+                //     JOIN room_members rm ON rm.user_id = s.id AND rm.user_type = 'student'
+                //     LEFT JOIN student_progress sp ON sp.student_id = s.id AND sp.step_key IN ($placeholders)
+                //     WHERE rm.room_id = ?
+                //     GROUP BY s.id, s.full_name
+                //     ORDER BY done_count ASC, s.full_name
+                // ");
+                // $q->execute([...$dashSteps, $dashRoomId]);
+                // $dashReqAll      = $q->fetchAll(PDO::FETCH_ASSOC);
+                // $incompleteCount = count(array_filter($dashReqAll, fn($r) => (int) $r['done_count'] < $totalSteps));
+                // $dashReq         = array_slice($dashReqAll, 0, 5);
+            
+                // ^^ Requirements checklist progress per student (lowest first)
+                $placeholders = implode(',', array_fill(0, $totalSteps, '?'));
+                $q = $pdo->prepare("
                 SELECT s.id, s.full_name,
                     COUNT(DISTINCT sp.step_key) FILTER (WHERE sp.is_done) AS done_count
                 FROM students s
@@ -2770,42 +2820,42 @@ $page = 'messages';
                 GROUP BY s.id, s.full_name
                 ORDER BY done_count ASC, s.full_name
             ");
-            $q->execute([...$dashSteps, $adviser_id]);
-            $dashReqAll = $q->fetchAll(PDO::FETCH_ASSOC);
-            $incompleteCount = count(array_filter($dashReqAll, fn($r) => (int) $r['done_count'] < $totalSteps));
-            $dashReq = array_slice($dashReqAll, 0, 5);
+                $q->execute([...$dashSteps, $adviser_id]);
+                $dashReqAll = $q->fetchAll(PDO::FETCH_ASSOC);
+                $incompleteCount = count(array_filter($dashReqAll, fn($r) => (int) $r['done_count'] < $totalSteps));
+                $dashReq = array_slice($dashReqAll, 0, 5);
 
-            // Student hours progress
-            // $q = $pdo->prepare("
-            //     SELECT DISTINCT ON (s.id)
-            //         s.id, s.full_name,
-            //         COALESCE(i.company, oa.company_name) AS company,
-            //         COALESCE(i.required_hours, 486) AS required_hours,
-            //         COALESCE((
-            //             SELECT ROUND(SUM(
-            //                 GREATEST(0, EXTRACT(EPOCH FROM (h.m_out - h.m_in)) / 3600) +
-            //                 GREATEST(0, EXTRACT(EPOCH FROM (h.a_out - h.a_in)) / 3600)
-            //             )::numeric, 2)
-            //             FROM ojt_hours h
-            //             WHERE h.user_id = s.id AND h.user_type = 'student'
-            //             AND h.m_in IS NOT NULL AND h.m_out IS NOT NULL
-            //             AND h.a_in IS NOT NULL AND h.a_out IS NOT NULL
-            //         ), 0) AS total_hours
-            //     FROM students s
-            //     JOIN room_members rm ON rm.user_id = s.id AND rm.user_type = 'student'
-            //     LEFT JOIN student_internships si ON si.student_id = s.id
-            //     LEFT JOIN internships i ON i.id = si.internship_id
-            //     LEFT JOIN ojt_applications oa ON oa.student_id = s.id
-            //     WHERE rm.room_id = ?
-            //     ORDER BY s.id
-            // ");
-            // $q->execute([$dashRoomId]);
-            // $dashStudents = $q->fetchAll(PDO::FETCH_ASSOC);
-            // usort($dashStudents, fn($a, $b) => strcmp($a['full_name'], $b['full_name']));
-            // $dashStudents = array_slice($dashStudents, 0, 5);
-        
-            // ^^ Student hours progress
-            $q = $pdo->prepare("
+                // Student hours progress
+                // $q = $pdo->prepare("
+                //     SELECT DISTINCT ON (s.id)
+                //         s.id, s.full_name,
+                //         COALESCE(i.company, oa.company_name) AS company,
+                //         COALESCE(i.required_hours, 486) AS required_hours,
+                //         COALESCE((
+                //             SELECT ROUND(SUM(
+                //                 GREATEST(0, EXTRACT(EPOCH FROM (h.m_out - h.m_in)) / 3600) +
+                //                 GREATEST(0, EXTRACT(EPOCH FROM (h.a_out - h.a_in)) / 3600)
+                //             )::numeric, 2)
+                //             FROM ojt_hours h
+                //             WHERE h.user_id = s.id AND h.user_type = 'student'
+                //             AND h.m_in IS NOT NULL AND h.m_out IS NOT NULL
+                //             AND h.a_in IS NOT NULL AND h.a_out IS NOT NULL
+                //         ), 0) AS total_hours
+                //     FROM students s
+                //     JOIN room_members rm ON rm.user_id = s.id AND rm.user_type = 'student'
+                //     LEFT JOIN student_internships si ON si.student_id = s.id
+                //     LEFT JOIN internships i ON i.id = si.internship_id
+                //     LEFT JOIN ojt_applications oa ON oa.student_id = s.id
+                //     WHERE rm.room_id = ?
+                //     ORDER BY s.id
+                // ");
+                // $q->execute([$dashRoomId]);
+                // $dashStudents = $q->fetchAll(PDO::FETCH_ASSOC);
+                // usort($dashStudents, fn($a, $b) => strcmp($a['full_name'], $b['full_name']));
+                // $dashStudents = array_slice($dashStudents, 0, 5);
+            
+                // ^^ Student hours progress
+                $q = $pdo->prepare("
                 SELECT DISTINCT ON (s.id)
                     s.id, s.full_name,
                     COALESCE(i.company, oa.company_name) AS company,
@@ -2826,38 +2876,38 @@ $page = 'messages';
                 WHERE s.id IN ($myStudentsSql)
                 ORDER BY s.id, oa.id DESC
             ");
-            $q->execute([$adviser_id]);
-            $dashStudents = $q->fetchAll(PDO::FETCH_ASSOC);
+                $q->execute([$adviser_id]);
+                $dashStudents = $q->fetchAll(PDO::FETCH_ASSOC);
 
-            // Companies with at least one document available (loaded at the top of the file)
-            $docsAvailableCount = count(array_filter(
-                $docAvailability,
-                fn($d) =>
-                    !empty($d['mou_available']) || !empty($d['recommendation_letter_available']) || !empty($d['waiver_available'])
-            ));
-            $docsCompanyCount = count($docAvailability);
-            // ── CHART DATA (added) ──
-            // $attStmt = $pdo->prepare("
-            //     SELECT
-            //         h.date AS log_day,
-            //         SUM(
-            //             COALESCE(GREATEST(0, EXTRACT(EPOCH FROM (h.m_out - h.m_in)) / 3600), 0) +
-            //             COALESCE(GREATEST(0, EXTRACT(EPOCH FROM (h.a_out - h.a_in)) / 3600), 0)
-            //         ) AS hours
-            //     FROM ojt_hours h
-            //     JOIN room_members rm ON rm.user_id = h.user_id AND rm.user_type = 'student'
-            //     WHERE rm.room_id = ?
-            //     AND h.user_type = 'student'
-            //     AND h.date >= (CURRENT_DATE - INTERVAL '13 days')
-            //     GROUP BY h.date
-            //     ORDER BY h.date
-            // ");
-            // $attStmt->execute([$dashRoomId]);
-            // $attStmt->execute([$dashRoomId]);
-            // $attRows = $attStmt->fetchAll(PDO::FETCH_ASSOC);
-        
-            // ^^ ── CHART DATA (added) ──
-            $attStmt = $pdo->prepare("
+                // Companies with at least one document available (loaded at the top of the file)
+                $docsAvailableCount = count(array_filter(
+                    $docAvailability,
+                    fn($d) =>
+                        !empty($d['mou_available']) || !empty($d['recommendation_letter_available']) || !empty($d['waiver_available'])
+                ));
+                $docsCompanyCount = count($docAvailability);
+                // ── CHART DATA (added) ──
+                // $attStmt = $pdo->prepare("
+                //     SELECT
+                //         h.date AS log_day,
+                //         SUM(
+                //             COALESCE(GREATEST(0, EXTRACT(EPOCH FROM (h.m_out - h.m_in)) / 3600), 0) +
+                //             COALESCE(GREATEST(0, EXTRACT(EPOCH FROM (h.a_out - h.a_in)) / 3600), 0)
+                //         ) AS hours
+                //     FROM ojt_hours h
+                //     JOIN room_members rm ON rm.user_id = h.user_id AND rm.user_type = 'student'
+                //     WHERE rm.room_id = ?
+                //     AND h.user_type = 'student'
+                //     AND h.date >= (CURRENT_DATE - INTERVAL '13 days')
+                //     GROUP BY h.date
+                //     ORDER BY h.date
+                // ");
+                // $attStmt->execute([$dashRoomId]);
+                // $attStmt->execute([$dashRoomId]);
+                // $attRows = $attStmt->fetchAll(PDO::FETCH_ASSOC);
+            
+                // ^^ ── CHART DATA (added) ──
+                $attStmt = $pdo->prepare("
                 SELECT
                     h.date AS log_day,
                     SUM(
@@ -2871,812 +2921,812 @@ $page = 'messages';
                 GROUP BY h.date
                 ORDER BY h.date
             ");
-            $attStmt->execute([$adviser_id]);
-            $attRows = $attStmt->fetchAll(PDO::FETCH_ASSOC);
+                $attStmt->execute([$adviser_id]);
+                $attRows = $attStmt->fetchAll(PDO::FETCH_ASSOC);
 
-            // Build a full 14-day range so missing days show as 0 instead of skipping
-            $attLabels = [];
-            $attData = [];
-            $attByDay = [];
-            foreach ($attRows as $r) {
-                $attByDay[$r['log_day']] = round((float) $r['hours'], 1);
-            }
-            for ($i = 13; $i >= 0; $i--) {
-                $d = date('Y-m-d', strtotime("-{$i} days"));
-                $attLabels[] = date('M j', strtotime($d));
-                $attData[] = $attByDay[$d] ?? 0;
-            }
+                // Build a full 14-day range so missing days show as 0 instead of skipping
+                $attLabels = [];
+                $attData = [];
+                $attByDay = [];
+                foreach ($attRows as $r) {
+                    $attByDay[$r['log_day']] = round((float) $r['hours'], 1);
+                }
+                for ($i = 13; $i >= 0; $i--) {
+                    $d = date('Y-m-d', strtotime("-{$i} days"));
+                    $attLabels[] = date('M j', strtotime($d));
+                    $attData[] = $attByDay[$d] ?? 0;
+                }
 
-            // Completion pie: complete vs incomplete, using the same totals already computed above
-            $completeCount = max(0, $totalStudents - $incompleteCount);
-            $barStudents = $dashStudents ?? [];
-            usort($barStudents, fn($a, $b) => (float) $b['total_hours'] <=> (float) $a['total_hours']);
-            $barStudents = array_slice($barStudents, 0, 6);
-            $barLabels = array_map(fn($s) => $s['full_name'], $barStudents);
-            $barData = array_map(fn($s) => round((float) $s['total_hours'], 1), $barStudents);
-            // addtl e
-            ?>
+                // Completion pie: complete vs incomplete, using the same totals already computed above
+                $completeCount = max(0, $totalStudents - $incompleteCount);
+                $barStudents = $dashStudents ?? [];
+                usort($barStudents, fn($a, $b) => (float) $b['total_hours'] <=> (float) $a['total_hours']);
+                $barStudents = array_slice($barStudents, 0, 6);
+                $barLabels = array_map(fn($s) => $s['full_name'], $barStudents);
+                $barData = array_map(fn($s) => round((float) $s['total_hours'], 1), $barStudents);
+                // addtl e
+                ?>
 
-            <div class="home-hero">
-                <div class="home-hero-bar">
-                    <!-- <div style="font-size:12px; letter-spacing:.08em; text-transform:uppercase; opacity:.75;">Rooms</div> -->
-                    <h2>Welcome back, <?= htmlspecialchars($userFullName) ?></h2>
-                    <p>Stay connected, track updates, and monitor your interns' progress — all in one place.</p>
-                </div>
-            </div>
-
-            <!-- MY ROOMS -->
-            <div class="rm-section">
-                <div class="rm-head">
-                    <h5 class="fw-bold mb-0"><i class="fa-solid fa-users me-2" style="color:#ff6b2c;"></i>My Rooms</h5>
-                    <small class="text-muted">Open a room to post announcements and see its members.</small>
+                <div class="home-hero">
+                    <div class="home-hero-bar">
+                        <!-- <div style="font-size:12px; letter-spacing:.08em; text-transform:uppercase; opacity:.75;">Rooms</div> -->
+                        <h2>Welcome back, <?= htmlspecialchars($userFullName) ?></h2>
+                        <p>Stay connected, track updates, and monitor your interns' progress — all in one place.</p>
+                    </div>
                 </div>
 
-                <?php if (empty($myRooms)): ?>
-                    <div class="home-empty">You're not in any rooms yet.</div>
-                <?php else: ?>
-                    <div class="rm-grid">
-                        <?php foreach ($myRooms as $r):
-                            $meta = array_filter([
-                                !empty($r['school_year']) ? 'S.Y. ' . $r['school_year'] : '',
-                                $r['year_level'] ?? '',
-                                $r['section'] ?? '',
-                            ]);
-                            ?>
-                            <a href="ojt-rooms.php?room_id=<?= (int) $r['id'] ?>&section=room" class="rm-card">
-                                <div class="rm-ic"><i class="fa-solid fa-users"></i></div>
-                                <div class="rm-info">
-                                    <strong><?= htmlspecialchars($r['room_name']) ?></strong>
-                                    <?php if ($meta): ?>
-                                        <small><?= htmlspecialchars(implode(' · ', $meta)) ?></small>
-                                    <?php endif; ?>
-                                </div>
-                                <i class="fa-solid fa-chevron-right rm-go"></i>
-                            </a>
-                        <?php endforeach; ?>
-                    </div>
-                <?php endif; ?>
-            </div>
-
-            <div class="row g-3">
-                <div class="col-lg-8">
-                    <div class="home-card accent-orange">
-                        <div class="dash-head">
-                            <div>
-                                <h5 class="fw-bold mb-0"><i class="fa-solid fa-bullhorn me-2"
-                                        style="color:#ff6b2c;"></i>Announcements</h5>
-                                <small class="text-muted">Latest updates and important notices for your room.</small>
-                            </div>
-                            <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=room" class="btn btn-sm"
-                                style="background:#eef1fb;color:#272f54;border-radius:20px;font-weight:600;">
-                                View All <i class="fa-solid fa-arrow-right ms-1"></i>
-                            </a>
-                        </div>
-
-                        <?php if ($latestPost): ?>
-                            <div style="border:1px solid #eee; border-radius:10px; padding:16px;">
-                                <strong><?= htmlspecialchars($latestPost['sender_name']) ?></strong>
-                                <small class="text-muted d-block mb-2">
-                                    <?= date("M d, Y", strtotime($latestPost['created_at'])) ?>
-                                </small>
-                                <p class="mb-0"><?= htmlspecialchars($latestPost['content']) ?></p>
-                            </div>
-                        <?php else: ?>
-                            <div class="home-empty">
-                                <div class="d-flex align-items-center gap-3">
-                                    <i class="fa-solid fa-bullhorn fa-2x" style="color:#ff6b2c;"></i>
-                                    <div>
-                                        <strong style="color:#475569;">No announcements yet</strong>
-                                        <div style="font-size:13px;">When there are new updates, they will appear here.</div>
-                                    </div>
-                                </div>
-                            </div>
-                        <?php endif; ?>
-                    </div>
-                    <!-- addtl s -->
-                    <div class="dash-stats">
-                        <a href="<?= $dashUrl ?>status" class="dash-stat tone-blue">
-                            <div class="dash-stat-icon"><i class="fa-solid fa-users"></i></div>
-                            <div>
-                                <p class="dash-stat-label">Students</p>
-                                <p class="dash-stat-value"><?= $totalStudents ?></p>
-                            </div>
-                        </a>
-                        <a href="<?= $dashUrl ?>ojt_applications" class="dash-stat tone-amber">
-                            <div class="dash-stat-icon"><i class="fa-solid fa-list-check"></i></div>
-                            <div>
-                                <p class="dash-stat-label">Incomplete requirements</p>
-                                <p class="dash-stat-value"><?= $incompleteCount ?></p>
-                            </div>
-                        </a>
-                        <a href="<?= $dashUrl ?>weekly_reports" class="dash-stat tone-amber">
-                            <div class="dash-stat-icon"><i class="fa-solid fa-file-lines"></i></div>
-                            <div>
-                                <p class="dash-stat-label">Weekly reports</p>
-                                <p class="dash-stat-value"><?= $totalReports ?></p>
-                            </div>
-                        </a>
-                        <a href="<?= $dashUrl ?>announcements" class="dash-stat tone-orange">
-                            <div class="dash-stat-icon"><i class="fa-solid fa-folder-open"></i></div>
-                            <div>
-                                <p class="dash-stat-label">Docs available</p>
-                                <p class="dash-stat-value"><?= $docsAvailableCount ?></p>
-                            </div>
-                        </a>
+                <!-- MY ROOMS -->
+                <div class="rm-section">
+                    <div class="rm-head">
+                        <h5 class="fw-bold mb-0"><i class="fa-solid fa-users me-2" style="color:#ff6b2c;"></i>My Rooms</h5>
+                        <small class="text-muted">Open a room to post announcements and see its members.</small>
                     </div>
 
-
-                    <div class="home-card accent-blue" style="margin-top:16px;">
-                        <div class="dash-head">
-                            <div>
-                                <h5 class="fw-bold mb-0"><i class="fa-solid fa-calendar-check me-2"
-                                        style="color:#ff6b2c;"></i>Student Progress</h5>
-                                <small class="text-muted">OJT hours rendered by your interns.</small>
-                            </div>
-                            <a href="<?= $dashUrl ?>status" class="btn btn-sm"
-                                style="background:#eef1fb;color:#272f54;border-radius:20px;font-weight:600;">
-                                View All <i class="fa-solid fa-arrow-right ms-1"></i>
-                            </a>
-                        </div>
-
-                        <?php if (empty($dashStudents)): ?>
-                            <div class="home-empty">No students in this room yet.</div>
-                        <?php else: ?>
-                            <div class="dash-list">
-                                <?php foreach ($dashStudents as $ds):
-                                    $req = max(1, (int) $ds['required_hours']);
-                                    $hrs = (float) $ds['total_hours'];
-                                    $pct = (int) min(100, round(($hrs / $req) * 100));
-                                    $col = $avatarColors[crc32($ds['full_name']) % count($avatarColors)];
+                    <?php if (empty($myRooms)): ?>
+                            <div class="home-empty">You're not in any rooms yet.</div>
+                    <?php else: ?>
+                            <div class="rm-grid">
+                                <?php foreach ($myRooms as $r):
+                                    $meta = array_filter([
+                                        !empty($r['school_year']) ? 'S.Y. ' . $r['school_year'] : '',
+                                        $r['year_level'] ?? '',
+                                        $r['section'] ?? '',
+                                    ]);
                                     ?>
-                                    <div class="dash-row">
-                                        <div class="avatar" style="background:<?= $col ?>;">
-                                            <strong><?= strtoupper(substr($ds['full_name'], 0, 1)) ?></strong>
-                                        </div>
-                                        <div class="dash-row-main">
-                                            <div class="dash-row-name"><?= htmlspecialchars($ds['full_name']) ?></div>
-                                            <div class="dash-row-sub"><?= htmlspecialchars($ds['company'] ?: 'No company') ?></div>
-                                        </div>
-                                        <div class="dash-hours"><strong><?= round($hrs, 1) ?></strong> / <?= $req ?> hrs</div>
-                                        <div class="dash-bar">
-                                            <div style="width:<?= $pct ?>%"></div>
-                                        </div>
-                                        <span class="dash-pct"><?= $pct ?>%</span>
-                                    </div>
+                                        <a href="ojt-rooms.php?room_id=<?= (int) $r['id'] ?>&section=room" class="rm-card">
+                                            <div class="rm-ic"><i class="fa-solid fa-users"></i></div>
+                                            <div class="rm-info">
+                                                <strong><?= htmlspecialchars($r['room_name']) ?></strong>
+                                                <?php if ($meta): ?>
+                                                        <small><?= htmlspecialchars(implode(' · ', $meta)) ?></small>
+                                                <?php endif; ?>
+                                            </div>
+                                            <i class="fa-solid fa-chevron-right rm-go"></i>
+                                        </a>
                                 <?php endforeach; ?>
                             </div>
-                        <?php endif; ?>
+                    <?php endif; ?>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-lg-8">
+                        <div class="home-card accent-orange">
+                            <div class="dash-head">
+                                <div>
+                                    <h5 class="fw-bold mb-0"><i class="fa-solid fa-bullhorn me-2"
+                                            style="color:#ff6b2c;"></i>Announcements</h5>
+                                    <small class="text-muted">Latest updates and important notices for your room.</small>
+                                </div>
+                                <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=room" class="btn btn-sm"
+                                    style="background:#eef1fb;color:#272f54;border-radius:20px;font-weight:600;">
+                                    View All <i class="fa-solid fa-arrow-right ms-1"></i>
+                                </a>
+                            </div>
+
+                            <?php if ($latestPost): ?>
+                                    <div style="border:1px solid #eee; border-radius:10px; padding:16px;">
+                                        <strong><?= htmlspecialchars($latestPost['sender_name']) ?></strong>
+                                        <small class="text-muted d-block mb-2">
+                                            <?= date("M d, Y", strtotime($latestPost['created_at'])) ?>
+                                        </small>
+                                        <p class="mb-0"><?= htmlspecialchars($latestPost['content']) ?></p>
+                                    </div>
+                            <?php else: ?>
+                                    <div class="home-empty">
+                                        <div class="d-flex align-items-center gap-3">
+                                            <i class="fa-solid fa-bullhorn fa-2x" style="color:#ff6b2c;"></i>
+                                            <div>
+                                                <strong style="color:#475569;">No announcements yet</strong>
+                                                <div style="font-size:13px;">When there are new updates, they will appear here.</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                            <?php endif; ?>
+                        </div>
+                        <!-- addtl s -->
+                        <div class="dash-stats">
+                            <a href="<?= $dashUrl ?>status" class="dash-stat tone-blue">
+                                <div class="dash-stat-icon"><i class="fa-solid fa-users"></i></div>
+                                <div>
+                                    <p class="dash-stat-label">Students</p>
+                                    <p class="dash-stat-value"><?= $totalStudents ?></p>
+                                </div>
+                            </a>
+                            <a href="<?= $dashUrl ?>ojt_applications" class="dash-stat tone-amber">
+                                <div class="dash-stat-icon"><i class="fa-solid fa-list-check"></i></div>
+                                <div>
+                                    <p class="dash-stat-label">Incomplete requirements</p>
+                                    <p class="dash-stat-value"><?= $incompleteCount ?></p>
+                                </div>
+                            </a>
+                            <a href="<?= $dashUrl ?>weekly_reports" class="dash-stat tone-amber">
+                                <div class="dash-stat-icon"><i class="fa-solid fa-file-lines"></i></div>
+                                <div>
+                                    <p class="dash-stat-label">Weekly reports</p>
+                                    <p class="dash-stat-value"><?= $totalReports ?></p>
+                                </div>
+                            </a>
+                            <a href="<?= $dashUrl ?>announcements" class="dash-stat tone-orange">
+                                <div class="dash-stat-icon"><i class="fa-solid fa-folder-open"></i></div>
+                                <div>
+                                    <p class="dash-stat-label">Docs available</p>
+                                    <p class="dash-stat-value"><?= $docsAvailableCount ?></p>
+                                </div>
+                            </a>
+                        </div>
+
+
+                        <div class="home-card accent-blue" style="margin-top:16px;">
+                            <div class="dash-head">
+                                <div>
+                                    <h5 class="fw-bold mb-0"><i class="fa-solid fa-calendar-check me-2"
+                                            style="color:#ff6b2c;"></i>Student Progress</h5>
+                                    <small class="text-muted">OJT hours rendered by your interns.</small>
+                                </div>
+                                <a href="<?= $dashUrl ?>status" class="btn btn-sm"
+                                    style="background:#eef1fb;color:#272f54;border-radius:20px;font-weight:600;">
+                                    View All <i class="fa-solid fa-arrow-right ms-1"></i>
+                                </a>
+                            </div>
+
+                            <?php if (empty($dashStudents)): ?>
+                                    <div class="home-empty">No students in this room yet.</div>
+                            <?php else: ?>
+                                    <div class="dash-list">
+                                        <?php foreach ($dashStudents as $ds):
+                                            $req = max(1, (int) $ds['required_hours']);
+                                            $hrs = (float) $ds['total_hours'];
+                                            $pct = (int) min(100, round(($hrs / $req) * 100));
+                                            $col = $avatarColors[crc32($ds['full_name']) % count($avatarColors)];
+                                            ?>
+                                                <div class="dash-row">
+                                                    <div class="avatar" style="background:<?= $col ?>;">
+                                                        <strong><?= strtoupper(substr($ds['full_name'], 0, 1)) ?></strong>
+                                                    </div>
+                                                    <div class="dash-row-main">
+                                                        <div class="dash-row-name"><?= htmlspecialchars($ds['full_name']) ?></div>
+                                                        <div class="dash-row-sub"><?= htmlspecialchars($ds['company'] ?: 'No company') ?></div>
+                                                    </div>
+                                                    <div class="dash-hours"><strong><?= round($hrs, 1) ?></strong> / <?= $req ?> hrs</div>
+                                                    <div class="dash-bar">
+                                                        <div style="width:<?= $pct ?>%"></div>
+                                                    </div>
+                                                    <span class="dash-pct"><?= $pct ?>%</span>
+                                                </div>
+                                        <?php endforeach; ?>
+                                    </div>
+                            <?php endif; ?>
+                        </div>
+                        <!-- addtl e -->
+                    </div>
+
+                    <!-- addtl s -->
+                    <div class="col-lg-4">
+                        <div class="dash-side">
+                            <a href="<?= $dashUrl ?>ojt_applications" class="dash-side-card">
+                                <div class="dash-side-top">
+                                    <div class="quick-card-icon" style="background:#dbeafe;color:#1e40af;"><i
+                                            class="fa fa-list-ul"></i></div>
+                                    <div class="quick-card-text"><strong>Requirements</strong><small>Check student
+                                            requirements</small></div>
+                                    <i class="fa-solid fa-chevron-right quick-card-arrow"></i>
+                                </div>
+                                <div class="dash-side-meta">
+                                    <i class="fa-solid fa-list-check"></i>
+                                    <?= $incompleteCount ?> of <?= $totalStudents ?>
+                                    student<?= $totalStudents === 1 ? '' : 's' ?> still incomplete
+                                </div>
+                            </a>
+
+                            <a href="<?= $dashUrl ?>weekly_reports" class="dash-side-card">
+                                <div class="dash-side-top">
+                                    <div class="quick-card-icon" style="background:#ffe7b3;color:#7a5200;"><i
+                                            class="fa-solid fa-file-lines"></i></div>
+                                    <div class="quick-card-text"><strong>Progress Reports</strong><small>View submitted
+                                            reports</small></div>
+                                    <i class="fa-solid fa-chevron-right quick-card-arrow"></i>
+                                </div>
+                                <div class="dash-side-meta">
+                                    <i class="fa-solid fa-clock"></i>
+                                    <?php if (!empty($dashReports)): ?>
+                                            Latest: <?= htmlspecialchars($dashReports[0]['full_name']) ?> &middot; Week
+                                            <?= (int) $dashReports[0]['week_number'] ?>
+                                    <?php else: ?>
+                                            No reports submitted yet
+                                    <?php endif; ?>
+                                </div>
+                            </a>
+
+                            <a href="<?= $dashUrl ?>chats" class="dash-side-card">
+                                <div class="dash-side-top">
+                                    <div class="quick-card-icon" style="background:#dbeafe;color:#272f54;"><i
+                                            class="fa-solid fa-comments"></i></div>
+                                    <div class="quick-card-text"><strong>Chats</strong><small>Communicate with your team</small>
+                                    </div>
+                                    <i class="fa-solid fa-chevron-right quick-card-arrow"></i>
+                                </div>
+                                <div class="dash-side-meta">
+                                    <i class="fa-solid fa-user-group"></i>
+                                    <?= count($chattableUsers) ?>         <?= count($chattableUsers) === 1 ? 'person' : 'people' ?> you
+                                    can message
+                                </div>
+                            </a>
+
+                            <a href="<?= $dashUrl ?>announcements" class="dash-side-card">
+                                <div class="dash-side-top">
+                                    <div class="quick-card-icon" style="background:#ffe5d9;color:#ff6b2c;"><i
+                                            class="fa-solid fa-folder-open"></i></div>
+                                    <div class="quick-card-text"><strong>Documents</strong><small>Partner company
+                                            documents</small></div>
+                                    <i class="fa-solid fa-chevron-right quick-card-arrow"></i>
+                                </div>
+                                <div class="dash-side-meta">
+                                    <i class="fa-solid fa-building"></i>
+                                    <?= $docsAvailableCount ?> of <?= $docsCompanyCount ?>
+                                    compan<?= $docsCompanyCount === 1 ? 'y' : 'ies' ?> have documents ready
+                                </div>
+                            </a>
+                        </div>
                     </div>
                     <!-- addtl e -->
                 </div>
 
                 <!-- addtl s -->
-                <div class="col-lg-4">
-                    <div class="dash-side">
-                        <a href="<?= $dashUrl ?>ojt_applications" class="dash-side-card">
-                            <div class="dash-side-top">
-                                <div class="quick-card-icon" style="background:#dbeafe;color:#1e40af;"><i
-                                        class="fa fa-list-ul"></i></div>
-                                <div class="quick-card-text"><strong>Requirements</strong><small>Check student
-                                        requirements</small></div>
-                                <i class="fa-solid fa-chevron-right quick-card-arrow"></i>
+                <div class="dash-bottom">
+                    <div class="home-card accent-orange">
+                        <div class="dash-head">
+                            <div>
+                                <h5 class="fw-bold mb-0"><i class="fa-solid fa-list-check me-2"
+                                        style="color:#ff6b2c;"></i>Requirements Progress</h5>
+                                <small class="text-muted">Students with the fewest requirements done.</small>
                             </div>
-                            <div class="dash-side-meta">
-                                <i class="fa-solid fa-list-check"></i>
-                                <?= $incompleteCount ?> of <?= $totalStudents ?>
-                                student<?= $totalStudents === 1 ? '' : 's' ?> still incomplete
-                            </div>
-                        </a>
-
-                        <a href="<?= $dashUrl ?>weekly_reports" class="dash-side-card">
-                            <div class="dash-side-top">
-                                <div class="quick-card-icon" style="background:#ffe7b3;color:#7a5200;"><i
-                                        class="fa-solid fa-file-lines"></i></div>
-                                <div class="quick-card-text"><strong>Progress Reports</strong><small>View submitted
-                                        reports</small></div>
-                                <i class="fa-solid fa-chevron-right quick-card-arrow"></i>
-                            </div>
-                            <div class="dash-side-meta">
-                                <i class="fa-solid fa-clock"></i>
-                                <?php if (!empty($dashReports)): ?>
-                                    Latest: <?= htmlspecialchars($dashReports[0]['full_name']) ?> &middot; Week
-                                    <?= (int) $dashReports[0]['week_number'] ?>
-                                <?php else: ?>
-                                    No reports submitted yet
-                                <?php endif; ?>
-                            </div>
-                        </a>
-
-                        <a href="<?= $dashUrl ?>chats" class="dash-side-card">
-                            <div class="dash-side-top">
-                                <div class="quick-card-icon" style="background:#dbeafe;color:#272f54;"><i
-                                        class="fa-solid fa-comments"></i></div>
-                                <div class="quick-card-text"><strong>Chats</strong><small>Communicate with your team</small>
+                            <a href="<?= $dashUrl ?>ojt_applications" class="btn btn-sm"
+                                style="background:#eef1fb;color:#272f54;border-radius:20px;font-weight:600;">
+                                View All <i class="fa-solid fa-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                        <?php if (empty($dashReq)): ?>
+                                <div class="home-empty">No students in this room yet.</div>
+                        <?php else: ?>
+                                <div class="dash-list">
+                                    <?php foreach ($dashReq as $r):
+                                        $done = (int) $r['done_count'];
+                                        $pct = (int) round(($done / $totalSteps) * 100);
+                                        $col = $avatarColors[crc32($r['full_name']) % count($avatarColors)];
+                                        ?>
+                                            <div class="dash-row">
+                                                <div class="avatar" style="background:<?= $col ?>;">
+                                                    <strong><?= strtoupper(substr($r['full_name'], 0, 1)) ?></strong>
+                                                </div>
+                                                <div class="dash-row-main">
+                                                    <div class="dash-row-name"><?= htmlspecialchars($r['full_name']) ?></div>
+                                                </div>
+                                                <div class="dash-hours"><strong><?= $done ?></strong> / <?= $totalSteps ?></div>
+                                                <div class="dash-bar">
+                                                    <div style="width:<?= $pct ?>%"></div>
+                                                </div>
+                                            </div>
+                                    <?php endforeach; ?>
                                 </div>
-                                <i class="fa-solid fa-chevron-right quick-card-arrow"></i>
-                            </div>
-                            <div class="dash-side-meta">
-                                <i class="fa-solid fa-user-group"></i>
-                                <?= count($chattableUsers) ?>     <?= count($chattableUsers) === 1 ? 'person' : 'people' ?> you
-                                can message
-                            </div>
-                        </a>
+                        <?php endif; ?>
+                    </div>
 
-                        <a href="<?= $dashUrl ?>announcements" class="dash-side-card">
-                            <div class="dash-side-top">
-                                <div class="quick-card-icon" style="background:#ffe5d9;color:#ff6b2c;"><i
-                                        class="fa-solid fa-folder-open"></i></div>
-                                <div class="quick-card-text"><strong>Documents</strong><small>Partner company
-                                        documents</small></div>
-                                <i class="fa-solid fa-chevron-right quick-card-arrow"></i>
+                    <div class="home-card accent-amber">
+                        <div class="dash-head">
+                            <div>
+                                <h5 class="fw-bold mb-0"><i class="fa-solid fa-calendar-days me-2"
+                                        style="color:#ff6b2c;"></i>Latest Weekly Reports</h5>
+                                <small class="text-muted">Most recent submissions from your interns.</small>
                             </div>
-                            <div class="dash-side-meta">
-                                <i class="fa-solid fa-building"></i>
-                                <?= $docsAvailableCount ?> of <?= $docsCompanyCount ?>
-                                compan<?= $docsCompanyCount === 1 ? 'y' : 'ies' ?> have documents ready
+                            <a href="<?= $dashUrl ?>weekly_reports" class="btn btn-sm"
+                                style="background:#eef1fb;color:#272f54;border-radius:20px;font-weight:600;">
+                                View All <i class="fa-solid fa-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                        <?php if (empty($dashReports)): ?>
+                                <div class="home-empty">No weekly reports submitted yet.</div>
+                        <?php else: ?>
+                                <div class="dash-list">
+                                    <?php foreach ($dashReports as $r):
+                                        $col = $avatarColors[crc32($r['full_name']) % count($avatarColors)];
+                                        ?>
+                                            <div class="dash-row">
+                                                <div class="avatar" style="background:<?= $col ?>;">
+                                                    <strong><?= strtoupper(substr($r['full_name'], 0, 1)) ?></strong>
+                                                </div>
+                                                <div class="dash-row-main">
+                                                    <div class="dash-row-name"><?= htmlspecialchars($r['full_name']) ?></div>
+                                                    <div class="dash-row-sub">Week <?= (int) $r['week_number'] ?></div>
+                                                </div>
+                                                <span class="dash-date"><?= date('M d, Y', strtotime($r['created_at'])) ?></span>
+                                            </div>
+                                    <?php endforeach; ?>
+                                </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+                <div class="row g-3 mt-1">
+                    <div class="col-md-6 col-lg-5">
+                        <div class="home-card accent-blue h-100">
+                            <div class="dash-head">
+                                <div>
+                                    <h5 class="fw-bold mb-0"><i class="fa-solid fa-chart-line me-2"
+                                            style="color:#ff6b2c;"></i>Attendance Trend</h5>
+                                    <small class="text-muted">Total hours logged per day, last 14 days.</small>
+                                </div>
                             </div>
-                        </a>
+                            <div style="position:relative; height:220px;">
+                                <canvas id="attendanceChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 col-lg-4">
+                        <div class="home-card accent-amber h-100">
+                            <div class="dash-head">
+                                <div>
+                                    <h5 class="fw-bold mb-0"><i class="fa-solid fa-chart-bar me-2"
+                                            style="color:#ff6b2c;"></i>Hours Rendered</h5>
+                                    <small class="text-muted">Top students by OJT hours.</small>
+                                </div>
+                            </div>
+                            <div style="position:relative; height:220px;">
+                                <canvas id="hoursBarChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3">
+                        <div class="home-card accent-orange h-100">
+                            <div class="dash-head">
+                                <div>
+                                    <h5 class="fw-bold mb-0"><i class="fa-solid fa-chart-pie me-2"
+                                            style="color:#ff6b2c;"></i>Requirements</h5>
+                                    <small class="text-muted">Students who finished all.</small>
+                                </div>
+                            </div>
+                            <div style="position:relative; height:220px;">
+                                <canvas id="completionChart"></canvas>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <!-- addtl e -->
-            </div>
-
-            <!-- addtl s -->
-            <div class="dash-bottom">
-                <div class="home-card accent-orange">
-                    <div class="dash-head">
-                        <div>
-                            <h5 class="fw-bold mb-0"><i class="fa-solid fa-list-check me-2"
-                                    style="color:#ff6b2c;"></i>Requirements Progress</h5>
-                            <small class="text-muted">Students with the fewest requirements done.</small>
-                        </div>
-                        <a href="<?= $dashUrl ?>ojt_applications" class="btn btn-sm"
-                            style="background:#eef1fb;color:#272f54;border-radius:20px;font-weight:600;">
-                            View All <i class="fa-solid fa-arrow-right ms-1"></i>
-                        </a>
-                    </div>
-                    <?php if (empty($dashReq)): ?>
-                        <div class="home-empty">No students in this room yet.</div>
-                    <?php else: ?>
-                        <div class="dash-list">
-                            <?php foreach ($dashReq as $r):
-                                $done = (int) $r['done_count'];
-                                $pct = (int) round(($done / $totalSteps) * 100);
-                                $col = $avatarColors[crc32($r['full_name']) % count($avatarColors)];
-                                ?>
-                                <div class="dash-row">
-                                    <div class="avatar" style="background:<?= $col ?>;">
-                                        <strong><?= strtoupper(substr($r['full_name'], 0, 1)) ?></strong>
-                                    </div>
-                                    <div class="dash-row-main">
-                                        <div class="dash-row-name"><?= htmlspecialchars($r['full_name']) ?></div>
-                                    </div>
-                                    <div class="dash-hours"><strong><?= $done ?></strong> / <?= $totalSteps ?></div>
-                                    <div class="dash-bar">
-                                        <div style="width:<?= $pct ?>%"></div>
-                                    </div>
-                                </div>
-                            <?php endforeach; ?>
-                        </div>
-                    <?php endif; ?>
-                </div>
-
-                <div class="home-card accent-amber">
-                    <div class="dash-head">
-                        <div>
-                            <h5 class="fw-bold mb-0"><i class="fa-solid fa-calendar-days me-2"
-                                    style="color:#ff6b2c;"></i>Latest Weekly Reports</h5>
-                            <small class="text-muted">Most recent submissions from your interns.</small>
-                        </div>
-                        <a href="<?= $dashUrl ?>weekly_reports" class="btn btn-sm"
-                            style="background:#eef1fb;color:#272f54;border-radius:20px;font-weight:600;">
-                            View All <i class="fa-solid fa-arrow-right ms-1"></i>
-                        </a>
-                    </div>
-                    <?php if (empty($dashReports)): ?>
-                        <div class="home-empty">No weekly reports submitted yet.</div>
-                    <?php else: ?>
-                        <div class="dash-list">
-                            <?php foreach ($dashReports as $r):
-                                $col = $avatarColors[crc32($r['full_name']) % count($avatarColors)];
-                                ?>
-                                <div class="dash-row">
-                                    <div class="avatar" style="background:<?= $col ?>;">
-                                        <strong><?= strtoupper(substr($r['full_name'], 0, 1)) ?></strong>
-                                    </div>
-                                    <div class="dash-row-main">
-                                        <div class="dash-row-name"><?= htmlspecialchars($r['full_name']) ?></div>
-                                        <div class="dash-row-sub">Week <?= (int) $r['week_number'] ?></div>
-                                    </div>
-                                    <span class="dash-date"><?= date('M d, Y', strtotime($r['created_at'])) ?></span>
-                                </div>
-                            <?php endforeach; ?>
-                        </div>
-                    <?php endif; ?>
-                </div>
-            </div>
-
-            <div class="row g-3 mt-1">
-                <div class="col-md-6 col-lg-5">
-                    <div class="home-card accent-blue h-100">
-                        <div class="dash-head">
-                            <div>
-                                <h5 class="fw-bold mb-0"><i class="fa-solid fa-chart-line me-2"
-                                        style="color:#ff6b2c;"></i>Attendance Trend</h5>
-                                <small class="text-muted">Total hours logged per day, last 14 days.</small>
-                            </div>
-                        </div>
-                        <div style="position:relative; height:220px;">
-                            <canvas id="attendanceChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-6 col-lg-4">
-                    <div class="home-card accent-amber h-100">
-                        <div class="dash-head">
-                            <div>
-                                <h5 class="fw-bold mb-0"><i class="fa-solid fa-chart-bar me-2"
-                                        style="color:#ff6b2c;"></i>Hours Rendered</h5>
-                                <small class="text-muted">Top students by OJT hours.</small>
-                            </div>
-                        </div>
-                        <div style="position:relative; height:220px;">
-                            <canvas id="hoursBarChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-3">
-                    <div class="home-card accent-orange h-100">
-                        <div class="dash-head">
-                            <div>
-                                <h5 class="fw-bold mb-0"><i class="fa-solid fa-chart-pie me-2"
-                                        style="color:#ff6b2c;"></i>Requirements</h5>
-                                <small class="text-muted">Students who finished all.</small>
-                            </div>
-                        </div>
-                        <div style="position:relative; height:220px;">
-                            <canvas id="completionChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- addtl e -->
         <?php elseif ($section === 'room' || $section === 'rooms'): ?>
-            <?php if ($current_room_id): ?>
-                <a href="ojt-rooms.php?room_id=<?= (int) $current_room_id ?>&section=home" class="room-back">
-                    <i class="fa-solid fa-arrow-left"></i> Back to Home
-                </a>
-                <?php include 'chat-room-content.php'; ?>
-            <?php endif; ?>
+                <?php if ($current_room_id): ?>
+                        <a href="ojt-rooms.php?room_id=<?= (int) $current_room_id ?>&section=home" class="room-back">
+                            <i class="fa-solid fa-arrow-left"></i> Back to Home
+                        </a>
+                        <?php include 'chat-room-content.php'; ?>
+                <?php endif; ?>
         <?php elseif ($section === 'announcements'): ?>
-            <?php
-            $docAvailStmt = $pdo->query("
+                <?php
+                $docAvailStmt = $pdo->query("
                 SELECT ida.internship_id, ida.mou_available, ida.recommendation_letter_available,
                     ida.waiver_available, ida.updated_at, i.title, i.company
                 FROM internship_document_availability ida
                 JOIN internships i ON i.id = ida.internship_id
                 ORDER BY ida.updated_at DESC
             ");
-            $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
-            ?>
-            <div id="documents" class="section sysAdm-section">
-                <div class="sysAdm-header--danger sysAdm-header--blue mb-4">
-                    <div class="sysAdm-header-left">
-                        <div class="sysAdm-header-icon">
-                            <i class="fa fa-folder-open"></i>
-                        </div>
-                        <div class="sysAdm-header-text">
-                            <h2>Documents Available</h2>
-                            <p>Check which documents are available for each partner company, ready to be picked up by the
-                                student</p>
+                $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
+                ?>
+                <div id="documents" class="section sysAdm-section">
+                    <div class="sysAdm-header--danger sysAdm-header--blue mb-4">
+                        <div class="sysAdm-header-left">
+                            <div class="sysAdm-header-icon">
+                                <i class="fa fa-folder-open"></i>
+                            </div>
+                            <div class="sysAdm-header-text">
+                                <h2>Documents Available</h2>
+                                <p>Check which documents are available for each partner company, ready to be picked up by the
+                                    student</p>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Search -->
-                <div style="display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap;
+                    <!-- Search -->
+                    <div style="display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap;
                     align-items:center; justify-content:space-between;">
-                    <div style="position:relative; flex:1; min-width:200px;">
-                        <i class="fa fa-search"
-                            style="position:absolute; color:#f97316; left:10px; top:50%; transform:translateY(-50%); font-size:13px;"></i>
-                        <input type="text" id="docsSearchInput" placeholder="Search company..." oninput="filterDocsTable()"
-                            style="width:50%; padding:8px 12px 8px 32px; border:1.5px solid #aeaeae; border-radius:22px;
+                        <div style="position:relative; flex:1; min-width:200px;">
+                            <i class="fa fa-search"
+                                style="position:absolute; color:#f97316; left:10px; top:50%; transform:translateY(-50%); font-size:13px;"></i>
+                            <input type="text" id="docsSearchInput" placeholder="Search company..." oninput="filterDocsTable()"
+                                style="width:50%; padding:8px 12px 8px 32px; border:1.5px solid #aeaeae; border-radius:22px;
                             font-size:13px; font-family:inherit; outline:none; transition:border-color .2s;"
-                            onfocus="this.style.borderColor='#f97316'" onblur="this.style.borderColor='#e5e7eb'">
+                                onfocus="this.style.borderColor='#f97316'" onblur="this.style.borderColor='#e5e7eb'">
+                        </div>
                     </div>
-                </div>
 
-                <?php
-                // Reusable pill: same look as the Supervisor Eval badge in the status block
-                $docPill = function (bool $available): string {
-                    if ($available) {
-                        return '<span style="display:inline-flex; align-items:center; gap:5px; padding:5px 10px;
+                    <?php
+                    // Reusable pill: same look as the Supervisor Eval badge in the status block
+                    $docPill = function (bool $available): string {
+                        if ($available) {
+                            return '<span style="display:inline-flex; align-items:center; gap:5px; padding:5px 10px;
                             background:#ffe5d9; color:#ff6b2c; border-radius:6px; font-size:11px;
                             font-weight:600; border:1px solid #ff6b2c; white-space:nowrap;">
                             <i class="fa fa-check"></i> Available</span>';
-                    }
-                    return '<span style="display:inline-flex; align-items:center; gap:5px; padding:5px 10px;
+                        }
+                        return '<span style="display:inline-flex; align-items:center; gap:5px; padding:5px 10px;
                         background:#f3f4f6; color:#9ca3af; border-radius:6px; font-size:11px;
                         font-weight:600; border:1px solid #e5e7eb; white-space:nowrap;">
                         N/A</span>';
-                };
-                ?>
+                    };
+                    ?>
 
-                <div style="background:white; border:1px solid #ddd; border-radius:8px; overflow:hidden;">
-                    <div class="sysAdm-table-wrapper">
-                        <table class="sysAdm-table" id="docs-availability-table">
-                            <thead style="background:#f8f9fa;">
-                                <tr>
-                                    <th>COMPANY</th>
-                                    <th>MOU</th>
-                                    <th>RECOMMENDATION LETTER</th>
-                                    <th>WAIVER</th>
-                                </tr>
-                            </thead>
-                            <tbody id="docs-availability-tbody">
-                                <?php if (empty($docAvailability)): ?>
+                    <div style="background:white; border:1px solid #ddd; border-radius:8px; overflow:hidden;">
+                        <div class="sysAdm-table-wrapper">
+                            <table class="sysAdm-table" id="docs-availability-table">
+                                <thead style="background:#f8f9fa;">
                                     <tr>
-                                        <td colspan="4" class="text-center text-muted py-4">
-                                            No document availability announced yet.
-                                        </td>
+                                        <th>COMPANY</th>
+                                        <th>MOU</th>
+                                        <th>RECOMMENDATION LETTER</th>
+                                        <th>WAIVER</th>
                                     </tr>
-                                <?php else: ?>
-                                    <?php foreach ($docAvailability as $d): ?>
-                                        <tr>
-                                            <td>
-                                                <div class="student-cell">
-                                                    <div class="avatar"
-                                                        style="background:<?= $avatarColors[crc32($d['company']) % count($avatarColors)] ?? '#2c6fff' ?>;">
-                                                        <strong><?= strtoupper(substr($d['company'], 0, 1)) ?></strong>
-                                                    </div>
-                                                    <span><?= htmlspecialchars($d['company']) ?></span>
-                                                </div>
-                                            </td>
-                                            <td data-label="MOU"><?= $docPill(!empty($d['mou_available'])) ?></td>
-                                            <td data-label="Reco Letter">
-                                                <?= $docPill(!empty($d['recommendation_letter_available'])) ?>
-                                            </td>
-                                            <td data-label="Waiver"><?= $docPill(!empty($d['waiver_available'])) ?></td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                <?php endif; ?>
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody id="docs-availability-tbody">
+                                    <?php if (empty($docAvailability)): ?>
+                                            <tr>
+                                                <td colspan="4" class="text-center text-muted py-4">
+                                                    No document availability announced yet.
+                                                </td>
+                                            </tr>
+                                    <?php else: ?>
+                                            <?php foreach ($docAvailability as $d): ?>
+                                                    <tr>
+                                                        <td>
+                                                            <div class="student-cell">
+                                                                <div class="avatar"
+                                                                    style="background:<?= $avatarColors[crc32($d['company']) % count($avatarColors)] ?? '#2c6fff' ?>;">
+                                                                    <strong><?= strtoupper(substr($d['company'], 0, 1)) ?></strong>
+                                                                </div>
+                                                                <span><?= htmlspecialchars($d['company']) ?></span>
+                                                            </div>
+                                                        </td>
+                                                        <td data-label="MOU"><?= $docPill(!empty($d['mou_available'])) ?></td>
+                                                        <td data-label="Reco Letter">
+                                                            <?= $docPill(!empty($d['recommendation_letter_available'])) ?>
+                                                        </td>
+                                                        <td data-label="Waiver"><?= $docPill(!empty($d['waiver_available'])) ?></td>
+                                                    </tr>
+                                            <?php endforeach; ?>
+                                    <?php endif; ?>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <script>
-                function filterDocsTable() {
-                    const q = document.getElementById('docsSearchInput').value.toLowerCase();
-                    document.querySelectorAll('#docs-availability-tbody tr').forEach(row => {
-                        // skip the empty-state row (single cell with colspan)
-                        if (row.children.length < 2) return;
-                        row.style.display = row.children[0].textContent.toLowerCase().includes(q) ? '' : 'none';
-                    });
-                }
-            </script>
+                <script>
+                    function filterDocsTable() {
+                        const q = document.getElementById('docsSearchInput').value.toLowerCase();
+                        document.querySelectorAll('#docs-availability-tbody tr').forEach(row => {
+                            // skip the empty-state row (single cell with colspan)
+                            if (row.children.length < 2) return;
+                            row.style.display = row.children[0].textContent.toLowerCase().includes(q) ? '' : 'none';
+                        });
+                    }
+                </script>
 
         <?php elseif ($section === 'status'): ?>
-            <!-- addtl e -->
-            <div id="status" class="section sysAdm-section">
-                <div class="sysAdm-header--danger sysAdm-header--blue mb-4">
-                    <div class="sysAdm-header-left">
-                        <div class="sysAdm-header-icon">
-                            <i class="fa-solid fa-calendar-check"></i>
-                        </div>
-                        <div class="sysAdm-header-text">
-                            <h2>OJT Status</h2>
-                            <p>Monitor student progress on their OJT program</p>
+                <!-- addtl e -->
+                <div id="status" class="section sysAdm-section">
+                    <div class="sysAdm-header--danger sysAdm-header--blue mb-4">
+                        <div class="sysAdm-header-left">
+                            <div class="sysAdm-header-icon">
+                                <i class="fa-solid fa-calendar-check"></i>
+                            </div>
+                            <div class="sysAdm-header-text">
+                                <h2>OJT Status</h2>
+                                <p>Monitor student progress on their OJT program</p>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Adviser: Set Required Hours -->
-                <div style="display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap;
+                    <!-- Adviser: Set Required Hours -->
+                    <div style="display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap;
                 align-items:center; justify-content:space-between;">
 
-                    <div style="position:relative; flex:1; min-width:200px;">
-                        <i class="fa fa-search"
-                            style="position:absolute; color: #f97316; left:10px; top:50%; transform:translateY(-50%); font-size:13px;"></i>
-                        <input type="text" id="searchInput" placeholder="Search student..." oninput="filterTable()" style="width:50%; padding:8px 12px 8px 32px; border:1.5px solid #aeaeae; border-radius:22px;
+                        <div style="position:relative; flex:1; min-width:200px;">
+                            <i class="fa fa-search"
+                                style="position:absolute; color: #f97316; left:10px; top:50%; transform:translateY(-50%); font-size:13px;"></i>
+                            <input type="text" id="searchInput" placeholder="Search student..." oninput="filterTable()" style="width:50%; padding:8px 12px 8px 32px; border:1.5px solid #aeaeae; border-radius:22px;
                             font-size:13px; font-family:inherit; outline:none; transition:border-color .2s;"
-                            onfocus="this.style.borderColor='#f97316'" onblur="this.style.borderColor='#e5e7eb'">
-                    </div>
+                                onfocus="this.style.borderColor='#f97316'" onblur="this.style.borderColor='#e5e7eb'">
+                        </div>
 
-                    <div style="display:flex; align-items:center; gap:8px; padding:8px 14px;
+                        <div style="display:flex; align-items:center; gap:8px; padding:8px 14px;
                 background:#eff6ff; border:1px solid #bfdbfe; border-radius:10px;
                 font-size:13px; color:#1e40af;">
-                        <i class="fa-solid fa-circle-info"></i>
-                        Required OJT hours are set per program by the System Administrator.
+                            <i class="fa-solid fa-circle-info"></i>
+                            Required OJT hours are set per program by the System Administrator.
+                        </div>
+
                     </div>
 
-                </div>
 
-
-                <div style="background:white; border:1px solid #ddd; border-radius:8px; overflow:hidden;">
-                    <div class="sysAdm-table-wrapper">
-                        <table class="sysAdm-table" id="ojt-status-table">
-                            <thead style="background:#f8f9fa;">
-                                <tr>
-                                    <th>STUDENT</th>
-                                    <th>COMPANY</th>
-                                    <th>HOURS</th>
-                                    <th>PROGRESS</th>
-                                    <th>ACTIONS</th>
-                                </tr>
-                            </thead>
-                            <tbody id="all-students-tbody">
-                                <?php if (empty($statuses)): ?>
+                    <div style="background:white; border:1px solid #ddd; border-radius:8px; overflow:hidden;">
+                        <div class="sysAdm-table-wrapper">
+                            <table class="sysAdm-table" id="ojt-status-table">
+                                <thead style="background:#f8f9fa;">
                                     <tr>
-                                        <td colspan="5" class="text-center text-muted py-4">
-                                            No students in this room yet.
-                                        </td>
+                                        <th>STUDENT</th>
+                                        <th>COMPANY</th>
+                                        <th>HOURS</th>
+                                        <th>PROGRESS</th>
+                                        <th>ACTIONS</th>
                                     </tr>
-                                <?php else: ?>
-                                    <?php foreach ($statuses as $s):
-                                        // required_hours now comes from the student's matched internship
-                                        $requiredHours = !empty($s['required_hours']) ? (int) $s['required_hours'] : 486;
-                                        $progressWidth = min(round(($s['total_hours'] / $requiredHours) * 100, 2), 100);
-                                        $avatarColors = ['#ff2c8f', '#2c6fff', '#1abc9c', '#9b59b6', '#e67e22'];
-                                        $avatarColor = $avatarColors[crc32($s['full_name']) % count($avatarColors)];
-                                        ?>
-                                        <tr>
-                                            <td>
-                                                <div class="student-cell">
-                                                    <div class="avatar" style="background:<?= $avatarColor ?>;">
-                                                        <strong><?= strtoupper(substr($s['full_name'], 0, 1)) ?></strong>
-                                                    </div>
-                                                    <span><?= htmlspecialchars($s['full_name']) ?></span>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <?php if (empty($s['company'])): ?>
-                                                    <span style="font-size:12px; font-weight:500;">
-                                                        No company
-                                                    </span>
-                                                <?php else: ?>
-                                                    <?= htmlspecialchars($s['company']) ?>
-                                                <?php endif; ?>
-                                            </td>
-                                            <td>
-                                                <strong><?= $s['total_hours'] ?></strong>
-                                                <span style="color:#aaa; font-size:12px;">/ <?= $requiredHours ?> hrs</span>
-                                            </td>
-                                            <td>
-                                                <div style="display:flex; align-items:center; gap:8px;">
-                                                    <div class="progress-bar-bg">
-                                                        <div class="progress-bar-fill" style="width:<?= $progressWidth ?>%"></div>
-                                                    </div>
-                                                    <span><?= $progressWidth ?>%</span>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <?php
-                                                $supEvalStmt = $pdo->prepare("SELECT id FROM ojt_evaluations_supervisor WHERE student_id = ?");
-                                                $supEvalStmt->execute([$s['id']]);
-                                                $hasSupEval = (bool) $supEvalStmt->fetchColumn();
+                                </thead>
+                                <tbody id="all-students-tbody">
+                                    <?php if (empty($statuses)): ?>
+                                            <tr>
+                                                <td colspan="5" class="text-center text-muted py-4">
+                                                    No students in this room yet.
+                                                </td>
+                                            </tr>
+                                    <?php else: ?>
+                                            <?php foreach ($statuses as $s):
+                                                // required_hours now comes from the student's matched internship
+                                                $requiredHours = !empty($s['required_hours']) ? (int) $s['required_hours'] : 486;
+                                                $progressWidth = min(round(($s['total_hours'] / $requiredHours) * 100, 2), 100);
+                                                $avatarColors = ['#ff2c8f', '#2c6fff', '#1abc9c', '#9b59b6', '#e67e22'];
+                                                $avatarColor = $avatarColors[crc32($s['full_name']) % count($avatarColors)];
                                                 ?>
-                                                <?php if ($hasSupEval): ?>
-                                                    <a href="ojt-evaluation-download.php?student_id=<?= $s['id'] ?>" target="_blank"
-                                                        style="display:inline-flex; align-items:center; gap:5px; padding:5px 10px;
+                                                    <tr>
+                                                        <td>
+                                                            <div class="student-cell">
+                                                                <div class="avatar" style="background:<?= $avatarColor ?>;">
+                                                                    <strong><?= strtoupper(substr($s['full_name'], 0, 1)) ?></strong>
+                                                                </div>
+                                                                <span><?= htmlspecialchars($s['full_name']) ?></span>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <?php if (empty($s['company'])): ?>
+                                                                    <span style="font-size:12px; font-weight:500;">
+                                                                        No company
+                                                                    </span>
+                                                            <?php else: ?>
+                                                                    <?= htmlspecialchars($s['company']) ?>
+                                                            <?php endif; ?>
+                                                        </td>
+                                                        <td>
+                                                            <strong><?= $s['total_hours'] ?></strong>
+                                                            <span style="color:#aaa; font-size:12px;">/ <?= $requiredHours ?> hrs</span>
+                                                        </td>
+                                                        <td>
+                                                            <div style="display:flex; align-items:center; gap:8px;">
+                                                                <div class="progress-bar-bg">
+                                                                    <div class="progress-bar-fill" style="width:<?= $progressWidth ?>%"></div>
+                                                                </div>
+                                                                <span><?= $progressWidth ?>%</span>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <?php
+                                                            $supEvalStmt = $pdo->prepare("SELECT id FROM ojt_evaluations_supervisor WHERE student_id = ?");
+                                                            $supEvalStmt->execute([$s['id']]);
+                                                            $hasSupEval = (bool) $supEvalStmt->fetchColumn();
+                                                            ?>
+                                                            <?php if ($hasSupEval): ?>
+                                                                    <a href="ojt-evaluation-download.php?student_id=<?= $s['id'] ?>" target="_blank"
+                                                                        style="display:inline-flex; align-items:center; gap:5px; padding:5px 10px;
                               background: #ffe5d9; color: #ff6b2c; border-radius:6px; font-size:11px;
                               font-weight:600; border:1px solid #ff6b2c; text-decoration:none; white-space:nowrap;">
-                                                        <i class="fa fa-file-pdf"></i> Supervisor Eval
-                                                    </a>
-                                                <?php else: ?>
-                                                    <span style="display:inline-flex; align-items:center; gap:5px; padding:5px 10px;
+                                                                        <i class="fa fa-file-pdf"></i> Supervisor Eval
+                                                                    </a>
+                                                            <?php else: ?>
+                                                                    <span style="display:inline-flex; align-items:center; gap:5px; padding:5px 10px;
                                  background: #f3f4f6; color: #9ca3af; border-radius:6px; font-size:11px;
                                  font-weight:600; white-space:nowrap; border:1px solid #e5e7eb;">
-                                                        <i class="fa fa-file-pdf"></i> Supervisor Eval
-                                                    </span>
-                                                <?php endif; ?>
-                                            </td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                <?php endif; ?>
-                            </tbody>
-                        </table>
+                                                                        <i class="fa fa-file-pdf"></i> Supervisor Eval
+                                                                    </span>
+                                                            <?php endif; ?>
+                                                        </td>
+                                                    </tr>
+                                            <?php endforeach; ?>
+                                    <?php endif; ?>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
-            </div>
 
         <?php elseif ($section === 'remarks'): ?>
-            <div>
-                <h4 class="fw-bold mb-1">Requirements & Remarks</h4>
-                <p class="text-muted mb-3" style="font-size:.85rem;">Track student requirement submissions.</p>
-                <!-- your existing remarks/requirements content here -->
-            </div>
+                <div>
+                    <h4 class="fw-bold mb-1">Requirements & Remarks</h4>
+                    <p class="text-muted mb-3" style="font-size:.85rem;">Track student requirement submissions.</p>
+                    <!-- your existing remarks/requirements content here -->
+                </div>
 
         <?php elseif ($section === 'ojt_applications'): ?>
 
-            <?php
-            $stepLabels = [
-                'resume' => 'Resume',
-                'mou' => 'MOU',
-                'company_profile' => 'Company Profile',
-                'addendum' => 'Addendum',
-                'reco_letter' => 'Reco Letter',
-                'waiver' => 'Waiver',
-                'medical_cert' => 'Medical Cert',
-                'internship_plan' => 'Internship Plan',
-                'vicinity_map' => 'Vicinity Map',
-                'oath' => 'Oath',
-            ];
-
-            $reqData = [];
-            foreach ($ojtApplications as $app) {
-                $checklist = json_decode($app['checklist'] ?? '{}', true) ?: [];
-                $docs = [];
-                foreach ($stepLabels as $key => $label) {
-                    $entry = $checklist[$key] ?? null;
-                    if (!empty($entry['done'])) {
-                        $docs[] = [
-                            'label' => $label,
-                            'file' => $entry['file_path'] ?? '',
-                        ];
-                    }
-                }
-                $reqData[(int) $app['application_id']] = [
-                    'name' => $app['full_name'],
-                    'docs' => $docs,
+                <?php
+                $stepLabels = [
+                    'resume' => 'Resume',
+                    'mou' => 'MOU',
+                    'company_profile' => 'Company Profile',
+                    'addendum' => 'Addendum',
+                    'reco_letter' => 'Reco Letter',
+                    'waiver' => 'Waiver',
+                    'medical_cert' => 'Medical Cert',
+                    'internship_plan' => 'Internship Plan',
+                    'vicinity_map' => 'Vicinity Map',
+                    'oath' => 'Oath',
                 ];
-            }
-            ?>
+
+                $reqData = [];
+                foreach ($ojtApplications as $app) {
+                    $checklist = json_decode($app['checklist'] ?? '{}', true) ?: [];
+                    $docs = [];
+                    foreach ($stepLabels as $key => $label) {
+                        $entry = $checklist[$key] ?? null;
+                        if (!empty($entry['done'])) {
+                            $docs[] = [
+                                'label' => $label,
+                                'file' => $entry['file_path'] ?? '',
+                            ];
+                        }
+                    }
+                    $reqData[(int) $app['application_id']] = [
+                        'name' => $app['full_name'],
+                        'docs' => $docs,
+                    ];
+                }
+                ?>
 
 
-            <!-- REQUIREMENTS -->
-            <div id="status" class="section-panel section sysAdm-section">
-                <div class="sysAdm-header--danger sysAdm-header--blue mb-4">
-                    <div class="sysAdm-header-left">
-                        <div class="sysAdm-header-icon">
-                            <i class="fa fa-list-ul"></i>
-                        </div>
-                        <div class="sysAdm-header-text">
-                            <h2>Requirements</h2>
-                            <p>Track students' pre-deployment requirements submission progress.</p>
+                <!-- REQUIREMENTS -->
+                <div id="status" class="section-panel section sysAdm-section">
+                    <div class="sysAdm-header--danger sysAdm-header--blue mb-4">
+                        <div class="sysAdm-header-left">
+                            <div class="sysAdm-header-icon">
+                                <i class="fa fa-list-ul"></i>
+                            </div>
+                            <div class="sysAdm-header-text">
+                                <h2>Requirements</h2>
+                                <p>Track students' pre-deployment requirements submission progress.</p>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div style="display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap; align-items:center;">
-                    <div style="position:relative; flex:1; min-width:200px;">
-                        <i class="fa fa-search"
-                            style="position:absolute; color: #f97316; left:10px; top:50%; transform:translateY(-50%); font-size:13px;"></i>
-                        <input type="text" id="search-input" placeholder="Search by name, student no., or company..."
-                            oninput="filterApps()" style="width:75%; padding:8px 12px 8px 32px; border:1.5px solid #aeaeae; border-radius:22px;
+                    <div style="display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap; align-items:center;">
+                        <div style="position:relative; flex:1; min-width:200px;">
+                            <i class="fa fa-search"
+                                style="position:absolute; color: #f97316; left:10px; top:50%; transform:translateY(-50%); font-size:13px;"></i>
+                            <input type="text" id="search-input" placeholder="Search by name, student no., or company..."
+                                oninput="filterApps()" style="width:75%; padding:8px 12px 8px 32px; border:1.5px solid #aeaeae; border-radius:22px;
                             font-size:13px; font-family:inherit; outline:none; transition:border-color .2s;"
-                            onfocus="this.style.borderColor='#f97316'" onblur="this.style.borderColor='#e5e7eb'">
-                    </div>
-                    <select id="progress-filter" onchange="filterApps()"
-                        style="padding:8px 12px; border:1.5px solid #e5e7eb; border-radius:8px; font-size:13px;
+                                onfocus="this.style.borderColor='#f97316'" onblur="this.style.borderColor='#e5e7eb'">
+                        </div>
+                        <select id="progress-filter" onchange="filterApps()"
+                            style="padding:8px 12px; border:1.5px solid #e5e7eb; border-radius:8px; font-size:13px;
                         font-family:inherit; outline:none; background:white; cursor:pointer; transition:border-color .2s;" onfocus="this.style.borderColor='#f97316'"
-                        onblur="this.style.borderColor='#e5e7eb'">
-                        <option value="all">All Progress</option>
-                        <option value="0">Not Started (0%)</option>
-                        <option value="1">In Progress (1-49%)</option>
-                        <option value="50">Halfway (50-74%)</option>
-                        <option value="75">Almost Done (75-99%)</option>
-                        <option value="100">Complete (100%)</option>
-                    </select>
-                </div>
+                            onblur="this.style.borderColor='#e5e7eb'">
+                            <option value="all">All Progress</option>
+                            <option value="0">Not Started (0%)</option>
+                            <option value="1">In Progress (1-49%)</option>
+                            <option value="50">Halfway (50-74%)</option>
+                            <option value="75">Almost Done (75-99%)</option>
+                            <option value="100">Complete (100%)</option>
+                        </select>
+                    </div>
 
-                <div class="ojt-table-wrapper">
-                    <table class="ojt-status-table">
-                        <thead style="background:#f8f9fa;">
-                            <tr>
-                                <th>Student</th>
-                                <th>Company</th>
-                                <th>Requirements</th>
-                                <th>Last Submitted</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="apps-list">
-                            <?php if (empty($ojtApplications)): ?>
+                    <div class="ojt-table-wrapper">
+                        <table class="ojt-status-table">
+                            <thead style="background:#f8f9fa;">
                                 <tr>
-                                    <td colspan="5" class="text-center text-muted py-4">No OJT applications yet.</td>
+                                    <th>Student</th>
+                                    <th>Company</th>
+                                    <th>Requirements</th>
+                                    <th>Last Submitted</th>
+                                    <th>Actions</th>
                                 </tr>
-                            <?php else: ?>
-                                <?php foreach ($ojtApplications as $app):
-                                    $avatarColors = ['#ff2c8f', '#2c6fff', '#1abc9c', '#9b59b6', '#e67e22'];
-                                    $avatarColor = $avatarColors[crc32($app['full_name']) % count($avatarColors)];
-                                    $checklist = json_decode($app['checklist'] ?? '{}', true) ?: [];
-                                    $doneCount = count(array_filter($checklist, fn($v) => !empty($v['done'])));
-                                    $totalCount = count($stepLabels);
-                                    $progressPct = $totalCount > 0 ? (int) round(($doneCount / $totalCount) * 100) : 0;
-                                    $bg = $progressPct === 100 ? '#d1fae5' : ($progressPct >= 50 ? '#dbeafe' : '#fef3c7');
-                                    $fg = $progressPct === 100 ? '#065f46' : ($progressPct >= 50 ? '#1e40af' : '#92400e');
-                                    $bd = $progressPct === 100 ? '#6ee7b7' : ($progressPct >= 50 ? '#93c5fd' : '#fde68a');
-                                    ?>
-                                    <tr class="app-card" data-name="<?= strtolower(htmlspecialchars($app['full_name'])) ?>"
-                                        data-student="<?= strtolower(htmlspecialchars($app['student_no'])) ?>"
-                                        data-company="<?= strtolower(htmlspecialchars($app['company_name'] ?? '')) ?>"
-                                        data-progress="<?= $progressPct ?>">
-                                        <td>
-                                            <div class="student-cell">
-                                                <div class="avatar" style="background:<?= $avatarColor ?>;">
-                                                    <strong><?= strtoupper(substr($app['full_name'], 0, 1)) ?></strong>
-                                                </div>
-                                                <div>
-                                                    <div><?= htmlspecialchars($app['full_name']) ?></div>
-                                                    <small style="color:#888;">
-                                                        <?= htmlspecialchars($app['student_no']) ?> &middot;
-                                                        <?= htmlspecialchars($app['program']) ?>
-                                                    </small>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td><?= htmlspecialchars($app['company_name'] ?? '—') ?></td>
-                                        <td>
-                                            <span
-                                                style="background:<?= $bg ?>; color:<?= $fg ?>; border:1px solid <?= $bd ?>;
+                            </thead>
+                            <tbody id="apps-list">
+                                <?php if (empty($ojtApplications)): ?>
+                                        <tr>
+                                            <td colspan="5" class="text-center text-muted py-4">No OJT applications yet.</td>
+                                        </tr>
+                                <?php else: ?>
+                                        <?php foreach ($ojtApplications as $app):
+                                            $avatarColors = ['#ff2c8f', '#2c6fff', '#1abc9c', '#9b59b6', '#e67e22'];
+                                            $avatarColor = $avatarColors[crc32($app['full_name']) % count($avatarColors)];
+                                            $checklist = json_decode($app['checklist'] ?? '{}', true) ?: [];
+                                            $doneCount = count(array_filter($checklist, fn($v) => !empty($v['done'])));
+                                            $totalCount = count($stepLabels);
+                                            $progressPct = $totalCount > 0 ? (int) round(($doneCount / $totalCount) * 100) : 0;
+                                            $bg = $progressPct === 100 ? '#d1fae5' : ($progressPct >= 50 ? '#dbeafe' : '#fef3c7');
+                                            $fg = $progressPct === 100 ? '#065f46' : ($progressPct >= 50 ? '#1e40af' : '#92400e');
+                                            $bd = $progressPct === 100 ? '#6ee7b7' : ($progressPct >= 50 ? '#93c5fd' : '#fde68a');
+                                            ?>
+                                                <tr class="app-card" data-name="<?= strtolower(htmlspecialchars($app['full_name'])) ?>"
+                                                    data-student="<?= strtolower(htmlspecialchars($app['student_no'])) ?>"
+                                                    data-company="<?= strtolower(htmlspecialchars($app['company_name'] ?? '')) ?>"
+                                                    data-progress="<?= $progressPct ?>">
+                                                    <td>
+                                                        <div class="student-cell">
+                                                            <div class="avatar" style="background:<?= $avatarColor ?>;">
+                                                                <strong><?= strtoupper(substr($app['full_name'], 0, 1)) ?></strong>
+                                                            </div>
+                                                            <div>
+                                                                <div><?= htmlspecialchars($app['full_name']) ?></div>
+                                                                <small style="color:#888;">
+                                                                    <?= htmlspecialchars($app['student_no']) ?> &middot;
+                                                                    <?= htmlspecialchars($app['program']) ?>
+                                                                </small>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td><?= htmlspecialchars($app['company_name'] ?? '—') ?></td>
+                                                    <td>
+                                                        <span
+                                                            style="background:<?= $bg ?>; color:<?= $fg ?>; border:1px solid <?= $bd ?>;
                                   font-size:11px; font-weight:600; padding:2px 8px; border-radius:99px; white-space:nowrap;">
-                                                <?= $doneCount ?>/<?= $totalCount ?> &middot; <?= $progressPct ?>%
-                                            </span>
-                                        </td>
-                                        <td><?= date('M d, Y', strtotime($app['submitted_at'])) ?></td>
-                                        <td>
-                                            <button type="button" onclick="openRequirements(<?= (int) $app['application_id'] ?>)"
-                                                style="display:inline-flex; align-items:center; gap:5px; padding:5px 10px;
+                                                            <?= $doneCount ?>/<?= $totalCount ?> &middot; <?= $progressPct ?>%
+                                                        </span>
+                                                    </td>
+                                                    <td><?= date('M d, Y', strtotime($app['submitted_at'])) ?></td>
+                                                    <td>
+                                                        <button type="button" onclick="openRequirements(<?= (int) $app['application_id'] ?>)"
+                                                            style="display:inline-flex; align-items:center; gap:5px; padding:5px 10px;
                                 background:#dbeafe; color:#1e40af; border-radius:6px; font-size:11px;
                                 font-weight:600; border:1px solid #93c5fd; cursor:pointer; white-space:nowrap;">
-                                                <i class="fa fa-eye"></i> View
-                                            </button>
-                                        </td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            <?php endif; ?>
-                        </tbody>
-                    </table>
-                    <div id="reqModal" onclick="if(event.target===this) closeRequirements()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:2000;
+                                                            <i class="fa fa-eye"></i> View
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                        <?php endforeach; ?>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                        <div id="reqModal" onclick="if(event.target===this) closeRequirements()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:2000;
             align-items:center; justify-content:center; padding:16px;">
-                        <div style="background:#fff; border-radius:14px; width:100%; max-width:1000px; height:85vh;
+                            <div style="background:#fff; border-radius:14px; width:100%; max-width:1000px; height:85vh;
                 display:flex; flex-direction:column; overflow:hidden;">
 
-                            <div style="display:flex; justify-content:space-between; align-items:center;
+                                <div style="display:flex; justify-content:space-between; align-items:center;
                     padding:14px 18px; border-bottom:1px solid #e5e7eb;">
-                                <h5 id="reqModalTitle" style="margin:0; color:#272f54;"></h5>
-                                <button type="button" onclick="closeRequirements()"
-                                    style="border:none; background:none; font-size:24px; cursor:pointer;">&times;</button>
-                            </div>
+                                    <h5 id="reqModalTitle" style="margin:0; color:#272f54;"></h5>
+                                    <button type="button" onclick="closeRequirements()"
+                                        style="border:none; background:none; font-size:24px; cursor:pointer;">&times;</button>
+                                </div>
 
-                            <div style="display:flex; flex:1; min-height:0; flex-wrap:wrap;">
-                                <!-- completed documents -->
-                                <div id="reqList" style="width:230px; max-width:100%; overflow:auto; padding:12px;
+                                <div style="display:flex; flex:1; min-height:0; flex-wrap:wrap;">
+                                    <!-- completed documents -->
+                                    <div id="reqList" style="width:230px; max-width:100%; overflow:auto; padding:12px;
                                      border-right:1px solid #e5e7eb; background:#f8f9fa;"></div>
 
-                                <!-- preview -->
-                                <div style="flex:1; min-width:280px; display:flex; flex-direction:column;">
-                                    <div style="display:flex; justify-content:space-between; align-items:center;
+                                    <!-- preview -->
+                                    <div style="flex:1; min-width:280px; display:flex; flex-direction:column;">
+                                        <div style="display:flex; justify-content:space-between; align-items:center;
                             padding:8px 14px; border-bottom:1px solid #e5e7eb; gap:8px;">
-                                        <strong id="reqCurrent" style="font-size:14px;"></strong>
-                                        <span>
-                                            <a id="reqOpen" href="#" target="_blank" rel="noopener"
-                                                class="btn btn-sm btn-outline-primary">
-                                                <i class="fa fa-up-right-from-square"></i> Open</a>
-                                            <a id="reqDl" href="#" class="btn btn-sm btn-outline-secondary">
-                                                <i class="fa fa-download"></i> Download</a>
-                                        </span>
-                                    </div>
-                                    <iframe id="reqFrame" style="flex:1; border:0; width:100%;"></iframe>
-                                    <img id="reqImg" alt=""
-                                        style="display:none; flex:1; min-height:0; object-fit:contain; width:100%;">
-                                    <div id="reqNoPreview" style="display:none; flex:1; align-items:center; justify-content:center;
+                                            <strong id="reqCurrent" style="font-size:14px;"></strong>
+                                            <span>
+                                                <a id="reqOpen" href="#" target="_blank" rel="noopener"
+                                                    class="btn btn-sm btn-outline-primary">
+                                                    <i class="fa fa-up-right-from-square"></i> Open</a>
+                                                <a id="reqDl" href="#" class="btn btn-sm btn-outline-secondary">
+                                                    <i class="fa fa-download"></i> Download</a>
+                                            </span>
+                                        </div>
+                                        <iframe id="reqFrame" style="flex:1; border:0; width:100%;"></iframe>
+                                        <img id="reqImg" alt=""
+                                            style="display:none; flex:1; min-height:0; object-fit:contain; width:100%;">
+                                        <div id="reqNoPreview" style="display:none; flex:1; align-items:center; justify-content:center;
                                               text-align:center; color:#6b7280; padding:20px;">
-                                        Nothing to preview for this document.
+                                            Nothing to preview for this document.
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- start of weekly reports logic -->
-            <!-- SUBMITTED REPORTS LIST -->
-            <!-- <h6 class="fw-bold mb-2" style="font-size:14px;">Your Submitted Reports</h6>
+                <!-- start of weekly reports logic -->
+                <!-- SUBMITTED REPORTS LIST -->
+                <!-- <h6 class="fw-bold mb-2" style="font-size:14px;">Your Submitted Reports</h6>
             <div class="card  shadow-sm rounded-3" style="overflow:hidden; border:1px solid #e5e7eb;">
                 <table class="w-100" style="font-size:13px; border-collapse:collapse;">
                     <thead style="background:#f8f9fa;">
@@ -3724,21 +3774,21 @@ $page = 'messages';
                 </table>
             </div> -->
         <?php elseif ($section === 'weekly_reports'): ?>
-            <div id="status" class="section-panel section sysAdm-section">
-                <div class="sysAdm-header--danger sysAdm-header--blue mb-4">
-                    <div class="sysAdm-header-left">
-                        <div class="sysAdm-header-icon">
-                            <i class="bi bi-file-earmark-text-fill"></i>
-                        </div>
-                        <div class="sysAdm-header-text">
-                            <h2>Weekly Progress Reports</h2>
-                            <p>View the Google Document report links submitted by students in this room.</p>
+                <div id="status" class="section-panel section sysAdm-section">
+                    <div class="sysAdm-header--danger sysAdm-header--blue mb-4">
+                        <div class="sysAdm-header-left">
+                            <div class="sysAdm-header-icon">
+                                <i class="bi bi-file-earmark-text-fill"></i>
+                            </div>
+                            <div class="sysAdm-header-text">
+                                <h2>Weekly Progress Reports</h2>
+                                <p>View the Google Document report links submitted by students in this room.</p>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <?php
-                $reportsStmt = $pdo->prepare("
+                    <?php
+                    $reportsStmt = $pdo->prepare("
             SELECT rl.student_id, rl.link, rl.updated_at,
                    s.full_name AS student_name
             FROM report_links rl
@@ -3752,326 +3802,332 @@ $page = 'messages';
             )
             ORDER BY s.full_name
         ");
-                $reportsStmt->execute([$adviser_id]);
-                $reportRows = $reportsStmt->fetchAll(PDO::FETCH_ASSOC);
+                    $reportsStmt->execute([$adviser_id]);
+                    $reportRows = $reportsStmt->fetchAll(PDO::FETCH_ASSOC);
 
-                // turn a normal Google Docs link into an embeddable /preview link
-                function gdocPreviewUrl(string $url): string
-                {
-                    $url = preg_replace('/[?#].*$/', '', $url);
-                    if (preg_match('#/(edit|view|preview)$#', $url)) {
-                        return preg_replace('#/(edit|view|preview)$#', '/preview', $url);
+                    // turn a normal Google Docs link into an embeddable /preview link
+                    function gdocPreviewUrl(string $url): string
+                    {
+                        $url = preg_replace('/[?#].*$/', '', $url);
+                        if (preg_match('#/(edit|view|preview)$#', $url)) {
+                            return preg_replace('#/(edit|view|preview)$#', '/preview', $url);
+                        }
+                        return rtrim($url, '/') . '/preview';
                     }
-                    return rtrim($url, '/') . '/preview';
-                }
-                ?>
+                    ?>
 
-                <div
-                    style="display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap; align-items:center; justify-content:space-between;">
-                    <div style="position:relative; flex:1; min-width:200px;">
-                        <i class="fa fa-search"
-                            style="position:absolute; color: #f97316; left:10px; top:50%; transform:translateY(-50%); font-size:13px;"></i>
-                        <input type="text" id="reportsSearchInput" placeholder="Search student..."
-                            oninput="filterReportsTable()" style="width:50%; padding:8px 12px 8px 32px; border:1.5px solid #aeaeae; border-radius:22px;
+                    <div
+                        style="display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap; align-items:center; justify-content:space-between;">
+                        <div style="position:relative; flex:1; min-width:200px;">
+                            <i class="fa fa-search"
+                                style="position:absolute; color: #f97316; left:10px; top:50%; transform:translateY(-50%); font-size:13px;"></i>
+                            <input type="text" id="reportsSearchInput" placeholder="Search student..."
+                                oninput="filterReportsTable()" style="width:50%; padding:8px 12px 8px 32px; border:1.5px solid #aeaeae; border-radius:22px;
                     font-size:13px; font-family:inherit; outline:none; transition:border-color .2s;"
-                            onfocus="this.style.borderColor='#f97316'" onblur="this.style.borderColor='#e5e7eb'">
+                                onfocus="this.style.borderColor='#f97316'" onblur="this.style.borderColor='#e5e7eb'">
+                        </div>
                     </div>
-                </div>
 
-                <div class="ojt-table-wrapper">
-                    <table class="ojt-status-table">
-                        <thead style="background:#f8f9fa;">
-                            <tr>
-                                <th>Student</th>
-                                <th>Last Updated</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="reports-tbody">
-                            <?php if (empty($reportRows)): ?>
+                    <div class="ojt-table-wrapper">
+                        <table class="ojt-status-table">
+                            <thead style="background:#f8f9fa;">
                                 <tr>
-                                    <td colspan="3" class="text-center text-muted py-4">No report links submitted yet.</td>
+                                    <th>Student</th>
+                                    <th>Last Updated</th>
+                                    <th>Actions</th>
                                 </tr>
-                            <?php else: ?>
-                                <?php foreach ($reportRows as $row):
-                                    $avatarColors = ['#ff2c8f', '#2c6fff', '#1abc9c', '#9b59b6', '#e67e22'];
-                                    $avatarColor = $avatarColors[crc32($row['student_name']) % count($avatarColors)];
-                                    ?>
-                                    <tr>
-                                        <td>
-                                            <div class="student-cell">
-                                                <div class="avatar" style="background:<?= $avatarColor ?>;">
-                                                    <strong><?= strtoupper(substr($row['student_name'], 0, 1)) ?></strong>
-                                                </div>
-                                                <span><?= htmlspecialchars($row['student_name']) ?></span>
-                                            </div>
-                                        </td>
-                                        <td><?= date('M d, Y', strtotime($row['updated_at'])) ?></td>
-                                        <td>
-                                            <button type="button" data-name="<?= htmlspecialchars($row['student_name']) ?>"
-                                                data-link="<?= htmlspecialchars($row['link']) ?>"
-                                                data-preview="<?= htmlspecialchars(gdocPreviewUrl($row['link'])) ?>"
-                                                onclick="openReport(this)"
-                                                style="display:inline-flex; align-items:center; gap:5px; padding:5px 10px;
+                            </thead>
+                            <tbody id="reports-tbody">
+                                <?php if (empty($reportRows)): ?>
+                                        <tr>
+                                            <td colspan="3" class="text-center text-muted py-4">No report links submitted yet.</td>
+                                        </tr>
+                                <?php else: ?>
+                                        <?php foreach ($reportRows as $row):
+                                            $avatarColors = ['#ff2c8f', '#2c6fff', '#1abc9c', '#9b59b6', '#e67e22'];
+                                            $avatarColor = $avatarColors[crc32($row['student_name']) % count($avatarColors)];
+                                            ?>
+                                                <tr>
+                                                    <td>
+                                                        <div class="student-cell">
+                                                            <div class="avatar" style="background:<?= $avatarColor ?>;">
+                                                                <strong><?= strtoupper(substr($row['student_name'], 0, 1)) ?></strong>
+                                                            </div>
+                                                            <span><?= htmlspecialchars($row['student_name']) ?></span>
+                                                        </div>
+                                                    </td>
+                                                    <td><?= date('M d, Y', strtotime($row['updated_at'])) ?></td>
+                                                    <td>
+                                                        <button type="button" data-name="<?= htmlspecialchars($row['student_name']) ?>"
+                                                            data-link="<?= htmlspecialchars($row['link']) ?>"
+                                                            data-preview="<?= htmlspecialchars(gdocPreviewUrl($row['link'])) ?>"
+                                                            onclick="openReport(this)"
+                                                            style="display:inline-flex; align-items:center; gap:5px; padding:5px 10px;
                                         background:#dbeafe; color:#1e40af; border-radius:6px; font-size:11px;
                                         font-weight:600; border:1px solid #93c5fd; cursor:pointer; white-space:nowrap;">
-                                                <i class="fa fa-eye"></i> View
-                                            </button>
-                                            <a href="<?= htmlspecialchars($row['link']) ?>" target="_blank"
-                                                rel="noopener noreferrer"
-                                                style="display:inline-flex; align-items:center; gap:5px; padding:5px 10px;
+                                                            <i class="fa fa-eye"></i> View
+                                                        </button>
+                                                        <a href="<?= htmlspecialchars($row['link']) ?>" target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            style="display:inline-flex; align-items:center; gap:5px; padding:5px 10px;
                                         background:#eef2ff; color:#272f54; border-radius:6px; font-size:11px;
                                         font-weight:600; border:1px solid #c7d2fe; text-decoration:none; white-space:nowrap;">
-                                                <i class="fa fa-up-right-from-square"></i> Open
-                                            </a>
-                                        </td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            <?php endif; ?>
-                        </tbody>
-                    </table>
-                </div>
+                                                            <i class="fa fa-up-right-from-square"></i> Open
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                        <?php endforeach; ?>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
 
-                <!-- PREVIEW MODAL -->
-                <div id="reportsModal" onclick="if(event.target===this) closeReport()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:2000;
+                    <!-- PREVIEW MODAL -->
+                    <div id="reportsModal" onclick="if(event.target===this) closeReport()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:2000;
             align-items:center; justify-content:center; padding:16px;">
-                    <div style="background:#fff; border-radius:14px; width:100%; max-width:1000px; height:85vh;
+                        <div style="background:#fff; border-radius:14px; width:100%; max-width:1000px; height:85vh;
                 display:flex; flex-direction:column; overflow:hidden;">
 
-                        <div style="display:flex; justify-content:space-between; align-items:center;
+                            <div style="display:flex; justify-content:space-between; align-items:center;
                     padding:14px 18px; border-bottom:1px solid #e5e7eb; gap:8px;">
-                            <h5 id="reportsModalTitle" style="margin:0; color:#272f54;"></h5>
-                            <span style="display:flex; align-items:center; gap:10px;">
-                                <a id="reportsOpen" href="#" target="_blank" rel="noopener noreferrer"
-                                    class="btn btn-sm btn-outline-primary">
-                                    <i class="fa fa-up-right-from-square"></i> Open in Google Docs</a>
-                                <button type="button" onclick="closeReport()"
-                                    style="border:none; background:none; font-size:24px; cursor:pointer;">&times;</button>
-                            </span>
-                        </div>
+                                <h5 id="reportsModalTitle" style="margin:0; color:#272f54;"></h5>
+                                <span style="display:flex; align-items:center; gap:10px;">
+                                    <a id="reportsOpen" href="#" target="_blank" rel="noopener noreferrer"
+                                        class="btn btn-sm btn-outline-primary">
+                                        <i class="fa fa-up-right-from-square"></i> Open in Google Docs</a>
+                                    <button type="button" onclick="closeReport()"
+                                        style="border:none; background:none; font-size:24px; cursor:pointer;">&times;</button>
+                                </span>
+                            </div>
 
-                        <iframe id="reportsFrame" style="flex:1; border:0; width:100%;"></iframe>
+                            <iframe id="reportsFrame" style="flex:1; border:0; width:100%;"></iframe>
+                        </div>
                     </div>
                 </div>
-            </div>
 
         <?php elseif ($section === 'chats'): ?>
-            <?php
-            $chatLookup = [];
-            foreach ($adviserChats as $ac) {
-                $chatLookup[$ac['chat_user_id'] . '-' . $ac['chat_user_type']] = $ac;
-            }
-            $chatStudents = array_filter($chattableUsers, fn($u) => $u['user_type'] === 'student');
-            $chatHteAdvisers = array_filter($chattableUsers, fn($u) => $u['user_type'] === 'adviser');
-            $avatarColors = ['#ff2c8f', '#2c6fff', '#1abc9c', '#9b59b6', '#e67e22', '#e74c3c', '#16a085'];
-            ?>
+                <?php
+                $chatLookup = [];
+                foreach ($adviserChats as $ac) {
+                    $chatLookup[$ac['chat_user_id'] . '-' . $ac['chat_user_type']] = $ac;
+                }
+                $chatStudents = array_filter($chattableUsers, fn($u) => $u['user_type'] === 'student');
+                $chatHteAdvisers = array_filter($chattableUsers, fn($u) => $u['user_type'] === 'adviser');
+                $avatarColors = ['#ff2c8f', '#2c6fff', '#1abc9c', '#9b59b6', '#e67e22', '#e74c3c', '#16a085'];
+                ?>
 
-            <div class="room-chat-wrap" id="roomChatWrap">
+                <div class="room-chat-wrap" id="roomChatWrap">
 
-                <!-- Left: chat list -->
-                <div class="room-chat-list" id="roomChatList">
-                    <div class="room-chat-list-header">
-                        <h5>Chats</h5>
-                    </div>
-                    <div class="room-chat-search">
-                        <input type="text" placeholder="Search..." id="roomChatSearch" oninput="filterRoomChats()">
-                    </div>
-                    <div class="room-chat-entries" id="roomChatEntries">
-
-                        <div class="room-chat-divider">Students</div>
-                        <?php foreach ($chatStudents as $u):
-                            $preview = chatPreview($chatLookup[$u['user_id'] . '-student'] ?? null);
-                            $avatarColor = $avatarColors[crc32($u['full_name']) % count($avatarColors)];
-                            $isActive = ($chatSection_id == $u['user_id'] && $chatSection_type === 'student');
-                            ?>
-                            <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=chats&chat_id=<?= (int) $u['user_id'] ?>&chat_type=student"
-                                class="room-chat-entry <?= $isActive ? 'active' : '' ?>"
-                                data-name="<?= strtolower(htmlspecialchars($u['full_name'])) ?>">
-                                <div class="room-chat-avatar" style="background:<?= $avatarColor ?>;">
-                                    <?= strtoupper(mb_substr($u['full_name'], 0, 1)) ?>
-                                </div>
-                                <div class="room-chat-entry-meta">
-                                    <div class="room-chat-entry-name"><?= htmlspecialchars($u['full_name']) ?></div>
-                                    <div class="room-chat-entry-preview"><?= htmlspecialchars(mb_substr($preview, 0, 40)) ?>
-                                    </div>
-                                </div>
-                                <span class="room-chat-badge" style="background:#dbeafe;color:#1e40af;">Student</span>
-                            </a>
-                        <?php endforeach; ?>
-
-                        <?php if (empty($chatStudents)): ?>
-                            <div style="padding:14px 18px;font-size:12px;color:#bbb;">No students in your rooms yet.</div>
-                        <?php endif; ?>
-
-                        <?php if (!empty($chatHteAdvisers)): ?>
-                            <div class="room-chat-divider" style="margin-top:4px;">HTE Supervisors</div>
-                            <?php foreach ($chatHteAdvisers as $u):
-                                $preview = chatPreview($chatLookup[$u['user_id'] . '-adviser'] ?? null);
-                                $avatarColor = $avatarColors[crc32($u['full_name']) % count($avatarColors)];
-                                $isActive = ($chatSection_id == $u['user_id'] && $chatSection_type === 'adviser');
-                                ?>
-                                <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=chats&chat_id=<?= (int) $u['user_id'] ?>&chat_type=adviser"
-                                    class="room-chat-entry <?= $isActive ? 'active' : '' ?>"
-                                    data-name="<?= strtolower(htmlspecialchars($u['full_name'])) ?>">
-                                    <div class="room-chat-avatar" style="background:<?= $avatarColor ?>;">
-                                        <?= strtoupper(mb_substr($u['full_name'], 0, 1)) ?>
-                                    </div>
-                                    <div class="room-chat-entry-meta">
-                                        <div class="room-chat-entry-name"><?= htmlspecialchars($u['full_name']) ?></div>
-                                        <div class="room-chat-entry-preview"><?= htmlspecialchars(mb_substr($preview, 0, 40)) ?>
-                                        </div>
-                                    </div>
-                                    <span class="room-chat-badge" style="background:#d1fae5;color:#065f46;">HTE</span>
-                                </a>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-
-                    </div>
-                </div>
-
-                <!-- Right: message panel -->
-                <div class="room-message-panel">
-
-                    <?php if ($chatSection_id): ?>
-                        <?php
-                        $openName = getRoomChatName($pdo, $chatSection_id, $chatSection_type);
-                        $openColor = $avatarColors[crc32($openName) % count($avatarColors)];
-                        $isHte = ($chatSection_type === 'adviser');
-                        ?>
-
-                        <!-- Header -->
-                        <div class="room-message-header">
-                            <button type="button" class="room-toggle-list" id="roomToggleList" onclick="roomToggleList()"
-                                title="Hide chat list" aria-label="Hide chat list">
-                                <i class="fa-solid fa-angles-left i-collapse"></i>
-                                <i class="fa-solid fa-arrow-left i-back"></i>
-                            </button>
-                            <div class="room-chat-avatar"
-                                style="background:<?= $openColor ?>;width:36px;height:36px;font-size:14px;">
-                                <?= strtoupper(mb_substr($openName, 0, 1)) ?>
-                            </div>
-                            <div>
-                                <div style="font-weight:700;font-size:14px;"><?= htmlspecialchars($openName) ?></div>
-                                <div style="font-size:11px;color:#aaa;"><?= $isHte ? 'HTE Supervisor' : 'Student' ?></div>
-                            </div>
+                    <!-- Left: chat list -->
+                    <div class="room-chat-list" id="roomChatList">
+                        <div class="room-chat-list-header">
+                            <h5>Chats</h5>
                         </div>
+                        <div class="room-chat-search">
+                            <input type="text" placeholder="Search..." id="roomChatSearch" oninput="filterRoomChats()">
+                        </div>
+                        <div class="room-chat-entries" id="roomChatEntries">
 
-                        <!-- Messages -->
-                        <div class="room-message-body" id="roomMsgBody">
-                            <?php if (empty($chatMessages)): ?>
-                                <div style="text-align:center;color:#ccc;margin:auto;font-size:13px;">
-                                    <i class="fa fa-comments fa-2x d-block mb-2"></i>
-                                    No messages yet. Say hello!
-                                </div>
-                            <?php else:
-                                $lastDay = '';
-                                foreach ($chatMessages as $msg):
-                                    $isMe = ($msg['sender_id'] == $adviser_id && $msg['sender_type'] === 'adviser');
-                                    $bubbleColor = $avatarColors[crc32($msg['sender_name'] ?? '') % count($avatarColors)];
-                                    $msgDay = date('F j, Y', strtotime($msg['created_at']));
-                                    if ($msgDay !== $lastDay):
-                                        $lastDay = $msgDay; ?>
-                                        <div class="room-day-sep"><?= $msgDay ?></div>
-                                    <?php endif; ?>
-
-                                    <div class="room-msg-row <?= $isMe ? 'me' : '' ?>">
-                                        <?php if (!$isMe): ?>
-                                            <div class="room-msg-avatar" style="background:<?= $bubbleColor ?>;">
-                                                <?= strtoupper(mb_substr($msg['sender_name'] ?? '?', 0, 1)) ?>
+                            <div class="room-chat-divider">Students</div>
+                            <?php foreach ($chatStudents as $u):
+                                $preview = chatPreview($chatLookup[$u['user_id'] . '-student'] ?? null);
+                                $avatarColor = $avatarColors[crc32($u['full_name']) % count($avatarColors)];
+                                $isActive = ($chatSection_id == $u['user_id'] && $chatSection_type === 'student');
+                                ?>
+                                    <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=chats&chat_id=<?= (int) $u['user_id'] ?>&chat_type=student"
+                                        class="room-chat-entry <?= $isActive ? 'active' : '' ?>"
+                                        data-name="<?= strtolower(htmlspecialchars($u['full_name'])) ?>">
+                                        <div class="room-chat-avatar" style="background:<?= $avatarColor ?>;">
+                                            <?= strtoupper(mb_substr($u['full_name'], 0, 1)) ?>
+                                        </div>
+                                        <div class="room-chat-entry-meta">
+                                            <div class="room-chat-entry-name"><?= htmlspecialchars($u['full_name']) ?></div>
+                                            <div class="room-chat-entry-preview"><?= htmlspecialchars(mb_substr($preview, 0, 40)) ?>
                                             </div>
-                                        <?php endif; ?>
+                                        </div>
+                                        <span class="room-chat-badge" style="background:#dbeafe;color:#1e40af;">Student</span>
+                                    </a>
+                            <?php endforeach; ?>
 
-                                        <div class="room-msg-bubble-wrap">
-                                            <?php if (!$isMe): ?>
-                                                <div class="room-msg-sender"><?= htmlspecialchars($msg['sender_name'] ?? '') ?></div>
-                                            <?php endif; ?>
+                            <?php if (empty($chatStudents)): ?>
+                                    <div style="padding:14px 18px;font-size:12px;color:#bbb;">No students in your rooms yet.</div>
+                            <?php endif; ?>
 
-                                            <div class="room-msg-bubble">
-                                                <?php if (!empty($msg['message'])): ?>
-                                                    <?= nl2br(htmlspecialchars($msg['message'])) ?>
-                                                <?php endif; ?>
+                            <?php if (!empty($chatHteAdvisers)): ?>
+                                    <div class="room-chat-divider" style="margin-top:4px;">HTE Supervisors</div>
+                                    <?php foreach ($chatHteAdvisers as $u):
+                                        $preview = chatPreview($chatLookup[$u['user_id'] . '-adviser'] ?? null);
+                                        $avatarColor = $avatarColors[crc32($u['full_name']) % count($avatarColors)];
+                                        $isActive = ($chatSection_id == $u['user_id'] && $chatSection_type === 'adviser');
+                                        ?>
+                                            <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=chats&chat_id=<?= (int) $u['user_id'] ?>&chat_type=adviser"
+                                                class="room-chat-entry <?= $isActive ? 'active' : '' ?>"
+                                                data-name="<?= strtolower(htmlspecialchars($u['full_name'])) ?>">
+                                                <div class="room-chat-avatar" style="background:<?= $avatarColor ?>;">
+                                                    <?= strtoupper(mb_substr($u['full_name'], 0, 1)) ?>
+                                                </div>
+                                                <div class="room-chat-entry-meta">
+                                                    <div class="room-chat-entry-name"><?= htmlspecialchars($u['full_name']) ?></div>
+                                                    <div class="room-chat-entry-preview"><?= htmlspecialchars(mb_substr($preview, 0, 40)) ?>
+                                                    </div>
+                                                </div>
+                                                <span class="room-chat-badge" style="background:#d1fae5;color:#065f46;">HTE</span>
+                                            </a>
+                                    <?php endforeach; ?>
+                            <?php endif; ?>
 
-                                                <?php if (!empty($msg['has_attachment'])):
-                                                    $fileUrl = 'chat-file.php?id=' . (int) $msg['id']; ?>
-                                                    <div style="<?= !empty($msg['message']) ? 'margin-top:8px;' : '' ?>">
-                                                        <?php if ($msg['attachment_type'] === 'image'): ?>
-                                                            <a href="<?= $fileUrl ?>" target="_blank">
-                                                                <img src="<?= $fileUrl ?>" alt="attachment"
-                                                                    style="max-width:220px;border-radius:10px;display:block;">
-                                                            </a>
-                                                        <?php elseif ($msg['attachment_type'] === 'video'): ?>
-                                                            <video controls style="max-width:240px;border-radius:10px;">
-                                                                <source src="<?= $fileUrl ?>">
-                                                                Your browser does not support video playback.
-                                                            </video>
-                                                        <?php else: ?>
-                                                            <a href="<?= $fileUrl ?>" target="_blank" style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:#fff;
+                        </div>
+                    </div>
+
+                    <!-- Right: message panel -->
+                    <div class="room-message-panel">
+
+                        <?php if ($chatSection_id): ?>
+                                <?php
+                                $openName = getRoomChatName($pdo, $chatSection_id, $chatSection_type);
+                                $openColor = $avatarColors[crc32($openName) % count($avatarColors)];
+                                $isHte = ($chatSection_type === 'adviser');
+                                ?>
+
+                                <!-- Header -->
+                                <div class="room-message-header">
+                                    <button type="button" class="room-toggle-list" id="roomToggleList" onclick="roomToggleList()"
+                                        title="Hide chat list" aria-label="Hide chat list">
+                                        <i class="fa-solid fa-angles-left i-collapse"></i>
+                                        <i class="fa-solid fa-arrow-left i-back"></i>
+                                    </button>
+                                    <div class="room-chat-avatar"
+                                        style="background:<?= $openColor ?>;width:36px;height:36px;font-size:14px;">
+                                        <?= strtoupper(mb_substr($openName, 0, 1)) ?>
+                                    </div>
+                                    <div>
+                                        <div style="font-weight:700;font-size:14px;"><?= htmlspecialchars($openName) ?></div>
+                                        <div style="font-size:11px;color:#aaa;"><?= $isHte ? 'HTE Supervisor' : 'Student' ?></div>
+                                    </div>
+                                </div>
+
+                                <!-- Messages -->
+                                <div class="room-message-body" id="roomMsgBody">
+                                    <?php if (empty($chatMessages)): ?>
+                                            <div style="text-align:center;color:#ccc;margin:auto;font-size:13px;">
+                                                <i class="fa fa-comments fa-2x d-block mb-2"></i>
+                                                No messages yet. Say hello!
+                                            </div>
+                                    <?php else:
+                                        $lastDay = '';
+                                        foreach ($chatMessages as $msg):
+                                            $isMe = ($msg['sender_id'] == $adviser_id && $msg['sender_type'] === 'adviser');
+                                            $bubbleColor = $avatarColors[crc32($msg['sender_name'] ?? '') % count($avatarColors)];
+                                            $msgDay = date('F j, Y', strtotime($msg['created_at']));
+                                            if ($msgDay !== $lastDay):
+                                                $lastDay = $msgDay; ?>
+                                                            <div class="room-day-sep"><?= $msgDay ?></div>
+                                                    <?php endif; ?>
+
+                                                    <div class="room-msg-row <?= $isMe ? 'me' : '' ?>">
+                                                        <?php if (!$isMe): ?>
+                                                                <div class="room-msg-avatar" style="background:<?= $bubbleColor ?>;">
+                                                                    <?= strtoupper(mb_substr($msg['sender_name'] ?? '?', 0, 1)) ?>
+                                                                </div>
+                                                        <?php endif; ?>
+
+                                                        <div class="room-msg-bubble-wrap">
+                                                            <?php if (!$isMe): ?>
+                                                                    <div class="room-msg-sender"><?= htmlspecialchars($msg['sender_name'] ?? '') ?></div>
+                                                            <?php endif; ?>
+
+                                                            <div class="room-msg-bubble">
+                                                                <?php if (!empty($msg['message'])): ?>
+                                                                        <?= nl2br(htmlspecialchars($msg['message'])) ?>
+                                                                <?php endif; ?>
+
+                                                                <?php if (!empty($msg['has_attachment'])):
+                                                                    $fileUrl = 'chat-file.php?id=' . (int) $msg['id']; ?>
+                                                                        <div style="<?= !empty($msg['message']) ? 'margin-top:8px;' : '' ?>">
+                                                                            <?php if ($msg['attachment_type'] === 'image'): ?>
+                                                                                    <a href="<?= $fileUrl ?>" target="_blank">
+                                                                                        <img src="<?= $fileUrl ?>" alt="attachment"
+                                                                                            style="max-width:220px;border-radius:10px;display:block;">
+                                                                                    </a>
+                                                                            <?php elseif ($msg['attachment_type'] === 'video'): ?>
+                                                                                    <video controls style="max-width:240px;border-radius:10px;">
+                                                                                        <source src="<?= $fileUrl ?>">
+                                                                                        Your browser does not support video playback.
+                                                                                    </video>
+                                                                            <?php else: ?>
+                                                                                    <a href="<?= $fileUrl ?>" target="_blank" style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:#fff;
                                                           border:1px solid #e5e7eb;border-radius:10px;text-decoration:none;
                                                           color:#333;font-size:12.5px;">
-                                                                <i class="fa-solid <?= $msg['attachment_type'] === 'pdf' ? 'fa-file-pdf' : 'fa-file-word' ?>"
-                                                                    style="font-size:18px;color:<?= $msg['attachment_type'] === 'pdf' ? '#dc2626' : '#2563eb' ?>;"></i>
-                                                                <span><?= htmlspecialchars($msg['attachment_name']) ?></span>
-                                                            </a>
+                                                                                        <i class="fa-solid <?= $msg['attachment_type'] === 'pdf' ? 'fa-file-pdf' : 'fa-file-word' ?>"
+                                                                                            style="font-size:18px;color:<?= $msg['attachment_type'] === 'pdf' ? '#dc2626' : '#2563eb' ?>;"></i>
+                                                                                        <span><?= htmlspecialchars($msg['attachment_name']) ?></span>
+                                                                                    </a>
+                                                                            <?php endif; ?>
+                                                                        </div>
+                                                                <?php endif; ?>
+                                                            </div>
+
+                                                            <div class="room-msg-time"><?= date('g:i A', strtotime($msg['created_at'])) ?></div>
+                                                        </div>
+
+                                                        <?php if ($isMe): ?>
+                                                                <button type="button" class="room-msg-delete"
+                                                                    onclick="roomDeleteMessage(<?= (int) $msg['id'] ?>, this)" title="Delete message">
+                                                                    <i class="fa-solid fa-trash"></i>
+                                                                </button>
                                                         <?php endif; ?>
                                                     </div>
-                                                <?php endif; ?>
-                                            </div>
+                                            <?php endforeach;
+                                    endif; ?>
+                                </div>
 
-                                            <div class="room-msg-time"><?= date('g:i A', strtotime($msg['created_at'])) ?></div>
+                                <!-- Input bar -->
+                                <div class="room-message-input-bar">
+                                    <form method="POST" action="message-db.php" id="roomChatForm" enctype="multipart/form-data">
+                                        <input type="hidden" name="receiver_id" value="<?= (int) $chatSection_id ?>">
+                                        <input type="hidden" name="receiver_type" value="<?= htmlspecialchars($chatSection_type) ?>">
+                                        <input type="hidden" name="redirect"
+                                            value="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=chats&chat_id=<?= (int) $chatSection_id ?>&chat_type=<?= htmlspecialchars($chatSection_type) ?>">
+
+                                        <!-- attachment preview (shown via JS when a file is picked) -->
+                                        <div id="roomAttachPreview" class="room-attach-preview" style="display:none;">
+                                            <div class="room-attach-thumb-wrap">
+                                                <img id="roomAttachThumbImg" style="display:none;">
+                                                <video id="roomAttachThumbVideo" style="display:none;" muted></video>
+                                                <div id="roomAttachThumbIcon" style="display:none;"></div>
+                                                <button type="button" class="room-attach-remove"
+                                                    onclick="roomClearAttachment()">×</button>
+                                            </div>
+                                            <span id="roomAttachName" class="room-attach-filename"></span>
                                         </div>
 
-                                        <?php if ($isMe): ?>
-                                            <button type="button" class="room-msg-delete"
-                                                onclick="roomDeleteMessage(<?= (int) $msg['id'] ?>, this)" title="Delete message">
-                                                <i class="fa-solid fa-trash"></i>
+                                        <div class="room-message-input-row">
+                                            <label for="roomAttachInput"
+                                                style="cursor:pointer;display:flex;align-items:center;padding:0 6px;">
+                                                <i class="fa-solid fa-paperclip" style="font-size:16px;color:#888;"></i>
+                                            </label>
+                                            <input type="file" id="roomAttachInput" name="attachment" style="display:none;"
+                                                accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.gif,.webp,.mp4"
+                                                onchange="roomShowAttachment(this)">
+
+                                            <textarea name="message" id="roomChatInput" rows="1" placeholder="Type a message…"
+                                                onkeydown="roomChatEnterSend(event)"></textarea>
+                                            <button type="submit" class="room-chat-send-btn" id="roomChatSendBtn">
+                                                <i class="fa fa-paper-plane"></i>
                                             </button>
-                                        <?php endif; ?>
-                                    </div>
-                                <?php endforeach;
-                            endif; ?>
-                        </div>
-
-                        <!-- Input bar -->
-                        <div class="room-message-input-bar">
-                            <form method="POST" action="message-db.php" id="roomChatForm" enctype="multipart/form-data">
-                                <input type="hidden" name="receiver_id" value="<?= (int) $chatSection_id ?>">
-                                <input type="hidden" name="receiver_type" value="<?= htmlspecialchars($chatSection_type) ?>">
-                                <input type="hidden" name="redirect"
-                                    value="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=chats&chat_id=<?= (int) $chatSection_id ?>&chat_type=<?= htmlspecialchars($chatSection_type) ?>">
-
-                                <div id="roomAttachName" style="display:none;font-size:12px;color:#666;padding:4px 8px;">
-                                    <i class="fa-solid fa-paperclip"></i>
-                                    <span id="roomAttachText"></span>
-                                    <button type="button" onclick="roomClearAttachment()"
-                                        style="border:0;background:none;color:#dc2626;font-size:16px;">×</button>
+                                        </div>
+                                    </form>
                                 </div>
 
-                                <div class="room-message-input-row">
-                                    <label for="roomAttachInput"
-                                        style="cursor:pointer;display:flex;align-items:center;padding:0 6px;">
-                                        <i class="fa-solid fa-paperclip" style="font-size:16px;color:#888;"></i>
-                                    </label>
-                                    <input type="file" id="roomAttachInput" name="attachment" style="display:none;"
-                                        accept=".pdf,.doc,.docx,image/*,video/mp4" onchange="roomShowAttachment(this)">
-
-                                    <textarea name="message" id="roomChatInput" rows="1" placeholder="Type a message…"
-                                        onkeydown="roomChatEnterSend(event)"></textarea>
-                                    <button type="submit" class="room-chat-send-btn" id="roomChatSendBtn">
-                                        <i class="fa fa-paper-plane"></i>
-                                    </button>
+                        <?php else: ?>
+                                <div class="room-chat-empty">
+                                    <i class="fa fa-comments fa-3x"></i>
+                                    <div style="font-size:14px;">Select a student or supervisor to start chatting</div>
                                 </div>
-                            </form>
-                        </div>
+                        <?php endif; ?>
 
-                    <?php else: ?>
-                        <div class="room-chat-empty">
-                            <i class="fa fa-comments fa-3x"></i>
-                            <div style="font-size:14px;">Select a student or supervisor to start chatting</div>
-                        </div>
-                    <?php endif; ?>
-
+                    </div>
                 </div>
-            </div>
         <?php endif; ?>
     </div>
 
@@ -4154,6 +4210,80 @@ $page = 'messages';
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- addtl s -->
     <script>
+        const ROOM_MAX_MB = 10;
+        const ROOM_ALLOWED = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'mp4', 'pdf', 'doc', 'docx'];
+        let roomPreviewUrl = null;
+
+        function roomResetPreview() {
+            const imgEl = document.getElementById('roomAttachThumbImg');
+            const vidEl = document.getElementById('roomAttachThumbVideo');
+            const iconEl = document.getElementById('roomAttachThumbIcon');
+
+            imgEl.style.display = vidEl.style.display = iconEl.style.display = 'none';
+            imgEl.removeAttribute('src');
+            vidEl.removeAttribute('src');
+            vidEl.load();
+
+            if (roomPreviewUrl) {
+                URL.revokeObjectURL(roomPreviewUrl);
+                roomPreviewUrl = null;
+            }
+        }
+
+        function roomShowAttachment(input) {
+            const preview = document.getElementById('roomAttachPreview');
+            const nameEl = document.getElementById('roomAttachName');
+            const imgEl = document.getElementById('roomAttachThumbImg');
+            const vidEl = document.getElementById('roomAttachThumbVideo');
+            const iconEl = document.getElementById('roomAttachThumbIcon');
+
+            roomResetPreview();
+
+            if (!input.files || !input.files[0]) {
+                preview.style.display = 'none';
+                return;
+            }
+
+            const file = input.files[0];
+            const ext = file.name.split('.').pop().toLowerCase();
+
+            if (!ROOM_ALLOWED.includes(ext)) {
+                alert('File type not allowed. Use an image, MP4 video, PDF or Word document.');
+                input.value = '';
+                preview.style.display = 'none';
+                return;
+            }
+            if (file.size > ROOM_MAX_MB * 1024 * 1024) {
+                alert(`File too large. Max ${ROOM_MAX_MB}MB.`);
+                input.value = '';
+                preview.style.display = 'none';
+                return;
+            }
+
+            roomPreviewUrl = URL.createObjectURL(file);
+
+            if (file.type.startsWith('image/')) {
+                imgEl.src = roomPreviewUrl;
+                imgEl.style.display = 'block';
+            } else if (file.type.startsWith('video/')) {
+                vidEl.src = roomPreviewUrl;
+                vidEl.style.display = 'block';
+            } else {
+                const icon = ext === 'pdf' ? 'fa-file-pdf' : 'fa-file-word';
+                iconEl.innerHTML = `<i class="fa-solid ${icon}" style="font-size:20px;color:#888;"></i>`;
+                iconEl.style.display = 'flex';
+            }
+
+            nameEl.textContent = file.name;
+            preview.style.display = 'flex';
+        }
+
+        function roomClearAttachment() {
+            document.getElementById('roomAttachInput').value = '';
+            document.getElementById('roomAttachPreview').style.display = 'none';
+            roomResetPreview();
+        }
+.
         if (document.getElementById('attendanceChart')) {
             new Chart(document.getElementById('attendanceChart'), {
                 type: 'line',
