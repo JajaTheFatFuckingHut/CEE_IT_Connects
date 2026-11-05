@@ -333,6 +333,7 @@ $roomAdvisers = $roomAdviserStmt->fetchAll(PDO::FETCH_ASSOC);
 $chatSection_id = $_GET['chat_id'] ?? null;
 $chatSection_type = $_GET['chat_type'] ?? null;
 $chatMessages = [];
+$currentUserType = getUserType($_SESSION['role']);
 
 if ($chatSection_id) {
     $stmt = $pdo->prepare("
