@@ -40,7 +40,7 @@ if (!empty($_FILES['attachment']['name']) && $_FILES['attachment']['error'] === 
         $attachment_type = 'doc';
     }
 
-    $uploadDir = __DIR__ . '/uploads/chat/';
+    $uploadDir = __DIR__ . '.../uploads/chat/';
     if (!is_dir($uploadDir)) {
         mkdir($uploadDir, 0755, true);
     }
@@ -52,7 +52,10 @@ if (!empty($_FILES['attachment']['name']) && $_FILES['attachment']['error'] === 
         die('Upload failed.');
     }
 
-    $attachment_path = 'uploads/chat/' . $safeName;
+    $webBase = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'])), '/');
+
+    $attachment_path = $webBase . '/uploads/chat/' . $safeName;
+    $attachment_name = $originalName;
     $attachment_name = $originalName;
 }
 
