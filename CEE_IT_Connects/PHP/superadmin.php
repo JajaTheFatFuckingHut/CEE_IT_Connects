@@ -547,6 +547,7 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>System Admin | CEE IT Connects</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
@@ -1093,56 +1094,6 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                 border-radius: 0;
             }
 
-            .sidebar {
-                top: auto;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                width: 100% !important;
-                flex-direction: row;
-                align-items: center;
-                gap: 4px;
-                padding: 6px 8px calc(6px + env(safe-area-inset-bottom)) !important;
-                overflow-x: auto !important;
-                overflow-y: hidden !important;
-                z-index: 1050;
-                box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.15);
-            }
-
-            .sidebar h3 {
-                display: none !important;
-            }
-
-            .sidebar a {
-                flex: 1 1 0;
-                min-width: 44px;
-                height: 44px !important;
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-                border-radius: 12px !important;
-                margin: 0 !important;
-                padding: 0 !important;
-            }
-
-            .sidebar a i {
-                margin: 0 !important;
-            }
-
-            /* Hide text labels */
-            .sidebar a .nav-label {
-                display: none !important;
-            }
-
-            .sidebar-user {
-                display: none;
-            }
-
-            .main-content {
-                margin-left: 0 !important;
-                padding: 10px 10px calc(70px + env(safe-area-inset-bottom)) !important;
-            }
-
             /* STAT CARDS — 1 row, 3 columns */
             .row.g-3.mb-4 {
                 display: grid !important;
@@ -1433,6 +1384,88 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
         #suspAdmin .sa-empty {
             font-size: .85rem;
             color: #7a869f;
+        }
+
+        /* ===== bottom nav: phones + tablet portrait ===== */
+        @media (max-width: 768px), (max-width: 1024px) and (orientation: portrait) {
+            :root { --bn-h: 60px; }
+
+            .sidebar {
+                top: auto;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                width: 100% !important;
+                height: calc(var(--bn-h) + env(safe-area-inset-bottom));
+                padding: 0 0 env(safe-area-inset-bottom) !important;
+                flex-direction: row;
+                align-items: stretch;
+                gap: 0;
+                overflow-x: auto;
+                overflow-y: hidden;
+                scrollbar-width: none;
+                z-index: 1050;
+                box-shadow: 0 -2px 10px rgba(0, 0, 0, .15);
+            }
+
+            .sidebar::-webkit-scrollbar { display: none; }
+
+            .sidebar h3,
+            .sidebar-user { display: none !important; }
+
+            .sidebar a {
+                flex: 1 0 68px;
+                min-width: 0;
+                height: var(--bn-h);
+                display: flex !important;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 3px;
+                margin: 0 !important;
+                padding: 0 4px !important;
+                border-radius: 0 !important;
+                background: transparent;
+                color: #aab1d4;
+                font-size: 10px;
+                font-weight: 500;
+                text-align: center;
+                white-space: nowrap;
+                border-top: 3px solid transparent;
+            }
+
+            .sidebar a i {
+                margin: 0 !important;
+                font-size: 18px;
+            }
+
+            .sidebar a .nav-label {
+                display: block !important;
+                max-width: 100%;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .sidebar a:hover {
+                background: transparent;
+                color: #fff;
+            }
+
+            .sidebar a:hover i { color: inherit; }
+
+            .sidebar a.active {
+                background: transparent;
+                color: #fff;
+                font-weight: 500;
+                border-top-color: #ff6b2c;
+            }
+
+            .sidebar a.active i { color: #ff6b2c; }
+
+            .main-content {
+                margin-left: 0 !important;
+                padding: 10px 10px calc(var(--bn-h) + env(safe-area-inset-bottom) + 20px) !important;
+            }
         }
     </style>
 </head>
@@ -3577,6 +3610,16 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
             card.title = 'Click to view full details';
             card.addEventListener('click', () => goToSection(card.dataset.go));
         });
+
+        (function () {
+            const nav = document.querySelector('.sidebar');
+            if (!nav) return;
+            new MutationObserver(() => {
+                if (window.innerWidth <= 1024) {
+                    nav.querySelector('a.active')?.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
+                }
+            }).observe(nav, { subtree: true, attributes: true, attributeFilter: ['class'] });
+        })();
 
         // For the calendar
         //
