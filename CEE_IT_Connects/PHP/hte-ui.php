@@ -2341,6 +2341,21 @@ foreach ($roomStatuses as $s) {
             }
         }
 
+        .rm-section .rm-grid {
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        }
+
+        .rm-section a.rm-card {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 16px;
+        }
+
+        .rm-section a.rm-card:hover {
+            transform: translateY(-2px);
+        }
+
         /* ===== bottom nav: phones + tablet portrait ===== */
         .bottom-nav { display: none; }
 
@@ -2929,8 +2944,7 @@ foreach ($roomStatuses as $s) {
                                             <?= htmlspecialchars($s['company']) ?>
                                         <?php endif; ?>
                                     </td>
-                                    <td data-label="Hours"><strong><?= round($s['total_hours'], 2) ?></strong> / <?= $requiredHours ?></td>
-                                    <td data-label="Progress">
+                                    <td data-label="Hours"><span><strong><?= round($s['total_hours'], 2) ?></strong> / <?= $requiredHours ?></span></td>                                    <td data-label="Progress">
                                         <div style="display:flex; align-items:center; gap:8px;">
                                             <div class="progress-bar-bg">
                                                 <div class="progress-bar-fill" style="width:<?= $progressWidth ?>%"></div>
@@ -3264,8 +3278,8 @@ foreach ($roomStatuses as $s) {
                         onfocus="this.style.borderColor='#f97316'" onblur="this.style.borderColor='#e5e7eb'">
                 </div>
             </div>
-            <div class="ojt-table-wrapper">
-                <table class="ojt-status-table">
+            <div class="sysAdm-table-wrapper">
+                <table class="sysAdm-table">
                     <thead style="background:#f8f9fa;">
                         <tr>
                             <th>Student No.</th>
