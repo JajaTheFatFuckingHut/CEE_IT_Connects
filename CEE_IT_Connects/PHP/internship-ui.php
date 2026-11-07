@@ -243,7 +243,7 @@ for ($t = 13; $t >= 0; $t--) {
 
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>CEE IT Connects</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -833,80 +833,6 @@ for ($t = 13; $t >= 0; $t--) {
                 /* optional: square off entirely on mobile if you want */
             }
 
-            .sidebar {
-                top: 60px;
-                width: 60px !important;
-                padding: 10px 0 !important;
-                align-items: center;
-                overflow: visible !important;
-                z-index: 1050;
-            }
-
-            .sidebar-user {
-                flex-direction: column;
-                gap: 4px;
-                padding: 10px 0;
-                margin: auto 0 0 0;
-                width: 100%;
-            }
-
-            .sidebar-user-info {
-                display: none;
-            }
-
-            .sidebar h3 {
-                display: none !important;
-            }
-
-            .sidebar a {
-                width: 44px !important;
-                height: 44px !important;
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-                border-radius: 12px !important;
-                margin: 0 auto 8px auto !important;
-                padding: 0 !important;
-                position: relative;
-            }
-
-            .sidebar a i {
-                margin: 0 !important;
-            }
-
-            /* Hide text labels */
-            .sidebar a .nav-label {
-                display: none !important;
-            }
-
-            /* Tooltip */
-            .sidebar a::after {
-                content: attr(data-tooltip);
-                position: absolute;
-                left: 56px;
-                top: 50%;
-                transform: translateY(-50%);
-                background: #1a1a2e;
-                color: #fff;
-                font-size: 12px;
-                font-weight: 500;
-                padding: 5px 10px;
-                border-radius: 6px;
-                white-space: nowrap;
-                opacity: 0;
-                pointer-events: none;
-                transition: opacity 0.2s ease;
-            }
-
-            .sidebar a:hover::after {
-                opacity: 1;
-            }
-
-            .main-content {
-                margin-left: 60px !important;
-                padding: 10px !important;
-            }
-
             .row.g-3.mb-4 .card {
                 border-radius: 10px !important;
             }
@@ -1042,6 +968,93 @@ for ($t = 13; $t >= 0; $t--) {
                 font-size: 1rem !important;
             }
         }
+
+        /* ===== bottom nav: phones + tablet portrait ===== */
+        @media (max-width: 768px), (max-width: 1024px) and (orientation: portrait) {
+            :root { --bn-h: 60px; }
+
+            .sidebar {
+                top: auto;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                width: 100% !important;
+                height: calc(var(--bn-h) + env(safe-area-inset-bottom));
+                padding: 0 0 env(safe-area-inset-bottom) !important;
+                flex-direction: row;
+                align-items: stretch;
+                gap: 0;
+                overflow-x: auto;
+                overflow-y: hidden;
+                scrollbar-width: none;
+                z-index: 900;              /* below your modals (1000+), above page content */
+                box-shadow: 0 -2px 10px rgba(0, 0, 0, .15);
+            }
+
+            .sidebar::-webkit-scrollbar { display: none; }
+
+            /* the account box doesn't belong in a bottom bar */
+            .sidebar h3,
+            .sidebar-user { display: none !important; }
+
+            /* every link is a tab: 5 or fewer stretch, more will scroll */
+            .sidebar a {
+                flex: 1 0 68px;
+                min-width: 0;
+                height: var(--bn-h);
+                display: flex !important;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 3px;
+                margin: 0 !important;
+                padding: 0 4px !important;
+                border-radius: 0 !important;
+                background: transparent;
+                color: #aab1d4;
+                font-size: 10px;
+                font-weight: 500;
+                text-align: center;
+                white-space: nowrap;
+                border-top: 3px solid transparent;
+            }
+
+            .sidebar a i {
+                margin: 0 !important;
+                font-size: 18px;
+                color: inherit;
+            }
+
+            .sidebar a .nav-label {
+                display: block !important;
+                max-width: 100%;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .sidebar a:hover {
+                background: transparent;
+                color: #fff;
+            }
+
+            .sidebar a:hover i { color: inherit; }
+
+            .sidebar a.active {
+                background: transparent;
+                color: #fff;
+                font-weight: 500;
+                border-top-color: #ff6b2c;
+            }
+
+            .sidebar a.active i { color: #ff6b2c; }
+
+            /* this page scrolls inside .main-content, so the padding goes there */
+            .main-content {
+                margin-left: 0 !important;
+                height: calc(100dvh - 70px);
+                padding: 10px 10px calc(var(--bn-h) + env(safe-area-inset-bottom) + 20px) !important;
+            }
+        }
     </style>
 </head>
 
@@ -1049,10 +1062,7 @@ for ($t = 13; $t >= 0; $t--) {
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
     function showSection(sectionID) {
-        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-        document.getElementById(sectionID).classList.add('active');
-        document.querySelectorAll('.sidebar a').forEach(l => l.classList.remove('active'));
-        event.target.classList.add('active');
+        goToSection(sectionID);
     }
 </script>
 
@@ -3160,6 +3170,17 @@ for ($t = 13; $t >= 0; $t--) {
             card.title = 'Click to view full details';
             card.addEventListener('click', () => goToSection(target));
         });
+
+        // keep the active bottom-nav tab visible when the bar scrolls
+        (function () {
+            const nav = document.querySelector('.sidebar');
+            if (!nav) return;
+            new MutationObserver(() => {
+                if (window.innerWidth <= 1024) {
+                    nav.querySelector('a.active')?.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
+                }
+            }).observe(nav, { subtree: true, attributes: true, attributeFilter: ['class'] });
+        })();
     </script>
 </body>
 
