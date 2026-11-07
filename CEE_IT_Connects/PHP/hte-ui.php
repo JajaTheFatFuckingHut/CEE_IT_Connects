@@ -2315,6 +2315,32 @@ foreach ($roomStatuses as $s) {
             .dash-stat-label { overflow-wrap: anywhere; }
         }
 
+        /* for the info table to scroll sideways */
+        #information .student-cell p {
+            margin: 0;
+        }
+
+        @media (min-width: 769px) {
+            #information .sysAdm-table {
+                min-width: 960px;
+            }
+
+            #information .sysAdm-table th,
+            #information .sysAdm-table td {
+                white-space: nowrap;
+            }
+        }
+
+        @media (min-width: 769px) and (max-width: 1024px) and (orientation: landscape) {
+            .sidebar {
+                width: 220px;
+            }
+
+            .main {
+                margin-left: 220px;
+            }
+        }
+
         /* ===== bottom nav: phones + tablet portrait ===== */
         .bottom-nav { display: none; }
 
@@ -3036,9 +3062,9 @@ foreach ($roomStatuses as $s) {
                 </select>
             </div>
 
-            <div class="ojt-table-wrapper">
-                <table class="ojt-status-table">
-                    <thead style="background:#f8f9fa;">
+            <div class="sysAdm-table-wrapper">
+                <table class="sysAdm-table">
+                    <thead>
                         <tr>
                             <th>Student</th>
                             <th>Room</th>
