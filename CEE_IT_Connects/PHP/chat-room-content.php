@@ -1326,13 +1326,10 @@ $backLink = getDashboardByRole($_SESSION['role']);
 
             /* one line header thingy */
             .rm-chips {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 2px;
-            }
-
-            .rm-chip + .rm-chip::before {
-                content: none;
+                flex-direction: row;
+                flex-wrap: wrap;
+                align-items: baseline;
+                gap: 0;
             }
 
             .rm-chip {
@@ -1374,7 +1371,7 @@ $backLink = getDashboardByRole($_SESSION['role']);
             .circle-progress {
                 width: 52px;
                 height: 52px;
-                margin: 0 auto 4px;   /* centered above the hours text */
+                margin: 0 auto 4px;
             }
 
             .circle-progress span {
@@ -1397,7 +1394,6 @@ $backLink = getDashboardByRole($_SESSION['role']);
                 border-top: 1px solid rgba(255, 255, 255, .15);
             }
 
-            /* "Room details" repeats what the hero already shows */
             .rm-grid > .rm-col:last-child > .rm-card:first-child { display: none; }
 
             .rm-tabs {
@@ -1422,12 +1418,10 @@ $backLink = getDashboardByRole($_SESSION['role']);
 
         /* this mq is for a very narrow screen just in case .. */
         @media (max-width: 380px) {
-            /* drop the tab icons so the label + count fit */
             .rm-tab i {
                 display: none;
             }
 
-            /* the title was wrapping to 3 lines; stack the progress under it instead */
             .rm-hero:has(.circle-progress) {
                 flex-wrap: wrap;
             }
