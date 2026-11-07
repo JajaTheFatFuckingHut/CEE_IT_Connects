@@ -3551,8 +3551,7 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
             display: none;
         }
 
-        @media (max-width: 768px),
-        (max-width: 1024px) and (orientation: portrait) {
+        @media (max-width: 1024px) {
             :root {
                 --bn-h: 60px;
             }
