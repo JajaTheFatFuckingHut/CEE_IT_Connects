@@ -1880,11 +1880,34 @@ foreach ($roomStatuses as $s) {
             }
 
             .dash-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-            .dash-stat { flex-direction: column; align-items: flex-start; gap: 8px; padding: 12px; }
-            .dash-stat:nth-child(odd):last-child { grid-column: 1 / -1; }
-            .dash-stat-icon { width: 32px; height: 32px; min-width: 32px; font-size: 14px; }
-            .dash-stat-label { font-size: 10px; }
-            .dash-stat-value { font-size: 22px; }
+            .dash-stat:nth-child(odd):last-child { 
+                grid-column: 1 / -1; 
+            }
+
+            .dash-stat {
+                flex-direction: row;
+                justify-content: space-between;
+                gap: 8px;
+                padding: 10px 12px;
+            }
+
+            /* unwrap the unclassed label/value div so they sit side by side */
+            .dash-stat > div:not(.dash-stat-icon) {
+                display: contents;
+            }
+
+            .dash-stat-icon {
+                display: none;
+            }
+
+            .dash-stat-label {
+                font-size: 10px;
+                flex: 1;
+            }
+
+            .dash-stat-value {
+                font-size: 20px;
+            }
 
             .home-hero::before,
             .home-hero::after { display: none; }
