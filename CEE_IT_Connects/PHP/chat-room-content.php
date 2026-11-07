@@ -1420,7 +1420,7 @@ $backLink = getDashboardByRole($_SESSION['role']);
         @media (max-width: 380px) {
             .rm-tab i {
                 display: none;
-            }
+            /* }
 
             .rm-hero:has(.circle-progress) {
                 flex-wrap: wrap;
@@ -1437,7 +1437,7 @@ $backLink = getDashboardByRole($_SESSION['role']);
 
             .rm-hero-right .text-end small {
                 text-align: left;
-            }
+            } */
         }
 
         /* addtl e */
