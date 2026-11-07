@@ -1401,6 +1401,11 @@ $backLink = getDashboardByRole($_SESSION['role']);
                 overflow-x: auto;
             }
 
+            .rm-toolbar #memberCount {
+                margin-left: 0 !important;
+                flex: 1;
+            }
+
             .rm-tab {
                 flex: 1 1 0;
                 min-width: 0;
