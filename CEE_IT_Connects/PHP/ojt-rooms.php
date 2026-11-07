@@ -4284,7 +4284,7 @@ $page = 'messages';
             document.getElementById('roomAttachPreview').style.display = 'none';
             roomResetPreview();
         }
-.
+
         if (document.getElementById('attendanceChart')) {
             new Chart(document.getElementById('attendanceChart'), {
                 type: 'line',

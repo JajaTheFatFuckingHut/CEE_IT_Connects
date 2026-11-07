@@ -848,6 +848,12 @@ $backLink = getDashboardByRole($_SESSION['role']);
             box-shadow: 0 2px 10px rgba(0, 0, 0, .05);
         }
 
+        .rm-card,
+        .rm-card:hover {
+            display: block;
+            transform: none;
+        }
+
         .rm-avatar {
             width: 38px;
             height: 38px;
