@@ -1091,16 +1091,22 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                 margin: -20px -20px 20px -20px;
                 width: calc(100% + 40px);
                 border-radius: 0;
-                /* optional: square off entirely on mobile if you want */
             }
 
             .sidebar {
-                top: 60px;
-                width: 60px !important;
-                padding: 10px 0 !important;
+                top: auto;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                width: 100% !important;
+                flex-direction: row;
                 align-items: center;
-                overflow: visible !important;
+                gap: 4px;
+                padding: 6px 8px calc(6px + env(safe-area-inset-bottom)) !important;
+                overflow-x: auto !important;
+                overflow-y: hidden !important;
                 z-index: 1050;
+                box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.15);
             }
 
             .sidebar h3 {
@@ -1108,15 +1114,15 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
             }
 
             .sidebar a {
-                width: 44px !important;
+                flex: 1 1 0;
+                min-width: 44px;
                 height: 44px !important;
                 display: flex !important;
                 align-items: center !important;
                 justify-content: center !important;
                 border-radius: 12px !important;
-                margin: 0 auto 8px auto !important;
+                margin: 0 !important;
                 padding: 0 !important;
-                position: relative;
             }
 
             .sidebar a i {
@@ -1128,44 +1134,13 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                 display: none !important;
             }
 
-            /* Tooltip */
-            .sidebar a::after {
-                content: attr(data-tooltip);
-                position: absolute;
-                left: 56px;
-                top: 50%;
-                transform: translateY(-50%);
-                background: #1a1a2e;
-                color: #fff;
-                font-size: 12px;
-                font-weight: 500;
-                padding: 5px 10px;
-                border-radius: 6px;
-                white-space: nowrap;
-                opacity: 0;
-                pointer-events: none;
-                transition: opacity 0.2s ease;
-            }
-
-            .sidebar a:hover::after {
-                opacity: 1;
-            }
-
             .sidebar-user {
-                flex-direction: column;
-                gap: 4px;
-                padding: 10px 0;
-                margin: auto 0 0 0;
-                width: 100%;
-            }
-
-            .sidebar-user-info {
                 display: none;
             }
 
             .main-content {
-                margin-left: 60px !important;
-                padding: 10px !important;
+                margin-left: 0 !important;
+                padding: 10px 10px calc(70px + env(safe-area-inset-bottom)) !important;
             }
 
             /* STAT CARDS — 1 row, 3 columns */
