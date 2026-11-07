@@ -1950,27 +1950,28 @@ $page = 'messages';
             }
 
             .dash-stat {
-                flex-direction: column;
-                align-items: flex-start;
+                flex-direction: row;
+                justify-content: space-between;
                 gap: 8px;
-                padding: 12px;
+                padding: 10px 12px;
+            }
+
+            .dash-stat > div:not(.dash-stat-icon) {
+                display: contents;
             }
 
             .dash-stat-icon {
-                width: 32px;
-                height: 32px;
-                min-width: 32px;
-                font-size: 14px;
+                display: none;
             }
 
             .dash-stat-label {
                 font-size: 10px;
+                flex: 1;
             }
 
             .dash-stat-value {
-                font-size: 22px;
+                font-size: 20px;
             }
-
             .dash-hours {
                 display: none;
             }
