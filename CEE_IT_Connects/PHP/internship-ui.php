@@ -1189,12 +1189,6 @@ for ($t = 13; $t >= 0; $t--) {
                             </div>
                         </div>
                     </div>
-
-                    <div class="col-12 col-md-6 col-xxl-3">
-                        <div class="ojtc-stat-card card-tint-announcements">
-                            <div class="ojtc-stat-icon icon-announcements"><i class="bi bi-patch-check-fill"></i></div>
-                        </div>
-                    </div>
                     <div class="col-12 col-md-6 col-xxl-3">
                         <div class="ojtc-stat-card card-tint-documents">
                             <div class="ojtc-stat-icon icon-documents"><i class="bi bi-clipboard-check-fill"></i></div>
