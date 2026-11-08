@@ -979,6 +979,21 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
             color: #791f1f;
         }
 
+        .btn-restore {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 14px;
+            border-radius: 8px;
+            border: 1px solid #bcd0f7;
+            background: #eaf1fe;
+            color: #1b4fce;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
         .form-card {
             background: #fff;
             border: 1px solid #ddd;
@@ -2152,7 +2167,7 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                                             <input type="hidden" name="source"
                                                 value="<?= htmlspecialchars($u['source']) ?>">
                                             <input type="hidden" name="restore" value="1">
-                                            <button type="submit" class="btn btn-success btn-sm">
+                                            <button type="submit" class="btn-restore">
                                                 <i class="bi bi-check2-circle"></i> Restore
                                             </button>
                                         </form>
