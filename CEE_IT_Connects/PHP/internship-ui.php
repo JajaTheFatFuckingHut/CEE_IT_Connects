@@ -1102,107 +1102,18 @@ for ($t = 13; $t >= 0; $t--) {
             }
         }
 
-        /* ===== FILTER ROWS: shared by all admin sections ===== */
-        .filter-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 16px;
-        }
-
-        .filter-bar {
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
-            min-width: 0;
-        }
-
-        /* .filter-bar .search-box {
-            position: relative;
-            flex: 0 1 260px;
-            min-width: 0;
-        } */
-
-        .filter-bar .search-box {
-            width: 320px !important;
-        }
-
-        .filter-bar .search-box input,
-        .filter-bar select {
-            box-sizing: border-box;
-            height: 44px;
-            margin-top: 0 !important;
-            padding: 0 14px !important;
-            border: 1px solid #ddd;
-            border-radius: 10px !important;
-            background-color: #fff;
-            font-size: 13px !important;
-            font-weight: 600;
-        }
-
-        .filter-bar .search-box input {
-            width: 100%;
-            min-width: 0 !important;
-            padding-right: 40px !important;
-        }
-
-        .filter-bar .search-box i {
-            position: absolute;
-            right: 14px;
-            top: 50%;
-            transform: translateY(-50%);
-            pointer-events: none;
-        }
-
-        .filter-bar select {
-            flex: 0 1 200px;
-            min-width: 0 !important;
-        }
-
-        .filter-row > .btn-update {
-            height: 44px;
-            white-space: nowrap;
-        }
-
-        /* ===== TABLET (up to 1024px) ===== */
-        @media (max-width: 1024px) {
-            .filter-row .filter-bar {
-                flex: 1 1 auto;
-            }
-
-            .filter-bar .search-box {
-                flex: 1 1 240px;
-            }
-
-            .filter-bar select {
-                flex: 1 1 180px; 
-            }
-        }
-
-        /* ===== MOBILE (up to 768px): stack everything, same size ===== */
         @media (max-width: 768px) {
-            .filter-row {
-                flex-direction: column;
-                align-items: stretch;
+            .sysAdm-section div:has(> .search-box) {
+                flex-direction: column !important;
+                align-items: stretch !important;
+                width: 100% !important;
             }
-
-            .filter-bar {
-                flex-direction: column;
-                align-items: stretch;
-                width: 100%;
-            }
-
-            .filter-bar .search-box,
-            .filter-bar select {
-                flex: none;
-                width: 100%;
-            }
-
-            .filter-row > .btn-update {
-                width: 100%;
+            .sysAdm-section .search-box,
+            .sysAdm-section select.filter-select {
+                flex: none !important;
+                width: 100% !important;
+                max-width: none !important;
+                margin: 0 !important;
             }
         }
 
