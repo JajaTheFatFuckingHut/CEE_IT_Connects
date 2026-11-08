@@ -2105,7 +2105,7 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
             <!-- Archived stuff -->
             <div id="restore" class="section sysAdm-section">
                 <div class="sysAdm-header--danger mb-4">
-                    <div class="sysAdm-header-left">
+                    <div class="sysAdm-header-left sysAdm-header--blue">
                         <div class="sysAdm-header-icon">
                             <i class="bi bi-check2-circle"></i>
                         </div>
