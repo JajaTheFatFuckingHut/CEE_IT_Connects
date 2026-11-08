@@ -1970,46 +1970,6 @@ foreach ($roomStatuses as $s) {
             }
         }
 
-        .room-day-sep {
-            text-align: center;
-            font-size: 11px;
-            color: #bbb;
-            position: relative;
-            margin: 6px 0;
-        }
-
-        .room-day-sep::before,
-        .room-day-sep::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            width: 38%;
-            height: 1px;
-            background: #eee;
-        }
-
-        .room-day-sep::before { left: 0; }
-        .room-day-sep::after { right: 0; }
-
-        .room-msg-delete {
-            background: none;
-            border: none;
-            color: #ccc;
-            cursor: pointer;
-            font-size: 12px;
-            opacity: 0;
-            align-self: center;
-            padding: 4px;
-            transition: opacity .15s, color .15s;
-        }
-
-        .room-msg-row.me:hover .room-msg-delete { opacity: 1; }
-        .room-msg-delete:hover { color: #dc2626; }
-
-        @media (hover: none) {
-            .room-msg-row.me .room-msg-delete { opacity: .6; }
-        }
-
         /* addtl e */
 
         @media (max-width: 768px) {
@@ -3525,10 +3485,15 @@ foreach ($roomStatuses as $s) {
                                     <i class="fa fa-comments fa-2x d-block mb-2"></i>
                                     No messages yet. Say hello!
                                 </div>
-                            <?php else: ?>
+                            <?php else: $lastDay = ''; ?>
                                 <?php foreach ($chatMessages as $msg):
                                     $isMe = ($msg['sender_id'] == $adviser_id && $msg['sender_type'] === 'adviser');
                                     $bubbleColor = $avatarColors[crc32($msg['sender_name'] ?? '') % count($avatarColors)];
+                                    $msgDay = date('F j, Y', strtotime($msg['created_at']));
+                                    if ($msgDay !== $lastDay) {
+                                        $lastDay = $msgDay;
+                                        echo '<div class="room-day-sep">' . $msgDay . '</div>';
+                                    }
                                     ?>
                                     <div class="room-msg-row <?= $isMe ? 'me' : '' ?>">
                                         <?php if (!$isMe): ?>
@@ -3546,9 +3511,15 @@ foreach ($roomStatuses as $s) {
                                                 <?= htmlspecialchars($msg['message']) ?>
                                             </div>
                                             <div class="room-msg-time">
-                                                <?= date('M d, g:i A', strtotime($msg['created_at'])) ?>
+                                                <?= date('g:i A', strtotime($msg['created_at'])) ?>
                                             </div>
                                         </div>
+                                        <?php if ($isMe): ?>
+                                            <button type="button" class="room-msg-delete"
+                                                onclick="roomDeleteMessage(<?= (int) $msg['id'] ?>, this)" title="Delete message">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                        <?php endif; ?>
                                     </div>
                                 <?php endforeach; ?>
                             <?php endif; ?>
