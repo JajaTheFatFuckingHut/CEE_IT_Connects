@@ -2037,12 +2037,6 @@ foreach ($roomStatuses as $s) {
                 width: calc(100% - 24px);
             }
 
-            /* .rooms-list:hover {
-                background: rgba(255, 255, 255, 0.1);
-                color: #FFB62F;
-                width: calc(100% - 24px);
-            } */
-
             .room-name-text {
                 display: none !important;
             }
@@ -2269,6 +2263,20 @@ foreach ($roomStatuses as $s) {
             }
 
             :is(.sysAdm-table, .ojt-status-table) td[colspan] { display: block; }
+
+            #status :is(.sysAdm-table, .ojt-status-table) td:last-child {
+                justify-content: center;
+                text-align: center;
+            }
+
+            /* hte-ui: the stacked buttons inside the Actions cell */
+            #status .sysAdm-table td:last-child > div {
+                align-items: center;
+            }
+
+            #status .sysAdm-table td:last-child > div > div {
+                justify-content: center;
+            }
         }
 
 
