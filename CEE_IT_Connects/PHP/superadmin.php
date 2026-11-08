@@ -1496,6 +1496,52 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                 padding: 10px 10px calc(var(--bn-h) + env(safe-area-inset-bottom) + 20px) !important;
             }
         }
+
+        @media (max-width: 768px) {
+        .row.g-3.mb-4 {
+            display: grid !important;
+            grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+            gap: 8px !important;
+            margin: 0 0 16px 0 !important;
+            --bs-gutter-x: 0;
+            --bs-gutter-y: 0;
+        }
+
+        .row.g-3.mb-4 > [class*="col-"] {
+            width: auto !important;
+            max-width: 100% !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+
+        .row.g-3.mb-4 .ojtc-stat-card { border-radius: 14px !important; }
+
+        .row.g-3.mb-4 .card-body { padding: 12px 8px !important; }
+
+        .row.g-3.mb-4 .card-body .d-flex { display: block !important; }
+
+        .row.g-3.mb-4 .card-body .rounded-3,
+        .row.g-3.mb-4 .card-body p.d-none { display: none !important; }
+
+        .row.g-3.mb-4 .card-body .flex-grow-1 { min-width: 0 !important; }
+
+        .row.g-3.mb-4 .card-body p {
+            font-size: 9px !important;
+            line-height: 1.25 !important;
+            letter-spacing: 0 !important;
+            margin: 0 0 6px 0 !important;
+            min-height: 2.5em; 
+            word-break: normal !important;
+            overflow-wrap: normal !important;
+            hyphens: none !important;
+        }
+
+        .row.g-3.mb-4 .card-body h2 {
+            font-size: 1.15rem !important;
+            line-height: 1.1 !important;
+            margin: 0 !important;
+        }
+    }
     </style>
 </head>
 
@@ -1695,10 +1741,24 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                         background: #FFE7B3 !important;
                         color: #7a5200 !important;
                         border: none !important;
+                        -webkit-tap-highlight-color: transparent;
                         transition: background-color .15s ease, color .15s ease;
                     }
 
                     .btn-update:hover {
+                        background: #E4572E !important;
+                        color: #fff !important;
+                    }
+
+                    @media (hover: hover) and (pointer: fine) {
+                        .btn-update:hover {
+                            background: #E4572E !important;
+                            color: #fff !important;
+                        }
+                    }
+
+                    /* touch feedback that disappears when the finger lifts */
+                    .btn-update:active {
                         background: #E4572E !important;
                         color: #fff !important;
                     }
