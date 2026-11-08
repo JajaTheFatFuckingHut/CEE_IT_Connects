@@ -71,13 +71,13 @@ $registerVisible = file_exists($statePath) ? trim(file_get_contents($statePath))
 
                     <!-- ROLE TOGGLE -->
                     <div class="role-toggle">
-                        <a href="login-ui.php?role=student" class="btn-role <?= $role === 'student' ? 'active' : 'inactive' ?>">
+                        <a href="login-page.php?role=student" class="btn-role <?= $role === 'student' ? 'active' : 'inactive' ?>">
                             <i class="fa-solid fa-graduation-cap"></i> Students
                         </a>
-                        <a href="login-ui.php?role=adviser" class="btn-role <?= $role === 'adviser' ? 'active' : 'inactive' ?>">
+                        <a href="login-page.php?role=adviser" class="btn-role <?= $role === 'adviser' ? 'active' : 'inactive' ?>">
                             <i class="fa-regular fa-user"></i> Adviser
                         </a>
-                        <a href="login-ui.php?role=admin" class="btn-role <?= $role === 'admin' ? 'active' : 'inactive' ?>">
+                        <a href="login-page.php?role=admin" class="btn-role <?= $role === 'admin' ? 'active' : 'inactive' ?>">
                             <i class="fa-solid fa-user-shield"></i> Admins
                         </a>
                     </div>

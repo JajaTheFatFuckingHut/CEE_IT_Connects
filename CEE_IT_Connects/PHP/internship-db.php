@@ -4,7 +4,7 @@ require 'db.php';
 
 
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'internship_admin') {
-    header("Location: login-ui.php?role=admin");
+    header("Location: login-page.php?role=admin");
     exit();
 }
 

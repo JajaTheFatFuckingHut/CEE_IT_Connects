@@ -4,7 +4,7 @@ require 'db.php';
 // only superadmin
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'superadmin') {
     $_SESSION['error'] = "Invalid role. Please log in using a system admin account.";
-    header("Location: login-ui.php");
+    header("Location: login-page.php");
     exit();
 }
 function formatSection(?string $key): string

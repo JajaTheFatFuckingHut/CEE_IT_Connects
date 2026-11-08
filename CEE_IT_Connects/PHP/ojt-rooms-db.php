@@ -5,7 +5,7 @@ require_once 'auth.php';
 
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'internship_adviser') {
     echo '<script>alert("You are not authorized to access this page.");</script>';
-    header("Location: login-ui.php");
+    header("Location: login-page.php");
     exit();
 }
 

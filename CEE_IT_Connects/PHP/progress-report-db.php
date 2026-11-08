@@ -10,7 +10,7 @@ $redirect = 'rooms.php?section=progress_report&room_id=' . urlencode($current_ro
 
 if (!$student_id) {
     $_SESSION['error'] = 'You must be logged in.';
-    header('Location: login-ui.php');
+    header('Location: login-apge.php');
     exit;
 }
 

@@ -7,7 +7,7 @@ $student_id = (int) ($_SESSION['user_id'] ?? 0);
 $current_room_id = $_GET['room_id'] ?? null;
 if (!$student_id) {
     $_SESSION['error'] = 'You must be logged in.';
-    header('Location: login-ui.php');
+    header('Location: login-page.php');
     exit;
 }
 

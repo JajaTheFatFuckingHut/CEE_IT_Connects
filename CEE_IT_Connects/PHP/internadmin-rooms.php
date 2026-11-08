@@ -17,7 +17,7 @@ $roleMap = [
 
 if (!isset($roleMap[$role])) {
     $_SESSION['error'] = "We couldn't find a room for your account type. Please contact support if this keeps happening.";
-    header("Location: login-ui.php");
+    header("Location: login-page.php");
     exit;
 }
 
