@@ -969,6 +969,52 @@ for ($t = 13; $t >= 0; $t--) {
             }
         }
 
+        /* smaller summary cards on tablet and phone */
+        @media (max-width: 1199px) {
+            .ojtc-stat-card {
+                padding: 14px;
+                gap: 10px;
+                border-radius: 14px;
+            }
+
+            .ojtc-stat-icon {
+                width: 36px;
+                height: 36px;
+                min-width: 36px;
+                font-size: 15px;
+                border-radius: 10px;
+            }
+
+            .ojtc-stat-card h2 {
+                font-size: 1.4rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .ojtc-stat-card {
+                padding: 10px 12px;
+                gap: 8px;
+            }
+
+            .ojtc-stat-icon {
+                width: 30px;
+                height: 30px;
+                min-width: 30px;
+                font-size: 13px;
+            }
+
+            /* the label has an inline font-size, so !important is needed */
+            .ojtc-stat-card p {
+                font-size: 10px !important;
+                letter-spacing: 0 !important;
+                line-height: 1.2;
+            }
+
+            .ojtc-stat-card h2 {
+                font-size: 1.15rem;
+            }
+        }
+
         /* ===== bottom nav: phones + tablet portrait ===== */
         @media (max-width: 768px), (max-width: 1024px) and (orientation: portrait) {
             :root { --bn-h: 60px; }
@@ -1161,7 +1207,7 @@ for ($t = 13; $t >= 0; $t--) {
 
                 <!-- SUMMARY CARDS -->
                 <div class="row g-3 mb-4">
-                    <div class="col-12 col-md-6 col-xl-4">
+                    <div class="col-6 col-md-6 col-xl-4">
                         <div class="ojtc-stat-card card-tint-applications">
                             <div class="ojtc-stat-icon icon-applications"><i class="bi bi-file-earmark-fill"></i></div>
                             <div>
@@ -1170,7 +1216,7 @@ for ($t = 13; $t >= 0; $t--) {
                             </div>
                         </div>
                     </div>
-                    <div class="col-12 col-md-6 col-xl-4">
+                    <div class="col-6 col-md-6 col-xl-4">
                         <div class="ojtc-stat-card card-tint-internships">
                             <div class="ojtc-stat-icon icon-internships"><i class="bi bi-briefcase-fill"></i></div>
                             <div>
@@ -1180,7 +1226,7 @@ for ($t = 13; $t >= 0; $t--) {
                         </div>
                     </div>
                     
-                    <div class="col-12 col-md-6 col-xl-4">
+                    <div class="col-6 col-md-6 col-xl-4">
                         <div class="ojtc-stat-card card-tint-documents">
                             <div class="ojtc-stat-icon icon-documents"><i class="bi bi-file-earmark-text-fill"></i></div>
                             <div>
@@ -1189,7 +1235,7 @@ for ($t = 13; $t >= 0; $t--) {
                             </div>
                         </div>
                     </div>
-                    <div class="col-12 col-md-6 col-xl-4">
+                    <div class="col-6 col-md-6 col-xl-4">
                         <div class="ojtc-stat-card card-tint-documents">
                             <div class="ojtc-stat-icon icon-documents"><i class="bi bi-clipboard-check-fill"></i></div>
                             <div>
@@ -1198,7 +1244,7 @@ for ($t = 13; $t >= 0; $t--) {
                             </div>
                         </div>
                     </div>
-                    <div class="col-12 col-md-6 col-xl-4">
+                    <div class="col-6 col-md-6 col-xl-4">
                         <div class="ojtc-stat-card card-tint-applications">
                             <div class="ojtc-stat-icon icon-applications"><i class="bi bi-hourglass-split"></i></div>
                             <div>
@@ -1207,7 +1253,7 @@ for ($t = 13; $t >= 0; $t--) {
                             </div>
                         </div>
                     </div>
-                    <div class="col-12 col-md-6 col-xl-4">
+                    <div class="col-6 col-md-6 col-xl-4">
                         <div class="ojtc-stat-card card-tint-internships">
                             <div class="ojtc-stat-icon icon-internships"><i class="bi bi-dash-circle-fill"></i></div>
                             <div>
