@@ -2150,22 +2150,18 @@ for ($t = 13; $t >= 0; $t--) {
                     </div>
                 </div>
 
-                <div class="filter-row"
-                    style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
-                    <div class="filter-bar"
-                        style="display:flex; align-items:center; flex-wrap:wrap; gap:10px; justify-content:space-between; width:100%;">
+                <div class="filter-row" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
+                    <div class="filter-bar" style="display:flex; align-items:center; flex-wrap:wrap; gap:10px;">
                         <div class="search-box">
-                            <input type="text" id="search-docavail" 
+                            <input type="text" id="search-docavail"
                                 style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:220px;"
-                                placeholder="Search by company..." oninput="filterDocAvail()">
-
+                                placeholder="Search by company or internship..." oninput="filterDocAvail()">
                             <i class="bi bi-search" style="color:#272f54 !important;"></i>
                         </div>
                     </div>
-                        <button class="btn-update" onclick="showDocAvailForm()">
-                            <i class="bi bi-plus-circle me-1"></i> Post Document Availability
-                        </button>
-                    
+                    <button class="btn-update" onclick="showDocAvailForm()">
+                        <i class="bi bi-plus-circle me-1"></i> Post Document Availability
+                    </button>
                 </div>
                 <div class="sysAdm-table-wrapper">
                     <table class="sysAdm-table" id="docuAvail-table">
