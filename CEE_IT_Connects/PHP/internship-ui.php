@@ -1203,13 +1203,6 @@ for ($t = 13; $t >= 0; $t--) {
                     </div>
 
                     <div class="col-12 col-md-6 col-xxl-3">
-                        <div class="ojtc-stat-card card-tint-announcements">
-                            <div class="ojtc-stat-icon icon-announcements"><i class="bi bi-patch-check-fill"></i></div>
-                            <div>
-                                <p class="small mb-1 fw-semibold text-uppercase" style="letter-spacing:.05em; font-size:11px; color:#27500a;">Confirmed Rate</p>
-                                <h2 class="fw-bold mb-0" style="color:#27500a;"><?= $confirmedPct ?>%</h2>
-                            </div>
-                        </div>
                     </div>
                     <div class="col-12 col-md-6 col-xxl-3">
                         <div class="ojtc-stat-card card-tint-documents">
@@ -1272,10 +1265,10 @@ for ($t = 13; $t >= 0; $t--) {
                             <div class="card border-0 shadow-sm h-100 ojtc-panel-card">
                                 <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
                                     <i class="bi bi-bar-chart" style="color:#272f54;"></i>
-                                    <h6 class="fw-bold mb-0" style="color:#272f54;">Applicants per Program</h6>
+                                    <h6 class="fw-bold mb-0" style="color:#272f54;">Interns per Program</h6>
                                 </div>
                                 <div class="card-body px-4 pb-4 pt-2">
-                                    <p class="text-muted small mb-3">Number of applicants by program.</p>
+                                    <p class="text-muted small mb-3">Number of interns by program.</p>
                                     <div style="position:relative; height:220px;"><canvas id="programChart"></canvas></div>
                                 </div>
                             </div>
@@ -1285,10 +1278,10 @@ for ($t = 13; $t >= 0; $t--) {
                             <div class="card border-0 shadow-sm h-100 ojtc-panel-card">
                                 <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
                                     <i class="bi bi-graph-up" style="color:#272f54;"></i>
-                                    <h6 class="fw-bold mb-0" style="color:#272f54;">Application Trend</h6>
+                                    <h6 class="fw-bold mb-0" style="color:#272f54;">Submissions Trend</h6>
                                 </div>
                                 <div class="card-body px-4 pb-4 pt-2">
-                                    <p class="text-muted small mb-3">Applications submitted per day, last 14 days.</p>
+                                    <p class="text-muted small mb-3">Students' internship submitted per day, last 14 days.</p>
                                     <div style="position:relative; height:220px;"><canvas id="trendChart"></canvas></div>
                                 </div>
                             </div>
@@ -1301,7 +1294,7 @@ for ($t = 13; $t >= 0; $t--) {
                                     <h6 class="fw-bold mb-0" style="color:#272f54;">Top Companies</h6>
                                 </div>
                                 <div class="card-body px-4 pb-4 pt-2">
-                                    <p class="text-muted small mb-3">Companies with the most applicants.</p>
+                                    <p class="text-muted small mb-3">Companies with the most interns.</p>
                                     <div style="position:relative; height:220px;"><canvas id="companyChart"></canvas></div>
                                 </div>
                             </div>
@@ -1313,7 +1306,7 @@ for ($t = 13; $t >= 0; $t--) {
                         <div class="card border-0 shadow-sm h-100 ojtc-panel-card">
                             <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
                                 <i class="bi bi-file-earmark-text" style="color:#272f54;"></i>
-                                <h6 class="fw-bold mb-0" style="color:#272f54;">Application List</h6>
+                                <h6 class="fw-bold mb-0" style="color:#272f54;">Students' Internship List</h6>
                             </div>
                             <div class="card-body px-4 pb-4 pt-2">
                                 <?php if (empty($recentInterested)): ?>
@@ -1329,9 +1322,6 @@ for ($t = 13; $t >= 0; $t--) {
                                                 <th
                                                     style="padding:8px 10px; border-bottom:1px solid #f0f2f7; font-weight:600;">
                                                     Company</th>
-                                                <th
-                                                    style="padding:8px 10px; border-bottom:1px solid #f0f2f7; font-weight:600;">
-                                                    Status</th>
                                                 <th
                                                     style="padding:8px 10px; border-bottom:1px solid #f0f2f7; font-weight:600;">
                                                     Date</th>
@@ -1353,10 +1343,6 @@ for ($t = 13; $t >= 0; $t--) {
                                                     <td
                                                         style="padding:10px; border-bottom:1px solid #f0f2f7; color:#888; font-size:12px;">
                                                         <?= htmlspecialchars($ri['company']) ?>
-                                                    </td>
-                                                    <td style="padding:10px; border-bottom:1px solid #f0f2f7;">
-                                                        <span
-                                                            style="background:#fff8e1;color:#633806;font-size:11px;padding:3px 10px;border-radius:6px;font-weight:500;">Interested</span>
                                                     </td>
                                                     <td
                                                         style="padding:10px; border-bottom:1px solid #f0f2f7; color:#aaa; font-size:12px;">
@@ -1802,7 +1788,7 @@ for ($t = 13; $t >= 0; $t--) {
                 }
             </style>
 
-            <!-- ── APPLICANTS ── -->
+            <!-- ── Interns ── -->
             <div id="interns" class="section sysAdm-section">
                 <div class="sysAdm-header--danger sysAdm-header--blue mb-4">
                     <div class="sysAdm-header-left">
@@ -2667,7 +2653,7 @@ for ($t = 13; $t >= 0; $t--) {
             });
         }
 
-        // Applicants filter
+        // Interns filter
         function filterApplicants() {
             const search = document.getElementById('search-applicants').value.toLowerCase();
             const req = document.getElementById('app-req-filter').value;
@@ -3081,13 +3067,13 @@ for ($t = 13; $t >= 0; $t--) {
                 }
             });
 
-            // Applicants per program
+            // Interns per program
             make('programChart', {
                 type: 'bar',
                 data: {
                     labels: <?= json_encode(array_keys($programCounts)) ?>,
                     datasets: [{
-                        label: 'Applicants',
+                        label: 'Interns',
                         data: <?= json_encode(array_values($programCounts)) ?>,
                         backgroundColor: '#ff8652fe',
                         borderRadius: 6
@@ -3133,7 +3119,7 @@ for ($t = 13; $t >= 0; $t--) {
                 data: {
                     labels: <?= json_encode(array_keys($companyCounts)) ?>,
                     datasets: [{
-                        label: 'Applicants',
+                        label: 'Interns',
                         data: <?= json_encode(array_values($companyCounts)) ?>,
                         backgroundColor: '#272F54',
                         borderRadius: 6
