@@ -2653,7 +2653,7 @@ foreach ($roomStatuses as $s) {
                                 <p class="dash-stat-value"><?= $noSupervisorCount ?></p>
                             </div>
                         </a> -->
-                        <a href="<?= $dashUrl ?>status" class="dash-stat tone-blue">
+                        <a href="<?= $dashUrl ?>status" class="dash-stat tone-amber">
                             <div class="dash-stat-icon"><i class="fa-solid fa-circle-check"></i></div>
                             <div>
                                 <p class="dash-stat-label">Completed hours</p>
