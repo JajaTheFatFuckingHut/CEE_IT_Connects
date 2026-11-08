@@ -1201,6 +1201,17 @@ for ($t = 13; $t >= 0; $t--) {
                 width: 100%;
             }
         }
+
+        .filter-bar .search-box input {
+            width: 100% !important;
+            max-width: 100%;
+        }
+
+        .filter-bar select.filter-select {
+            min-width: 0 !important;
+            box-shadow: none;
+            color: #555;
+        }
     </style>
 </head>
 
@@ -2229,9 +2240,9 @@ for ($t = 13; $t >= 0; $t--) {
                     <div class="filter-bar"
                         style="display:flex; align-items:center; flex-wrap:wrap; gap:10px; justify-content:space-between; width:100%;">
                         <div class="search-box">
-                            <input type="text" id="search-postings" 
+                            <input type="text" id="search-docavail" 
                                 style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:220px;"
-                                placeholder="Search by company..." oninput="filterPostings()">
+                                placeholder="Search by company..." oninput="filterDocAvail()">
 
                             <i class="bi bi-search" style="color:#272f54 !important;"></i>
                         </div>
@@ -2782,6 +2793,14 @@ for ($t = 13; $t >= 0; $t--) {
                 const typeMatch = type === 'all' || row.dataset.type === type;
                 const progMatch = program === 'programs' || (row.dataset.program ?? '').toLowerCase() === program;
                 row.style.display = (nameMatch && typeMatch && progMatch) ? '' : 'none';
+            });
+        }
+
+        // Document availability filter
+        function filterDocAvail() {
+            const search = document.getElementById('search-docavail').value.toLowerCase();
+            document.querySelectorAll('#docuAvail-table tbody tr').forEach(row => {
+                row.style.display = row.innerText.toLowerCase().includes(search) ? '' : 'none';
             });
         }
 
