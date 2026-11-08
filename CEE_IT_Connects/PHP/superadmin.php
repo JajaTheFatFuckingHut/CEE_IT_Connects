@@ -1617,10 +1617,6 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                 <i class="bi bi-person-gear"></i>
                 <span class="nav-label">Account Management</span>
             </a>
-            <a href="#" onclick="showSection(event, 'delete')" data-tooltip="Account Deletion">
-                <i class="bi bi-person-x me-2"></i>
-                <span class="nav-label">Account Deletion</span>
-            </a>
             <a href="#" onclick="showSection(event, 'monitor')" data-tooltip="Monitor">
                 <i class="bi bi-binoculars me-2"></i>
                 <span class="nav-label">Monitor</span>
@@ -1646,12 +1642,11 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                 <i class="bi bi-calendar me-2"></i>
                 <span class="nav-label">Calendar</span>
             </a>
-            <!-- <a href="#" onclick="showSection(event, 'restore')" data-tooltip="Settings">
-                <i class="bi bi-archive me-2"></i>
-                <span class="nav-label">Archives</span>
+            <a href="#" onclick="showSection(event, 'restore')" data-tooltip="Restoration">
+                <i class="bi bi-check2-circle me-2"></i>
+                <span class="nav-label">Restoration</span>
             </a>
-        </div> -->
-            <a href="#" onclick="showSection(event, 'restore')" data-tooltip="Archives">
+            <a href="#" onclick="showSection(event, 'delete')" data-tooltip="Archives">
                 <i class="bi bi-archive me-2"></i>
                 <span class="nav-label">Archives</span>
             </a>
@@ -2054,15 +2049,11 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                 <div class="sysAdm-header--danger">
                     <div class="sysAdm-header-left">
                         <div class="sysAdm-header-icon">
-                            <i class="fa-solid fa-trash"></i>
+                            <i class="bi bi-archive"></i>
                         </div>
-                        <h2>Account Deletion</h2>
-                        <p>Permanently remove users from the system.</p>
+                        <h2>Archive Accounts</h2>
+                        <p>Archive users from the system.</p>
                     </div>
-
-                    <!-- <div class="sysAdm-header-deco">
-                        <img src="../Sources/Inbox%20cleanup-pana.svg" alt="Delete account illustration">
-                    </div> -->
                 </div>
 
                 <div class="sa-toolbar">
@@ -2100,7 +2091,7 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                                             <input type="hidden" name="id" value="<?= $u['id'] ?>">
                                             <input type="hidden" name="source" value="<?= $u['source'] ?>">
                                             <button type="submit" name="delete" class="btn-delete">
-                                                <i class="bi bi-trash-fill"></i> Delete
+                                                <i class="bi bi-trash-fill"></i> Archive
                                             </button>
                                         </form>
                                     </td>
@@ -2116,11 +2107,11 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                 <div class="sysAdm-header--danger mb-4">
                     <div class="sysAdm-header-left">
                         <div class="sysAdm-header-icon">
-                            <i class="fa-solid fa-archive"></i>
+                            <i class="bi bi-check2-circle"></i>
                         </div>
                         <div class="sysAdm-header-text">
-                            <h2>Archived Accounts</h2>
-                            <p>Manage accounts that are archived.</p>
+                            <h2>Restore Accounts</h2>
+                            <p>Restore accounts that are currently archived.</p>
                         </div>
                     </div>
                 </div>
