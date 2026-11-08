@@ -2091,7 +2091,7 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                                             <input type="hidden" name="id" value="<?= $u['id'] ?>">
                                             <input type="hidden" name="source" value="<?= $u['source'] ?>">
                                             <button type="submit" name="delete" class="btn-delete">
-                                                <i class="bi bi-trash-fill"></i> Archive
+                                                <i class="bi bi-archive"></i> Archive
                                             </button>
                                         </form>
                                     </td>
