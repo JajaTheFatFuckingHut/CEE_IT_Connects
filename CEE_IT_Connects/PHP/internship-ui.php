@@ -1236,11 +1236,11 @@ for ($t = 13; $t >= 0; $t--) {
                         </div>
                     </div>
                     <div class="col-6 col-md-6 col-xl-4">
-                        <div class="ojtc-stat-card card-tint-documents">
-                            <div class="ojtc-stat-icon icon-documents"><i class="bi bi-clipboard-check-fill"></i></div>
+                        <div class="ojtc-stat-card card-tint-announcements">
+                            <div class="ojtc-stat-icon icon-announcements"><i class="bi bi-clipboard-check-fill"></i></div>
                             <div>
-                                <p class="small mb-1 fw-semibold text-uppercase" style="letter-spacing:.05em; font-size:11px; color:#a13d1f;">Requirements Complete</p>
-                                <h2 class="fw-bold mb-0" style="color:#a13d1f;"><?= $reqCompletePct ?>%</h2>
+                                <p class="small mb-1 fw-semibold text-uppercase" style="letter-spacing:.05em; font-size:11px; color:#27500a;">Requirements Complete</p>
+                                <h2 class="fw-bold mb-0" style="color:#27500a;"><?= $reqCompletePct ?>%</h2>
                             </div>
                         </div>
                     </div>
