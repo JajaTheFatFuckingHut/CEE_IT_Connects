@@ -1239,8 +1239,8 @@ for ($t = 13; $t >= 0; $t--) {
                         <div class="ojtc-stat-card card-tint-applications">
                             <div class="ojtc-stat-icon icon-applications"><i class="bi bi-clipboard-check-fill"></i></div>
                             <div>
-                                <p class="small mb-1 fw-semibold text-uppercase" style="letter-spacing:.05em; font-size:11px; color:#27500a;">Requirements Complete</p>
-                                <h2 class="fw-bold mb-0" style="color:#27500a;"><?= $reqCompletePct ?>%</h2>
+                                <p class="small mb-1 fw-semibold text-uppercase" style="letter-spacing:.05em; font-size:11px; color:#7a5200;">Requirements Complete</p>
+                                <h2 class="fw-bold mb-0" style="color:#3b2600;"><?= $reqCompletePct ?>%</h2>
                             </div>
                         </div>
                     </div>
@@ -1248,8 +1248,8 @@ for ($t = 13; $t >= 0; $t--) {
                         <div class="ojtc-stat-card card-tint-announcements">
                             <div class="ojtc-stat-icon icon-announcements"><i class="bi bi-hourglass-split"></i></div>
                             <div>
-                                <p class="small mb-1 fw-semibold text-uppercase" style="letter-spacing:.05em; font-size:11px; color:#7a5200;">In Progress</p>
-                                <h2 class="fw-bold mb-0" style="color:#3b2600;"><?= $inProgressPct ?>%</h2>
+                                <p class="small mb-1 fw-semibold text-uppercase" style="letter-spacing:.05em; font-size:11px; color:#27500a;">In Progress</p>
+                                <h2 class="fw-bold mb-0" style="color:#27500a;"><?= $inProgressPct ?>%</h2>
                             </div>
                         </div>
                     </div>
