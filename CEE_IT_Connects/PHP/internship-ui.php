@@ -1120,10 +1120,14 @@ for ($t = 13; $t >= 0; $t--) {
             min-width: 0;
         }
 
-        .filter-bar .search-box {
+        /* .filter-bar .search-box {
             position: relative;
             flex: 0 1 260px;
             min-width: 0;
+        } */
+
+        .filter-bar .search-box {
+            width: 320px !important;
         }
 
         .filter-bar .search-box input,
