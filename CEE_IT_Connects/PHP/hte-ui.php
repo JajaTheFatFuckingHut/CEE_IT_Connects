@@ -2262,7 +2262,9 @@ foreach ($roomStatuses as $s) {
                 flex-shrink: 0;
             }
 
-            :is(.sysAdm-table, .ojt-status-table) td[colspan] { display: block; }
+            :is(.sysAdm-table, .ojt-status-table) td[colspan] { 
+                display: block; 
+            }
 
             #status :is(.sysAdm-table, .ojt-status-table) td:last-child {
                 justify-content: center;
@@ -2275,6 +2277,13 @@ foreach ($roomStatuses as $s) {
             }
 
             #status .sysAdm-table td:last-child > div > div {
+                justify-content: center;
+            }
+
+            #status .sysAdm-table td:last-child button,
+            #status .sysAdm-table td:last-child a {
+                width: 190px;
+                max-width: 100%;
                 justify-content: center;
             }
         }
@@ -3009,9 +3018,9 @@ foreach ($roomStatuses as $s) {
                                             <?php if ($hasSupEval): ?>
                                                 <a href="ojt-evaluation-download.php?student_id=<?= $s['id'] ?>" target="_blank"
                                                     style="display:inline-flex;align-items:center;gap:5px;padding:5px 10px;
-                                                            background:#dbeafe;color:#1e40af;border-radius:6px;font-size:11px;
-                                                            font-weight:600;border:1px solid #93c5fd;cursor:pointer;text-decoration:none;">
-                                                    <i class="fa fa-file-pdf"></i> Supervisor Eval
+                                                            background:#ffe5d9;color:#a13d1f;border-radius:6px;font-size:11px;
+                                                            font-weight:600;border:1px solid #a13d1f;cursor:pointer;text-decoration:none;">
+                                                    <i class="fa fa-file-pdf"></i> Download Eval Form
                                                 </a>
 
                                             <?php elseif ($hasSup): ?>
