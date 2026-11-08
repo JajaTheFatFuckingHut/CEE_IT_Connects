@@ -1161,7 +1161,7 @@ for ($t = 13; $t >= 0; $t--) {
 
                 <!-- SUMMARY CARDS -->
                 <div class="row g-3 mb-4">
-                    <div class="col-12 col-md-6 col-xxl-3">
+                    <div class="col-12 col-md-6 col-xl-4">
                         <div class="ojtc-stat-card card-tint-applications">
                             <div class="ojtc-stat-icon icon-applications"><i class="bi bi-file-earmark-fill"></i></div>
                             <div>
@@ -1170,7 +1170,7 @@ for ($t = 13; $t >= 0; $t--) {
                             </div>
                         </div>
                     </div>
-                    <div class="col-12 col-md-6 col-xxl-3">
+                    <div class="col-12 col-md-6 col-xl-4">
                         <div class="ojtc-stat-card card-tint-internships">
                             <div class="ojtc-stat-icon icon-internships"><i class="bi bi-briefcase-fill"></i></div>
                             <div>
@@ -1180,7 +1180,7 @@ for ($t = 13; $t >= 0; $t--) {
                         </div>
                     </div>
                     
-                    <div class="col-12 col-md-6 col-xxl-3">
+                    <div class="col-12 col-md-6 col-xl-4">
                         <div class="ojtc-stat-card card-tint-documents">
                             <div class="ojtc-stat-icon icon-documents"><i class="bi bi-file-earmark-text-fill"></i></div>
                             <div>
@@ -1189,7 +1189,7 @@ for ($t = 13; $t >= 0; $t--) {
                             </div>
                         </div>
                     </div>
-                    <div class="col-12 col-md-6 col-xxl-3">
+                    <div class="col-12 col-md-6 col-xl-4">
                         <div class="ojtc-stat-card card-tint-documents">
                             <div class="ojtc-stat-icon icon-documents"><i class="bi bi-clipboard-check-fill"></i></div>
                             <div>
@@ -1198,7 +1198,7 @@ for ($t = 13; $t >= 0; $t--) {
                             </div>
                         </div>
                     </div>
-                    <div class="col-12 col-md-6 col-xxl-3">
+                    <div class="col-12 col-md-6 col-xl-4">
                         <div class="ojtc-stat-card card-tint-applications">
                             <div class="ojtc-stat-icon icon-applications"><i class="bi bi-hourglass-split"></i></div>
                             <div>
@@ -1207,7 +1207,7 @@ for ($t = 13; $t >= 0; $t--) {
                             </div>
                         </div>
                     </div>
-                    <div class="col-12 col-md-6 col-xxl-3">
+                    <div class="col-12 col-md-6 col-xl-4">
                         <div class="ojtc-stat-card card-tint-internships">
                             <div class="ojtc-stat-icon icon-internships"><i class="bi bi-dash-circle-fill"></i></div>
                             <div>
