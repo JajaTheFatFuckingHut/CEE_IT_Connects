@@ -126,7 +126,7 @@ if (!isset($_GET['room_id'])) {
         $joinStmt->execute([$room['id'], $user_id, $user_type]);
     }
 
-    header("Location: ojt-rooms.php?room_id=" . $room['id']);
+    header("Location: ojt-adviser.php?room_id=" . $room['id']);
     exit;
 }
 
@@ -201,11 +201,11 @@ if (!isset($_GET['room_id'])) {
         ");
         $memberStmt->execute([$room_id, $adviser_id]);
 
-        header("Location: ojt-rooms.php?room_id=" . $room_id);
+        header("Location: ojt-adviser.php?room_id=" . $room_id);
         exit;
     }
 
-    header("Location: ojt-rooms.php?room_id=" . $room['id']);
+    header("Location: ojt-adviser.php?room_id=" . $room['id']);
     exit;
 }
 
@@ -2694,7 +2694,7 @@ $page = 'messages';
         <div class="rooms-list" style="margin-top: 0;">
             <h6>ROOMS</h6>
             <?php foreach ($myRooms as $room): ?>
-                <a href="ojt-rooms.php?room_id=<?= $room['id'] ?>&section=room"
+                <a href="ojt-adviser.php?room_id=<?= $room['id'] ?>&section=room"
                     class="<?= ((int) $current_room_id === (int) $room['id']) ? 'active' : '' ?>"
                     data-tooltip="<?= htmlspecialchars($room['room_name']) ?>">
                     <i class="bi bi-people-fill me-2"></i>
@@ -2709,35 +2709,31 @@ $page = 'messages';
 
         <div style="display:flex; flex-direction:column; width:100%;">
             <!-- addtl s -->
-            <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=home"
+            <a href="ojt-adviser.php?room_id=<?= $current_room_id ?>&section=home"
                 class="<?= ($section === 'home') ? 'active' : '' ?>" data-tooltip="Home">
                 <i class="fa-solid fa-house me-2"></i> <span class="sidebar-text">Home</span>
             </a>
-            <!-- <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>" class="<?= $section === '' ? 'active' : '' ?>"
-                data-tooltip="Announcements">
-                <i class="fa-solid fa-bullhorn me-2"></i> <span class="sidebar-text">Announcements</span>
-            </a> -->
-            <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=announcements"
+            <a href="ojt-adviser.php?room_id=<?= $current_room_id ?>&section=announcements"
                 class="<?= $section === 'announcements' ? 'active' : '' ?>" data-tooltip="Documents Available">
                 <i class="fa-solid fa-folder-open me-2"></i> <span class="sidebar-text">Documents Available</span>
             </a>
             <!-- addtl e -->
-            <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=status" data-tooltip="OJT Status"
+            <a href="ojt-adviser.php?room_id=<?= $current_room_id ?>&section=status" data-tooltip="OJT Status"
                 class="<?= $section === 'status' ? 'active' : '' ?>">
                 <i class="fa-solid fa-calendar-check me-2"></i> <span class="sidebar-text">OJT Status</span>
             </a>
 
-            <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=ojt_applications"
+            <a href="ojt-adviser.php?room_id=<?= $current_room_id ?>&section=ojt_applications"
                 class="<?= $section === 'ojt_applications' ? 'active' : '' ?>" data-tooltip="Requirements">
                 <i class="fa fa-list-ul me-2"></i> <span class="sidebar-text">Requirements</span>
             </a>
 
-            <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=weekly_reports"
+            <a href="ojt-adviser.php?room_id=<?= $current_room_id ?>&section=weekly_reports"
                 class="<?= $section === 'weekly_reports' ? 'active' : '' ?>" data-tooltip="Progress Reports">
                 <i class="fa-solid fa-file-lines me-2"></i> <span class="sidebar-text">Progress Reports</span>
             </a>
 
-            <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=chats"
+            <a href="ojt-adviser.php?room_id=<?= $current_room_id ?>&section=chats"
                 class="<?= $section === 'chats' ? 'active' : '' ?>" data-tooltip="Chats">
                 <i class="fa-solid fa-comments me-2"></i> <span class="sidebar-text">Chats</span>
             </a>
@@ -2762,27 +2758,27 @@ $page = 'messages';
 
     <!-- BOTTOM NAV (mobile / tablet portrait) -->
     <nav class="bottom-nav">
-        <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=home"
+        <a href="ojt-adviser.php?room_id=<?= $current_room_id ?>&section=home"
             class="<?= in_array($section, ['', 'home', 'room', 'rooms']) ? 'active' : '' ?>">
             <i class="fa-solid fa-house"></i><span>Home</span>
         </a>
-        <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=announcements"
+        <a href="ojt-adviser.php?room_id=<?= $current_room_id ?>&section=announcements"
             class="<?= $section === 'announcements' ? 'active' : '' ?>">
             <i class="fa-solid fa-folder-open"></i><span>Docs</span>
         </a>
-        <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=status"
+        <a href="ojt-adviser.php?room_id=<?= $current_room_id ?>&section=status"
             class="<?= $section === 'status' ? 'active' : '' ?>">
             <i class="fa-solid fa-calendar-check"></i><span>Status</span>
         </a>
-        <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=ojt_applications"
+        <a href="ojt-adviser.php?room_id=<?= $current_room_id ?>&section=ojt_applications"
             class="<?= $section === 'ojt_applications' ? 'active' : '' ?>">
             <i class="fa fa-list-ul"></i><span>Reqs</span>
         </a>
-        <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=weekly_reports"
+        <a href="ojt-adviser.php?room_id=<?= $current_room_id ?>&section=weekly_reports"
             class="<?= $section === 'weekly_reports' ? 'active' : '' ?>">
             <i class="fa-solid fa-file-lines"></i><span>Reports</span>
         </a>
-        <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=chats"
+        <a href="ojt-adviser.php?room_id=<?= $current_room_id ?>&section=chats"
             class="<?= $section === 'chats' ? 'active' : '' ?>">
             <i class="fa-solid fa-comments"></i><span>Chats</span>
         </a>
@@ -2801,7 +2797,7 @@ $page = 'messages';
             // addtl s
             // ── DASHBOARD DATA ──
             $dashRoomId = (int) $current_room_id;
-            $dashUrl = "ojt-rooms.php?room_id={$dashRoomId}&section=";
+            $dashUrl = "ojt-adviser.php?room_id={$dashRoomId}&section=";
 
             // Students in any active room owned by this adviser (same rule as the other sections)
             $myStudentsSql = "
@@ -3046,7 +3042,7 @@ $page = 'messages';
                                 $r['section'] ?? '',
                             ]);
                             ?>
-                            <a href="ojt-rooms.php?room_id=<?= (int) $r['id'] ?>&section=room" class="rm-card">
+                            <a href="ojt-adviser.php?room_id=<?= (int) $r['id'] ?>&section=room" class="rm-card">
                                 <div class="rm-ic"><i class="fa-solid fa-users"></i></div>
                                 <div class="rm-info">
                                     <strong><?= htmlspecialchars($r['room_name']) ?></strong>
@@ -3070,7 +3066,7 @@ $page = 'messages';
                                         style="color:#ff6b2c;"></i>Announcements</h5>
                                 <small class="text-muted">Latest updates and important notices for your room.</small>
                             </div>
-                            <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=room" class="btn btn-sm"
+                            <a href="ojt-adviser.php?room_id=<?= $current_room_id ?>&section=room" class="btn btn-sm"
                                 style="background:#eef1fb;color:#272f54;border-radius:20px;font-weight:600;">
                                 View All <i class="fa-solid fa-arrow-right ms-1"></i>
                             </a>
@@ -3368,7 +3364,7 @@ $page = 'messages';
             <!-- addtl e -->
         <?php elseif ($section === 'room' || $section === 'rooms'): ?>
             <?php if ($current_room_id): ?>
-                <a href="ojt-rooms.php?room_id=<?= (int) $current_room_id ?>&section=home" class="room-back">
+                <a href="ojt-adviser.php?room_id=<?= (int) $current_room_id ?>&section=home" class="room-back">
                     <i class="fa-solid fa-arrow-left"></i> Back to Home
                 </a>
                 <?php include 'chat-room-content.php'; ?>
@@ -4007,7 +4003,7 @@ $page = 'messages';
                             $avatarColor = $avatarColors[crc32($u['full_name']) % count($avatarColors)];
                             $isActive = ($chatSection_id == $u['user_id'] && $chatSection_type === 'student');
                             ?>
-                            <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=chats&chat_id=<?= (int) $u['user_id'] ?>&chat_type=student"
+                            <a href="ojt-adviser.php?room_id=<?= $current_room_id ?>&section=chats&chat_id=<?= (int) $u['user_id'] ?>&chat_type=student"
                                 class="room-chat-entry <?= $isActive ? 'active' : '' ?>"
                                 data-name="<?= strtolower(htmlspecialchars($u['full_name'])) ?>">
                                 <div class="room-chat-avatar" style="background:<?= $avatarColor ?>;">
@@ -4033,7 +4029,7 @@ $page = 'messages';
                                 $avatarColor = $avatarColors[crc32($u['full_name']) % count($avatarColors)];
                                 $isActive = ($chatSection_id == $u['user_id'] && $chatSection_type === 'adviser');
                                 ?>
-                                <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=chats&chat_id=<?= (int) $u['user_id'] ?>&chat_type=adviser"
+                                <a href="ojt-adviser.php?room_id=<?= $current_room_id ?>&section=chats&chat_id=<?= (int) $u['user_id'] ?>&chat_type=adviser"
                                     class="room-chat-entry <?= $isActive ? 'active' : '' ?>"
                                     data-name="<?= strtolower(htmlspecialchars($u['full_name'])) ?>">
                                     <div class="room-chat-avatar" style="background:<?= $avatarColor ?>;">
@@ -4160,7 +4156,7 @@ $page = 'messages';
                                 <input type="hidden" name="receiver_id" value="<?= (int) $chatSection_id ?>">
                                 <input type="hidden" name="receiver_type" value="<?= htmlspecialchars($chatSection_type) ?>">
                                 <input type="hidden" name="redirect"
-                                    value="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=chats&chat_id=<?= (int) $chatSection_id ?>&chat_type=<?= htmlspecialchars($chatSection_type) ?>">
+                                    value="ojt-adviser.php?room_id=<?= $current_room_id ?>&section=chats&chat_id=<?= (int) $chatSection_id ?>&chat_type=<?= htmlspecialchars($chatSection_type) ?>">
 
                                 <!-- attachment preview (shown via JS when a file is picked) -->
                                 <div id="roomAttachPreview" class="room-attach-preview" style="display:none;">

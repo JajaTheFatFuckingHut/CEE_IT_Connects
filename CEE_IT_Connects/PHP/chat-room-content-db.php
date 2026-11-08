@@ -65,7 +65,7 @@ if (isset($_POST['users'])) {
                 'user_type' => $user['type'],
                 'title' => 'You were added to ' . $room['room_name'],
                 'message' => $adviser['full_name'] . ' added you to the room "' . $room['room_name'] . '".',
-                'link' => 'message.php?room_id=' . $room_id . '&tab=updates',
+                'link' => 'rooms.php?room_id=' . $room_id . '&tab=updates',
             ]);
         }
     }
@@ -130,16 +130,16 @@ if (isset($_POST['post_announcement'])) {
             'user_type' => $member['user_type'],
             'title' => 'New Post in the room ' . $room['room_name'],
             'message' => $adviser['full_name'] . ' posted: ' . substr($content, 0, 80) . (strlen($content) > 80 ? '...' : ''),
-            'link' => 'message.php?room_id=' . $room_id . '&tab=updates',
+            'link' => 'rooms.php?room_id=' . $room_id . '&tab=updates',
         ]);
     }
 
     if ($_SESSION['role'] === 'hte_adviser') {
-        header("Location: hte-ui.php?room_id={$room_id}&tab=updates");
+        header("Location: hte-adviser.php?room_id={$room_id}&tab=updates");
     } elseif ($_SESSION['role'] === 'superadmin') {
         header("Location: systemadmin-rooms.php?room_id={$room_id}&tab=members");
     } elseif ($_SESSION['role'] === 'internship_adviser') {
-        header("Location: ojt-rooms.php?room_id={$room_id}&tab=updates");
+        header("Location: ojt-adviser.php?room_id={$room_id}&tab=updates");
     } elseif ($_SESSION['role'] === 'internship_admin') {
         header("Location: hte-rooms.php?room_id={$room_id}&tab=updates");
     }
@@ -161,6 +161,6 @@ if (isset($_POST['remove-member'])) {
     $stmt->execute([$roomId, $userId, $userType]);
 
     $_SESSION['success'] = "Member removed from the room.";
-    header("Location: " . "ojt-rooms.php?room_id={$roomId}&tab=members");
+    header("Location: " . "ojt-adviser.php?room_id={$roomId}&tab=members");
     exit();
 }

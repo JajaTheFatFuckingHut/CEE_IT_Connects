@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $submission_id = (int) ($_POST['submission_id'] ?? 0);
         $student_id = (int) ($_POST['student_id'] ?? 0);
         $room_id = (int) ($_POST['room_id'] ?? 0);
-        $redirect = "ojt-rooms.php?room_id={$room_id}&section=supervisor_requests";
+        $redirect = "ojt-adviser.php?room_id={$room_id}&section=supervisor_requests";
 
         $stmt = $pdo->prepare("SELECT * FROM student_hte_supervisor_submissions WHERE id = ?");
         $stmt->execute([$submission_id]);
@@ -93,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $check->execute([$adviser_id]);
     if ($check->fetch()) {
         $_SESSION['error'] = "You already have an active room.";
-        header("Location: ojt-rooms.php");
+        header("Location: ojt-adviser.php");
         exit;
     }
 
@@ -110,7 +110,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->execute([$room_id, $adviser_id]);
 
     $_SESSION['success'] = "Room created successfully.";
-    header("Location: ojt-rooms.php?room_id=" . $room_id);
+    header("Location: ojt-adviser.php?room_id=" . $room_id);
     exit;
 }
 

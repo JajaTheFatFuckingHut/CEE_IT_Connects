@@ -671,17 +671,17 @@ function timeAgo($datetime)
 <nav class="navbar navbar-expand-lg navbar-custom fixed-top">
     <div class="container-fluid px-3">
         <a class="navbar-brand d-flex align-items-center" href="<?php if ($role == 'students') {
-            echo 'index.php';
+            echo 'student.php';
         } else if ($role == 'superadmin' || $role == 'sys_admin' || $role == 'admin') {
-            echo 'superadmin.php';
+            echo 'systemadmin.php';
         } else if ($role == 'internship_admin') {
-            echo 'internship-ui.php';
+            echo 'internship-admin.php';
         } else if ($role == 'hte_adviser') {
-            echo 'hte-ui.php';
+            echo 'hte-adviser.php';
         } else if ($role == 'internship_adviser') {
-            echo 'ojt-rooms.php';
+            echo 'ojt-adviser.php';
         } else {
-            echo 'index.php';
+            echo 'student.php';
         }
         ?>">
             <img src="/Sources/CEE IT Connects Logo.png" class="nav-logo">
@@ -695,13 +695,13 @@ function timeAgo($datetime)
                     <li class="nav-item">
                         <a class="nav-link <?= ($page == 'home') ? 'active' : '' ?>" href="<?php
                                 if ($role == 'students') {
-                                    echo 'index.php';
+                                    echo 'student.php';
                                 } else if ($role == 'hte_adviser') {
-                                    echo 'hte-ui.php';
+                                    echo 'hte-adviser.php';
                                 } else if ($role == 'internship_adviser') {
-                                    echo 'ojt-rooms.php';
+                                    echo 'ojt-adviser.php';
                                 } else {
-                                    echo 'index.php';
+                                    echo 'student.php';
 
                                 } ?>">Home</a>
                     </li>
@@ -725,13 +725,13 @@ function timeAgo($datetime)
                 <div>
                     <a href="<?php
                     if ($role == 'student') {
-                        echo 'message.php';
+                        echo 'rooms.php';
                     } else if ($role == 'superadmin' || $role == 'admin') {
                         echo 'systemadmin-rooms.php';
                     } else if ($role == 'internship_admin') {
                         echo 'internadmin-rooms.php';
                     } else {
-                        echo 'message.php';
+                        echo 'rooms.php';
 
                     } ?>" class="navbar-icon-btn" data-tip="Rooms">
                         <i class="fa-solid fa-users"></i>
@@ -759,7 +759,7 @@ function timeAgo($datetime)
 
                     <?php foreach ($notifications as $notif): ?>
                         <div class="notif-item"
-                            onclick="window.location.href='<?= htmlspecialchars($notif['link'] ?? 'index.php') ?>'">
+                            onclick="window.location.href='<?= htmlspecialchars($notif['link'] ?? 'student.php') ?>'">
                             <?php if (!$notif['is_read']): ?>
                                 <div class="dot"></div><?php endif; ?>
                             <div>
@@ -783,7 +783,7 @@ function timeAgo($datetime)
                     <div class="notif-popup-list">
                         <?php foreach ($notifications as $notif): ?>
                             <div class="notif-item"
-                                onclick="window.location.href='<?= htmlspecialchars($notif['link'] ?? 'index.php') ?>'">
+                                onclick="window.location.href='<?= htmlspecialchars($notif['link'] ?? 'student.php') ?>'">
                                 <?php if (!$notif['is_read']): ?>
                                     <div class="dot"></div><?php endif; ?>
                                 <div>
@@ -1169,7 +1169,7 @@ function timeAgo($datetime)
     <!-- <?php if (!$hideStudentNav): ?>
         <div id="mobileMenu"
             style="display: none;position: absolute;top: 70px; left: 0;width: 100%;background: #2c3e67;z-index: 999;padding: 10px 0;box-shadow: 0 8px 20px rgba(0,0,0,0.3);">
-            <a href=" index.php" style="display:block;padding:14px 24px;color:white;text-decoration:none;font-weight:600;
+            <a href=" student.php" style="display:block;padding:14px 24px;color:white;text-decoration:none;font-weight:600;
             <?= ($page == 'home') ? 'background:#ff6b2c;border-radius:8px;margin:4px 12px;' : '' ?>">
                 <i class="fa-solid fa-house me-2"></i> Home
             </a>
@@ -1188,7 +1188,7 @@ function timeAgo($datetime)
     <!-- MOBILE DROPDOWN MENU -->
     <?php if (!$hideStudentNav): ?>
         <div id="mobileMenu">
-            <a href="index.php" class="<?= ($page == 'home') ? 'active' : '' ?>">
+            <a href="student.php" class="<?= ($page == 'home') ? 'active' : '' ?>">
                 <i class="fa-solid fa-house"></i> Home
             </a>
             <a href="applied-Internship-programs.php" class="<?= ($page == 'opportunity') ? 'active' : '' ?>">

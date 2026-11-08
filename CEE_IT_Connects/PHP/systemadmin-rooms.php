@@ -137,11 +137,11 @@ if (!isset($_GET['room_id'])) {
         ");
         $memberStmt->execute([$room_id, $adviser_id]);
 
-        header("Location: ojt-rooms.php?room_id=" . $room_id);
+        header("Location: ojt-adviser.php?room_id=" . $room_id);
         exit;
     }
 
-    header("Location: ojt-rooms.php?room_id=" . $room['id']);
+    header("Location: ojt-adviser.php?room_id=" . $room['id']);
     exit;
 }
 
@@ -1320,7 +1320,7 @@ $page = 'messages';
     <!-- SIDEBAR -->
     <div class="sidebar">
         <div class="rooms-list" style="display:flex; flex-direction:column; width:100%;">
-            <a href="superadmin.php" data-tooltip="Back to Home">
+            <a href="systemadmin.php" data-tooltip="Back to Home">
                 <i class="fa-solid fa-arrow-left me-2"></i>
                 <span class="sidebar-text">Back to Home</span>
             </a>
@@ -1381,7 +1381,7 @@ $page = 'messages';
                             $avatarColor = $avatarColors[crc32($u['full_name']) % count($avatarColors)];
                             $isActive = ($chatSection_id == $u['user_id'] && $chatSection_type === 'student');
                             ?>
-                            <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=chats&chat_id=<?= $u['user_id'] ?>&chat_type=student"
+                            <a href="ojt-adviser.php?room_id=<?= $current_room_id ?>&section=chats&chat_id=<?= $u['user_id'] ?>&chat_type=student"
                                 class="room-chat-entry <?= $isActive ? 'active' : '' ?>"
                                 data-name="<?= strtolower(htmlspecialchars($u['full_name'])) ?>">
                                 <div class="room-chat-avatar" style="background:<?= $avatarColor ?>;">
@@ -1404,7 +1404,7 @@ $page = 'messages';
                                 $avatarColor = $avatarColors[crc32($u['full_name']) % count($avatarColors)];
                                 $isActive = ($chatSection_id == $u['user_id'] && $chatSection_type === 'adviser');
                                 ?>
-                                <a href="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=chats&chat_id=<?= $u['user_id'] ?>&chat_type=adviser"
+                                <a href="ojt-adviser.php?room_id=<?= $current_room_id ?>&section=chats&chat_id=<?= $u['user_id'] ?>&chat_type=adviser"
                                     class="room-chat-entry <?= $isActive ? 'active' : '' ?>"
                                     data-name="<?= strtolower(htmlspecialchars($u['full_name'])) ?>">
                                     <div class="room-chat-avatar" style="background:<?= $avatarColor ?>;">
@@ -1484,7 +1484,7 @@ $page = 'messages';
                                 <input type="hidden" name="receiver_id" value="<?= $chatSection_id ?>">
                                 <input type="hidden" name="receiver_type" value="<?= $chatSection_type ?>">
                                 <input type="hidden" name="redirect"
-                                    value="ojt-rooms.php?room_id=<?= $current_room_id ?>&section=chats&chat_id=<?= $chatSection_id ?>&chat_type=<?= $chatSection_type ?>">
+                                    value="ojt-adviser.php?room_id=<?= $current_room_id ?>&section=chats&chat_id=<?= $chatSection_id ?>&chat_type=<?= $chatSection_type ?>">
                                 <div class="room-message-input-row">
                                     <textarea name="message" id="roomChatInput" rows="1" placeholder="Type a message…" required
                                         onkeydown="roomChatEnterSend(event)"></textarea>

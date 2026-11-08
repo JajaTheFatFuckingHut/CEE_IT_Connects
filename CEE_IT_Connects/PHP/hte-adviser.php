@@ -98,7 +98,7 @@ if (!isset($_GET['room_id'])) {
         $joinStmt->execute([$room['id'], $user_id, $user_type]);
     }
 
-    header("Location: hte-ui.php?room_id=" . $room['id']);
+    header("Location: hte-adviser.php?room_id=" . $room['id']);
     exit;
 }
 
@@ -2534,7 +2534,7 @@ foreach ($roomStatuses as $s) {
             <?php
             // ── HOME DASHBOARD DATA ──
             $dashRoomId = (int) $current_room_id;
-            $dashUrl = "hte-ui.php?room_id={$dashRoomId}&section=";
+            $dashUrl = "hte-adviser.php?room_id={$dashRoomId}&section=";
             $avatarColors = ['#ff2c8f', '#2c6fff', '#1abc9c', '#9b59b6', '#e67e22'];
 
             // $roomStatuses, $supAssignments, $adviserInternshipId are already loaded at the top of the file

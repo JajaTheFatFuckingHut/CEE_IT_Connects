@@ -104,7 +104,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     ]);
     // Redirect after success
     $_SESSION['success'] = "Successfully made your account!";
-    header("Location: ../index.php");
+    header("Location: ../student.php");
     exit();
 }
 ?>

@@ -26,7 +26,7 @@
             <p class="subtext">Start customizing your account?</p>
 
             <div class="button-group">
-                <a href="../PHP/index.php" class="btn-custom btn-skip">Skip for now</a>
+                <a href="../PHP/student.php" class="btn-custom btn-skip">Skip for now</a>
                 <a href="wala pa po ate" class="btn-custom btn-proceed">Proceed</a>
             </div>
         </div>

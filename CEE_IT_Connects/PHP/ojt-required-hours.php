@@ -17,5 +17,5 @@ if ($room_id) {
     $_SESSION['success'] = "Required hours updated to $required_hours.";
 }
 
-header("Location: ojt-rooms.php?room_id=$room_id&section=status");
+header("Location: ojt-adviser.php?room_id=$room_id&section=status");
 exit;

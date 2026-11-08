@@ -19,5 +19,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['room_id'])) {
 
 }
 
-header("Location: ojt-rooms.php");
+header("Location: ojt-adviser.php");
 exit();

@@ -34,7 +34,7 @@ $now = new DateTime();
 //     $stmt = $pdo->prepare("SELECT id FROM students WHERE id = :id");
 //     $stmt->execute(['id' => $userId]);
 //     if ($stmt->fetch()) {
-//         header('Location: index.php');
+//         header('Location: student.php');
 //         exit;
 //     }
 // }
@@ -43,14 +43,14 @@ $now = new DateTime();
 //     $stmt = $pdo->prepare("SELECT id FROM advisers WHERE id = :id");
 //     $stmt->execute(['id' => $userId]);
 //     if ($stmt->fetch()) {
-//         header('Location: hte-ui.php');
+//         header('Location: hte-adviser.php');
 //         exit;
 //     }
 // } elseif ($role === 'internship_adviser') {
 //     $stmt = $pdo->prepare("SELECT id FROM advisers WHERE id = :id");
 //     $stmt->execute(['id' => $userId]);
 //     if ($stmt->fetch()) {
-//         header('Location: ojt-rooms.php');
+//         header('Location: ojt-adviser.php');
 //         exit;
 //     }
 // }
@@ -60,21 +60,21 @@ $now = new DateTime();
 //     $stmt = $pdo->prepare("SELECT id FROM admins WHERE id = :id");
 //     $stmt->execute(['id' => $userId]);
 //     if ($stmt->fetch()) {
-//         header('Location: superadmin.php');
+//         header('Location: systemadmin.php');
 //         exit;
 //     }
 // } elseif ($role === 'internship_admin') {
 //     $stmt = $pdo->prepare("SELECT id FROM admins WHERE id = :id");
 //     $stmt->execute(['id' => $userId]);
 //     if ($stmt->fetch()) {
-//         header('Location: internship-ui.php');
+//         header('Location: internship-admin.php');
 //         exit;
 //     }
 // }
 
 // session_unset();
 // session_destroy();
-// header('Location: index.php');
+// header('Location: student.php');
 // exit;
 ?>
 <!DOCTYPE html>

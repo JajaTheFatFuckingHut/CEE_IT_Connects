@@ -7,7 +7,7 @@ $role = strtolower(trim($_SESSION['role'] ?? ''));
 
 
 if ($role !== 'superadmin') {
-    header("Location: index.php");
+    header("Location: student.php");
     exit();
 }
 // addtl s — admin credentials for sidebar account box
@@ -120,7 +120,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_role'])) {
 
     if ($superadmincount > 3) {
         $_SESSION['error'] = "Only three system administrators are allowed.";
-        header("Location: superadmin.php");
+        header("Location: systemadmin.php");
         exit;
     }
 
@@ -142,7 +142,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_role'])) {
                 $admin_ids[$i],
                 'Role Updated',
                 'Your role has been changed from ' . $oldRole . ' to ' . $roles[$i] . ' by a system administrator.',
-                $roles[$i] === 'superadmin' ? 'superadmin.php' : 'internship-ui.php'
+                $roles[$i] === 'superadmin' ? 'systemadmin.php' : 'internship-admin.php'
             ]);
         }
     }
@@ -160,7 +160,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_role'])) {
         $_SESSION['info'] = "No roles were changed.";
     }
 
-    header("Location: superadmin.php?section=roles");
+    header("Location: systemadmin.php?section=roles");
     exit;
 }
 $adviserList = $pdo->query("
@@ -241,7 +241,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_assign_csv'])) {
 
     if ($sidIdx === false || $aidIdx === false) {
         $_SESSION['error'] = "CSV must contain student_id and adviser_id columns.";
-        header("Location: superadmin.php?section=assign_adviser");
+        header("Location: systemadmin.php?section=assign_adviser");
         exit;
     }
 
@@ -291,7 +291,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_assign_csv'])) {
         ->execute([$_SESSION['user_id'], "Bulk assigned {$assigned} student(s) via CSV, skipped {$skipped}"]);
 
     $_SESSION['success'] = "Assigned {$assigned} student(s). Skipped {$skipped} (already assigned or invalid).";
-    header("Location: superadmin.php?section=assign_adviser");
+    header("Location: systemadmin.php?section=assign_adviser");
     exit;
 }
 
@@ -2101,7 +2101,7 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                                     <td><?= htmlspecialchars($u['email']) ?></td>
                                     <td><?= htmlspecialchars(ucwords(str_replace('_', ' ', $u['role']))) ?></td>
                                     <td>
-                                        <form method="POST" action="superadmin-db.php"
+                                        <form method="POST" action="systemadmin-db.php"
                                             onsubmit="return confirm('Are you sure you want to delete this user?')">
                                             <input type="hidden" name="id" value="<?= $u['id'] ?>">
                                             <input type="hidden" name="source" value="<?= $u['source'] ?>">
@@ -2161,7 +2161,7 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                                     <td><?= htmlspecialchars($u['email']) ?></td>
                                     <td><?= htmlspecialchars(ucwords(str_replace('_', ' ', $u['role']))) ?></td>
                                     <td>
-                                        <form method="POST" action="superadmin-db.php"
+                                        <form method="POST" action="systemadmin-db.php"
                                             onsubmit="return confirm('Restore this user?')">
                                             <input type="hidden" name="user_id" value="<?= $u['id'] ?>">
                                             <input type="hidden" name="source"
@@ -2263,7 +2263,7 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                         </div>
                     </div>
                 </div>
-                <form method="POST" action="superadmin-db.php" class="admin-form">
+                <form method="POST" action="systemadmin-db.php" class="admin-form">
                     <input type="text" name="name" placeholder="Full Name" required>
                     <input type="email" name="email" placeholder="Email Address" required>
                     <input type="password" name="password" placeholder="Password" required>
@@ -2295,7 +2295,7 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                         </div>
                     </div>
                 </div>
-                <form method="POST" action="superadmin-db.php" class="admin-form">
+                <form method="POST" action="systemadmin-db.php" class="admin-form">
                     <input type="text" name="name" placeholder="Full Name" required>
                     <input type="email" name="email" placeholder="Email Address" required>
                     <!-- <input type="password" name="password" placeholder="Password" required> -->
@@ -2695,12 +2695,12 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                 </form>
 
                 <!-- Handle the adding of sy -->
-                <form method="POST" action="superadmin-db.php" id="addSyForm" style="display:none;">
+                <form method="POST" action="systemadmin-db.php" id="addSyForm" style="display:none;">
                     <input type="hidden" name="add_school_year" value="1">
                 </form>
 
                 <div class="sysAdm-table-wrapper mb-3">
-                    <form method="POST" class="p-3" action="superadmin-db.php">
+                    <form method="POST" class="p-3" action="systemadmin-db.php">
                         <input type="hidden" name="save_section_settings" value="1">
                         <input type="hidden" name="school_year" value="<?= htmlspecialchars($schoolYear) ?>">
                         <div class="fw-semibold mb-2" style="font-size:13px; color:#272f54;">
@@ -2789,7 +2789,7 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                                         <?php if ($isAssigned): ?>
                                             <?php foreach ($mine as $sectionKey => $label): ?>
                                                 <?php [$yr, $sec] = explode('|', $sectionKey); ?>
-                                                <form method="POST" action="superadmin-db.php" class="d-inline unassign-form"
+                                                <form method="POST" action="systemadmin-db.php" class="d-inline unassign-form"
                                                     onsubmit="return confirm('Unassign this adviser from Year <?= (int) $yr ?> - Section <?= htmlspecialchars($sec) ?>? This will delete the room and remove all its members.');">
                                                     <input type="hidden" name="school_year"
                                                         value="<?= htmlspecialchars($schoolYear) ?>">
@@ -2813,7 +2813,7 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                                         <?php endif; ?>
                                     </td>
                                     <td>
-                                        <form method="POST" action="superadmin-db.php" id="assign-form-<?= $adv['id'] ?>">
+                                        <form method="POST" action="systemadmin-db.php" id="assign-form-<?= $adv['id'] ?>">
                                             <input type="hidden" name="school_year"
                                                 value="<?= htmlspecialchars($schoolYear) ?>">
                                             <input type="hidden" name="adviser_id" value="<?= $adv['id'] ?>">
@@ -2936,7 +2936,7 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                                 <!-- Actions -->
                                 <?php if ($req['status'] === 'pending'): ?>
                                     <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
-                                        <form action="superadmin-db.php" method="POST" style="margin:0;">
+                                        <form action="systemadmin-db.php" method="POST" style="margin:0;">
                                             <input type="hidden" name="submission_id" value="<?= $req['id'] ?>">
                                             <input type="hidden" name="student_id" value="<?= $req['student_id'] ?>">
                                             <input type="hidden" name="action" value="approve">
@@ -3074,7 +3074,7 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                     </div>
                 <?php else: ?>
 
-                    <form method="POST" action="superadmin-db.php">
+                    <form method="POST" action="systemadmin-db.php">
                         <?php
                         $countStmt = $pdo->query("
                                 SELECT program, COUNT(*) AS total
@@ -3201,7 +3201,7 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                     <div class="sa-panel">
                         <div class="sa-head">
                             <div class="sa-title">Suspended dates</div>
-                            <form method="GET" action="superadmin.php">
+                            <form method="GET" action="systemadmin.php">
                                 <input type="hidden" name="section" value="calendar">
                                 <select name="year" class="sa-input" onchange="this.form.submit()">
                                     <option value="all" <?= $filterYear === 'all' ? 'selected' : '' ?>>All years</option>
@@ -3529,7 +3529,7 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
 
             const form = document.createElement('form');
             form.method = 'POST';
-            form.action = 'superadmin.php'; // posts back to itself
+            form.action = 'systemadmin.php'; // posts back to itself
 
             const sourceInput = document.createElement('input');
             sourceInput.type = 'hidden'; sourceInput.name = 'bulk_assign_csv'; sourceInput.value = '1';
