@@ -1515,6 +1515,32 @@ $page = 'messages';
             display: none;
         }
 
+        .room-msg-delete {
+            width: 28px;
+            height: 28px;
+            border: none;
+            border-radius: 50%;
+            background: #f1f3f8;
+            color: #94a3b8;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            align-self: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity .15s, background .15s, color .15s;
+        }
+
+        .room-msg-row.me:hover .room-msg-delete {
+            opacity: 1;
+        }
+
+        .room-msg-delete:hover {
+            background: #dc2626;
+            color: #fff;
+        }
+
         /* tablet: slightly narrower list */
         @media (min-width: 769px) and (max-width: 1024px) {
             .room-chat-list {
@@ -2054,6 +2080,12 @@ $page = 'messages';
         }
 
         /* addtl e */
+
+        @media (hover: none) {
+            .room-msg-row.me .room-msg-delete {
+                opacity: .7;
+            }
+        }
 
         .rm-section {
             margin-bottom: 20px;
@@ -4074,7 +4106,7 @@ $page = 'messages';
                                         <?php if ($isMe): ?>
                                             <button type="button" class="room-msg-delete"
                                                 onclick="roomDeleteMessage(<?= (int) $msg['id'] ?>, this)" title="Delete message">
-                                                <i class="fa-solid fa-trash"></i>
+                                                <i class="fa-solid fa-trash-can"></i>
                                             </button>
                                         <?php endif; ?>
                                     </div>
