@@ -1125,10 +1125,6 @@ for ($t = 13; $t >= 0; $t--) {
                 <i class="bi bi-file-earmark-text-fill"></i>
                 <span class="nav-label">Documents</span>
             </a>
-            <!-- <a href="#" onclick="showSection('interested')" data-tooltip="Interested">
-                <i class="bi bi-bookmarks-fill"></i>
-                <span class="nav-label">Interested</span>
-            </a> -->
             <a href="#" onclick="showSection('docu_availability')" data-tooltip="Document Availability">
                 <i class="bi bi-bookmark-fill"></i>
                 <span class="nav-label">Document Availability</span>
@@ -1183,7 +1179,7 @@ for ($t = 13; $t >= 0; $t--) {
                             </div>
                         </div>
                     </div>
-                    <div class="col-12 col-md-6 col-xxl-3">
+                    <!-- <div class="col-12 col-md-6 col-xxl-3">
                         <div class="ojtc-stat-card card-tint-announcements">
                             <div class="ojtc-stat-icon icon-announcements"><i class="bi bi-bookmark-fill"></i></div>
                             <div>
@@ -1191,7 +1187,7 @@ for ($t = 13; $t >= 0; $t--) {
                                 <h2 class="fw-bold mb-0" style="color:#27500a;"><?= $totalAnnouncements ?></h2>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                     <div class="col-12 col-md-6 col-xxl-3">
                         <div class="ojtc-stat-card card-tint-documents">
                             <div class="ojtc-stat-icon icon-documents"><i class="bi bi-file-earmark-text-fill"></i></div>
@@ -1203,6 +1199,9 @@ for ($t = 13; $t >= 0; $t--) {
                     </div>
 
                     <div class="col-12 col-md-6 col-xxl-3">
+                        <div class="ojtc-stat-card card-tint-announcements">
+                            <div class="ojtc-stat-icon icon-announcements"><i class="bi bi-patch-check-fill"></i></div>
+                        </div>
                     </div>
                     <div class="col-12 col-md-6 col-xxl-3">
                         <div class="ojtc-stat-card card-tint-documents">
