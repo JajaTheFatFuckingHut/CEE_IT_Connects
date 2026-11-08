@@ -3019,7 +3019,7 @@ foreach ($roomStatuses as $s) {
                                                 <a href="ojt-evaluation-download.php?student_id=<?= $s['id'] ?>" target="_blank"
                                                     style="display:inline-flex;align-items:center;gap:5px;padding:5px 10px;
                                                             background:#ffe5d9;color:#a13d1f;border-radius:6px;font-size:11px;
-                                                            font-weight:600;border:1px solid #a13d1f;cursor:pointer;text-decoration:none;">
+                                                            font-weight:600;border:1px solid #da633f;cursor:pointer;text-decoration:none;">
                                                     <i class="fa fa-file-pdf"></i> Download Eval Form
                                                 </a>
 
