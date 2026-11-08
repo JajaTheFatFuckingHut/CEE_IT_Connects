@@ -453,7 +453,7 @@ $saProgRows = $pdo->query("
     ORDER BY total DESC
 ")->fetchAll(PDO::FETCH_ASSOC);
 $saProgColorMap = [
-    'information technology' => '#2c6fff',
+    'information technology' => '#29335C',
     'civil engineering'      => '#E4572E',
     'electrical engineering' => '#f2b705',
 ];
@@ -3028,7 +3028,7 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
 
                         $cardStyles = [
                             'Civil Engineering'      => ['color' => '#E4572E', 'icon' => 'bi-pc-display'],
-                            'Information Technology' => ['color' => '#2c6fff', 'icon' => 'bi-code-slash'],
+                            'Information Technology' => ['color' => '#29335C', 'icon' => 'bi-code-slash'],
                             'Electrical Engineering' => ['color' => '#f2b705', 'icon' => 'bi-lightning-charge'],
                         ];
                         ?>
