@@ -1127,6 +1127,21 @@ for ($t = 13; $t >= 0; $t--) {
             box-shadow: none;
             color: #555;
         }
+
+        .dash-table-scroll {
+            overflow-x: auto;
+            width: 100%;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .dash-table-scroll table {
+            min-width: 480px; 
+        }
+
+        .dash-table-scroll th,
+        .dash-table-scroll td {
+            white-space: nowrap; 
+        }
     </style>
 </head>
 
@@ -1369,6 +1384,7 @@ for ($t = 13; $t >= 0; $t--) {
                                 <?php if (empty($recentInterested)): ?>
                                     <p class="text-muted small mb-0">No applications yet.</p>
                                 <?php else: ?>
+                                    <div class="dash-table-scroll">
                                     <table style="width:100%; border-collapse:collapse; font-size:13px;">
                                         <thead>
                                             <tr class="ojtc-th-tab"
@@ -1409,6 +1425,7 @@ for ($t = 13; $t >= 0; $t--) {
                                             <?php endforeach; ?>
                                         </tbody>
                                     </table>
+                                    </div>
                                 <?php endif; ?>
                             </div>
                         </div>
@@ -1468,12 +1485,13 @@ for ($t = 13; $t >= 0; $t--) {
                                 <?php if (empty($recentInternships)): ?>
                                     <p class="text-muted small mb-0">No internships posted yet.</p>
                                 <?php else: ?>
+                                    <div class="dash-table-scroll">
                                     <table style="width:100%; border-collapse:collapse; font-size:13px;">
-                                        <thead>
-                                            <tr class="ojtc-th-tab"
-                                                style="color:#aaa; font-size:12px; text-transform:uppercase; letter-spacing:.04em;">
-                                                <th
-                                                    style="padding:8px 10px; border-bottom:1px solid #f0f2f7; font-weight:600;">
+                                            <thead>
+                                                <tr class="ojtc-th-tab"
+                                                    style="color:#aaa; font-size:12px; text-transform:uppercase; letter-spacing:.04em;">
+                                                    <th
+                                                        style="padding:8px 10px; border-bottom:1px solid #f0f2f7; font-weight:600;">
                                                     Title</th>
                                                 <th
                                                     style="padding:8px 10px; border-bottom:1px solid #f0f2f7; font-weight:600;">
@@ -1512,6 +1530,7 @@ for ($t = 13; $t >= 0; $t--) {
                                             <?php endforeach; ?>
                                         </tbody>
                                     </table>
+                                    </div>
                                 <?php endif; ?>
                             </div>
                         </div>
