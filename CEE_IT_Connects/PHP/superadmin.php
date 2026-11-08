@@ -453,8 +453,8 @@ $saProgRows = $pdo->query("
     ORDER BY total DESC
 ")->fetchAll(PDO::FETCH_ASSOC);
 $saProgColorMap = [
-    'information technology' => '#e0483e',
-    'civil engineering' => '#4f51a8',
+    'information technology' => '#2c6fff',
+    'civil engineering'      => '#E4572E',
     'electrical engineering' => '#f2b705',
 ];
 $saProgLabels = [];
@@ -1097,62 +1097,39 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
             /* STAT CARDS — 1 row, 3 columns */
             .row.g-3.mb-4 {
                 display: grid !important;
-                grid-template-columns: repeat(3, 1fr) !important;
-                gap: 4px !important;
+                grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+                gap: 6px !important;
+                margin: 0 0 16px 0 !important;
+                --bs-gutter-x: 0;
             }
-
-            .row.g-3.mb-4 .col-md-4 {
-                width: 100% !important;
+            .row.g-3.mb-4 > [class*="col-"] {
+                width: auto !important;
+                max-width: 100% !important;
+                min-width: 0 !important;
                 padding: 0 !important;
+                margin: 0 !important;
             }
-
-            .row.g-3.mb-4 .card {
-                border-radius: 10px !important;
-            }
-
-            .row.g-3.mb-4 .card-body {
-                padding: 8px !important;
-                font-size: 0.8rem !important;
-            }
-
-            .row.g-3.mb-4 .card-body p {
-                font-size: 10px !important;
-                margin-bottom: 4px !important;
-                letter-spacing: 0 !important;
-                font-size: 0.5rem !important;
-            }
-
+            .row.g-3.mb-4 .card-body { padding: 8px !important; }
             .row.g-3.mb-4 .card-body .d-flex {
                 flex-wrap: nowrap !important;
                 align-items: flex-start !important;
-                justify-content: space-between !important;
                 gap: 4px !important;
             }
-
-            .row.g-3.mb-4 .card-body .d-flex>div:first-child:not(.rounded-3) {
-                flex: 1 !important;
+            .row.g-3.mb-4 .card-body .flex-grow-1 { min-width: 0 !important; } /* beats the inline min-width:90px */
+            .row.g-3.mb-4 .card-body p {
+                font-size: 8px !important;
+                letter-spacing: 0 !important;
+                line-height: 1.15 !important;
+                margin-bottom: 2px !important;
+                word-break: break-word;
             }
-
-            .row.g-3.mb-4 .card-body h2 {
-                font-size: 0.7rem !important;
-                margin-bottom: 0 !important;
-            }
-
-            /* Hide icon box to save space */
+            .row.g-3.mb-4 .card-body h2 { font-size: 0.9rem !important; margin: 0 !important; }
             .row.g-3.mb-4 .card-body .rounded-3 {
-                width: 24px !important;
-                height: 24px !important;
+                width: 22px !important;
+                height: 22px !important;
                 flex-shrink: 0;
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-                align-self: flex-start !important;
-                margin-top: 4px !important;
             }
-
-            .row.g-3.mb-4 .card-body .rounded-3 i {
-                font-size: 10px !important;
-            }
+            .row.g-3.mb-4 .card-body .rounded-3 i { font-size: 10px !important; }
 
             /* TABLES — allow horizontal scroll */
             .sysAdm-table {
@@ -1205,7 +1182,7 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
         }
 
         @media (max-width: 480px) {
-            .row.g-3.mb-4 {
+            /* .row.g-3.mb-4 {
                 gap: 3px !important;
             }
 
@@ -1233,7 +1210,7 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
 
             .row.g-3.mb-4 .card-body .rounded-3 i {
                 font-size: 10px !important;
-            }
+            } */
 
             .stat-card-title {
                 font-size: 7px !important;
@@ -1244,6 +1221,58 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
             .stat-card-number {
                 font-size: 1rem !important;
             }
+        }
+
+        /* ===== shared toolbar: search / filter / action buttons ===== */
+        .sa-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .sa-toolbar-filters,
+        .sa-toolbar-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+        .sa-toolbar-filters { flex: 1 1 auto; min-width: 0; }
+
+        .sa-field {
+            height: 40px;
+            padding: 0 14px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            background: #fff;
+            font-size: 13px;
+            min-width: 200px;
+            box-sizing: border-box;
+        }
+        .sa-toolbar .btn-update {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 40px;
+            padding: 0 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        /* calendar fields match */
+        #suspAdmin .sa-input,
+        #suspAdmin .sa-btn { height: 40px; }
+
+        @media (max-width: 768px) {
+            .sa-toolbar,
+            .sa-toolbar-filters,
+            .sa-toolbar-actions { flex-direction: column; align-items: stretch; width: 100%; }
+            .sa-toolbar-filters .sa-field { width: 100%; min-width: 0; }
+            .sa-toolbar-actions .btn-update { width: 100%; }
+
+            #suspAdmin .sa-form { flex-direction: column; }
+            #suspAdmin .sa-form > * { width: 100%; flex: none; }
+            #suspAdmin .sa-head { flex-wrap: wrap; }
+            #suspAdmin .sa-head form,
+            #suspAdmin .sa-head .sa-input { width: 100%; }
         }
 
         /* This is for the calendar */
@@ -1632,13 +1661,13 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
 
                     /* ADDED*/
                     .ojtc-badge-it {
-                        background: #fff1e0;
-                        color: #b85c00;
+                        background: #e7effe;
+                        color: #1b4fce;
                     }
 
                     .ojtc-badge-ce {
-                        background: #e7effe;
-                        color: #1b4fce;
+                        background: #fff1e0;
+                        color: #b85c00;
                     }
 
                     .ojtc-badge-ee {
@@ -1886,15 +1915,20 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                                             // Does not change $ph['program'] or how it is stored/echoed —
                                             // only picks which existing badge class to apply below.
                                             $ojtcProgramName = strtoupper((string) $ph['program']);
-                                            if (strpos($ojtcProgramName, 'IT') !== false) {
-                                                $ojtcBadgeClass = 'ojtc-badge-it';
-                                            } elseif (strpos($ojtcProgramName, 'CE') !== false) {
-                                                $ojtcBadgeClass = 'ojtc-badge-ce';
-                                            } elseif (strpos($ojtcProgramName, 'EE') !== false) {
-                                                $ojtcBadgeClass = 'ojtc-badge-ee';
-                                            } else {
-                                                $ojtcBadgeClass = 'ojtc-badge-default';
-                                            }
+                                            // if (strpos($ojtcProgramName, 'IT') !== false) {
+                                            //     $ojtcBadgeClass = 'ojtc-badge-it';
+                                            // } elseif (strpos($ojtcProgramName, 'CE') !== false) {
+                                            //     $ojtcBadgeClass = 'ojtc-badge-ce';
+                                            // } elseif (strpos($ojtcProgramName, 'EE') !== false) {
+                                            //     $ojtcBadgeClass = 'ojtc-badge-ee';
+                                            // } else {
+                                            //     $ojtcBadgeClass = 'ojtc-badge-default';
+                                            // }
+                                            $ojtcBadgeClass = [
+                                                'BSIT' => 'ojtc-badge-it',
+                                                'BSCE' => 'ojtc-badge-ce',
+                                                'BSEE' => 'ojtc-badge-ee',
+                                            ][deptCode($ph['program'])] ?? 'ojtc-badge-default';
                                             ?>
                                             <!-- CHANGED: added ojtc-hours-row class for a subtle row hover. -->
                                             <div class="d-flex align-items-center justify-content-between ojtc-hours-row">
@@ -1971,13 +2005,10 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                     </div> -->
                 </div>
 
-                <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-                    <div class="d-flex gap-2 flex-wrap">
-                        <input type="text" id="search-delete" oninput="filterDelete()"
-                            placeholder="Search for a student"
-                            style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:220px;">
-                        <select id="filter-role" onchange="filterDelete()"
-                            style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:200px;">
+                <div class="sa-toolbar">
+                    <div class="sa-toolbar-filters">
+                        <input type="text" id="search-delete" oninput="filterDelete()" placeholder="Search for a student" class="sa-field">
+                        <select id="filter-role" onchange="filterDelete()" class="sa-field">
                             <option value="">All Roles</option>
                             <option value="student">Student</option>
                             <option value="adviser">Adviser</option>
@@ -2034,18 +2065,10 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                     </div>
                 </div>
 
-                <div
-                    style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
-                    <div style="display:flex; align-items:center; flex-wrap:wrap; gap:10px;">
-                        <div class="search-box">
-                            <input type="text" id="search-archive" oninput="filterArchive()"
-                                placeholder="Search by name or email..."
-                                style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:220px;">
-                        </div>
-
-                        <select class="filter-select"
-                            style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:200px;"
-                            id="filter-role-archive" onchange="filterArchive()">
+                <div class="sa-toolbar">
+                    <div class="sa-toolbar-filters">
+                        <input type="text" id="search-archive" oninput="filterArchive()" placeholder="Search by name or email..." class="sa-field">
+                        <select id="filter-role-archive" onchange="filterArchive()" class="sa-field">
                             <option value="">All Roles</option>
                             <option value="student">Student</option>
                             <option value="adviser">Adviser</option>
@@ -2105,18 +2128,16 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                     </div>
                 </div>
 
-                <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-                    <div class="d-flex gap-2 flex-wrap">
-                        <input type="text" id="search-roles" oninput="filterRoles()" placeholder="Search for an admin"
-                            style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:220px;">
-                        <select id="filter-role-admin" onchange="filterRoles()"
-                            style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:200px;">
+                <div class="sa-toolbar">
+                    <div class="sa-toolbar-filters">
+                        <input type="text" id="search-roles" oninput="filterRoles()" placeholder="Search for an admin" class="sa-field">
+                        <select id="filter-role-admin" onchange="filterRoles()" class="sa-field">
                             <option value="">All Roles</option>
                             <option value="superadmin">System Admin</option>
                             <option value="internship_admin">Internship Admin</option>
                         </select>
                     </div>
-                    <div class="d-flex gap-2 flex-wrap">
+                    <div class="sa-toolbar-actions">
                         <button type="button" class="btn-update" onclick="showSection(event, 'add-admin')">
                             <i class="bi bi-person-plus me-1"></i>Add Admin
                         </button>
@@ -2260,13 +2281,10 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                         </div>
                     </div>
                 </div>
-                <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-                    <div class="d-flex gap-2 flex-wrap">
-                        <input type="text" id="search-monitor" oninput="filterMonitor()"
-                            placeholder="Search for a student"
-                            style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:220px;">
-                        <select id="filter-role-monitor" onchange="filterMonitor()"
-                            style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:200px;">
+                <div class="sa-toolbar">
+                    <div class="sa-toolbar-filters">
+                        <input type="text" id="search-monitor" oninput="filterMonitor()" placeholder="Search for a student" class="sa-field">
+                        <select id="filter-role-monitor" onchange="filterMonitor()" class="sa-field">
                             <option value="">All Roles</option>
                             <option value="student">Student</option>
                             <option value="hte_adviser">HTE Adviser</option>
@@ -2340,12 +2358,13 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                         <p class="text-muted small mb-0">Replaces the existing CSV with the uploaded file.</p>
                     </div>
                     <form action="../auto-register-csv.php" method="POST" enctype="multipart/form-data">
-                        <div class="d-flex gap-2 align-items-center">
-                            <input type="file" name="students_csv" accept=".csv" required class="form-control"
-                                style="flex:1;font-size:13px;">
-                            <button class="btn-update" type="submit">
-                                <i class="bi bi-upload me-1"></i>Replace CSV
-                            </button>
+                        <div class="d-flex flex-column gap-2">
+                            <input type="file" name="students_csv" accept=".csv" required class="form-control" style="font-size:13px;">
+                            <div>
+                                <button class="btn-update" type="submit">
+                                    <i class="bi bi-upload me-1"></i>Replace CSV
+                                </button>
+                            </div>
                         </div>
                     </form>
                 </div>
@@ -2596,9 +2615,9 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                 </div>
 
                 <!-- school year picker -->
-                <form method="GET" id="syForm" class="mb-2 d-flex align-items-center gap-2">
+                <form method="GET" id="syForm" class="sa-toolbar-filters mb-3" style="align-items:center;">
                     <label style="font-size:13px; color:#272f54;" class="fw-semibold">School year</label>
-                    <select name="sy" onchange="handleSyChange(this)"
+                    <select name="sy" onchange="handleSyChange(this)" class="sa-field">
                         style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px;">
                         <?php foreach ($schoolYearOptions as $opt): ?>
                             <option value="<?= htmlspecialchars($opt) ?>" <?= $opt === $schoolYear ? 'selected' : '' ?>>
@@ -2656,26 +2675,22 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                 </div>
 
                 <!-- Search + filter -->
-                <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-                    <div class="d-flex gap-2 flex-wrap">
-                        <input type="text" id="assign-search" oninput="filterAssignTable()"
-                            placeholder="Search for a student"
-                            style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:220px;">
-                        <select id="assign-filter-adviser" onchange="filterAssignTable()"
-                            style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:200px;">
+                <div class="sa-toolbar">
+                    <div class="sa-toolbar-filters">
+                        <input type="text" id="assign-search" oninput="filterAssignTable()" placeholder="Search for an adviser" class="sa-field">
+                        <select id="assign-filter-adviser" onchange="filterAssignTable()" class="sa-field">
                             <option value="">All Advisers</option>
                             <option value="unassigned">Unassigned</option>
                             <?php foreach ($adviserList as $adv): ?>
-                                <option value="<?= htmlspecialchars($adv['full_name']) ?>">
-                                    <?= htmlspecialchars($adv['full_name']) ?>
-                                </option>
+                                <option value="<?= htmlspecialchars($adv['full_name']) ?>"><?= htmlspecialchars($adv['full_name']) ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
-
-                    <button class="btn-update" data-bs-toggle="modal" data-bs-target="#csvAssignModal">
-                        <i class="bi bi-file-earmark-spreadsheet me-1"></i> Import via CSV
-                    </button>
+                    <div class="sa-toolbar-actions">
+                        <button class="btn-update" data-bs-toggle="modal" data-bs-target="#csvAssignModal">
+                            <i class="bi bi-file-earmark-spreadsheet me-1"></i> Import via CSV
+                        </button>
+                    </div>
                 </div>
                 <div class="sysAdm-table-wrapper">
                     <table class="sysAdm-table">
@@ -3012,8 +3027,8 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                         ");
 
                         $cardStyles = [
-                            'Civil Engineering' => ['color' => '#4f51a8', 'icon' => 'bi-pc-display'],
-                            'Information Technology' => ['color' => '#e0483e', 'icon' => 'bi-code-slash'],
+                            'Civil Engineering'      => ['color' => '#E4572E', 'icon' => 'bi-pc-display'],
+                            'Information Technology' => ['color' => '#2c6fff', 'icon' => 'bi-code-slash'],
                             'Electrical Engineering' => ['color' => '#f2b705', 'icon' => 'bi-lightning-charge'],
                         ];
                         ?>
@@ -3208,8 +3223,8 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                 const matchAdviser = adviser === ''
                     ? true
                     : adviser === 'unassigned'
-                        ? rowAdviser === ''
-                        : rowAdviser === adviser;
+                        ? row.dataset.has === 'none'
+                        : name === adviser;
 
                 row.style.display = (matchName && matchAdviser) ? '' : 'none';
             });
