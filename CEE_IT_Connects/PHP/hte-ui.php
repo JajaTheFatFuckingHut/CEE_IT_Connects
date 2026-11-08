@@ -1931,6 +1931,43 @@ foreach ($roomStatuses as $s) {
             .sysAdm-header-icon { width: 44px; height: 44px; min-width: 44px; font-size: 1rem; }
             .sysAdm-header--danger h2 { font-size: 20px; }
             .sysAdm-header--danger p { font-size: 13px; }
+
+            #supEvalModal .modal-header {
+                padding: 14px 16px !important;
+            }
+
+            #supEvalModal .modal-body {
+                padding: 14px 12px !important;
+            }
+
+            /* footer: note on top, three buttons in one compact row */
+            #supEvalModal .modal-footer {
+                padding: 10px 12px !important;
+                gap: 6px !important;
+                flex-wrap: wrap;
+                justify-content: stretch;
+            }
+
+            #supEvalModal .modal-footer > span {
+                flex: 1 1 100% !important;
+                font-size: 11px !important;
+                line-height: 1.3;
+                margin: 0 0 2px;
+            }
+
+            #supEvalModal .modal-footer .btn {
+                flex: 1 1 0;
+                margin: 0;
+                padding: 6px 8px;
+                font-size: 12px;
+                white-space: nowrap;
+            }
+
+            /* intern info: smaller gaps so the inputs fit */
+            #supEvalForm > div:first-child {
+                padding: 12px !important;
+                gap: 8px !important;
+            }
         }
 
         /* addtl e */
