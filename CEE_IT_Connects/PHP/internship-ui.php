@@ -1033,7 +1033,7 @@ for ($t = 13; $t >= 0; $t--) {
                 overflow-x: auto;
                 overflow-y: hidden;
                 scrollbar-width: none;
-                z-index: 900;              /* below your modals (1000+), above page content */
+                z-index: 900;
                 box-shadow: 0 -2px 10px rgba(0, 0, 0, .15);
             }
 
@@ -1099,6 +1099,106 @@ for ($t = 13; $t >= 0; $t--) {
                 margin-left: 0 !important;
                 height: calc(100dvh - 70px);
                 padding: 10px 10px calc(var(--bn-h) + env(safe-area-inset-bottom) + 20px) !important;
+            }
+        }
+
+        /* ===== FILTER ROWS: shared by all admin sections ===== */
+        .filter-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .filter-bar {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            min-width: 0;
+        }
+
+        .filter-bar .search-box {
+            position: relative;
+            flex: 0 1 260px;
+            min-width: 0;
+        }
+
+        .filter-bar .search-box input,
+        .filter-bar select {
+            box-sizing: border-box;
+            height: 44px;
+            margin-top: 0 !important;
+            padding: 0 14px !important;
+            border: 1px solid #ddd;
+            border-radius: 10px !important;
+            background-color: #fff;
+            font-size: 13px !important;
+            font-weight: 600;
+        }
+
+        .filter-bar .search-box input {
+            width: 100%;
+            min-width: 0 !important;
+            padding-right: 40px !important;
+        }
+
+        .filter-bar .search-box i {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+
+        .filter-bar select {
+            flex: 0 1 200px;
+            min-width: 0 !important;
+        }
+
+        .filter-row > .btn-update {
+            height: 44px;
+            white-space: nowrap;
+        }
+
+        /* ===== TABLET (up to 1024px) ===== */
+        @media (max-width: 1024px) {
+            .filter-row .filter-bar {
+                flex: 1 1 auto;
+            }
+
+            .filter-bar .search-box {
+                flex: 1 1 240px;
+            }
+
+            .filter-bar select {
+                flex: 1 1 180px; 
+            }
+        }
+
+        /* ===== MOBILE (up to 768px): stack everything, same size ===== */
+        @media (max-width: 768px) {
+            .filter-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .filter-bar {
+                flex-direction: column;
+                align-items: stretch;
+                width: 100%;
+            }
+
+            .filter-bar .search-box,
+            .filter-bar select {
+                flex: none;
+                width: 100%;
+            }
+
+            .filter-row > .btn-update {
+                width: 100%;
             }
         }
     </style>
@@ -1558,9 +1658,9 @@ for ($t = 13; $t >= 0; $t--) {
                     </div>
                 </div>
 
-                <div
+                <div class="filter-row"
                     style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
-                    <div style="display:flex; align-items:center; flex-wrap:wrap; gap:10px;">
+                    <div class="filter-bar" style="display:flex; align-items:center; flex-wrap:wrap; gap:10px;">
                         <div class="search-box">
                             <input type="text" id="search-postings"
                                 style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:220px;"
@@ -1833,9 +1933,9 @@ for ($t = 13; $t >= 0; $t--) {
                     </div>
                 </div>
 
-                <div
+                <div class="filter-row"
                     style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
-                    <div style="display:flex; align-items:center; flex-wrap:wrap; gap:10px;">
+                    <div class="filter-bar" style="display:flex; align-items:center; flex-wrap:wrap; gap:10px;">
                         <div class="search-box">
                             <input type="text" id="search-applicants"
                                 style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:220px;"
@@ -1932,9 +2032,9 @@ for ($t = 13; $t >= 0; $t--) {
                     </div>
                 </div>
 
-                <div
+                <div class="filter-row"
                     style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
-                    <div style="display:flex; align-items:center; flex-wrap:wrap; gap:10px;">
+                    <div class="filter-bar" style="display:flex; align-items:center; flex-wrap:wrap; gap:10px;">
                         <div class="search-box">
                             <input type="text" id="search-documents"
                                 style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:220px;"
@@ -2124,21 +2224,22 @@ for ($t = 13; $t >= 0; $t--) {
                     </div>
                 </div>
 
-                <div
+                <div class="filter-row"
                     style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
-                    <div
+                    <div class="filter-bar"
                         style="display:flex; align-items:center; flex-wrap:wrap; gap:10px; justify-content:space-between; width:100%;">
                         <div class="search-box">
-                            <input type="text" id="search-postings"
+                            <input type="text" id="search-postings" 
                                 style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:220px;"
                                 placeholder="Search by company..." oninput="filterPostings()">
 
                             <i class="bi bi-search" style="color:#272f54 !important;"></i>
                         </div>
+                    </div>
                         <button class="btn-update" onclick="showDocAvailForm()">
                             <i class="bi bi-plus-circle me-1"></i> Post Document Availability
                         </button>
-                    </div>
+                    
                 </div>
                 <div class="sysAdm-table-wrapper">
                     <table class="sysAdm-table" id="docuAvail-table">
@@ -2210,9 +2311,9 @@ for ($t = 13; $t >= 0; $t--) {
 
 
 
-                <div
+                <div class="filter-row"
                     style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
-                    <div style="display:flex; align-items:center; flex-wrap:wrap; gap:10px;">
+                    <div class="filter-bar" style="display:flex; align-items:center; flex-wrap:wrap; gap:10px;">
                         <div class="search-box">
                             <input type="text" id="search-announcements"
                                 style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:220px;"
@@ -2448,9 +2549,9 @@ for ($t = 13; $t >= 0; $t--) {
                     </div>
                 </div>
 
-                <div
+                <div class="filter-row"
                     style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
-                    <div style="display:flex; align-items:center; flex-wrap:wrap; gap:10px;">
+                    <div class="filter-bar" style="display:flex; align-items:center; flex-wrap:wrap; gap:10px;">
                         <div class="search-box">
                             <input type="text" id="search-mou"
                                 style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:220px;"
