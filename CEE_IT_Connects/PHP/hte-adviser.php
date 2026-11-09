@@ -172,29 +172,27 @@ if ($isAdviser) {
         }
     }
 
-    // Add this HTE adviser's students (applicants to their internship) to the room.
-    // Skips students already in the room and students whose accounts are archived.
     if ($advisersRoomId) {
         $pdo->prepare("
-            INSERT INTO room_members (room_id, user_id, user_type)
-            SELECT DISTINCT ?, s.id, 'student'
-            FROM advisers hte
-            JOIN ojt_applications oa ON oa.internship_id = hte.internship_id
-            JOIN students s ON s.id = oa.student_id
-            WHERE hte.id = ?
-              AND hte.role = 'HTE_adviser'
-              AND s.is_archived = FALSE
-              AND NOT EXISTS (
-                  SELECT 1 FROM room_members rm
-                  WHERE rm.room_id = ?
-                    AND rm.user_id = s.id
-                    AND rm.user_type = 'student'
-              )
-        ")->execute([$advisersRoomId, $adviser_id, $advisersRoomId]);
-    }
-
-    if (!$current_room_id) {
-        $current_room_id = $advisersRoomId;
+        INSERT INTO room_members (room_id, user_id, user_type)
+        SELECT DISTINCT CAST(:room_id AS INTEGER), s.id, 'student'
+        FROM advisers hte
+        JOIN ojt_applications oa ON oa.internship_id = hte.internship_id
+        JOIN students s ON s.id = oa.student_id
+        WHERE hte.id = :adviser_id
+          AND hte.role = 'HTE_adviser'
+          AND s.is_archived = FALSE
+          AND NOT EXISTS (
+              SELECT 1 FROM room_members rm
+              WHERE rm.room_id = CAST(:room_id2 AS INTEGER)
+                AND rm.user_id = s.id
+                AND rm.user_type = 'student'
+          )
+    ")->execute([
+                    ':room_id' => (int) $advisersRoomId,
+                    ':adviser_id' => (int) $adviser_id,
+                    ':room_id2' => (int) $advisersRoomId,
+                ]);
     }
 }
 
