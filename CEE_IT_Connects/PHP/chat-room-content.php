@@ -10,6 +10,17 @@ $rt = $pdo->prepare("SELECT room_type FROM rooms WHERE id = ?");
 $rt->execute([$room_id]);
 $isDepartmentRoom = $rt->fetchColumn() === 'department';
 
+
+// ROOM INFO
+$stmt = $pdo->prepare("
+    SELECT r.*, a.full_name, a.role
+    FROM rooms r
+    LEFT JOIN advisers a ON r.adviser_id = a.id
+    WHERE r.id = ?
+");
+$stmt->execute([$room_id]);
+$room = $stmt->fetch();
+
 function canManageRoomMembers(array $room): bool
 {
     $role = $_SESSION['role'] ?? '';
@@ -26,17 +37,6 @@ function canManageRoomMembers(array $room): bool
         && (int) $room['adviser_id'] === $uid;
 }
 $canManageMembers = !empty($room) && canManageRoomMembers($room);
-
-
-// ROOM INFO
-$stmt = $pdo->prepare("
-    SELECT r.*, a.full_name, a.role
-    FROM rooms r
-    LEFT JOIN advisers a ON r.adviser_id = a.id
-    WHERE r.id = ?
-");
-$stmt->execute([$room_id]);
-$room = $stmt->fetch();
 
 // ROOM POSTS (UPDATES)
 $stmt = $pdo->prepare("
