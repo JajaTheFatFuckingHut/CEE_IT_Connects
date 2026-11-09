@@ -3768,27 +3768,28 @@ foreach ($roomStatuses as $s) {
             class="section-panel section sysAdm-section <?= $section === 'information' ? 'active' : '' ?>">
             <?php
             $stdntInfoStmt = $pdo->prepare("
-                SELECT
+                SELECT DISTINCT
                     s.id,
                     s.student_id,
-                    s.full_name       AS student_name,
+                    s.full_name AS student_name,
                     s.email,
                     s.program,
                     s.year_level,
                     s.section,
                     s.contact_number,
                     i.company,
-                    a.full_name       AS adviser_name
-                FROM students s
-                LEFT JOIN ojt_applications oa ON oa.student_id = s.id AND
-                oa.adviser_id = :adviser_id
-                LEFT JOIN internships i ON i.id = oa.internship_id
-                LEFT JOIN advisers a ON a.id = i.adviser_id
-                WHERE s.is_archived = false
+                    hte.full_name AS adviser_name
+                FROM advisers hte
+                JOIN internships i        ON i.id = hte.internship_id
+                JOIN ojt_applications oa  ON oa.internship_id = i.id
+                JOIN students s           ON s.id = oa.student_id
+                WHERE hte.id = :adviser_id
+                AND hte.role = 'HTE_adviser'
+                AND s.is_archived = FALSE
                 ORDER BY s.full_name
             ");
-            $stdntInfoStmt->execute(['adviser_id' => $_SESSION['user_id']]);
-            $students = $stdntInfoStmt->fetchAll(PDO::FETCH_ASSOC);
+            $stdntInfoStmt->execute([':adviser_id' => (int) $adviser_id]);
+            $studentsInfo = $stdntInfoStmt->fetchAll(PDO::FETCH_ASSOC);
             ?>
 
             <div class="sysAdm-header--danger sysAdm-header--blue mb-4">
