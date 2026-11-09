@@ -4,14 +4,14 @@ require 'db.php';
 require 'auth.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header("Location: message.php?section=application");
+    header("Location: rooms.php?section=application");
     exit;
 }
 
 $bookmark_id = $_POST['bookmark_id'] ?? null;
 
 if (!$bookmark_id) {
-    header("Location: message.php?section=application");
+    header("Location: rooms.php?section=application");
     exit;
 }
 
@@ -22,5 +22,5 @@ $stmt = $pdo->prepare("
 ");
 $stmt->execute([$bookmark_id, $_SESSION['user_id']]);
 
-header("Location: message.php?section=application");
+header("Location: rooms.php?section=application");
 exit;

@@ -4,12 +4,12 @@ require 'db.php';
 
 
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'internship_admin') {
-    header("Location: login-ui.php?role=admin");
+    header("Location: login-page.php?role=admin");
     exit();
 }
 
 if ($_SERVER["REQUEST_METHOD"] !== "POST") {
-    header("Location: internship-ui.php");
+    header("Location: internship-admin.php");
     exit();
 }
 
@@ -132,7 +132,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 ':roles' => $_SESSION['role'],
                 ':activity' => 'Posted a new internship: ' . $title . ' at ' . $company
             ]);
-            header("Location: internship-ui.php?success=1");
+            header("Location: internship-admin.php?success=1");
             exit();
         } catch (PDOException $e) {
             echo "<!DOCTYPE html>
@@ -143,7 +143,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 <body>
                     <h2>Database Error</h2>
                     <pre>" . htmlspecialchars($e->getMessage()) . "</pre>
-                    <button onclick=\"window.location.href='internship-ui.php'\">
+                    <button onclick=\"window.location.href='internship-admin.php'\">
                         Return to Internship System
                     </button>
                     <?php
@@ -202,7 +202,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         }
 
         $_SESSION['success'] = "New Announcement '$title' has been created.";
-        header("Location: internship-ui.php?success=1");
+        header("Location: internship-admin.php?success=1");
         exit();
     }
     if ($form_type === 'send_feedback') {
@@ -282,7 +282,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     $stmt->execute([$bookmark_id]);
 
-    header("Location: internship-ui.php?removed=1");
+    header("Location: internship-admin.php?removed=1");
     exit;
 } */
 
@@ -323,7 +323,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         }
 
         $_SESSION['success'] = "Announcement " . $_POST['title'] . " has been deleted.";
-        header("location: internship-ui.php?removed=1");
+        header("location: internship-admin.php?removed=1");
         exit;
     }
 
@@ -366,7 +366,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         ]);
 
         $_SESSION['success'] = "Announcement " . $_POST['title'] . " has been updated succesfully!";
-        header("location: internship-ui.php?updated=1");
+        header("location: internship-admin.php?updated=1");
         exit;
     }
 
@@ -407,14 +407,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         if (empty($_POST['internship_id']) || !ctype_digit($_POST['internship_id'])) {
             $_SESSION['error'] = 'Please select a valid internship.';
-            header('Location: internship-ui.php#upload_mou');
+            header('Location: internship-admin.php#upload_mou');
             exit;
         }
         $internship_id = (int) $_POST['internship_id'];
 
         if (empty($_FILES['mou_file']['name'])) {
             $_SESSION['error'] = 'Please choose a file to upload.';
-            header('Location: internship-ui.php#upload_mou');
+            header('Location: internship-admin.php#upload_mou');
             exit;
         }
 
@@ -425,7 +425,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
         if (!in_array($ext, $allowedExt) || $file['error'] !== UPLOAD_ERR_OK || $file['size'] > 5 * 1024 * 1024) {
             $_SESSION['error'] = 'Invalid file. Must be a PDF under 5MB.';
-            header('Location: internship-ui.php#upload_mou');
+            header('Location: internship-admin.php#upload_mou');
             exit;
         }
 
@@ -440,7 +440,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         if (!move_uploaded_file($file['tmp_name'], $destPath)) {
             $_SESSION['error'] = 'Failed to save file.';
-            header('Location: internship-ui.php#upload_mou');
+            header('Location: internship-admin.php#upload_mou');
             exit;
         }
 
@@ -454,14 +454,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         ]);
 
         $_SESSION['success'] = 'MOU uploaded successfully.';
-        header('Location: internship-ui.php#upload_mou');
+        header('Location: internship-admin.php#upload_mou');
         exit;
     }
 
     if (($_POST['form_type'] ?? '') === 'mou_delete') {
 
         if (empty($_POST['mou_id']) || !ctype_digit($_POST['mou_id'])) {
-            header('Location: internship-ui.php#upload_mou');
+            header('Location: internship-admin.php#upload_mou');
             exit;
         }
         $mou_id = (int) $_POST['mou_id'];
@@ -479,7 +479,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $del->execute([$mou_id]);
 
         $_SESSION['success'] = 'MOU deleted.';
-        header('Location: internship-ui.php#upload_mou');
+        header('Location: internship-admin.php#upload_mou');
         exit;
     }
 }

@@ -6,11 +6,11 @@ require 'db.php';
 $student_id = (int) ($_SESSION['user_id'] ?? 0);
 $current_room_id = $_POST['room_id'] ?? null;
 
-$redirect = 'message.php?section=progress_report&room_id=' . urlencode($current_room_id ?? '');
+$redirect = 'rooms.php?section=progress_report&room_id=' . urlencode($current_room_id ?? '');
 
 if (!$student_id) {
     $_SESSION['error'] = 'You must be logged in.';
-    header('Location: login-ui.php');
+    header('Location: login-apge.php');
     exit;
 }
 

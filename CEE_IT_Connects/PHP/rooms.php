@@ -253,7 +253,7 @@ if (!empty($_GET['room_id']) && ctype_digit((string) $_GET['room_id'])) {
 //         $joinStmt->execute([$room['id'], $student_id]);
 //     }
 
-//     header("Location: message.php?room_id=" . $room['id']);
+//     header("Location: rooms.php?room_id=" . $room['id']);
 //     exit;
 // }
 
@@ -3551,8 +3551,7 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
             display: none;
         }
 
-        @media (max-width: 768px),
-        (max-width: 1024px) and (orientation: portrait) {
+        @media (max-width: 1024px) {
             :root {
                 --bn-h: 60px;
             }
@@ -4188,7 +4187,7 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                                 <input type="hidden" name="receiver_type"
                                     value="<?= htmlspecialchars($chatSection_type) ?>">
                                 <input type="hidden" name="redirect"
-                                    value="Message.php?room_id=<?= $current_room_id ?>&section=chats&chat_id=<?= $chatSection_id ?>&chat_type=<?= $chatSection_type ?>">
+                                    value="rooms.php?room_id=<?= $current_room_id ?>&section=chats&chat_id=<?= $chatSection_id ?>&chat_type=<?= $chatSection_type ?>">
 
                                 <!-- attachment preview (shown via JS when a file is picked) -->
                                 <div id="rcAttachPreview" class="rc-attach-preview" style="display:none;">

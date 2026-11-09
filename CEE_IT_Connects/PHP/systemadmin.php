@@ -7,7 +7,7 @@ $role = strtolower(trim($_SESSION['role'] ?? ''));
 
 
 if ($role !== 'superadmin') {
-    header("Location: index.php");
+    header("Location: student.php");
     exit();
 }
 // addtl s — admin credentials for sidebar account box
@@ -120,7 +120,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_role'])) {
 
     if ($superadmincount > 3) {
         $_SESSION['error'] = "Only three system administrators are allowed.";
-        header("Location: superadmin.php");
+        header("Location: systemadmin.php");
         exit;
     }
 
@@ -142,7 +142,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_role'])) {
                 $admin_ids[$i],
                 'Role Updated',
                 'Your role has been changed from ' . $oldRole . ' to ' . $roles[$i] . ' by a system administrator.',
-                $roles[$i] === 'superadmin' ? 'superadmin.php' : 'internship-ui.php'
+                $roles[$i] === 'superadmin' ? 'systemadmin.php' : 'internship-admin.php'
             ]);
         }
     }
@@ -160,7 +160,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_role'])) {
         $_SESSION['info'] = "No roles were changed.";
     }
 
-    header("Location: superadmin.php?section=roles");
+    header("Location: systemadmin.php?section=roles");
     exit;
 }
 $adviserList = $pdo->query("
@@ -241,7 +241,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_assign_csv'])) {
 
     if ($sidIdx === false || $aidIdx === false) {
         $_SESSION['error'] = "CSV must contain student_id and adviser_id columns.";
-        header("Location: superadmin.php?section=assign_adviser");
+        header("Location: systemadmin.php?section=assign_adviser");
         exit;
     }
 
@@ -291,7 +291,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_assign_csv'])) {
         ->execute([$_SESSION['user_id'], "Bulk assigned {$assigned} student(s) via CSV, skipped {$skipped}"]);
 
     $_SESSION['success'] = "Assigned {$assigned} student(s). Skipped {$skipped} (already assigned or invalid).";
-    header("Location: superadmin.php?section=assign_adviser");
+    header("Location: systemadmin.php?section=assign_adviser");
     exit;
 }
 
@@ -453,8 +453,8 @@ $saProgRows = $pdo->query("
     ORDER BY total DESC
 ")->fetchAll(PDO::FETCH_ASSOC);
 $saProgColorMap = [
-    'information technology' => '#e0483e',
-    'civil engineering' => '#4f51a8',
+    'information technology' => '#29335C',
+    'civil engineering'      => '#E4572E',
     'electrical engineering' => '#f2b705',
 ];
 $saProgLabels = [];
@@ -547,6 +547,7 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>System Admin | CEE IT Connects</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
@@ -978,6 +979,21 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
             color: #791f1f;
         }
 
+        .btn-restore {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 14px;
+            border-radius: 8px;
+            border: 1px solid #bcd0f7;
+            background: #eaf1fe;
+            color: #1b4fce;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
         .form-card {
             background: #fff;
             border: 1px solid #ddd;
@@ -1091,142 +1107,44 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                 margin: -20px -20px 20px -20px;
                 width: calc(100% + 40px);
                 border-radius: 0;
-                /* optional: square off entirely on mobile if you want */
-            }
-
-            .sidebar {
-                top: 60px;
-                width: 60px !important;
-                padding: 10px 0 !important;
-                align-items: center;
-                overflow: visible !important;
-                z-index: 1050;
-            }
-
-            .sidebar h3 {
-                display: none !important;
-            }
-
-            .sidebar a {
-                width: 44px !important;
-                height: 44px !important;
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-                border-radius: 12px !important;
-                margin: 0 auto 8px auto !important;
-                padding: 0 !important;
-                position: relative;
-            }
-
-            .sidebar a i {
-                margin: 0 !important;
-            }
-
-            /* Hide text labels */
-            .sidebar a .nav-label {
-                display: none !important;
-            }
-
-            /* Tooltip */
-            .sidebar a::after {
-                content: attr(data-tooltip);
-                position: absolute;
-                left: 56px;
-                top: 50%;
-                transform: translateY(-50%);
-                background: #1a1a2e;
-                color: #fff;
-                font-size: 12px;
-                font-weight: 500;
-                padding: 5px 10px;
-                border-radius: 6px;
-                white-space: nowrap;
-                opacity: 0;
-                pointer-events: none;
-                transition: opacity 0.2s ease;
-            }
-
-            .sidebar a:hover::after {
-                opacity: 1;
-            }
-
-            .sidebar-user {
-                flex-direction: column;
-                gap: 4px;
-                padding: 10px 0;
-                margin: auto 0 0 0;
-                width: 100%;
-            }
-
-            .sidebar-user-info {
-                display: none;
-            }
-
-            .main-content {
-                margin-left: 60px !important;
-                padding: 10px !important;
             }
 
             /* STAT CARDS — 1 row, 3 columns */
             .row.g-3.mb-4 {
                 display: grid !important;
-                grid-template-columns: repeat(3, 1fr) !important;
-                gap: 4px !important;
+                grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+                gap: 6px !important;
+                margin: 0 0 16px 0 !important;
+                --bs-gutter-x: 0;
             }
-
-            .row.g-3.mb-4 .col-md-4 {
-                width: 100% !important;
+            .row.g-3.mb-4 > [class*="col-"] {
+                width: auto !important;
+                max-width: 100% !important;
+                min-width: 0 !important;
                 padding: 0 !important;
+                margin: 0 !important;
             }
-
-            .row.g-3.mb-4 .card {
-                border-radius: 10px !important;
-            }
-
-            .row.g-3.mb-4 .card-body {
-                padding: 8px !important;
-                font-size: 0.8rem !important;
-            }
-
-            .row.g-3.mb-4 .card-body p {
-                font-size: 10px !important;
-                margin-bottom: 4px !important;
-                letter-spacing: 0 !important;
-                font-size: 0.5rem !important;
-            }
-
+            .row.g-3.mb-4 .card-body { padding: 8px !important; }
             .row.g-3.mb-4 .card-body .d-flex {
                 flex-wrap: nowrap !important;
                 align-items: flex-start !important;
-                justify-content: space-between !important;
                 gap: 4px !important;
             }
-
-            .row.g-3.mb-4 .card-body .d-flex>div:first-child:not(.rounded-3) {
-                flex: 1 !important;
+            .row.g-3.mb-4 .card-body .flex-grow-1 { min-width: 0 !important; } /* beats the inline min-width:90px */
+            .row.g-3.mb-4 .card-body p {
+                font-size: 8px !important;
+                letter-spacing: 0 !important;
+                line-height: 1.15 !important;
+                margin-bottom: 2px !important;
+                word-break: break-word;
             }
-
-            .row.g-3.mb-4 .card-body h2 {
-                font-size: 0.7rem !important;
-                margin-bottom: 0 !important;
-            }
-
-            /* Hide icon box to save space */
+            .row.g-3.mb-4 .card-body h2 { font-size: 0.9rem !important; margin: 0 !important; }
             .row.g-3.mb-4 .card-body .rounded-3 {
-                width: 24px !important;
-                height: 24px !important;
+                width: 22px !important;
+                height: 22px !important;
                 flex-shrink: 0;
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-                align-self: flex-start !important;
-                margin-top: 4px !important;
             }
-
-            .row.g-3.mb-4 .card-body .rounded-3 i {
-                font-size: 10px !important;
-            }
+            .row.g-3.mb-4 .card-body .rounded-3 i { font-size: 10px !important; }
 
             /* TABLES — allow horizontal scroll */
             .sysAdm-table {
@@ -1279,7 +1197,7 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
         }
 
         @media (max-width: 480px) {
-            .row.g-3.mb-4 {
+            /* .row.g-3.mb-4 {
                 gap: 3px !important;
             }
 
@@ -1307,7 +1225,7 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
 
             .row.g-3.mb-4 .card-body .rounded-3 i {
                 font-size: 10px !important;
-            }
+            } */
 
             .stat-card-title {
                 font-size: 7px !important;
@@ -1318,6 +1236,58 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
             .stat-card-number {
                 font-size: 1rem !important;
             }
+        }
+
+        /* ===== shared toolbar: search / filter / action buttons ===== */
+        .sa-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .sa-toolbar-filters,
+        .sa-toolbar-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+        .sa-toolbar-filters { flex: 1 1 auto; min-width: 0; }
+
+        .sa-field {
+            height: 40px;
+            padding: 0 14px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            background: #fff;
+            font-size: 13px;
+            min-width: 200px;
+            box-sizing: border-box;
+        }
+        .sa-toolbar .btn-update {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 40px;
+            padding: 0 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        /* calendar fields match */
+        #suspAdmin .sa-input,
+        #suspAdmin .sa-btn { height: 40px; }
+
+        @media (max-width: 768px) {
+            .sa-toolbar,
+            .sa-toolbar-filters,
+            .sa-toolbar-actions { flex-direction: column; align-items: stretch; width: 100%; }
+            .sa-toolbar-filters .sa-field { width: 100%; min-width: 0; }
+            .sa-toolbar-actions .btn-update { width: 100%; }
+
+            #suspAdmin .sa-form { flex-direction: column; }
+            #suspAdmin .sa-form > * { width: 100%; flex: none; }
+            #suspAdmin .sa-head { flex-wrap: wrap; }
+            #suspAdmin .sa-head form,
+            #suspAdmin .sa-head .sa-input { width: 100%; }
         }
 
         /* This is for the calendar */
@@ -1459,6 +1429,134 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
             font-size: .85rem;
             color: #7a869f;
         }
+
+        /* ===== bottom nav: phones + tablet portrait ===== */
+        @media (max-width: 768px), (max-width: 1024px) and (orientation: portrait) {
+            :root { --bn-h: 60px; }
+
+            .sidebar {
+                top: auto;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                width: 100% !important;
+                height: calc(var(--bn-h) + env(safe-area-inset-bottom));
+                padding: 0 0 env(safe-area-inset-bottom) !important;
+                flex-direction: row;
+                align-items: stretch;
+                gap: 0;
+                overflow-x: auto;
+                overflow-y: hidden;
+                scrollbar-width: none;
+                z-index: 1050;
+                box-shadow: 0 -2px 10px rgba(0, 0, 0, .15);
+            }
+
+            .sidebar::-webkit-scrollbar { display: none; }
+
+            .sidebar h3,
+            .sidebar-user { display: none !important; }
+
+            .sidebar a {
+                flex: 1 0 68px;
+                min-width: 0;
+                height: var(--bn-h);
+                display: flex !important;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 3px;
+                margin: 0 !important;
+                padding: 0 4px !important;
+                border-radius: 0 !important;
+                background: transparent;
+                color: #aab1d4;
+                font-size: 10px;
+                font-weight: 500;
+                text-align: center;
+                white-space: nowrap;
+                border-top: 3px solid transparent;
+            }
+
+            .sidebar a i {
+                margin: 0 !important;
+                font-size: 18px;
+            }
+
+            .sidebar a .nav-label {
+                display: block !important;
+                max-width: 100%;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .sidebar a:hover {
+                background: transparent;
+                color: #fff;
+            }
+
+            .sidebar a:hover i { color: inherit; }
+
+            .sidebar a.active {
+                background: transparent;
+                color: #fff;
+                font-weight: 500;
+                border-top-color: #ff6b2c;
+            }
+
+            .sidebar a.active i { color: #ff6b2c; }
+
+            .main-content {
+                margin-left: 0 !important;
+                padding: 10px 10px calc(var(--bn-h) + env(safe-area-inset-bottom) + 20px) !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+        .row.g-3.mb-4 {
+            display: grid !important;
+            grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+            gap: 8px !important;
+            margin: 0 0 16px 0 !important;
+            --bs-gutter-x: 0;
+            --bs-gutter-y: 0;
+        }
+
+        .row.g-3.mb-4 > [class*="col-"] {
+            width: auto !important;
+            max-width: 100% !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+
+        .row.g-3.mb-4 .ojtc-stat-card { border-radius: 14px !important; }
+
+        .row.g-3.mb-4 .card-body { padding: 12px 8px !important; }
+
+        .row.g-3.mb-4 .card-body .d-flex { display: block !important; }
+
+        .row.g-3.mb-4 .card-body .rounded-3,
+        .row.g-3.mb-4 .card-body p.d-none { display: none !important; }
+
+        .row.g-3.mb-4 .card-body .flex-grow-1 { min-width: 0 !important; }
+
+        .row.g-3.mb-4 .card-body p {
+            font-size: 9px !important;
+            line-height: 1.25 !important;
+            letter-spacing: 0 !important;
+            margin: 0 0 6px 0 !important;
+            min-height: 2.5em; 
+            word-break: normal !important;
+            overflow-wrap: normal !important;
+            hyphens: none !important;
+        }
+
+        .row.g-3.mb-4 .card-body h2 {
+            font-size: 1.15rem !important;
+            line-height: 1.1 !important;
+            margin: 0 !important;
+        }
+    }
     </style>
 </head>
 
@@ -1534,10 +1632,6 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                 <i class="bi bi-person-gear"></i>
                 <span class="nav-label">Account Management</span>
             </a>
-            <a href="#" onclick="showSection(event, 'delete')" data-tooltip="Account Deletion">
-                <i class="bi bi-person-x me-2"></i>
-                <span class="nav-label">Account Deletion</span>
-            </a>
             <a href="#" onclick="showSection(event, 'monitor')" data-tooltip="Monitor">
                 <i class="bi bi-binoculars me-2"></i>
                 <span class="nav-label">Monitor</span>
@@ -1563,12 +1657,11 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                 <i class="bi bi-calendar me-2"></i>
                 <span class="nav-label">Calendar</span>
             </a>
-            <!-- <a href="#" onclick="showSection(event, 'restore')" data-tooltip="Settings">
-                <i class="bi bi-archive me-2"></i>
-                <span class="nav-label">Archives</span>
+            <a href="#" onclick="showSection(event, 'restore')" data-tooltip="Restoration">
+                <i class="bi bi-check2-circle me-2"></i>
+                <span class="nav-label">Restoration</span>
             </a>
-        </div> -->
-            <a href="#" onclick="showSection(event, 'restore')" data-tooltip="Archives">
+            <a href="#" onclick="showSection(event, 'delete')" data-tooltip="Archives">
                 <i class="bi bi-archive me-2"></i>
                 <span class="nav-label">Archives</span>
             </a>
@@ -1624,13 +1717,13 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
 
                     /* ADDED*/
                     .ojtc-badge-it {
-                        background: #fff1e0;
-                        color: #b85c00;
+                        background: #e7effe;
+                        color: #1b4fce;
                     }
 
                     .ojtc-badge-ce {
-                        background: #e7effe;
-                        color: #1b4fce;
+                        background: #fff1e0;
+                        color: #b85c00;
                     }
 
                     .ojtc-badge-ee {
@@ -1658,10 +1751,24 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                         background: #FFE7B3 !important;
                         color: #7a5200 !important;
                         border: none !important;
+                        -webkit-tap-highlight-color: transparent;
                         transition: background-color .15s ease, color .15s ease;
                     }
 
                     .btn-update:hover {
+                        background: #E4572E !important;
+                        color: #fff !important;
+                    }
+
+                    @media (hover: hover) and (pointer: fine) {
+                        .btn-update:hover {
+                            background: #E4572E !important;
+                            color: #fff !important;
+                        }
+                    }
+
+                    /* touch feedback that disappears when the finger lifts */
+                    .btn-update:active {
                         background: #E4572E !important;
                         color: #fff !important;
                     }
@@ -1878,15 +1985,20 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                                             // Does not change $ph['program'] or how it is stored/echoed —
                                             // only picks which existing badge class to apply below.
                                             $ojtcProgramName = strtoupper((string) $ph['program']);
-                                            if (strpos($ojtcProgramName, 'IT') !== false) {
-                                                $ojtcBadgeClass = 'ojtc-badge-it';
-                                            } elseif (strpos($ojtcProgramName, 'CE') !== false) {
-                                                $ojtcBadgeClass = 'ojtc-badge-ce';
-                                            } elseif (strpos($ojtcProgramName, 'EE') !== false) {
-                                                $ojtcBadgeClass = 'ojtc-badge-ee';
-                                            } else {
-                                                $ojtcBadgeClass = 'ojtc-badge-default';
-                                            }
+                                            // if (strpos($ojtcProgramName, 'IT') !== false) {
+                                            //     $ojtcBadgeClass = 'ojtc-badge-it';
+                                            // } elseif (strpos($ojtcProgramName, 'CE') !== false) {
+                                            //     $ojtcBadgeClass = 'ojtc-badge-ce';
+                                            // } elseif (strpos($ojtcProgramName, 'EE') !== false) {
+                                            //     $ojtcBadgeClass = 'ojtc-badge-ee';
+                                            // } else {
+                                            //     $ojtcBadgeClass = 'ojtc-badge-default';
+                                            // }
+                                            $ojtcBadgeClass = [
+                                                'BSIT' => 'ojtc-badge-it',
+                                                'BSCE' => 'ojtc-badge-ce',
+                                                'BSEE' => 'ojtc-badge-ee',
+                                            ][deptCode($ph['program'])] ?? 'ojtc-badge-default';
                                             ?>
                                             <!-- CHANGED: added ojtc-hours-row class for a subtle row hover. -->
                                             <div class="d-flex align-items-center justify-content-between ojtc-hours-row">
@@ -1952,24 +2064,17 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                 <div class="sysAdm-header--danger">
                     <div class="sysAdm-header-left">
                         <div class="sysAdm-header-icon">
-                            <i class="fa-solid fa-trash"></i>
+                            <i class="bi bi-archive"></i>
                         </div>
-                        <h2>Account Deletion</h2>
-                        <p>Permanently remove users from the system.</p>
+                        <h2>Archive Accounts</h2>
+                        <p>Archive users from the system.</p>
                     </div>
-
-                    <!-- <div class="sysAdm-header-deco">
-                        <img src="../Sources/Inbox%20cleanup-pana.svg" alt="Delete account illustration">
-                    </div> -->
                 </div>
 
-                <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-                    <div class="d-flex gap-2 flex-wrap">
-                        <input type="text" id="search-delete" oninput="filterDelete()"
-                            placeholder="Search for a student"
-                            style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:220px;">
-                        <select id="filter-role" onchange="filterDelete()"
-                            style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:200px;">
+                <div class="sa-toolbar">
+                    <div class="sa-toolbar-filters">
+                        <input type="text" id="search-delete" oninput="filterDelete()" placeholder="Search for a student" class="sa-field">
+                        <select id="filter-role" onchange="filterDelete()" class="sa-field">
                             <option value="">All Roles</option>
                             <option value="student">Student</option>
                             <option value="adviser">Adviser</option>
@@ -1996,12 +2101,12 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                                     <td><?= htmlspecialchars($u['email']) ?></td>
                                     <td><?= htmlspecialchars(ucwords(str_replace('_', ' ', $u['role']))) ?></td>
                                     <td>
-                                        <form method="POST" action="superadmin-db.php"
+                                        <form method="POST" action="systemadmin-db.php"
                                             onsubmit="return confirm('Are you sure you want to delete this user?')">
                                             <input type="hidden" name="id" value="<?= $u['id'] ?>">
                                             <input type="hidden" name="source" value="<?= $u['source'] ?>">
                                             <button type="submit" name="delete" class="btn-delete">
-                                                <i class="bi bi-trash-fill"></i> Delete
+                                                <i class="bi bi-archive"></i> Archive
                                             </button>
                                         </form>
                                     </td>
@@ -2014,30 +2119,22 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
 
             <!-- Archived stuff -->
             <div id="restore" class="section sysAdm-section">
-                <div class="sysAdm-header--danger mb-4">
+                <div class="sysAdm-header--danger sysAdm-header--blue">
                     <div class="sysAdm-header-left">
                         <div class="sysAdm-header-icon">
-                            <i class="fa-solid fa-archive"></i>
+                            <i class="bi bi-check2-circle"></i>
                         </div>
                         <div class="sysAdm-header-text">
-                            <h2>Archived Accounts</h2>
-                            <p>Manage accounts that are archived.</p>
+                            <h2>Restore Accounts</h2>
+                            <p>Restore accounts that are currently archived.</p>
                         </div>
                     </div>
                 </div>
 
-                <div
-                    style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
-                    <div style="display:flex; align-items:center; flex-wrap:wrap; gap:10px;">
-                        <div class="search-box">
-                            <input type="text" id="search-archive" oninput="filterArchive()"
-                                placeholder="Search by name or email..."
-                                style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:220px;">
-                        </div>
-
-                        <select class="filter-select"
-                            style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:200px;"
-                            id="filter-role-archive" onchange="filterArchive()">
+                <div class="sa-toolbar">
+                    <div class="sa-toolbar-filters">
+                        <input type="text" id="search-archive" oninput="filterArchive()" placeholder="Search by name or email..." class="sa-field">
+                        <select id="filter-role-archive" onchange="filterArchive()" class="sa-field">
                             <option value="">All Roles</option>
                             <option value="student">Student</option>
                             <option value="adviser">Adviser</option>
@@ -2064,13 +2161,13 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                                     <td><?= htmlspecialchars($u['email']) ?></td>
                                     <td><?= htmlspecialchars(ucwords(str_replace('_', ' ', $u['role']))) ?></td>
                                     <td>
-                                        <form method="POST" action="superadmin-db.php"
+                                        <form method="POST" action="systemadmin-db.php"
                                             onsubmit="return confirm('Restore this user?')">
                                             <input type="hidden" name="user_id" value="<?= $u['id'] ?>">
                                             <input type="hidden" name="source"
                                                 value="<?= htmlspecialchars($u['source']) ?>">
                                             <input type="hidden" name="restore" value="1">
-                                            <button type="submit" class="btn btn-success btn-sm">
+                                            <button type="submit" class="btn-restore">
                                                 <i class="bi bi-check2-circle"></i> Restore
                                             </button>
                                         </form>
@@ -2097,18 +2194,16 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                     </div>
                 </div>
 
-                <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-                    <div class="d-flex gap-2 flex-wrap">
-                        <input type="text" id="search-roles" oninput="filterRoles()" placeholder="Search for an admin"
-                            style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:220px;">
-                        <select id="filter-role-admin" onchange="filterRoles()"
-                            style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:200px;">
+                <div class="sa-toolbar">
+                    <div class="sa-toolbar-filters">
+                        <input type="text" id="search-roles" oninput="filterRoles()" placeholder="Search for an admin" class="sa-field">
+                        <select id="filter-role-admin" onchange="filterRoles()" class="sa-field">
                             <option value="">All Roles</option>
                             <option value="superadmin">System Admin</option>
                             <option value="internship_admin">Internship Admin</option>
                         </select>
                     </div>
-                    <div class="d-flex gap-2 flex-wrap">
+                    <div class="sa-toolbar-actions">
                         <button type="button" class="btn-update" onclick="showSection(event, 'add-admin')">
                             <i class="bi bi-person-plus me-1"></i>Add Admin
                         </button>
@@ -2168,7 +2263,7 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                         </div>
                     </div>
                 </div>
-                <form method="POST" action="superadmin-db.php" class="admin-form">
+                <form method="POST" action="systemadmin-db.php" class="admin-form">
                     <input type="text" name="name" placeholder="Full Name" required>
                     <input type="email" name="email" placeholder="Email Address" required>
                     <input type="password" name="password" placeholder="Password" required>
@@ -2200,7 +2295,7 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                         </div>
                     </div>
                 </div>
-                <form method="POST" action="superadmin-db.php" class="admin-form">
+                <form method="POST" action="systemadmin-db.php" class="admin-form">
                     <input type="text" name="name" placeholder="Full Name" required>
                     <input type="email" name="email" placeholder="Email Address" required>
                     <!-- <input type="password" name="password" placeholder="Password" required> -->
@@ -2252,13 +2347,10 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                         </div>
                     </div>
                 </div>
-                <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-                    <div class="d-flex gap-2 flex-wrap">
-                        <input type="text" id="search-monitor" oninput="filterMonitor()"
-                            placeholder="Search for a student"
-                            style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:220px;">
-                        <select id="filter-role-monitor" onchange="filterMonitor()"
-                            style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:200px;">
+                <div class="sa-toolbar">
+                    <div class="sa-toolbar-filters">
+                        <input type="text" id="search-monitor" oninput="filterMonitor()" placeholder="Search for a student" class="sa-field">
+                        <select id="filter-role-monitor" onchange="filterMonitor()" class="sa-field">
                             <option value="">All Roles</option>
                             <option value="student">Student</option>
                             <option value="hte_adviser">HTE Adviser</option>
@@ -2332,12 +2424,13 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                         <p class="text-muted small mb-0">Replaces the existing CSV with the uploaded file.</p>
                     </div>
                     <form action="../auto-register-csv.php" method="POST" enctype="multipart/form-data">
-                        <div class="d-flex gap-2 align-items-center">
-                            <input type="file" name="students_csv" accept=".csv" required class="form-control"
-                                style="flex:1;font-size:13px;">
-                            <button class="btn-update" type="submit">
-                                <i class="bi bi-upload me-1"></i>Replace CSV
-                            </button>
+                        <div class="d-flex flex-column gap-2">
+                            <input type="file" name="students_csv" accept=".csv" required class="form-control" style="font-size:13px;">
+                            <div>
+                                <button class="btn-update" type="submit">
+                                    <i class="bi bi-upload me-1"></i>Replace CSV
+                                </button>
+                            </div>
                         </div>
                     </form>
                 </div>
@@ -2588,9 +2681,9 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                 </div>
 
                 <!-- school year picker -->
-                <form method="GET" id="syForm" class="mb-2 d-flex align-items-center gap-2">
+                <form method="GET" id="syForm" class="sa-toolbar-filters mb-3" style="align-items:center;">
                     <label style="font-size:13px; color:#272f54;" class="fw-semibold">School year</label>
-                    <select name="sy" onchange="handleSyChange(this)"
+                    <select name="sy" onchange="handleSyChange(this)" class="sa-field">
                         style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px;">
                         <?php foreach ($schoolYearOptions as $opt): ?>
                             <option value="<?= htmlspecialchars($opt) ?>" <?= $opt === $schoolYear ? 'selected' : '' ?>>
@@ -2602,12 +2695,12 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                 </form>
 
                 <!-- Handle the adding of sy -->
-                <form method="POST" action="superadmin-db.php" id="addSyForm" style="display:none;">
+                <form method="POST" action="systemadmin-db.php" id="addSyForm" style="display:none;">
                     <input type="hidden" name="add_school_year" value="1">
                 </form>
 
                 <div class="sysAdm-table-wrapper mb-3">
-                    <form method="POST" class="p-3" action="superadmin-db.php">
+                    <form method="POST" class="p-3" action="systemadmin-db.php">
                         <input type="hidden" name="save_section_settings" value="1">
                         <input type="hidden" name="school_year" value="<?= htmlspecialchars($schoolYear) ?>">
                         <div class="fw-semibold mb-2" style="font-size:13px; color:#272f54;">
@@ -2648,26 +2741,22 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                 </div>
 
                 <!-- Search + filter -->
-                <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-                    <div class="d-flex gap-2 flex-wrap">
-                        <input type="text" id="assign-search" oninput="filterAssignTable()"
-                            placeholder="Search for a student"
-                            style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:220px;">
-                        <select id="assign-filter-adviser" onchange="filterAssignTable()"
-                            style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:200px;">
+                <div class="sa-toolbar">
+                    <div class="sa-toolbar-filters">
+                        <input type="text" id="assign-search" oninput="filterAssignTable()" placeholder="Search for an adviser" class="sa-field">
+                        <select id="assign-filter-adviser" onchange="filterAssignTable()" class="sa-field">
                             <option value="">All Advisers</option>
                             <option value="unassigned">Unassigned</option>
                             <?php foreach ($adviserList as $adv): ?>
-                                <option value="<?= htmlspecialchars($adv['full_name']) ?>">
-                                    <?= htmlspecialchars($adv['full_name']) ?>
-                                </option>
+                                <option value="<?= htmlspecialchars($adv['full_name']) ?>"><?= htmlspecialchars($adv['full_name']) ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
-
-                    <button class="btn-update" data-bs-toggle="modal" data-bs-target="#csvAssignModal">
-                        <i class="bi bi-file-earmark-spreadsheet me-1"></i> Import via CSV
-                    </button>
+                    <div class="sa-toolbar-actions">
+                        <button class="btn-update" data-bs-toggle="modal" data-bs-target="#csvAssignModal">
+                            <i class="bi bi-file-earmark-spreadsheet me-1"></i> Import via CSV
+                        </button>
+                    </div>
                 </div>
                 <div class="sysAdm-table-wrapper">
                     <table class="sysAdm-table">
@@ -2700,7 +2789,7 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                                         <?php if ($isAssigned): ?>
                                             <?php foreach ($mine as $sectionKey => $label): ?>
                                                 <?php [$yr, $sec] = explode('|', $sectionKey); ?>
-                                                <form method="POST" action="superadmin-db.php" class="d-inline unassign-form"
+                                                <form method="POST" action="systemadmin-db.php" class="d-inline unassign-form"
                                                     onsubmit="return confirm('Unassign this adviser from Year <?= (int) $yr ?> - Section <?= htmlspecialchars($sec) ?>? This will delete the room and remove all its members.');">
                                                     <input type="hidden" name="school_year"
                                                         value="<?= htmlspecialchars($schoolYear) ?>">
@@ -2724,7 +2813,7 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                                         <?php endif; ?>
                                     </td>
                                     <td>
-                                        <form method="POST" action="superadmin-db.php" id="assign-form-<?= $adv['id'] ?>">
+                                        <form method="POST" action="systemadmin-db.php" id="assign-form-<?= $adv['id'] ?>">
                                             <input type="hidden" name="school_year"
                                                 value="<?= htmlspecialchars($schoolYear) ?>">
                                             <input type="hidden" name="adviser_id" value="<?= $adv['id'] ?>">
@@ -2847,7 +2936,7 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                                 <!-- Actions -->
                                 <?php if ($req['status'] === 'pending'): ?>
                                     <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
-                                        <form action="superadmin-db.php" method="POST" style="margin:0;">
+                                        <form action="systemadmin-db.php" method="POST" style="margin:0;">
                                             <input type="hidden" name="submission_id" value="<?= $req['id'] ?>">
                                             <input type="hidden" name="student_id" value="<?= $req['student_id'] ?>">
                                             <input type="hidden" name="action" value="approve">
@@ -2985,7 +3074,7 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                     </div>
                 <?php else: ?>
 
-                    <form method="POST" action="superadmin-db.php">
+                    <form method="POST" action="systemadmin-db.php">
                         <?php
                         $countStmt = $pdo->query("
                                 SELECT program, COUNT(*) AS total
@@ -3004,8 +3093,8 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                         ");
 
                         $cardStyles = [
-                            'Civil Engineering' => ['color' => '#4f51a8', 'icon' => 'bi-pc-display'],
-                            'Information Technology' => ['color' => '#e0483e', 'icon' => 'bi-code-slash'],
+                            'Civil Engineering'      => ['color' => '#E4572E', 'icon' => 'bi-pc-display'],
+                            'Information Technology' => ['color' => '#29335C', 'icon' => 'bi-code-slash'],
                             'Electrical Engineering' => ['color' => '#f2b705', 'icon' => 'bi-lightning-charge'],
                         ];
                         ?>
@@ -3112,7 +3201,7 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                     <div class="sa-panel">
                         <div class="sa-head">
                             <div class="sa-title">Suspended dates</div>
-                            <form method="GET" action="superadmin.php">
+                            <form method="GET" action="systemadmin.php">
                                 <input type="hidden" name="section" value="calendar">
                                 <select name="year" class="sa-input" onchange="this.form.submit()">
                                     <option value="all" <?= $filterYear === 'all' ? 'selected' : '' ?>>All years</option>
@@ -3200,8 +3289,8 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                 const matchAdviser = adviser === ''
                     ? true
                     : adviser === 'unassigned'
-                        ? rowAdviser === ''
-                        : rowAdviser === adviser;
+                        ? row.dataset.has === 'none'
+                        : name === adviser;
 
                 row.style.display = (matchName && matchAdviser) ? '' : 'none';
             });
@@ -3440,7 +3529,7 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
 
             const form = document.createElement('form');
             form.method = 'POST';
-            form.action = 'superadmin.php'; // posts back to itself
+            form.action = 'systemadmin.php'; // posts back to itself
 
             const sourceInput = document.createElement('input');
             sourceInput.type = 'hidden'; sourceInput.name = 'bulk_assign_csv'; sourceInput.value = '1';
@@ -3602,6 +3691,16 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
             card.title = 'Click to view full details';
             card.addEventListener('click', () => goToSection(card.dataset.go));
         });
+
+        (function () {
+            const nav = document.querySelector('.sidebar');
+            if (!nav) return;
+            new MutationObserver(() => {
+                if (window.innerWidth <= 1024) {
+                    nav.querySelector('a.active')?.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
+                }
+            }).observe(nav, { subtree: true, attributes: true, attributeFilter: ['class'] });
+        })();
 
         // For the calendar
         //

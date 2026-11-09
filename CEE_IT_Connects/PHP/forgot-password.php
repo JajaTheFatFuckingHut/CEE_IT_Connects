@@ -142,7 +142,7 @@ if (isset($_POST['reset_password'])) {
             'email' => $email
         ]);
 
-        header("Location: login-ui.php?reset=success");
+        header("Location: login-page.php?reset=success");
         exit;
     }
 }

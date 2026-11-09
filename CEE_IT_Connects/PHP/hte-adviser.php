@@ -98,7 +98,7 @@ if (!isset($_GET['room_id'])) {
         $joinStmt->execute([$room['id'], $user_id, $user_type]);
     }
 
-    header("Location: hte-ui.php?room_id=" . $room['id']);
+    header("Location: hte-adviser.php?room_id=" . $room['id']);
     exit;
 }
 
@@ -1880,11 +1880,34 @@ foreach ($roomStatuses as $s) {
             }
 
             .dash-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-            .dash-stat { flex-direction: column; align-items: flex-start; gap: 8px; padding: 12px; }
-            .dash-stat:nth-child(odd):last-child { grid-column: 1 / -1; }
-            .dash-stat-icon { width: 32px; height: 32px; min-width: 32px; font-size: 14px; }
-            .dash-stat-label { font-size: 10px; }
-            .dash-stat-value { font-size: 22px; }
+            .dash-stat:nth-child(odd):last-child { 
+                grid-column: 1 / -1; 
+            }
+
+            .dash-stat {
+                flex-direction: row;
+                justify-content: space-between;
+                gap: 8px;
+                padding: 10px 12px;
+            }
+
+            /* unwrap the unclassed label/value div so they sit side by side */
+            .dash-stat > div:not(.dash-stat-icon) {
+                display: contents;
+            }
+
+            .dash-stat-icon {
+                display: none;
+            }
+
+            .dash-stat-label {
+                font-size: 10px;
+                flex: 1;
+            }
+
+            .dash-stat-value {
+                font-size: 20px;
+            }
 
             .home-hero::before,
             .home-hero::after { display: none; }
@@ -1908,6 +1931,43 @@ foreach ($roomStatuses as $s) {
             .sysAdm-header-icon { width: 44px; height: 44px; min-width: 44px; font-size: 1rem; }
             .sysAdm-header--danger h2 { font-size: 20px; }
             .sysAdm-header--danger p { font-size: 13px; }
+
+            #supEvalModal .modal-header {
+                padding: 14px 16px !important;
+            }
+
+            #supEvalModal .modal-body {
+                padding: 14px 12px !important;
+            }
+
+            /* footer: note on top, three buttons in one compact row */
+            #supEvalModal .modal-footer {
+                padding: 10px 12px !important;
+                gap: 6px !important;
+                flex-wrap: wrap;
+                justify-content: stretch;
+            }
+
+            #supEvalModal .modal-footer > span {
+                flex: 1 1 100% !important;
+                font-size: 11px !important;
+                line-height: 1.3;
+                margin: 0 0 2px;
+            }
+
+            #supEvalModal .modal-footer .btn {
+                flex: 1 1 0;
+                margin: 0;
+                padding: 6px 8px;
+                font-size: 12px;
+                white-space: nowrap;
+            }
+
+            /* intern info: smaller gaps so the inputs fit */
+            #supEvalForm > div:first-child {
+                padding: 12px !important;
+                gap: 8px !important;
+            }
         }
 
         /* addtl e */
@@ -2013,12 +2073,6 @@ foreach ($roomStatuses as $s) {
                 color: #FFB62F;
                 width: calc(100% - 24px);
             }
-
-            /* .rooms-list:hover {
-                background: rgba(255, 255, 255, 0.1);
-                color: #FFB62F;
-                width: calc(100% - 24px);
-            } */
 
             .room-name-text {
                 display: none !important;
@@ -2245,7 +2299,30 @@ foreach ($roomStatuses as $s) {
                 flex-shrink: 0;
             }
 
-            :is(.sysAdm-table, .ojt-status-table) td[colspan] { display: block; }
+            :is(.sysAdm-table, .ojt-status-table) td[colspan] { 
+                display: block; 
+            }
+
+            #status :is(.sysAdm-table, .ojt-status-table) td:last-child {
+                justify-content: center;
+                text-align: center;
+            }
+
+            /* hte-ui: the stacked buttons inside the Actions cell */
+            #status .sysAdm-table td:last-child > div {
+                align-items: center;
+            }
+
+            #status .sysAdm-table td:last-child > div > div {
+                justify-content: center;
+            }
+
+            #status .sysAdm-table td:last-child button,
+            #status .sysAdm-table td:last-child a {
+                width: 190px;
+                max-width: 100%;
+                justify-content: center;
+            }
         }
 
 
@@ -2290,6 +2367,47 @@ foreach ($roomStatuses as $s) {
             .dash-stats { grid-template-columns: minmax(0, 1fr); }
             .dash-stat { flex-direction: row; align-items: center; }
             .dash-stat-label { overflow-wrap: anywhere; }
+        }
+
+        /* for the info table to scroll sideways */
+        #information .student-cell p {
+            margin: 0;
+        }
+
+        @media (min-width: 769px) {
+            #information .sysAdm-table {
+                min-width: 960px;
+            }
+
+            #information .sysAdm-table th,
+            #information .sysAdm-table td {
+                white-space: nowrap;
+            }
+        }
+
+        @media (min-width: 769px) and (max-width: 1024px) and (orientation: landscape) {
+            .sidebar {
+                width: 220px;
+            }
+
+            .main {
+                margin-left: 220px;
+            }
+        }
+
+        .rm-section .rm-grid {
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        }
+
+        .rm-section a.rm-card {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 16px;
+        }
+
+        .rm-section a.rm-card:hover {
+            transform: translateY(-2px);
         }
 
         /* ===== bottom nav: phones + tablet portrait ===== */
@@ -2416,7 +2534,7 @@ foreach ($roomStatuses as $s) {
             <?php
             // ── HOME DASHBOARD DATA ──
             $dashRoomId = (int) $current_room_id;
-            $dashUrl = "hte-ui.php?room_id={$dashRoomId}&section=";
+            $dashUrl = "hte-adviser.php?room_id={$dashRoomId}&section=";
             $avatarColors = ['#ff2c8f', '#2c6fff', '#1abc9c', '#9b59b6', '#e67e22'];
 
             // $roomStatuses, $supAssignments, $adviserInternshipId are already loaded at the top of the file
@@ -2572,7 +2690,7 @@ foreach ($roomStatuses as $s) {
                                 <p class="dash-stat-value"><?= $noSupervisorCount ?></p>
                             </div>
                         </a> -->
-                        <a href="<?= $dashUrl ?>status" class="dash-stat tone-blue">
+                        <a href="<?= $dashUrl ?>status" class="dash-stat tone-amber">
                             <div class="dash-stat-icon"><i class="fa-solid fa-circle-check"></i></div>
                             <div>
                                 <p class="dash-stat-label">Completed hours</p>
@@ -2880,8 +2998,7 @@ foreach ($roomStatuses as $s) {
                                             <?= htmlspecialchars($s['company']) ?>
                                         <?php endif; ?>
                                     </td>
-                                    <td data-label="Hours"><strong><?= round($s['total_hours'], 2) ?></strong> / <?= $requiredHours ?></td>
-                                    <td data-label="Progress">
+                                    <td data-label="Hours"><span><strong><?= round($s['total_hours'], 2) ?></strong> / <?= $requiredHours ?></span></td>                                    <td data-label="Progress">
                                         <div style="display:flex; align-items:center; gap:8px;">
                                             <div class="progress-bar-bg">
                                                 <div class="progress-bar-fill" style="width:<?= $progressWidth ?>%"></div>
@@ -2938,9 +3055,9 @@ foreach ($roomStatuses as $s) {
                                             <?php if ($hasSupEval): ?>
                                                 <a href="ojt-evaluation-download.php?student_id=<?= $s['id'] ?>" target="_blank"
                                                     style="display:inline-flex;align-items:center;gap:5px;padding:5px 10px;
-                                                            background:#dbeafe;color:#1e40af;border-radius:6px;font-size:11px;
-                                                            font-weight:600;border:1px solid #93c5fd;cursor:pointer;text-decoration:none;">
-                                                    <i class="fa fa-file-pdf"></i> Supervisor Eval
+                                                            background:#ffe5d9;color:#a13d1f;border-radius:6px;font-size:11px;
+                                                            font-weight:600;border:1px solid #da633f;cursor:pointer;text-decoration:none;">
+                                                    <i class="fa fa-file-pdf"></i> Download Eval Form
                                                 </a>
 
                                             <?php elseif ($hasSup): ?>
@@ -3013,9 +3130,9 @@ foreach ($roomStatuses as $s) {
                 </select>
             </div>
 
-            <div class="ojt-table-wrapper">
-                <table class="ojt-status-table">
-                    <thead style="background:#f8f9fa;">
+            <div class="sysAdm-table-wrapper">
+                <table class="sysAdm-table">
+                    <thead>
                         <tr>
                             <th>Student</th>
                             <th>Room</th>
@@ -3215,8 +3332,8 @@ foreach ($roomStatuses as $s) {
                         onfocus="this.style.borderColor='#f97316'" onblur="this.style.borderColor='#e5e7eb'">
                 </div>
             </div>
-            <div class="ojt-table-wrapper">
-                <table class="ojt-status-table">
+            <div class="sysAdm-table-wrapper">
+                <table class="sysAdm-table">
                     <thead style="background:#f8f9fa;">
                         <tr>
                             <th>Student No.</th>

@@ -4,7 +4,7 @@ require 'db.php';
 // only superadmin
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'superadmin') {
     $_SESSION['error'] = "Invalid role. Please log in using a system admin account.";
-    header("Location: login-ui.php");
+    header("Location: login-page.php");
     exit();
 }
 function formatSection(?string $key): string
@@ -99,7 +99,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $sy = $_POST['school_year'] ?? '';
         if (!preg_match('/^\d{4}-\d{4}$/', $sy)) {
             $_SESSION['error'] = "Invalid school year.";
-            header("Location: superadmin.php");
+            header("Location: systemadmin.php");
             exit;
         }
 
@@ -108,7 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if (!$adviser_id || count($parts) !== 2 || in_array('', $parts, true)) {
             $_SESSION['error'] = "Please select an adviser and a section.";
-            header("Location: superadmin.php");
+            header("Location: systemadmin.php");
             exit;
         }
         [$year, $section] = $parts;
@@ -121,7 +121,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $adviserRow = $advStmt->fetch(PDO::FETCH_ASSOC);
         if (!$adviserRow) {
             $_SESSION['error'] = "Invalid adviser.";
-            header("Location: superadmin.php");
+            header("Location: systemadmin.php");
             exit;
         }
         $adviserName = $adviserRow['full_name'];
@@ -133,7 +133,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $max = (int) $cfg->fetchColumn();
         if ($section < 1 || $section > $max) {
             $_SESSION['error'] = "That section is outside the configured range for year {$year}.";
-            header("Location: superadmin.php");
+            header("Location: systemadmin.php");
             exit;
         }
         $takenStmt = $pdo->prepare("
@@ -145,7 +145,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $takenStmt->execute([':sy' => $sy, ':year' => (string) $year, ':section' => (string) $section]);
         if ($takenStmt->fetch()) {
             $_SESSION['error'] = "That section already has an adviser.";
-            header("Location: superadmin.php");
+            header("Location: systemadmin.php");
             exit;
         }
         $step = 'start';
@@ -261,7 +261,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['error'] = "Failed at step [{$step}]: " . $e->getMessage();
         }
 
-        header("Location: superadmin.php");
+        header("Location: systemadmin.php");
         exit;
     }
 
@@ -348,11 +348,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $pdo->commit();
             $_SESSION['success'] = "Unassigned adviser from section '{$yearLevel}-{$section}'";
 
-            header("Location: superadmin.php?msg=unassigned");
+            header("Location: systemadmin.php?msg=unassigned");
             exit;
         } catch (Exception $e) {
             $pdo->rollBack();
-            header("Location: superadmin.php?error=unassign_failed");
+            header("Location: systemadmin.php?error=unassign_failed");
             exit;
         }
     }
@@ -394,7 +394,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $newAdminId,
             'Welcome to CEE IT Connects',
             'Your admin account has been created. Role: ' . $role . '.',
-            'internship-ui.php'
+            'internship-admin.php'
         ]);
 
         $allAdmins = $pdo->query("SELECT id FROM admins WHERE id != " . $newAdminId)->fetchAll(PDO::FETCH_ASSOC);
@@ -403,7 +403,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $admin['id'],
                 'New Admin Account Created',
                 'A new ' . $role . ' account has been created for ' . $name . '.',
-                'superadmin.php'
+                'systemadmin.php'
             ]);
         }
 
@@ -415,7 +415,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ]);
 
         $_SESSION['success'] = "Successfully created an account.";
-        header("Location: superadmin.php?success=1");
+        header("Location: systemadmin.php?success=1");
         exit();
     }
 
@@ -484,14 +484,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $newAdviserId,
                 'Welcome to CEE IT Connects!',
                 'Your adviser account has been created. Role: ' . $role . '.',
-                'hte-ui.php'
+                'hte-adviser.php'
             ]);
         } else {
             $notifStmt->execute([
                 $newAdviserId,
                 'Welcome to CEE IT Connects!',
                 'Your adviser account has been created. Role: ' . $role . '.',
-                'ojt-rooms.php'
+                'ojt-adviser.php'
             ]);
         }
 
@@ -505,7 +505,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $admin['id'],
                 'New Adviser Account Created',
                 'A new ' . $role . ' account has been created for ' . $name . '.',
-                'superadmin.php'
+                'systemadmin.php'
             ]);
         }
 
@@ -541,7 +541,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['success'] = "Adviser created, but the credentials email could not be sent. Please share the temporary password manually or reset it.";
         }
 
-        header("Location: superadmin.php?success=1");
+        header("Location: systemadmin.php?success=1");
         exit();
 
         exit();
@@ -607,7 +607,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $admin['id'],
                 'Account Deleted',
                 'The ' . $deletedUser['role'] . ' account of ' . $deletedUser['name'] . ' has been deleted.',
-                'superadmin.php'
+                'systemadmin.php'
             ]);
         }
 
@@ -622,12 +622,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $admin['id'],
                 'Account Deleted',
                 'The ' . $deletedUser['role'] . ' account of ' . $deletedUser['name'] . ' has been removed from the system.',
-                'internship-ui.php'
+                'internship-admin.php'
             ]);
         }
 
         $_SESSION['success'] = "User " . $deletedUser['name'] . " has been deleted.";
-        header("Location: superadmin.php?deleted=1");
+        header("Location: systemadmin.php?deleted=1");
         exit();
     }
     if (isset($_POST['action']) && in_array($_POST['action'], ['approve', 'reject'])) {
@@ -636,7 +636,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $submission_id = (int) ($_POST['submission_id'] ?? 0);
         $student_id = (int) ($_POST['student_id'] ?? 0);
         $room_id = (int) ($_POST['room_id'] ?? 0);
-        $redirect = "superadmin.php?section=supervisor_requests";
+        $redirect = "systemadmin.php?section=supervisor_requests";
 
         $stmt = $pdo->prepare("SELECT * FROM student_hte_supervisor_submissions WHERE id = ?");
         $stmt->execute([$submission_id]);
@@ -725,7 +725,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ]);
 
         $_SESSION['success'] = "Required hours updated for {$updatedCount} internship(s).";
-        header("Location: superadmin.php?section=ojt_hours");
+        header("Location: systemadmin.php?section=ojt_hours");
         exit;
     }
     if (isset($_POST['save_section_settings'])) {
@@ -733,7 +733,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $sy = $_POST['school_year'] ?? '';
         if (!preg_match('/^\d{4}-\d{4}$/', $sy)) {
             $_SESSION['error'] = "Invalid school year.";
-            header("Location: superadmin.php");
+            header("Location: systemadmin.php");
             exit;
         }
         $counts = $_POST['section_count'] ?? [];
@@ -772,7 +772,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $pdo->rollBack();
             $_SESSION['error'] = "Could not save section counts: " . $e->getMessage();
         }
-        header("Location: superadmin.php?sy=" . urlencode($sy));
+        header("Location: systemadmin.php?sy=" . urlencode($sy));
         exit;
     }
     if (isset($_POST['add_school_year'])) {
@@ -802,10 +802,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ]);
 
             $_SESSION['success'] = "School year {$newSY} added.";
-            header("Location: superadmin.php?sy=" . urlencode($newSY) . "#section_settings");
+            header("Location: systemadmin.php?sy=" . urlencode($newSY) . "#section_settings");
         } catch (Exception $e) {
             $_SESSION['error'] = "Could not add school year: " . $e->getMessage();
-            header("Location: superadmin.php");
+            header("Location: systemadmin.php");
         }
         exit;
     }
@@ -819,7 +819,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if (!$table || !$userId) {
             $_SESSION['error'] = "Invalid user.";
-            header("Location: superadmin.php");
+            header("Location: systemadmin.php");
             exit;
         }
 
@@ -841,7 +841,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['error'] = "Could not restore user: " . $e->getMessage();
         }
 
-        header("Location: superadmin.php#archived");
+        header("Location: systemadmin.php#archived");
         exit;
     }
 }

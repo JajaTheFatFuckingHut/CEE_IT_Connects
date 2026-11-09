@@ -243,7 +243,7 @@ for ($t = 13; $t >= 0; $t--) {
 
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>CEE IT Connects</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -833,80 +833,6 @@ for ($t = 13; $t >= 0; $t--) {
                 /* optional: square off entirely on mobile if you want */
             }
 
-            .sidebar {
-                top: 60px;
-                width: 60px !important;
-                padding: 10px 0 !important;
-                align-items: center;
-                overflow: visible !important;
-                z-index: 1050;
-            }
-
-            .sidebar-user {
-                flex-direction: column;
-                gap: 4px;
-                padding: 10px 0;
-                margin: auto 0 0 0;
-                width: 100%;
-            }
-
-            .sidebar-user-info {
-                display: none;
-            }
-
-            .sidebar h3 {
-                display: none !important;
-            }
-
-            .sidebar a {
-                width: 44px !important;
-                height: 44px !important;
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-                border-radius: 12px !important;
-                margin: 0 auto 8px auto !important;
-                padding: 0 !important;
-                position: relative;
-            }
-
-            .sidebar a i {
-                margin: 0 !important;
-            }
-
-            /* Hide text labels */
-            .sidebar a .nav-label {
-                display: none !important;
-            }
-
-            /* Tooltip */
-            .sidebar a::after {
-                content: attr(data-tooltip);
-                position: absolute;
-                left: 56px;
-                top: 50%;
-                transform: translateY(-50%);
-                background: #1a1a2e;
-                color: #fff;
-                font-size: 12px;
-                font-weight: 500;
-                padding: 5px 10px;
-                border-radius: 6px;
-                white-space: nowrap;
-                opacity: 0;
-                pointer-events: none;
-                transition: opacity 0.2s ease;
-            }
-
-            .sidebar a:hover::after {
-                opacity: 1;
-            }
-
-            .main-content {
-                margin-left: 60px !important;
-                padding: 10px !important;
-            }
-
             .row.g-3.mb-4 .card {
                 border-radius: 10px !important;
             }
@@ -1042,6 +968,180 @@ for ($t = 13; $t >= 0; $t--) {
                 font-size: 1rem !important;
             }
         }
+
+        /* smaller summary cards on tablet and phone */
+        @media (max-width: 1199px) {
+            .ojtc-stat-card {
+                padding: 14px;
+                gap: 10px;
+                border-radius: 14px;
+            }
+
+            .ojtc-stat-icon {
+                width: 36px;
+                height: 36px;
+                min-width: 36px;
+                font-size: 15px;
+                border-radius: 10px;
+            }
+
+            .ojtc-stat-card h2 {
+                font-size: 1.4rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .ojtc-stat-card {
+                padding: 10px 12px;
+                gap: 8px;
+            }
+
+            .ojtc-stat-icon {
+                width: 30px;
+                height: 30px;
+                min-width: 30px;
+                font-size: 13px;
+            }
+
+            /* the label has an inline font-size, so !important is needed */
+            .ojtc-stat-card p {
+                font-size: 10px !important;
+                letter-spacing: 0 !important;
+                line-height: 1.2;
+            }
+
+            .ojtc-stat-card h2 {
+                font-size: 1.15rem;
+            }
+        }
+
+        /* ===== bottom nav: phones + tablet portrait ===== */
+        @media (max-width: 768px), (max-width: 1024px) and (orientation: portrait) {
+            :root { --bn-h: 60px; }
+
+            .sidebar {
+                top: auto;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                width: 100% !important;
+                height: calc(var(--bn-h) + env(safe-area-inset-bottom));
+                padding: 0 0 env(safe-area-inset-bottom) !important;
+                flex-direction: row;
+                align-items: stretch;
+                gap: 0;
+                overflow-x: auto;
+                overflow-y: hidden;
+                scrollbar-width: none;
+                z-index: 900;
+                box-shadow: 0 -2px 10px rgba(0, 0, 0, .15);
+            }
+
+            .sidebar::-webkit-scrollbar { display: none; }
+
+            /* the account box doesn't belong in a bottom bar */
+            .sidebar h3,
+            .sidebar-user { display: none !important; }
+
+            /* every link is a tab: 5 or fewer stretch, more will scroll */
+            .sidebar a {
+                flex: 1 0 68px;
+                min-width: 0;
+                height: var(--bn-h);
+                display: flex !important;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 3px;
+                margin: 0 !important;
+                padding: 0 4px !important;
+                border-radius: 0 !important;
+                background: transparent;
+                color: #aab1d4;
+                font-size: 10px;
+                font-weight: 500;
+                text-align: center;
+                white-space: nowrap;
+                border-top: 3px solid transparent;
+            }
+
+            .sidebar a i {
+                margin: 0 !important;
+                font-size: 18px;
+                color: inherit;
+            }
+
+            .sidebar a .nav-label {
+                display: block !important;
+                max-width: 100%;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .sidebar a:hover {
+                background: transparent;
+                color: #fff;
+            }
+
+            .sidebar a:hover i { color: inherit; }
+
+            .sidebar a.active {
+                background: transparent;
+                color: #fff;
+                font-weight: 500;
+                border-top-color: #ff6b2c;
+            }
+
+            .sidebar a.active i { color: #ff6b2c; }
+
+            /* this page scrolls inside .main-content, so the padding goes there */
+            .main-content {
+                margin-left: 0 !important;
+                height: calc(100dvh - 70px);
+                padding: 10px 10px calc(var(--bn-h) + env(safe-area-inset-bottom) + 20px) !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sysAdm-section div:has(> .search-box) {
+                flex-direction: column !important;
+                align-items: stretch !important;
+                width: 100% !important;
+            }
+            .sysAdm-section .search-box,
+            .sysAdm-section select.filter-select {
+                flex: none !important;
+                width: 100% !important;
+                max-width: none !important;
+                margin: 0 !important;
+            }
+        }
+
+        .filter-bar .search-box input {
+            width: 100% !important;
+            max-width: 100%;
+        }
+
+        .filter-bar select.filter-select {
+            min-width: 0 !important;
+            box-shadow: none;
+            color: #555;
+        }
+
+        .dash-table-scroll {
+            overflow-x: auto;
+            width: 100%;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .dash-table-scroll table {
+            min-width: 480px; 
+        }
+
+        .dash-table-scroll th,
+        .dash-table-scroll td {
+            white-space: nowrap; 
+        }
     </style>
 </head>
 
@@ -1049,10 +1149,7 @@ for ($t = 13; $t >= 0; $t--) {
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
     function showSection(sectionID) {
-        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-        document.getElementById(sectionID).classList.add('active');
-        document.querySelectorAll('.sidebar a').forEach(l => l.classList.remove('active'));
-        event.target.classList.add('active');
+        goToSection(sectionID);
     }
 </script>
 
@@ -1115,10 +1212,6 @@ for ($t = 13; $t >= 0; $t--) {
                 <i class="bi bi-file-earmark-text-fill"></i>
                 <span class="nav-label">Documents</span>
             </a>
-            <!-- <a href="#" onclick="showSection('interested')" data-tooltip="Interested">
-                <i class="bi bi-bookmarks-fill"></i>
-                <span class="nav-label">Interested</span>
-            </a> -->
             <a href="#" onclick="showSection('docu_availability')" data-tooltip="Document Availability">
                 <i class="bi bi-bookmark-fill"></i>
                 <span class="nav-label">Document Availability</span>
@@ -1155,7 +1248,7 @@ for ($t = 13; $t >= 0; $t--) {
 
                 <!-- SUMMARY CARDS -->
                 <div class="row g-3 mb-4">
-                    <div class="col-12 col-md-6 col-xxl-3">
+                    <div class="col-6 col-md-6 col-xl-4">
                         <div class="ojtc-stat-card card-tint-applications">
                             <div class="ojtc-stat-icon icon-applications"><i class="bi bi-file-earmark-fill"></i></div>
                             <div>
@@ -1164,7 +1257,7 @@ for ($t = 13; $t >= 0; $t--) {
                             </div>
                         </div>
                     </div>
-                    <div class="col-12 col-md-6 col-xxl-3">
+                    <div class="col-6 col-md-6 col-xl-4">
                         <div class="ojtc-stat-card card-tint-internships">
                             <div class="ojtc-stat-icon icon-internships"><i class="bi bi-briefcase-fill"></i></div>
                             <div>
@@ -1173,16 +1266,8 @@ for ($t = 13; $t >= 0; $t--) {
                             </div>
                         </div>
                     </div>
-                    <div class="col-12 col-md-6 col-xxl-3">
-                        <div class="ojtc-stat-card card-tint-announcements">
-                            <div class="ojtc-stat-icon icon-announcements"><i class="bi bi-bookmark-fill"></i></div>
-                            <div>
-                                <p class="small mb-1 fw-semibold text-uppercase" style="letter-spacing:.05em; font-size:11px; color:#27500a;">Announcements</p>
-                                <h2 class="fw-bold mb-0" style="color:#27500a;"><?= $totalAnnouncements ?></h2>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-6 col-xxl-3">
+                    
+                    <div class="col-6 col-md-6 col-xl-4">
                         <div class="ojtc-stat-card card-tint-documents">
                             <div class="ojtc-stat-icon icon-documents"><i class="bi bi-file-earmark-text-fill"></i></div>
                             <div>
@@ -1191,26 +1276,16 @@ for ($t = 13; $t >= 0; $t--) {
                             </div>
                         </div>
                     </div>
-
-                    <div class="col-12 col-md-6 col-xxl-3">
-                        <div class="ojtc-stat-card card-tint-announcements">
-                            <div class="ojtc-stat-icon icon-announcements"><i class="bi bi-patch-check-fill"></i></div>
+                    <div class="col-6 col-md-6 col-xl-4">
+                        <div class="ojtc-stat-card card-tint-internships">
+                            <div class="ojtc-stat-icon icon-internships"><i class="bi bi-clipboard-check-fill"></i></div>
                             <div>
-                                <p class="small mb-1 fw-semibold text-uppercase" style="letter-spacing:.05em; font-size:11px; color:#27500a;">Confirmed Rate</p>
-                                <h2 class="fw-bold mb-0" style="color:#27500a;"><?= $confirmedPct ?>%</h2>
+                                <p class="small mb-1 fw-semibold text-uppercase" style="letter-spacing:.05em; font-size:11px; color:#272f54;">Requirements Complete</p>
+                                <h2 class="fw-bold mb-0" style="color:#272f54;"><?= $reqCompletePct ?>%</h2>
                             </div>
                         </div>
                     </div>
-                    <div class="col-12 col-md-6 col-xxl-3">
-                        <div class="ojtc-stat-card card-tint-documents">
-                            <div class="ojtc-stat-icon icon-documents"><i class="bi bi-clipboard-check-fill"></i></div>
-                            <div>
-                                <p class="small mb-1 fw-semibold text-uppercase" style="letter-spacing:.05em; font-size:11px; color:#a13d1f;">Requirements Complete</p>
-                                <h2 class="fw-bold mb-0" style="color:#a13d1f;"><?= $reqCompletePct ?>%</h2>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-6 col-xxl-3">
+                    <div class="col-6 col-md-6 col-xl-4">
                         <div class="ojtc-stat-card card-tint-applications">
                             <div class="ojtc-stat-icon icon-applications"><i class="bi bi-hourglass-split"></i></div>
                             <div>
@@ -1219,12 +1294,12 @@ for ($t = 13; $t >= 0; $t--) {
                             </div>
                         </div>
                     </div>
-                    <div class="col-12 col-md-6 col-xxl-3">
-                        <div class="ojtc-stat-card card-tint-internships">
-                            <div class="ojtc-stat-icon icon-internships"><i class="bi bi-dash-circle-fill"></i></div>
+                    <div class="col-6 col-md-6 col-xl-4">
+                        <div class="ojtc-stat-card card-tint-documents">
+                            <div class="ojtc-stat-icon icon-documents"><i class="bi bi-dash-circle-fill"></i></div>
                             <div>
-                                <p class="small mb-1 fw-semibold text-uppercase" style="letter-spacing:.05em; font-size:11px; color:#272f54;">No Progress</p>
-                                <h2 class="fw-bold mb-0" style="color:#272f54;"><?= $noProgressPct ?>%</h2>
+                                <p class="small mb-1 fw-semibold text-uppercase" style="letter-spacing:.05em; font-size:11px; color:#a13d1f;">No Progress</p>
+                                <h2 class="fw-bold mb-0" style="color:#a13d1f;"><?= $noProgressPct ?>%</h2>
                             </div>
                         </div>
                     </div>
@@ -1262,10 +1337,10 @@ for ($t = 13; $t >= 0; $t--) {
                             <div class="card border-0 shadow-sm h-100 ojtc-panel-card">
                                 <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
                                     <i class="bi bi-bar-chart" style="color:#272f54;"></i>
-                                    <h6 class="fw-bold mb-0" style="color:#272f54;">Applicants per Program</h6>
+                                    <h6 class="fw-bold mb-0" style="color:#272f54;">Interns per Program</h6>
                                 </div>
                                 <div class="card-body px-4 pb-4 pt-2">
-                                    <p class="text-muted small mb-3">Number of applicants by program.</p>
+                                    <p class="text-muted small mb-3">Number of interns by program.</p>
                                     <div style="position:relative; height:220px;"><canvas id="programChart"></canvas></div>
                                 </div>
                             </div>
@@ -1275,10 +1350,10 @@ for ($t = 13; $t >= 0; $t--) {
                             <div class="card border-0 shadow-sm h-100 ojtc-panel-card">
                                 <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
                                     <i class="bi bi-graph-up" style="color:#272f54;"></i>
-                                    <h6 class="fw-bold mb-0" style="color:#272f54;">Application Trend</h6>
+                                    <h6 class="fw-bold mb-0" style="color:#272f54;">Submissions Trend</h6>
                                 </div>
                                 <div class="card-body px-4 pb-4 pt-2">
-                                    <p class="text-muted small mb-3">Applications submitted per day, last 14 days.</p>
+                                    <p class="text-muted small mb-3">Students' internship submitted per day, last 14 days.</p>
                                     <div style="position:relative; height:220px;"><canvas id="trendChart"></canvas></div>
                                 </div>
                             </div>
@@ -1291,7 +1366,7 @@ for ($t = 13; $t >= 0; $t--) {
                                     <h6 class="fw-bold mb-0" style="color:#272f54;">Top Companies</h6>
                                 </div>
                                 <div class="card-body px-4 pb-4 pt-2">
-                                    <p class="text-muted small mb-3">Companies with the most applicants.</p>
+                                    <p class="text-muted small mb-3">Companies with the most interns.</p>
                                     <div style="position:relative; height:220px;"><canvas id="companyChart"></canvas></div>
                                 </div>
                             </div>
@@ -1303,12 +1378,13 @@ for ($t = 13; $t >= 0; $t--) {
                         <div class="card border-0 shadow-sm h-100 ojtc-panel-card">
                             <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
                                 <i class="bi bi-file-earmark-text" style="color:#272f54;"></i>
-                                <h6 class="fw-bold mb-0" style="color:#272f54;">Application List</h6>
+                                <h6 class="fw-bold mb-0" style="color:#272f54;">Students' Internship List</h6>
                             </div>
                             <div class="card-body px-4 pb-4 pt-2">
                                 <?php if (empty($recentInterested)): ?>
                                     <p class="text-muted small mb-0">No applications yet.</p>
                                 <?php else: ?>
+                                    <div class="dash-table-scroll">
                                     <table style="width:100%; border-collapse:collapse; font-size:13px;">
                                         <thead>
                                             <tr class="ojtc-th-tab"
@@ -1319,9 +1395,6 @@ for ($t = 13; $t >= 0; $t--) {
                                                 <th
                                                     style="padding:8px 10px; border-bottom:1px solid #f0f2f7; font-weight:600;">
                                                     Company</th>
-                                                <th
-                                                    style="padding:8px 10px; border-bottom:1px solid #f0f2f7; font-weight:600;">
-                                                    Status</th>
                                                 <th
                                                     style="padding:8px 10px; border-bottom:1px solid #f0f2f7; font-weight:600;">
                                                     Date</th>
@@ -1344,10 +1417,6 @@ for ($t = 13; $t >= 0; $t--) {
                                                         style="padding:10px; border-bottom:1px solid #f0f2f7; color:#888; font-size:12px;">
                                                         <?= htmlspecialchars($ri['company']) ?>
                                                     </td>
-                                                    <td style="padding:10px; border-bottom:1px solid #f0f2f7;">
-                                                        <span
-                                                            style="background:#fff8e1;color:#633806;font-size:11px;padding:3px 10px;border-radius:6px;font-weight:500;">Interested</span>
-                                                    </td>
                                                     <td
                                                         style="padding:10px; border-bottom:1px solid #f0f2f7; color:#aaa; font-size:12px;">
                                                         <?= date("M d", strtotime($ri['created_at'])) ?>
@@ -1356,6 +1425,7 @@ for ($t = 13; $t >= 0; $t--) {
                                             <?php endforeach; ?>
                                         </tbody>
                                     </table>
+                                    </div>
                                 <?php endif; ?>
                             </div>
                         </div>
@@ -1415,12 +1485,13 @@ for ($t = 13; $t >= 0; $t--) {
                                 <?php if (empty($recentInternships)): ?>
                                     <p class="text-muted small mb-0">No internships posted yet.</p>
                                 <?php else: ?>
+                                    <div class="dash-table-scroll">
                                     <table style="width:100%; border-collapse:collapse; font-size:13px;">
-                                        <thead>
-                                            <tr class="ojtc-th-tab"
-                                                style="color:#aaa; font-size:12px; text-transform:uppercase; letter-spacing:.04em;">
-                                                <th
-                                                    style="padding:8px 10px; border-bottom:1px solid #f0f2f7; font-weight:600;">
+                                            <thead>
+                                                <tr class="ojtc-th-tab"
+                                                    style="color:#aaa; font-size:12px; text-transform:uppercase; letter-spacing:.04em;">
+                                                    <th
+                                                        style="padding:8px 10px; border-bottom:1px solid #f0f2f7; font-weight:600;">
                                                     Title</th>
                                                 <th
                                                     style="padding:8px 10px; border-bottom:1px solid #f0f2f7; font-weight:600;">
@@ -1459,6 +1530,7 @@ for ($t = 13; $t >= 0; $t--) {
                                             <?php endforeach; ?>
                                         </tbody>
                                     </table>
+                                    </div>
                                 <?php endif; ?>
                             </div>
                         </div>
@@ -1531,9 +1603,9 @@ for ($t = 13; $t >= 0; $t--) {
                     </div>
                 </div>
 
-                <div
+                <div class="filter-row"
                     style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
-                    <div style="display:flex; align-items:center; flex-wrap:wrap; gap:10px;">
+                    <div class="filter-bar" style="display:flex; align-items:center; flex-wrap:wrap; gap:10px;">
                         <div class="search-box">
                             <input type="text" id="search-postings"
                                 style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:220px;"
@@ -1792,7 +1864,7 @@ for ($t = 13; $t >= 0; $t--) {
                 }
             </style>
 
-            <!-- ── APPLICANTS ── -->
+            <!-- ── Interns ── -->
             <div id="interns" class="section sysAdm-section">
                 <div class="sysAdm-header--danger sysAdm-header--blue mb-4">
                     <div class="sysAdm-header-left">
@@ -1806,9 +1878,9 @@ for ($t = 13; $t >= 0; $t--) {
                     </div>
                 </div>
 
-                <div
+                <div class="filter-row"
                     style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
-                    <div style="display:flex; align-items:center; flex-wrap:wrap; gap:10px;">
+                    <div class="filter-bar" style="display:flex; align-items:center; flex-wrap:wrap; gap:10px;">
                         <div class="search-box">
                             <input type="text" id="search-applicants"
                                 style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:220px;"
@@ -1905,9 +1977,9 @@ for ($t = 13; $t >= 0; $t--) {
                     </div>
                 </div>
 
-                <div
+                <div class="filter-row"
                     style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
-                    <div style="display:flex; align-items:center; flex-wrap:wrap; gap:10px;">
+                    <div class="filter-bar" style="display:flex; align-items:center; flex-wrap:wrap; gap:10px;">
                         <div class="search-box">
                             <input type="text" id="search-documents"
                                 style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:220px;"
@@ -2097,21 +2169,18 @@ for ($t = 13; $t >= 0; $t--) {
                     </div>
                 </div>
 
-                <div
-                    style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
-                    <div
-                        style="display:flex; align-items:center; flex-wrap:wrap; gap:10px; justify-content:space-between; width:100%;">
+                <div class="filter-row" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
+                    <div class="filter-bar" style="display:flex; align-items:center; flex-wrap:wrap; gap:10px;">
                         <div class="search-box">
-                            <input type="text" id="search-postings"
+                            <input type="text" id="search-docavail"
                                 style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:220px;"
-                                placeholder="Search by company..." oninput="filterPostings()">
-
+                                placeholder="Search by company or internship..." oninput="filterDocAvail()">
                             <i class="bi bi-search" style="color:#272f54 !important;"></i>
                         </div>
-                        <button class="btn-update" onclick="showDocAvailForm()">
-                            <i class="bi bi-plus-circle me-1"></i> Post Document Availability
-                        </button>
                     </div>
+                    <button class="btn-update" onclick="showDocAvailForm()">
+                        <i class="bi bi-plus-circle me-1"></i> Post Document Availability
+                    </button>
                 </div>
                 <div class="sysAdm-table-wrapper">
                     <table class="sysAdm-table" id="docuAvail-table">
@@ -2183,9 +2252,9 @@ for ($t = 13; $t >= 0; $t--) {
 
 
 
-                <div
+                <div class="filter-row"
                     style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
-                    <div style="display:flex; align-items:center; flex-wrap:wrap; gap:10px;">
+                    <div class="filter-bar" style="display:flex; align-items:center; flex-wrap:wrap; gap:10px;">
                         <div class="search-box">
                             <input type="text" id="search-announcements"
                                 style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:220px;"
@@ -2421,9 +2490,9 @@ for ($t = 13; $t >= 0; $t--) {
                     </div>
                 </div>
 
-                <div
+                <div class="filter-row"
                     style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
-                    <div style="display:flex; align-items:center; flex-wrap:wrap; gap:10px;">
+                    <div class="filter-bar" style="display:flex; align-items:center; flex-wrap:wrap; gap:10px;">
                         <div class="search-box">
                             <input type="text" id="search-mou"
                                 style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:220px;"
@@ -2657,7 +2726,15 @@ for ($t = 13; $t >= 0; $t--) {
             });
         }
 
-        // Applicants filter
+        // Document availability filter
+        function filterDocAvail() {
+            const search = document.getElementById('search-docavail').value.toLowerCase();
+            document.querySelectorAll('#docuAvail-table tbody tr').forEach(row => {
+                row.style.display = row.innerText.toLowerCase().includes(search) ? '' : 'none';
+            });
+        }
+
+        // Interns filter
         function filterApplicants() {
             const search = document.getElementById('search-applicants').value.toLowerCase();
             const req = document.getElementById('app-req-filter').value;
@@ -3071,13 +3148,13 @@ for ($t = 13; $t >= 0; $t--) {
                 }
             });
 
-            // Applicants per program
+            // Interns per program
             make('programChart', {
                 type: 'bar',
                 data: {
                     labels: <?= json_encode(array_keys($programCounts)) ?>,
                     datasets: [{
-                        label: 'Applicants',
+                        label: 'Interns',
                         data: <?= json_encode(array_values($programCounts)) ?>,
                         backgroundColor: '#ff8652fe',
                         borderRadius: 6
@@ -3123,7 +3200,7 @@ for ($t = 13; $t >= 0; $t--) {
                 data: {
                     labels: <?= json_encode(array_keys($companyCounts)) ?>,
                     datasets: [{
-                        label: 'Applicants',
+                        label: 'Interns',
                         data: <?= json_encode(array_values($companyCounts)) ?>,
                         backgroundColor: '#272F54',
                         borderRadius: 6
@@ -3160,6 +3237,17 @@ for ($t = 13; $t >= 0; $t--) {
             card.title = 'Click to view full details';
             card.addEventListener('click', () => goToSection(target));
         });
+
+        // keep the active bottom-nav tab visible when the bar scrolls
+        (function () {
+            const nav = document.querySelector('.sidebar');
+            if (!nav) return;
+            new MutationObserver(() => {
+                if (window.innerWidth <= 1024) {
+                    nav.querySelector('a.active')?.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
+                }
+            }).observe(nav, { subtree: true, attributes: true, attributeFilter: ['class'] });
+        })();
     </script>
 </body>
 

@@ -64,7 +64,7 @@ if (($handle = fopen($csvPath, 'r')) !== false) {
     }
 
     fclose($handle);
-    header("Location: internship-ui.php?imported=1");
+    header("Location: internship-admins.php?imported=1");
     exit;
 }
 

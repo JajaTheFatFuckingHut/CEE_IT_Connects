@@ -37,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         // redirect
-        header("Location: message.php?room_id=" . $room['id']);
+        header("Location: rooms.php?room_id=" . $room['id']);
         exit();
 
     } else {

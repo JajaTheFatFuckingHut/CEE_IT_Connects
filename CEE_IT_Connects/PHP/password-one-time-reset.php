@@ -35,4 +35,4 @@ $update = $pdo->prepare("
 $update->execute([$hashed, $id]);
 
 echo "Passwords updated!";
-echo "<a href='login-ui.php'>Back to Home</a>";
+echo "<a href='login-page.php'>Back to Home</a>";

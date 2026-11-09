@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['role'] = 'student';
 
-            header("Location: ../index.php");
+            header("Location: ../student.php");
             exit;
 
         } else {
@@ -67,8 +67,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // centralized redirect (cleaner)
             $dashboards = [
-                'superadmin' => '../superadmin.php',
-                'internship_admin' => '../internship-ui.php',
+                'superadmin' => '../systemadmin.php',
+                'internship_admin' => '../internship-admin.php',
                 // 'cma' => '../bsbsasdadw.php'
             ];
 
@@ -107,8 +107,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $normalizedRole = strtolower(trim($user['role']));
 
             $dashboards = [
-                'hte_adviser' => '../hte-ui.php',
-                'internship_adviser' => '../ojt-rooms.php',
+                'hte_adviser' => '../hte-adviser.php',
+                'internship_adviser' => '../ojt-adviser.php',
             ];
 
             if (isset($dashboards[$normalizedRole])) {

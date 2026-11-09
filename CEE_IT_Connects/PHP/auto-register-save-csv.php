@@ -4,7 +4,7 @@ require 'db.php';
 require_once 'auth.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header("Location: ojt-rooms.php");
+    header("Location: ojt-adviser.php");
     exit;
 }
 
@@ -105,7 +105,7 @@ if (isset($_POST['edit_csv'])) {
 
         if ($handle === false) {
             $_SESSION['error'] = "Unable to open CSV file: " . $csvPath;
-            header("Location: superadmin.php?section=student_register");
+            header("Location: systemadmin.php?section=student_register");
             exit;
         }
 
@@ -119,7 +119,7 @@ if (isset($_POST['edit_csv'])) {
 
         $_SESSION['success'] = "CSV saved successfully.";
 
-        header("Location: superadmin.php?section=student_register");
+        header("Location: systemadmin.php?section=student_register");
         exit;
     }
 
@@ -133,7 +133,7 @@ if (isset($_POST['edit_csv'])) {
 
         if (!$schoolYear) {
             $_SESSION['error'] = "No school year is configured in section settings.";
-            header("Location: superadmin.php?section=student_register");
+            header("Location: systemadmin.php?section=student_register");
             exit;
         }
 
@@ -163,7 +163,7 @@ if (isset($_POST['edit_csv'])) {
                 $_SESSION['error'] =
                     "CSV is missing the required column: {$column}";
 
-                header("Location: superadmin.php?section=student_register");
+                header("Location: systemadmin.php?section=student_register");
                 exit;
             }
 
@@ -457,7 +457,7 @@ if (isset($_POST['edit_csv'])) {
         }
 
 
-        header("Location: superadmin.php?section=student_register");
+        header("Location: systemadmin.php?section=student_register");
         exit;
     }
 }
@@ -469,7 +469,7 @@ if ($source === 'ojt-rooms') {
 
     if (!$room_id) {
         $_SESSION['error'] = "No room specified.";
-        header("Location: ojt-rooms.php");
+        header("Location: ojt-adviser.php");
         exit;
     }
 
@@ -481,7 +481,7 @@ if ($source === 'ojt-rooms') {
 
     if ($sidIdx === false) {
         $_SESSION['error'] = "Column 'student_id' not found in CSV.";
-        header("Location: ojt-rooms.php?room_id=" . $room_id . "&tab=members");
+        header("Location: ojt-adviser.php?room_id=" . $room_id . "&tab=members");
         exit;
     }
 
@@ -533,11 +533,11 @@ if ($source === 'ojt-rooms') {
             . ($skipped ? " ({$skipped} already in room, skipped.)" : "");
     }
 
-    header("Location: ojt-rooms.php?room_id=" . $room_id . "&tab=members");
+    header("Location: ojt-adviser.php?room_id=" . $room_id . "&tab=members");
     exit;
 }
 
 
 $_SESSION['error'] = "Unknown action.";
-header("Location: superadmin.php");
+header("Location: systemadmin.php");
 exit;

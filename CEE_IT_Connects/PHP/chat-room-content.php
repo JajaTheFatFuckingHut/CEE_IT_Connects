@@ -787,25 +787,6 @@ $backLink = getDashboardByRole($_SESSION['role']);
             flex-wrap: wrap;
         }
 
-        .rm-count {
-            background: rgba(255, 255, 255, .12);
-            border-radius: 10px;
-            padding: 8px 16px;
-            text-align: center;
-            min-width: 76px;
-        }
-
-        .rm-count b {
-            display: block;
-            font-size: 20px;
-            line-height: 1.2;
-        }
-
-        .rm-count small {
-            font-size: 11px;
-            opacity: .8;
-        }
-
         .rm-tabs {
             display: flex;
             gap: 24px;
@@ -865,6 +846,12 @@ $backLink = getDashboardByRole($_SESSION['role']);
             border-radius: 12px;
             padding: 16px 18px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, .05);
+        }
+
+        .rm-card,
+        .rm-card:hover {
+            display: block;
+            transform: none;
         }
 
         .rm-avatar {
@@ -1329,139 +1316,7 @@ $backLink = getDashboardByRole($_SESSION['role']);
             }
         }
 
-                /* ── ROOM PAGE: phones ── */
-        /* @media (max-width: 576px) {
-
-            .rm-hero {
-                padding: 14px;
-                gap: 12px;
-            }
-
-            .rm-hero > div:first-child { width: 100%; }
-
-            .rm-hero h5 {
-                font-size: 19px;
-                margin-bottom: 8px;
-            }
-
-            .rm-chips { gap: 6px; }
-
-            .rm-chip {
-                font-size: 12px;
-                padding: 3px 10px;
-            }
-
-            .rm-hero-right .text-end .text-end {
-                display: flex;
-                align-items: center;
-                gap: 12px;
-                text-align: left !important;
-            }
-
-            .circle-progress {
-                width: 52px;
-                height: 52px;
-                margin: 0;
-                flex-shrink: 0;
-            }
-
-            .circle-progress span {
-                width: 40px;
-                height: 40px;
-                font-size: 10px;
-            }
-
-            .rm-hero-right .text-end small { font-size: 13px; }
-
-            .rm-hero-right { gap: 8px; }
-
-            .rm-count {
-                flex: 1;
-                min-width: 0;
-                padding: 8px 10px;
-            }
-
-            .rm-hero-right .btn-update {
-                width: 100% !important;
-                padding: 10px 16px !important;
-                font-size: 14px !important;
-            }
-
-            .rm-tabs {
-                gap: 18px;
-                margin: 12px 0;
-                overflow-x: auto;
-            }
-
-            .rm-tab {
-                font-size: 13px;
-                white-space: nowrap;
-            }
-
-            .rm-card { padding: 14px; }
-            .rm-post-body { font-size: 13.5px; }
-            .rm-composer textarea { min-width: 0; }
-
-            .rm-composer-foot {
-                flex-direction: column-reverse;
-                align-items: stretch;
-            }
-
-            .rm-post-btn {
-                width: 100%;
-                padding: 10px 16px;
-            }
-
-            .rm-hint { text-align: center; }
-            .rm-dr span:last-child { overflow-wrap: anywhere; }
-
-            .rm-search {
-                flex: 1 1 100%;
-                max-width: none;
-                min-width: 0;
-            }
-
-            .rm-filters {
-                flex: 1 1 100%;
-                flex-wrap: nowrap;
-                overflow-x: auto;
-                padding-bottom: 2px;
-            }
-
-            .rm-filter {
-                flex-shrink: 0;
-                white-space: nowrap;
-            }
-
-            #memberCount {
-                margin-left: 0 !important;
-                flex: 1;
-            }
-
-            .rm-mgrid { grid-template-columns: minmax(0, 1fr); }
-
-            .rm-mcard {
-                display: grid;
-                grid-template-columns: 38px minmax(0, 1fr);
-                gap: 2px 12px;
-                align-items: center;
-                padding: 12px 36px 12px 12px;
-            }
-
-            .rm-mcard .rm-avatar { grid-row: 1 / span 2; }
-
-            .rm-mcard .rm-pill {
-                grid-column: 2;
-                justify-self: start;
-                margin-top: 4px;
-            }
-
-            .rm-remove-form { top: 4px; right: 4px; }
-
-            #addParticipantModal .participant-info { min-width: 0; }
-            #addParticipantModal .participant-info small { overflow-wrap: anywhere; }
-        } */
-
+              
                 /* ── ROOM PAGE: compact hero on phones ── */
         @media (max-width: 576px) {
 
@@ -1475,15 +1330,12 @@ $backLink = getDashboardByRole($_SESSION['role']);
                 margin-bottom: 4px;
             }
 
-            /* chips become one quiet line: BSIT 4-5 · S.Y. 2026-2027 · Norma Castillo */
+            /* one line header thingy */
             .rm-chips {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 2px;
-            }
-
-            .rm-chip + .rm-chip::before {
-                content: none;
+                flex-direction: row;
+                flex-wrap: wrap;
+                align-items: baseline;
+                gap: 0;
             }
 
             .rm-chip {
@@ -1525,7 +1377,7 @@ $backLink = getDashboardByRole($_SESSION['role']);
             .circle-progress {
                 width: 52px;
                 height: 52px;
-                margin: 0 auto 4px;   /* centered above the hours text */
+                margin: 0 auto 4px;
             }
 
             .circle-progress span {
@@ -1548,12 +1400,16 @@ $backLink = getDashboardByRole($_SESSION['role']);
                 border-top: 1px solid rgba(255, 255, 255, .15);
             }
 
-            /* "Room details" repeats what the hero already shows */
             .rm-grid > .rm-col:last-child > .rm-card:first-child { display: none; }
 
             .rm-tabs {
                 gap: 0;
                 overflow-x: auto;
+            }
+
+            .rm-toolbar #memberCount {
+                margin-left: 0 !important;
+                flex: 1;
             }
 
             .rm-tab {
@@ -1573,12 +1429,10 @@ $backLink = getDashboardByRole($_SESSION['role']);
 
         /* this mq is for a very narrow screen just in case .. */
         @media (max-width: 380px) {
-            /* drop the tab icons so the label + count fit */
             .rm-tab i {
                 display: none;
-            }
+            /* }
 
-            /* the title was wrapping to 3 lines; stack the progress under it instead */
             .rm-hero:has(.circle-progress) {
                 flex-wrap: wrap;
             }
@@ -1594,7 +1448,7 @@ $backLink = getDashboardByRole($_SESSION['role']);
 
             .rm-hero-right .text-end small {
                 text-align: left;
-            }
+            } */
         }
 
         /* addtl e */
@@ -1880,9 +1734,6 @@ $rmFmtTime = function ($ts): string {
                     </div>
                 </div>
             <?php endif; ?>
-        <?php else: ?>
-            <div class="rm-count"><b><?= $rmMemberCount ?></b><small>Members</small></div>
-            <div class="rm-count"><b><?= $rmPostCount ?></b><small>Posts</small></div>
         <?php endif; ?>
     </div>
 </div>

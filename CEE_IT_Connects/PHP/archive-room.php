@@ -4,7 +4,7 @@ require 'db.php';
 require 'auth.php';
 
 if ($_SESSION['role'] !== 'internship_adviser') {
-    header("Location: login-ui.php");
+    header("Location: login-page.php");
     exit();
 }
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['room_id'])) {
@@ -19,5 +19,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['room_id'])) {
 
 }
 
-header("Location: ojt-rooms.php");
+header("Location: ojt-adviser.php");
 exit();

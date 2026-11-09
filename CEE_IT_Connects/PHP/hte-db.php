@@ -66,6 +66,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_all'])) {
         ]);
     }
 
-    header("Location: hte-ui.php?saved=1");
+    header("Location: hte-adviser.php?saved=1");
     exit;
 }

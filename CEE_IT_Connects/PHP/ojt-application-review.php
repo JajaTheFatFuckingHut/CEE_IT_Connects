@@ -10,7 +10,7 @@ $adviser_id = (int) $_SESSION['user_id'];
 
 if (!$application_id || !$action || !$room_id) {
     $_SESSION['error'] = "Invalid request.";
-    header("Location: ojt-rooms.php?room_id=$room_id&section=ojt_applications");
+    header("Location: ojt-adviser.php?room_id=$room_id&section=ojt_applications");
     exit;
 }
 
@@ -26,7 +26,7 @@ if ($action === 'approve') {
 } elseif ($action === 'reject') {
     if (!$remarks) {
         $_SESSION['error'] = "Please provide a rejection reason.";
-        header("Location: ojt-rooms.php?room_id=$room_id&section=ojt_applications");
+        header("Location: ojt-adviser.php?room_id=$room_id&section=ojt_applications");
         exit;
     }
     $stmt = $pdo->prepare("
@@ -41,5 +41,5 @@ if ($action === 'approve') {
     $_SESSION['error'] = "Unknown action.";
 }
 
-header("Location: ojt-rooms.php?room_id=$room_id&section=ojt_applications");
+header("Location: ojt-adviser.php?room_id=$room_id&section=ojt_applications");
 exit;

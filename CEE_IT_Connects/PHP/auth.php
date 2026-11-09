@@ -4,7 +4,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 if (!isset($_SESSION['user_id'])) {
-    header("Location: login-ui.php");
+    header("Location: login-page.php");
     exit();
 }
 
@@ -28,10 +28,10 @@ function getUserType($role)
 function getDashboardByRole($role)
 {
     return match ($role) {
-        'student' => 'message.php',
-        'hte_adviser' => 'hte-ui.php',
-        'internship_adviser' => 'ojt-rooms.php',
-        default => 'index.php'
+        'student' => 'rooms.php',
+        'hte_adviser' => 'hte-adviser.php',
+        'internship_adviser' => 'ojt-adviser.php',
+        default => 'student.php'
     };
 }
 

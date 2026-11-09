@@ -42,7 +42,7 @@ if (($_SESSION['role'] ?? '') === 'student' && !empty($_SESSION['user_id'])) {
         }
 
         session_destroy();
-        header('Location: login-ui.php?deactivated=1');
+        header('Location: login-page.php?deactivated=1');
         exit;
     }   // <-- the block must close AFTER exit
 

@@ -671,17 +671,17 @@ function timeAgo($datetime)
 <nav class="navbar navbar-expand-lg navbar-custom fixed-top">
     <div class="container-fluid px-3">
         <a class="navbar-brand d-flex align-items-center" href="<?php if ($role == 'students') {
-            echo 'index.php';
+            echo 'student.php';
         } else if ($role == 'superadmin' || $role == 'sys_admin' || $role == 'admin') {
-            echo 'superadmin.php';
+            echo 'systemadmin.php';
         } else if ($role == 'internship_admin') {
-            echo 'internship-ui.php';
+            echo 'internship-admin.php';
         } else if ($role == 'hte_adviser') {
-            echo 'hte-ui.php';
+            echo 'hte-adviser.php';
         } else if ($role == 'internship_adviser') {
-            echo 'ojt-rooms.php';
+            echo 'ojt-adviser.php';
         } else {
-            echo 'index.php';
+            echo 'student.php';
         }
         ?>">
             <img src="/Sources/CEE IT Connects Logo.png" class="nav-logo">
@@ -695,13 +695,13 @@ function timeAgo($datetime)
                     <li class="nav-item">
                         <a class="nav-link <?= ($page == 'home') ? 'active' : '' ?>" href="<?php
                                 if ($role == 'students') {
-                                    echo 'index.php';
+                                    echo 'student.php';
                                 } else if ($role == 'hte_adviser') {
-                                    echo 'hte-ui.php';
+                                    echo 'hte-adviser.php';
                                 } else if ($role == 'internship_adviser') {
-                                    echo 'ojt-rooms.php';
+                                    echo 'ojt-adviser.php';
                                 } else {
-                                    echo 'index.php';
+                                    echo 'student.php';
 
                                 } ?>">Home</a>
                     </li>
@@ -725,13 +725,13 @@ function timeAgo($datetime)
                 <div>
                     <a href="<?php
                     if ($role == 'student') {
-                        echo 'message.php';
+                        echo 'rooms.php';
                     } else if ($role == 'superadmin' || $role == 'admin') {
                         echo 'systemadmin-rooms.php';
                     } else if ($role == 'internship_admin') {
                         echo 'internadmin-rooms.php';
                     } else {
-                        echo 'message.php';
+                        echo 'rooms.php';
 
                     } ?>" class="navbar-icon-btn" data-tip="Rooms">
                         <i class="fa-solid fa-users"></i>
@@ -759,7 +759,7 @@ function timeAgo($datetime)
 
                     <?php foreach ($notifications as $notif): ?>
                         <div class="notif-item"
-                            onclick="window.location.href='<?= htmlspecialchars($notif['link'] ?? 'index.php') ?>'">
+                            onclick="window.location.href='<?= htmlspecialchars($notif['link'] ?? 'student.php') ?>'">
                             <?php if (!$notif['is_read']): ?>
                                 <div class="dot"></div><?php endif; ?>
                             <div>
@@ -783,7 +783,7 @@ function timeAgo($datetime)
                     <div class="notif-popup-list">
                         <?php foreach ($notifications as $notif): ?>
                             <div class="notif-item"
-                                onclick="window.location.href='<?= htmlspecialchars($notif['link'] ?? 'index.php') ?>'">
+                                onclick="window.location.href='<?= htmlspecialchars($notif['link'] ?? 'student.php') ?>'">
                                 <?php if (!$notif['is_read']): ?>
                                     <div class="dot"></div><?php endif; ?>
                                 <div>
@@ -879,33 +879,33 @@ function timeAgo($datetime)
                                 'Click <strong>Read More</strong> for requirements, schedule and contact details.',
                                 'Open the map on <strong>Home</strong> to see company locations and get directions.',
                             ]],
-                            ['bi-building', 'Pick your host company', 'Home › Checklist', [
+                            ['bi-building', 'Pick your host company', 'Rooms Icon › Checklist', [
                                 'Choose the company where you will do your OJT.',
                                 'The Checklist marks this step <strong>Done</strong> once it is saved.',
                             ]],
-                            ['bi-list-check', 'Complete your requirements', 'Sidebar › Checklist', [
+                            ['bi-list-check', 'Complete your requirements', 'Rooms Icon › Checklist', [
                                 'Upload proof for each requirement (MOU, Recommendation Letter, Waiver and the other forms).',
                                 'Preview or download the generated documents where available.',
                                 'Once the MOU, Recommendation Letter and Waiver are done, <strong>Hours</strong> and <strong>Progress Report</strong> unlock.',
                             ]],
-                            ['bi-clock-history', 'Log your hours', 'Sidebar › Hours', [
+                            ['bi-clock-history', 'Log your hours', 'Rooms Icon › Hours', [
                                 'Enter your morning and afternoon time in/out for each day.',
                                 'Your adviser and HTE supervisor can see them on the Timesheet.',
                                 'Late or early time-outs are flagged against the company office hours.',
                             ]],
-                            ['bi-file-earmark-text-fill', 'Submit progress reports', 'Sidebar › Progress Report', [
+                            ['bi-file-earmark-text-fill', 'Submit progress reports', 'Rooms Icon › Progress Report', [
                                 'Upload your weekly report as a file.',
                                 'Your OJT adviser can view every week you submit.',
                             ]],
-                            ['bi-clipboard-check', 'Evaluation', 'Sidebar › Evaluation', [
+                            ['bi-clipboard-check', 'Evaluation', 'Rooms Icon › Evaluation', [
                                 'Open it once you have finished your required hours.',
                                 'Complete the evaluation form shown there.',
                             ]],
-                            ['bi-door-open-fill', 'Your OJT room', 'Sidebar › Rooms', [
+                            ['bi-door-open-fill', 'Your OJT room', 'Rooms Icon › Rooms', [
                                 'Open your room to read updates posted by your adviser.',
                                 'Check classmates and advisers under the <strong>Members</strong> tab.',
                             ]],
-                            ['bi-chat-dots-fill', 'Chats and notifications', 'Sidebar › Chats · top bar bell', [
+                            ['bi-chat-dots-fill', 'Chats and notifications', 'Rooms Icon › Chats · top bar bell', [
                                 'Pick your adviser or supervisor and click <strong>Send</strong>.',
                                 'The bell shows new updates. Click one to jump to the page.',
                             ]],
@@ -919,11 +919,11 @@ function timeAgo($datetime)
                         'tagline' => 'Run your section room and track every intern.',
                         'flow' => ['Open room', 'Post updates', 'Check requirements', 'Monitor hours', 'Review reports'],
                         'cards' => [
-                            ['bi-speedometer2', 'Home dashboard', 'Sidebar › Home', [
+                            ['bi-speedometer2', 'Home dashboard', 'Sidebar/Bottom Bar › Home', [
                                 'See your student count, incomplete requirements, weekly reports and available documents.',
                                 'Charts show attendance, hours rendered and requirement completion.',
                             ]],
-                            ['bi-megaphone-fill', 'Post updates', 'Sidebar › ROOMS › Updates tab', [
+                            ['bi-megaphone-fill', 'Post updates', 'Sidebar/Bottom Bar › ROOMS › Updates tab', [
                                 'Pick your room under <strong>ROOMS</strong>.',
                                 'Type in the box and click <strong>Post Announcement</strong>. Everyone in the room sees it.',
                             ]],
@@ -931,22 +931,22 @@ function timeAgo($datetime)
                                 'Click <strong>Add Participant</strong>, tick the people and confirm.',
                                 'Hover a member card and click the <strong>✕</strong> to remove them.',
                             ]],
-                            ['bi-list-ul', 'Requirements', 'Sidebar › Requirements', [
+                            ['bi-list-ul', 'Requirements', 'Sidebar/Bottom Bar › Requirements', [
                                 'Search by name, student no. or company, or filter by progress.',
                                 'Click <strong>View</strong> to preview or download each uploaded document.',
                             ]],
-                            ['bi-calendar-check-fill', 'OJT Status', 'Sidebar › OJT Status', [
+                            ['bi-calendar-check-fill', 'OJT Status', 'Sidebar/Bottom Bar › OJT Status', [
                                 'View each intern\'s hours and progress bar.',
                                 'The <strong>Supervisor Eval</strong> button turns active once the supervisor submits.',
                             ]],
-                            ['bi-file-earmark-text-fill', 'Progress Reports', 'Sidebar › Progress Reports', [
+                            ['bi-file-earmark-text-fill', 'Progress Reports', 'Sidebar/Bottom Bar › Progress Reports', [
                                 'Click <strong>View</strong> on a student, then pick a week.',
                                 'Use <strong>Open</strong> or <strong>Download</strong> on the preview.',
                             ]],
-                            ['bi-folder2-open', 'Documents Available', 'Sidebar › Documents Available', [
+                            ['bi-folder2-open', 'Documents Available', 'Sidebar/Bottom Bar › Documents Available', [
                                 'Check which partner companies have the MOU, Recommendation Letter and Waiver ready.',
                             ]],
-                            ['bi-chat-left-text-fill', 'Chats', 'Sidebar › Chats', [
+                            ['bi-chat-left-text-fill', 'Chats', 'Sidebar/Bottom Bar › Chats', [
                                 'Message your students and the HTE supervisors linked to them.',
                             ]],
                         ],
@@ -959,11 +959,11 @@ function timeAgo($datetime)
                         'tagline' => 'Supervise interns at your company and complete their evaluation.',
                         'flow' => ['Assign supervisor', 'Monitor hours', 'Review timesheet', 'Evaluation'],
                         'cards' => [
-                            ['bi-speedometer2', 'Home dashboard', 'Sidebar › Home', [
+                            ['bi-speedometer2', 'Home dashboard', 'Sidebar/Bottom Bar › Home', [
                                 'See interns, who is present today and who finished their hours.',
                                 'Latest timesheet logs and attendance charts are shown below.',
                             ]],
-                            ['bi-calendar-check-fill', 'OJT Status', 'Sidebar › OJT Status', [
+                            ['bi-calendar-check-fill', 'OJT Status', 'Sidebar/Bottom Bar › OJT Status', [
                                 'View each intern\'s rendered hours and progress.',
                                 'Use the search box to find a student.',
                             ]],
@@ -1169,7 +1169,7 @@ function timeAgo($datetime)
     <!-- <?php if (!$hideStudentNav): ?>
         <div id="mobileMenu"
             style="display: none;position: absolute;top: 70px; left: 0;width: 100%;background: #2c3e67;z-index: 999;padding: 10px 0;box-shadow: 0 8px 20px rgba(0,0,0,0.3);">
-            <a href=" index.php" style="display:block;padding:14px 24px;color:white;text-decoration:none;font-weight:600;
+            <a href=" student.php" style="display:block;padding:14px 24px;color:white;text-decoration:none;font-weight:600;
             <?= ($page == 'home') ? 'background:#ff6b2c;border-radius:8px;margin:4px 12px;' : '' ?>">
                 <i class="fa-solid fa-house me-2"></i> Home
             </a>
@@ -1188,7 +1188,7 @@ function timeAgo($datetime)
     <!-- MOBILE DROPDOWN MENU -->
     <?php if (!$hideStudentNav): ?>
         <div id="mobileMenu">
-            <a href="index.php" class="<?= ($page == 'home') ? 'active' : '' ?>">
+            <a href="student.php" class="<?= ($page == 'home') ? 'active' : '' ?>">
                 <i class="fa-solid fa-house"></i> Home
             </a>
             <a href="applied-Internship-programs.php" class="<?= ($page == 'opportunity') ? 'active' : '' ?>">
