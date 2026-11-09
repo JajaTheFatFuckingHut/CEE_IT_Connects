@@ -334,7 +334,8 @@ $archivedUsers = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 $stmt = $pdo->query("
     SELECT 
-        a.id, a.user_id, a.roles, a.activity, a.activity_date,
+        a.id, a.user_id, a.roles, a.activity, 
+        (a.activity_date AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') AS activity_date,
         COALESCE(u.name, 'Unknown (#' || a.user_id || ')') AS name
     FROM audits a
     LEFT JOIN (
@@ -2830,7 +2831,8 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                             <option value="unassigned">Unassigned</option>
                             <?php foreach ($adviserList as $adv): ?>
                                 <option value="<?= htmlspecialchars($adv['full_name']) ?>">
-                                    <?= htmlspecialchars($adv['full_name']) ?></option>
+                                    <?= htmlspecialchars($adv['full_name']) ?>
+                                </option>
                             <?php endforeach; ?>
                         </select>
                     </div>
@@ -3477,46 +3479,93 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
             a.click();
         }
 
-        function downloadDashboardPDF() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            let y = 15;
-            doc.setFontSize(16); doc.setTextColor(39, 47, 84);
-            doc.text('Dashboard Summary', 14, y); y += 10;
-            doc.setFontSize(12); doc.setTextColor(0, 0, 0);
-            doc.text('Recent Internship Postings', 14, y); y += 2;
-            const internshipRows = [];
-            document.querySelectorAll('#table-internships tbody tr').forEach(row => {
-                const cells = [...row.querySelectorAll('td')].map(td => td.innerText.trim().replace(/\n/g, ' '));
-                if (cells.length) internshipRows.push(cells);
-            });
-            doc.autoTable({ head: [['Title', 'Company', 'Location', 'Posted']], body: internshipRows, startY: y, styles: { fontSize: 10 }, headStyles: { fillColor: [39, 47, 84], textColor: [255, 255, 255] } });
-            y = doc.lastAutoTable.finalY + 10;
-            doc.text('Recently Interested Students', 14, y); y += 2;
-            const studentRows = [];
-            document.querySelectorAll('#table-interested .d-flex.align-items-center').forEach(row => {
-                studentRows.push([
-                    row.querySelector('.fw-semibold')?.innerText.trim() ?? '',
-                    row.querySelectorAll('p')[1]?.innerText.trim() ?? '',
-                    row.querySelector('.badge')?.innerText.trim() ?? '',
-                    row.querySelector('.text-muted.mb-0.mt-1')?.innerText.trim() ?? ''
-                ]);
-            });
-            doc.autoTable({ head: [['Name', 'Email', 'Company', 'Date']], body: studentRows, startY: y, styles: { fontSize: 10 }, headStyles: { fillColor: [255, 182, 47], textColor: [39, 47, 84] } });
-            y = doc.lastAutoTable.finalY + 10;
-            doc.text('Recent Announcements', 14, y); y += 2;
-            const announcementRows = [];
-            document.querySelectorAll('#table-announcements .d-flex.align-items-start').forEach(row => {
-                const title = row.querySelector('.fw-semibold')?.innerText.trim() ?? '';
-                if (title) announcementRows.push([
-                    row.querySelector('.badge')?.innerText.trim() ?? '',
-                    title,
-                    row.querySelector('.text-muted')?.innerText.trim() ?? ''
-                ]);
-            });
-            doc.autoTable({ head: [['Category', 'Title', 'Date']], body: announcementRows, startY: y, styles: { fontSize: 10 }, headStyles: { fillColor: [228, 87, 46], textColor: [255, 255, 255] } });
-            doc.save('dashboard_summary.pdf');
-        }
+        function pdfChartRow(doc, y, items, gap = 6) {
+    const pageH = doc.internal.pageSize.getHeight();
+    const margin = 14;
+
+    // Measure first so we know whether the row fits on the current page
+    const prepared = items.map(it => {
+        const canvas = document.getElementById(it.id);
+        if (!canvas || !canvas.width) return null;
+        return { ...it, canvas, h: it.w * canvas.height / canvas.width };
+    }).filter(Boolean);
+    if (!prepared.length) return y;
+
+    const rowH = Math.max(...prepared.map(p => p.h)) + 8; // +8 for the title
+    if (y + rowH > pageH - margin) {
+        doc.addPage();
+        y = 15;
+    }
+
+    let x = margin;
+    prepared.forEach(p => {
+        doc.setFontSize(10);
+        doc.setTextColor(39, 47, 84);
+        doc.text(p.title, x, y + 4);
+        doc.addImage(p.canvas.toDataURL('image/png', 1.0), 'PNG', x, y + 7, p.w, p.h);
+        x += p.w + gap;
+    });
+    doc.setTextColor(0, 0, 0);
+    return y + rowH + 4;
+}
+
+function downloadDashboardPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    let y = 15;
+    doc.setFontSize(16); doc.setTextColor(39, 47, 84);
+    doc.text('Dashboard Summary', 14, y); y += 10;
+
+    // ── Charts ──────────────────────────────────────────────
+    // Usable width = 210 - 28 = 182mm
+    y = pdfChartRow(doc, y, [
+        { id: 'saRoleChart',    title: 'Accounts by Role',     w: 88 },
+        { id: 'saProgramChart', title: 'Students by Program',  w: 88 }
+    ]);
+    y = pdfChartRow(doc, y, [
+        { id: 'saActivityChart', title: 'System Activity (last 14 days)', w: 116 },
+        { id: 'saRoleActChart',  title: 'Activity by Role',               w: 60 }
+    ]);
+
+    // ── Tables (unchanged) ──────────────────────────────────
+    doc.setFontSize(12); doc.setTextColor(0, 0, 0);
+    if (y > 260) { doc.addPage(); y = 15; }
+    doc.text('Recent Internship Postings', 14, y); y += 2;
+    const internshipRows = [];
+    document.querySelectorAll('#table-internships tbody tr').forEach(row => {
+        const cells = [...row.querySelectorAll('td')].map(td => td.innerText.trim().replace(/\n/g, ' '));
+        if (cells.length) internshipRows.push(cells);
+    });
+    doc.autoTable({ head: [['Title', 'Company', 'Location', 'Posted']], body: internshipRows, startY: y, styles: { fontSize: 10 }, headStyles: { fillColor: [39, 47, 84], textColor: [255, 255, 255] } });
+    y = doc.lastAutoTable.finalY + 10;
+
+    doc.text('Recently Interested Students', 14, y); y += 2;
+    const studentRows = [];
+    document.querySelectorAll('#table-interested .d-flex.align-items-center').forEach(row => {
+        studentRows.push([
+            row.querySelector('.fw-semibold')?.innerText.trim() ?? '',
+            row.querySelectorAll('p')[1]?.innerText.trim() ?? '',
+            row.querySelector('.badge')?.innerText.trim() ?? '',
+            row.querySelector('.text-muted.mb-0.mt-1')?.innerText.trim() ?? ''
+        ]);
+    });
+    doc.autoTable({ head: [['Name', 'Email', 'Company', 'Date']], body: studentRows, startY: y, styles: { fontSize: 10 }, headStyles: { fillColor: [255, 182, 47], textColor: [39, 47, 84] } });
+    y = doc.lastAutoTable.finalY + 10;
+
+    doc.text('Recent Announcements', 14, y); y += 2;
+    const announcementRows = [];
+    document.querySelectorAll('#table-announcements .d-flex.align-items-start').forEach(row => {
+        const title = row.querySelector('.fw-semibold')?.innerText.trim() ?? '';
+        if (title) announcementRows.push([
+            row.querySelector('.badge')?.innerText.trim() ?? '',
+            title,
+            row.querySelector('.text-muted')?.innerText.trim() ?? ''
+        ]);
+    });
+    doc.autoTable({ head: [['Category', 'Title', 'Date']], body: announcementRows, startY: y, styles: { fontSize: 10 }, headStyles: { fillColor: [228, 87, 46], textColor: [255, 255, 255] } });
+
+    doc.save('dashboard_summary.pdf');
+}
 
         function addRow() {
             const tbody = document.getElementById('csv-tbody');
