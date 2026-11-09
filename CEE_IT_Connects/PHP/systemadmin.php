@@ -2725,9 +2725,6 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                             </div>
                             <input type="hidden" id="col-count" value="<?= count($csvRows[0]) ?>">
                             <input type="hidden" id="row-count" value="<?= count($csvRows) ?>">
-                            <!-- CHANGED: buttons now reuse the existing .btn-update class (subtle yellow
-                                 by default, solid orange on hover) instead of bootstrap's btn-success/
-                                 btn-danger/submit-btn, for the same look as the dashboard buttons. -->
                             <div class="d-flex gap-2 mt-3">
                                 <button type="button" class="btn-update" onclick="addRow()">
                                     <i class="bi bi-plus-circle me-1"></i> Add Row
