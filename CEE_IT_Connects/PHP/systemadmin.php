@@ -334,7 +334,8 @@ $archivedUsers = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 $stmt = $pdo->query("
     SELECT 
-        a.id, a.user_id, a.roles, a.activity, a.activity_date,
+        a.id, a.user_id, a.roles, a.activity, 
+        (a.activity_date AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') AS activity_date,
         COALESCE(u.name, 'Unknown (#' || a.user_id || ')') AS name
     FROM audits a
     LEFT JOIN (
@@ -2830,7 +2831,8 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                             <option value="unassigned">Unassigned</option>
                             <?php foreach ($adviserList as $adv): ?>
                                 <option value="<?= htmlspecialchars($adv['full_name']) ?>">
-                                    <?= htmlspecialchars($adv['full_name']) ?></option>
+                                    <?= htmlspecialchars($adv['full_name']) ?>
+                                </option>
                             <?php endforeach; ?>
                         </select>
                     </div>
