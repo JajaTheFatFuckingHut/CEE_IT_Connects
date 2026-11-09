@@ -370,7 +370,8 @@ $chatMessages = [];
 
 if ($chatSection_id && $section === 'chats') {
     $msgStmt = $pdo->prepare("
-        SELECT m.id, m.sender_id, m.sender_type, m.message, m.created_at,
+        SELECT m.id, m.sender_id, m.sender_type, m.message, 
+        (m.created_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') AS created_at,
                m.attachment_name, m.attachment_type,
                CASE WHEN m.attachment_data IS NOT NULL THEN 1 ELSE 0 END AS has_attachment,
                COALESCE(s.full_name, a.full_name) AS sender_name
