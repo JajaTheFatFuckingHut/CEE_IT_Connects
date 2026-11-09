@@ -3780,13 +3780,14 @@ foreach ($roomStatuses as $s) {
                     i.company,
                     a.full_name       AS adviser_name
                 FROM students s
-                LEFT JOIN ojt_applications oa ON oa.student_id = s.id
-                LEFT JOIN internships i       ON i.id = oa.internship_id
-                LEFT JOIN advisers a          ON a.id = i.adviser_id
+                LEFT JOIN ojt_applications oa ON oa.student_id = s.id AND
+                oa.adviser_id = :adviser_id
+                LEFT JOIN internships i ON i.id = oa.internship_id
+                LEFT JOIN advisers a ON a.id = i.adviser_id
                 WHERE s.is_archived = false
                 ORDER BY s.full_name
             ");
-            $stdntInfoStmt->execute();
+            $stdntInfoStmt->execute(['adviser_id' => $_SESSION['user_id']]);
             $students = $stdntInfoStmt->fetchAll(PDO::FETCH_ASSOC);
             ?>
 
