@@ -7,7 +7,7 @@ $role = strtolower(trim($_SESSION['role'] ?? ''));
 
 
 if ($role !== 'superadmin') {
-    header("Location: student.php");
+    header("Location: index.php");
     exit();
 }
 // addtl s — admin credentials for sidebar account box
@@ -454,7 +454,7 @@ $saProgRows = $pdo->query("
 ")->fetchAll(PDO::FETCH_ASSOC);
 $saProgColorMap = [
     'information technology' => '#29335C',
-    'civil engineering'      => '#E4572E',
+    'civil engineering' => '#E4572E',
     'electrical engineering' => '#f2b705',
 ];
 $saProgLabels = [];
@@ -1117,20 +1117,30 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                 margin: 0 0 16px 0 !important;
                 --bs-gutter-x: 0;
             }
-            .row.g-3.mb-4 > [class*="col-"] {
+
+            .row.g-3.mb-4>[class*="col-"] {
                 width: auto !important;
                 max-width: 100% !important;
                 min-width: 0 !important;
                 padding: 0 !important;
                 margin: 0 !important;
             }
-            .row.g-3.mb-4 .card-body { padding: 8px !important; }
+
+            .row.g-3.mb-4 .card-body {
+                padding: 8px !important;
+            }
+
             .row.g-3.mb-4 .card-body .d-flex {
                 flex-wrap: nowrap !important;
                 align-items: flex-start !important;
                 gap: 4px !important;
             }
-            .row.g-3.mb-4 .card-body .flex-grow-1 { min-width: 0 !important; } /* beats the inline min-width:90px */
+
+            .row.g-3.mb-4 .card-body .flex-grow-1 {
+                min-width: 0 !important;
+            }
+
+            /* beats the inline min-width:90px */
             .row.g-3.mb-4 .card-body p {
                 font-size: 8px !important;
                 letter-spacing: 0 !important;
@@ -1138,13 +1148,21 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                 margin-bottom: 2px !important;
                 word-break: break-word;
             }
-            .row.g-3.mb-4 .card-body h2 { font-size: 0.9rem !important; margin: 0 !important; }
+
+            .row.g-3.mb-4 .card-body h2 {
+                font-size: 0.9rem !important;
+                margin: 0 !important;
+            }
+
             .row.g-3.mb-4 .card-body .rounded-3 {
                 width: 22px !important;
                 height: 22px !important;
                 flex-shrink: 0;
             }
-            .row.g-3.mb-4 .card-body .rounded-3 i { font-size: 10px !important; }
+
+            .row.g-3.mb-4 .card-body .rounded-3 i {
+                font-size: 10px !important;
+            }
 
             /* TABLES — allow horizontal scroll */
             .sysAdm-table {
@@ -1247,9 +1265,18 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
             gap: 10px;
             margin-bottom: 16px;
         }
+
         .sa-toolbar-filters,
-        .sa-toolbar-actions { display: flex; gap: 10px; flex-wrap: wrap; }
-        .sa-toolbar-filters { flex: 1 1 auto; min-width: 0; }
+        .sa-toolbar-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .sa-toolbar-filters {
+            flex: 1 1 auto;
+            min-width: 0;
+        }
 
         .sa-field {
             height: 40px;
@@ -1261,6 +1288,7 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
             min-width: 200px;
             box-sizing: border-box;
         }
+
         .sa-toolbar .btn-update {
             display: inline-flex;
             align-items: center;
@@ -1274,20 +1302,46 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
 
         /* calendar fields match */
         #suspAdmin .sa-input,
-        #suspAdmin .sa-btn { height: 40px; }
+        #suspAdmin .sa-btn {
+            height: 40px;
+        }
 
         @media (max-width: 768px) {
+
             .sa-toolbar,
             .sa-toolbar-filters,
-            .sa-toolbar-actions { flex-direction: column; align-items: stretch; width: 100%; }
-            .sa-toolbar-filters .sa-field { width: 100%; min-width: 0; }
-            .sa-toolbar-actions .btn-update { width: 100%; }
+            .sa-toolbar-actions {
+                flex-direction: column;
+                align-items: stretch;
+                width: 100%;
+            }
 
-            #suspAdmin .sa-form { flex-direction: column; }
-            #suspAdmin .sa-form > * { width: 100%; flex: none; }
-            #suspAdmin .sa-head { flex-wrap: wrap; }
+            .sa-toolbar-filters .sa-field {
+                width: 100%;
+                min-width: 0;
+            }
+
+            .sa-toolbar-actions .btn-update {
+                width: 100%;
+            }
+
+            #suspAdmin .sa-form {
+                flex-direction: column;
+            }
+
+            #suspAdmin .sa-form>* {
+                width: 100%;
+                flex: none;
+            }
+
+            #suspAdmin .sa-head {
+                flex-wrap: wrap;
+            }
+
             #suspAdmin .sa-head form,
-            #suspAdmin .sa-head .sa-input { width: 100%; }
+            #suspAdmin .sa-head .sa-input {
+                width: 100%;
+            }
         }
 
         /* This is for the calendar */
@@ -1431,8 +1485,11 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
         }
 
         /* ===== bottom nav: phones + tablet portrait ===== */
-        @media (max-width: 768px), (max-width: 1024px) and (orientation: portrait) {
-            :root { --bn-h: 60px; }
+        @media (max-width: 768px),
+        (max-width: 1024px) and (orientation: portrait) {
+            :root {
+                --bn-h: 60px;
+            }
 
             .sidebar {
                 top: auto;
@@ -1452,10 +1509,14 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                 box-shadow: 0 -2px 10px rgba(0, 0, 0, .15);
             }
 
-            .sidebar::-webkit-scrollbar { display: none; }
+            .sidebar::-webkit-scrollbar {
+                display: none;
+            }
 
             .sidebar h3,
-            .sidebar-user { display: none !important; }
+            .sidebar-user {
+                display: none !important;
+            }
 
             .sidebar a {
                 flex: 1 0 68px;
@@ -1495,7 +1556,9 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                 color: #fff;
             }
 
-            .sidebar a:hover i { color: inherit; }
+            .sidebar a:hover i {
+                color: inherit;
+            }
 
             .sidebar a.active {
                 background: transparent;
@@ -1504,7 +1567,9 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                 border-top-color: #ff6b2c;
             }
 
-            .sidebar a.active i { color: #ff6b2c; }
+            .sidebar a.active i {
+                color: #ff6b2c;
+            }
 
             .main-content {
                 margin-left: 0 !important;
@@ -1513,50 +1578,60 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
         }
 
         @media (max-width: 768px) {
-        .row.g-3.mb-4 {
-            display: grid !important;
-            grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-            gap: 8px !important;
-            margin: 0 0 16px 0 !important;
-            --bs-gutter-x: 0;
-            --bs-gutter-y: 0;
+            .row.g-3.mb-4 {
+                display: grid !important;
+                grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+                gap: 8px !important;
+                margin: 0 0 16px 0 !important;
+                --bs-gutter-x: 0;
+                --bs-gutter-y: 0;
+            }
+
+            .row.g-3.mb-4>[class*="col-"] {
+                width: auto !important;
+                max-width: 100% !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+
+            .row.g-3.mb-4 .ojtc-stat-card {
+                border-radius: 14px !important;
+            }
+
+            .row.g-3.mb-4 .card-body {
+                padding: 12px 8px !important;
+            }
+
+            .row.g-3.mb-4 .card-body .d-flex {
+                display: block !important;
+            }
+
+            .row.g-3.mb-4 .card-body .rounded-3,
+            .row.g-3.mb-4 .card-body p.d-none {
+                display: none !important;
+            }
+
+            .row.g-3.mb-4 .card-body .flex-grow-1 {
+                min-width: 0 !important;
+            }
+
+            .row.g-3.mb-4 .card-body p {
+                font-size: 9px !important;
+                line-height: 1.25 !important;
+                letter-spacing: 0 !important;
+                margin: 0 0 6px 0 !important;
+                min-height: 2.5em;
+                word-break: normal !important;
+                overflow-wrap: normal !important;
+                hyphens: none !important;
+            }
+
+            .row.g-3.mb-4 .card-body h2 {
+                font-size: 1.15rem !important;
+                line-height: 1.1 !important;
+                margin: 0 !important;
+            }
         }
-
-        .row.g-3.mb-4 > [class*="col-"] {
-            width: auto !important;
-            max-width: 100% !important;
-            padding: 0 !important;
-            margin: 0 !important;
-        }
-
-        .row.g-3.mb-4 .ojtc-stat-card { border-radius: 14px !important; }
-
-        .row.g-3.mb-4 .card-body { padding: 12px 8px !important; }
-
-        .row.g-3.mb-4 .card-body .d-flex { display: block !important; }
-
-        .row.g-3.mb-4 .card-body .rounded-3,
-        .row.g-3.mb-4 .card-body p.d-none { display: none !important; }
-
-        .row.g-3.mb-4 .card-body .flex-grow-1 { min-width: 0 !important; }
-
-        .row.g-3.mb-4 .card-body p {
-            font-size: 9px !important;
-            line-height: 1.25 !important;
-            letter-spacing: 0 !important;
-            margin: 0 0 6px 0 !important;
-            min-height: 2.5em; 
-            word-break: normal !important;
-            overflow-wrap: normal !important;
-            hyphens: none !important;
-        }
-
-        .row.g-3.mb-4 .card-body h2 {
-            font-size: 1.15rem !important;
-            line-height: 1.1 !important;
-            margin: 0 !important;
-        }
-    }
     </style>
 </head>
 
@@ -2073,7 +2148,8 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
 
                 <div class="sa-toolbar">
                     <div class="sa-toolbar-filters">
-                        <input type="text" id="search-delete" oninput="filterDelete()" placeholder="Search for a student" class="sa-field">
+                        <input type="text" id="search-delete" oninput="filterDelete()"
+                            placeholder="Search for a student" class="sa-field">
                         <select id="filter-role" onchange="filterDelete()" class="sa-field">
                             <option value="">All Roles</option>
                             <option value="student">Student</option>
@@ -2133,7 +2209,8 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
 
                 <div class="sa-toolbar">
                     <div class="sa-toolbar-filters">
-                        <input type="text" id="search-archive" oninput="filterArchive()" placeholder="Search by name or email..." class="sa-field">
+                        <input type="text" id="search-archive" oninput="filterArchive()"
+                            placeholder="Search by name or email..." class="sa-field">
                         <select id="filter-role-archive" onchange="filterArchive()" class="sa-field">
                             <option value="">All Roles</option>
                             <option value="student">Student</option>
@@ -2196,7 +2273,8 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
 
                 <div class="sa-toolbar">
                     <div class="sa-toolbar-filters">
-                        <input type="text" id="search-roles" oninput="filterRoles()" placeholder="Search for an admin" class="sa-field">
+                        <input type="text" id="search-roles" oninput="filterRoles()" placeholder="Search for an admin"
+                            class="sa-field">
                         <select id="filter-role-admin" onchange="filterRoles()" class="sa-field">
                             <option value="">All Roles</option>
                             <option value="superadmin">System Admin</option>
@@ -2349,7 +2427,8 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                 </div>
                 <div class="sa-toolbar">
                     <div class="sa-toolbar-filters">
-                        <input type="text" id="search-monitor" oninput="filterMonitor()" placeholder="Search for a student" class="sa-field">
+                        <input type="text" id="search-monitor" oninput="filterMonitor()"
+                            placeholder="Search for a student" class="sa-field">
                         <select id="filter-role-monitor" onchange="filterMonitor()" class="sa-field">
                             <option value="">All Roles</option>
                             <option value="student">Student</option>
@@ -2425,7 +2504,8 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                     </div>
                     <form action="../auto-register-csv.php" method="POST" enctype="multipart/form-data">
                         <div class="d-flex flex-column gap-2">
-                            <input type="file" name="students_csv" accept=".csv" required class="form-control" style="font-size:13px;">
+                            <input type="file" name="students_csv" accept=".csv" required class="form-control"
+                                style="font-size:13px;">
                             <div>
                                 <button class="btn-update" type="submit">
                                     <i class="bi bi-upload me-1"></i>Replace CSV
@@ -2743,12 +2823,14 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                 <!-- Search + filter -->
                 <div class="sa-toolbar">
                     <div class="sa-toolbar-filters">
-                        <input type="text" id="assign-search" oninput="filterAssignTable()" placeholder="Search for an adviser" class="sa-field">
+                        <input type="text" id="assign-search" oninput="filterAssignTable()"
+                            placeholder="Search for an adviser" class="sa-field">
                         <select id="assign-filter-adviser" onchange="filterAssignTable()" class="sa-field">
                             <option value="">All Advisers</option>
                             <option value="unassigned">Unassigned</option>
                             <?php foreach ($adviserList as $adv): ?>
-                                <option value="<?= htmlspecialchars($adv['full_name']) ?>"><?= htmlspecialchars($adv['full_name']) ?></option>
+                                <option value="<?= htmlspecialchars($adv['full_name']) ?>">
+                                    <?= htmlspecialchars($adv['full_name']) ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
@@ -3093,7 +3175,7 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                         ");
 
                         $cardStyles = [
-                            'Civil Engineering'      => ['color' => '#E4572E', 'icon' => 'bi-pc-display'],
+                            'Civil Engineering' => ['color' => '#E4572E', 'icon' => 'bi-pc-display'],
                             'Information Technology' => ['color' => '#29335C', 'icon' => 'bi-code-slash'],
                             'Electrical Engineering' => ['color' => '#f2b705', 'icon' => 'bi-lightning-charge'],
                         ];

@@ -31,7 +31,7 @@ function getDashboardByRole($role)
         'student' => 'rooms.php',
         'hte_adviser' => 'hte-adviser.php',
         'internship_adviser' => 'ojt-adviser.php',
-        default => 'student.php'
+        default => 'index.php'
     };
 }
 

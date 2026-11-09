@@ -34,7 +34,7 @@ $now = new DateTime();
 //     $stmt = $pdo->prepare("SELECT id FROM students WHERE id = :id");
 //     $stmt->execute(['id' => $userId]);
 //     if ($stmt->fetch()) {
-//         header('Location: student.php');
+//         header('Location: index.php');
 //         exit;
 //     }
 // }
@@ -74,7 +74,7 @@ $now = new DateTime();
 
 // session_unset();
 // session_destroy();
-// header('Location: student.php');
+// header('Location: index.php');
 // exit;
 ?>
 <!DOCTYPE html>
@@ -162,7 +162,9 @@ $now = new DateTime();
 
 
         @media (max-width: 768px) {
-            body { background-attachment: scroll; }
+            body {
+                background-attachment: scroll;
+            }
         }
     </style>
 </head>
@@ -223,8 +225,7 @@ $now = new DateTime();
                 Everything students, advisers and partner companies need to run the
                 On-the-Job Training process in one place.
             </p>
-            <div class="mx-auto mb-5"
-                style="width: 72px; height: 4px; border-radius: 4px; background: #ff673a;"></div>
+            <div class="mx-auto mb-5" style="width: 72px; height: 4px; border-radius: 4px; background: #ff673a;"></div>
 
             <div class="row g-4">
                 <div class="col-lg-4 col-md-6">
@@ -240,7 +241,7 @@ $now = new DateTime();
                     <div class="feature-item animate-on-scroll animate-scale">
                         <i class="fa-solid fa-filter feature-icon"></i>
                         <h5>Internship Matching</h5>
-                        <p>Search and filter listings by program and preferences 
+                        <p>Search and filter listings by program and preferences
                             to find the right fit faster.</p>
                         <span class="feature-role">Students</span>
                     </div>
@@ -286,7 +287,7 @@ $now = new DateTime();
     </section>
 
     <!-- MAP SECTION -->
-        <section class="map-section">
+    <section class="map-section">
         <div class="map-section-wrapper">
             <div class="map-header">
                 <div class="d-flex align-items-center gap-3">
@@ -353,7 +354,7 @@ $now = new DateTime();
         </div>
     </section>
 
-        <!-- ABOUT -->
+    <!-- ABOUT -->
     <section class="about-section">
         <div class="container">
             <div class="row align-items-center g-5">

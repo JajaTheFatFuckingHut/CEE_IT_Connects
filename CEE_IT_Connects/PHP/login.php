@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['role'] = 'student';
 
-            header("Location: ../student.php");
+            header("Location: ../index.php");
             exit;
 
         } else {
