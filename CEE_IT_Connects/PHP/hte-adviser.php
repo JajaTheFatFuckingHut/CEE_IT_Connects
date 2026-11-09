@@ -139,21 +139,54 @@ if ($isAdviser) {
 
         $roomName = $advName . "'s Room";
 
-        $insertRoom = $pdo->prepare("
-            INSERT INTO rooms (room_name, adviser_id, is_archived)
-            VALUES (?, ?, FALSE)
-            RETURNING id
-        ");
-        $insertRoom->execute([$roomName, $adviser_id]);
-        $advisersRoomId = $insertRoom->fetchColumn();
+        try {
+            $pdo->beginTransaction();
 
-        // Make the adviser a member of their own room so it shows up
-        // in the sidebar's room list query (rm.user_id = adviser_id)
+            $insertRoom = $pdo->prepare("
+                INSERT INTO rooms (room_name, adviser_id, is_archived)
+                VALUES (?, ?, FALSE)
+                RETURNING id
+            ");
+            $insertRoom->execute([$roomName, $adviser_id]);
+            $advisersRoomId = $insertRoom->fetchColumn();
+
+            // Make the adviser a member of their own room so it shows up
+            // in the sidebar's room list query (rm.user_id = adviser_id)
+            $pdo->prepare("
+                INSERT INTO room_members (room_id, user_id, user_type)
+                VALUES (?, ?, 'adviser')
+            ")->execute([$advisersRoomId, $adviser_id]);
+
+            $pdo->commit();
+        } catch (Throwable $e) {
+            if ($pdo->inTransaction())
+                $pdo->rollBack();
+            error_log('Room creation failed: ' . $e->getMessage());
+            $advisersRoomId = null;
+        }
+    }
+
+    // Add this HTE adviser's students (applicants to their internship) to the room.
+    // Skips students already in the room and students whose accounts are archived.
+    if ($advisersRoomId) {
         $pdo->prepare("
             INSERT INTO room_members (room_id, user_id, user_type)
-            VALUES (?, ?, 'adviser')
-        ")->execute([$advisersRoomId, $adviser_id]);
+            SELECT DISTINCT ?, s.id, 'student'
+            FROM advisers hte
+            JOIN ojt_applications oa ON oa.internship_id = hte.internship_id
+            JOIN students s ON s.id = oa.student_id
+            WHERE hte.id = ?
+              AND hte.role = 'HTE_adviser'
+              AND s.is_archived = FALSE
+              AND NOT EXISTS (
+                  SELECT 1 FROM room_members rm
+                  WHERE rm.room_id = ?
+                    AND rm.user_id = s.id
+                    AND rm.user_type = 'student'
+              )
+        ")->execute([$advisersRoomId, $adviser_id, $advisersRoomId]);
     }
+
     if (!$current_room_id) {
         $current_room_id = $advisersRoomId;
     }
@@ -4589,8 +4622,7 @@ foreach ($roomStatuses as $s) {
                             }
                         }
                     }
-                }
-            });
+            } });
         }
     </script>
     <script>
@@ -5352,7 +5384,7 @@ foreach ($roomStatuses as $s) {
                 </thead>
                 <tbody>${rowsHtml}</tbody>
             </table>
-        </div>
+      </div>
     </div>`;
         }
     </script>
