@@ -7,6 +7,7 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'superadmin') {
     header("Location: login-page.php");
     exit();
 }
+
 function formatSection(?string $key): string
 {
     if (!$key)
@@ -659,7 +660,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
     if (isset($_POST['delete_permanently'])) {
-        $id = (int) ($_POST['user_id'] ?? 0);   // was $_POST['id']
+        $id = (int) ($_POST['user_id'] ?? 0);
         $source = $_POST['source'] ?? '';
 
         if (!$id || !in_array($source, ['students', 'admins', 'advisers'], true)) {
@@ -668,7 +669,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
 
-        $user = fetchAccount($pdo, $source, $id, true);  // must already be archived
+        // ── Load the archived account (replaces fetchAccount) ──
+        $accountSql = [
+            'admins' => "SELECT id, name, role FROM admins WHERE id = ? AND is_archived = TRUE",
+            'advisers' => "SELECT id, full_name AS name, role FROM advisers WHERE id = ? AND is_archived = TRUE",
+            'students' => "SELECT id, full_name AS name, 'student' AS role FROM students WHERE id = ? AND is_archived = TRUE",
+        ][$source];
+
+        $accountStmt = $pdo->prepare($accountSql);
+        $accountStmt->execute([$id]);
+        $user = $accountStmt->fetch(PDO::FETCH_ASSOC);
+
         if (!$user) {
             $_SESSION['error'] = "Archived account not found.";
             header("Location: systemadmin.php#archived");
@@ -683,6 +694,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             $pdo->beginTransaction();
 
+            // ── Clean up rooms / membership ──
             if ($source === 'advisers') {
                 $pdo->prepare("DELETE FROM room_members WHERE room_id IN (SELECT id FROM rooms WHERE adviser_id = ?)")->execute([$id]);
                 $pdo->prepare("DELETE FROM rooms WHERE adviser_id = ?")->execute([$id]);
@@ -690,12 +702,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $pdo->prepare("DELETE FROM room_members WHERE user_id = ? AND user_type = 'student'")->execute([$id]);
             }
 
+            // ── Delete the account ──
             $pdo->prepare("DELETE FROM $source WHERE id = ? AND is_archived = TRUE")->execute([$id]);
 
+            // ── Audit log ──
             $pdo->prepare("INSERT INTO audits (user_id, roles, activity, activity_date) VALUES (?, ?, ?, NOW())")
-                ->execute([$_SESSION['user_id'], $_SESSION['role'], 'Permanently deleted ' . $user['role'] . ' account: ' . $user['name']]);
+                ->execute([
+                    $_SESSION['user_id'],
+                    $_SESSION['role'],
+                    'Permanently deleted ' . $user['role'] . ' account: ' . $user['name'],
+                ]);
 
-            notifyAdmins($pdo, 'Account Permanently Deleted', $user['role'], $user['name'], 'has been permanently deleted');
+            // ── Notifications (replaces notifyAdmins) ──
+            $notifStmt = $pdo->prepare("
+            INSERT INTO notifications (user_id, user_type, title, message, link, is_read, created_at)
+            VALUES (?, 'admin', ?, ?, ?, FALSE, NOW())
+        ");
+            $lookupStmt = $pdo->prepare("SELECT id FROM admins WHERE role = ? AND is_archived = FALSE");
+
+            foreach (['superadmin' => 'systemadmin.php', 'internship_admin' => 'internship-admin.php'] as $targetRole => $link) {
+                $lookupStmt->execute([$targetRole]);
+                foreach ($lookupStmt->fetchAll(PDO::FETCH_COLUMN) as $adminId) {
+                    $notifStmt->execute([
+                        $adminId,
+                        'Account Permanently Deleted',
+                        'The ' . $user['role'] . ' account of ' . $user['name'] . ' has been permanently deleted.',
+                        $link,
+                    ]);
+                }
+            }
 
             $pdo->commit();
         } catch (Throwable $e) {
