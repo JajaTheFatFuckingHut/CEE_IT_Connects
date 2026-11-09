@@ -3524,8 +3524,6 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
             doc.autoTable({ head: [['Title', 'Company', 'Location', 'Posted']], body: internshipRows, startY: y, styles: { fontSize: 10 }, headStyles: { fillColor: [39, 47, 84], textColor: [255, 255, 255] } });
             y = doc.lastAutoTable.finalY + 10;
 
-            doc.autoTable({ head: [['Category', 'Title', 'Date']], body: announcementRows, startY: y, styles: { fontSize: 10 }, headStyles: { fillColor: [228, 87, 46], textColor: [255, 255, 255] } });
-
             doc.save('dashboard_summary.pdf');
         }
 
