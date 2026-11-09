@@ -322,7 +322,7 @@ $chattableStmt = $pdo->prepare("
     AND a.internship_id IN (
         SELECT oa.internship_id
         FROM ojt_applications oa
-        JOIN room_members rm ON ib.student_id = rm.user_id AND rm.user_type = 'student'
+        JOIN room_members rm ON oa.student_id = rm.user_id AND rm.user_type = 'student'
         JOIN rooms r ON r.id = rm.room_id
     WHERE r.adviser_id = ?
     AND r.is_archived = FALSE

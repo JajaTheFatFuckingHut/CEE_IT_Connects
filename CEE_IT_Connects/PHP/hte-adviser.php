@@ -307,37 +307,41 @@ unset($row);
 // die();
 
 $chattableStmt = $pdo->prepare("
-    SELECT 
-        s.id          AS user_id,
-        s.full_name,
-        'student'     AS user_type
-    FROM students s
-    JOIN room_members rm ON s.id = rm.user_id AND rm.user_type = 'student'
-    JOIN rooms r ON r.id = rm.room_id
-    WHERE r.adviser_id = ?
-    AND r.is_archived = FALSE
-    UNION
     SELECT
-        a.id AS user_id,
-        a.full_name,
+        s.id      AS user_id,
+        s.full_name,
+        'student' AS user_type
+    FROM students s
+    JOIN ojt_applications oa ON oa.student_id = s.id
+    JOIN advisers hte ON hte.internship_id = oa.internship_id
+    WHERE hte.id = ?
+      AND hte.role = 'HTE_adviser'
+
+    UNION
+
+    -- OJT advisers whose section rooms contain this company's applicants
+    SELECT
+        adv.id    AS user_id,
+        adv.full_name,
         'adviser' AS user_type
-    FROM advisers a
-    WHERE a.role = 'HTE_adviser'
-    AND a.internship_id IN (
-        SELECT oa.internship_id
-        FROM ojt_applications oa
-        JOIN room_members rm ON oa.student_id = rm.user_id AND rm.user_type = 'student'
-        JOIN rooms r ON r.id = rm.room_id
-    WHERE r.adviser_id = ?
-    AND r.is_archived = FALSE
-    )
+    FROM advisers adv
+    JOIN rooms r ON r.adviser_id = adv.id AND r.is_archived = FALSE
+    JOIN room_members rm ON rm.room_id = r.id AND rm.user_type = 'student'
+    JOIN ojt_applications oa ON oa.student_id = rm.user_id
+    JOIN advisers hte ON hte.internship_id = oa.internship_id
+    WHERE hte.id = ?
+      AND hte.role = 'HTE_adviser'
+      AND adv.role = 'internship_adviser'
+
     ORDER BY full_name
 ");
 $chattableStmt->execute([$adviser_id, $adviser_id]);
 $chattableUsers = $chattableStmt->fetchAll(PDO::FETCH_ASSOC);
 
+// ── Validate the requested chat ──────────────────────────────────────────────
 $chatSection_id = isset($_GET['chat_id']) ? (int) $_GET['chat_id'] : null;
 $chatSection_type = $_GET['chat_type'] ?? null;
+
 if (!in_array($chatSection_type, ['student', 'adviser'], true)) {
     $chatSection_id = $chatSection_type = null;
 }
@@ -349,7 +353,7 @@ if ($chatSection_id) {
     }
 }
 
-// ── Fetch existing chat conversations for this adviser ────────────────────────
+// ── Fetch existing chat conversations for this adviser ───────────────────────
 $adviserChatStmt = $pdo->prepare("
     SELECT DISTINCT ON (chat_user_id, chat_user_type)
            chat_user_id, chat_user_type, last_message,
@@ -370,6 +374,8 @@ $adviserChatStmt = $pdo->prepare("
 ");
 $adviserChatStmt->execute([$adviser_id, $adviser_id, $adviser_id, $adviser_id]);
 $adviserChats = $adviserChatStmt->fetchAll(PDO::FETCH_ASSOC);
+
+// ── Fetch messages if a chat is open ─────────────────────────────────────────
 $chatMessages = [];
 
 if ($chatSection_id && $section === 'chats') {
