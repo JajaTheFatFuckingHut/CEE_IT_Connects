@@ -132,12 +132,18 @@ if ($isAdviser) {
 
     if (!$advisersRoomId) {
 
-        // Get the adviser's name to build a default room name
-        $advNameStmt = $pdo->prepare("SELECT full_name FROM advisers WHERE id = ?");
-        $advNameStmt->execute([$adviser_id]);
-        $advName = $advNameStmt->fetchColumn() ?: 'Adviser';
+        // Build the default room name from the company's name
+        $companyStmt = $pdo->prepare("
+            SELECT i.company, a.full_name
+            FROM advisers a
+            LEFT JOIN internships i ON i.id = a.internship_id
+            WHERE a.id = ?
+        ");
+        $companyStmt->execute([$adviser_id]);
+        $row = $companyStmt->fetch(PDO::FETCH_ASSOC);
 
-        $roomName = $advName . "'s Room";
+        $roomName = trim($row['company'] ?? '')
+            ?: (($row['full_name'] ?? 'Adviser') . "'s Room");
 
         try {
             $pdo->beginTransaction();
@@ -4622,7 +4628,8 @@ foreach ($roomStatuses as $s) {
                             }
                         }
                     }
-            } });
+                }
+            });
         }
     </script>
     <script>
