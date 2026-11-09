@@ -2179,10 +2179,10 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                                     <td><?= htmlspecialchars(ucwords(str_replace('_', ' ', $u['role']))) ?></td>
                                     <td>
                                         <form method="POST" action="systemadmin-db.php"
-                                            onsubmit="return confirm('Are you sure you want to delete this user?')">
+                                            onsubmit="return confirm('Are you sure you want to arhive this user?')">
                                             <input type="hidden" name="id" value="<?= $u['id'] ?>">
                                             <input type="hidden" name="source" value="<?= $u['source'] ?>">
-                                            <button type="submit" name="delete" class="btn-delete">
+                                            <button type="submit" name="archive" class="btn-delete">
                                                 <i class="bi bi-archive"></i> Archive
                                             </button>
                                         </form>
@@ -2247,6 +2247,16 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                                             <input type="hidden" name="restore" value="1">
                                             <button type="submit" class="btn-restore">
                                                 <i class="bi bi-check2-circle"></i> Restore
+                                            </button>
+                                        </form>
+                                        <form method="POST" action="systemadmin-db.php"
+                                            onsubmit="return confirm('Delete this user permanently?')">
+                                            <input type="hidden" name="user_id" value="<?= $u['id'] ?>">
+                                            <input type="hidden" name="source"
+                                                value="<?= htmlspecialchars($u['source']) ?>">
+                                            <input type="hidden" name="delete_permanently" value="1">
+                                            <button type="submit" class="btn-restore">
+                                                <i class="bi bi-trash"></i> Delete
                                             </button>
                                         </form>
                                     </td>
