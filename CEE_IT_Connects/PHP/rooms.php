@@ -303,9 +303,9 @@ $chatHteAdvisersStmt = $pdo->prepare("
         a.full_name,
         'adviser'     AS user_type
     FROM advisers a
-    JOIN internship_bookmarks ib
-        ON a.internship_id = ib.internship_id
-    WHERE ib.student_id = ?
+    JOIN ojt_applications oa
+        ON a.internship_id = oa.internship_id
+    WHERE oa.student_id = ?
       AND a.role = 'HTE_adviser'
     ORDER BY a.full_name
 ");
