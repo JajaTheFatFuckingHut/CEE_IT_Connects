@@ -10,6 +10,23 @@ $rt = $pdo->prepare("SELECT room_type FROM rooms WHERE id = ?");
 $rt->execute([$room_id]);
 $isDepartmentRoom = $rt->fetchColumn() === 'department';
 
+function canManageRoomMembers(array $room): bool
+{
+    $role = $_SESSION['role'] ?? '';
+    $uid = (int) ($_SESSION['user_id'] ?? 0);
+
+    // Department rooms (IT / CE / EE): superadmin + internship_admin only
+    if (($room['room_type'] ?? '') === 'department') {
+        return in_array($role, ['superadmin', 'internship_admin'], true);
+    }
+
+    // Regular rooms: only the adviser who owns the room
+    return getUserType($role) === 'adviser'
+        && !empty($room['adviser_id'])
+        && (int) $room['adviser_id'] === $uid;
+}
+$canManageMembers = !empty($room) && canManageRoomMembers($room);
+
 
 // ROOM INFO
 $stmt = $pdo->prepare("
@@ -1283,7 +1300,7 @@ $backLink = getDashboardByRole($_SESSION['role']);
                 justify-content: space-between;
             }
 
-            .rm-hero:has(.circle-progress) > div:first-child {
+            .rm-hero:has(.circle-progress)>div:first-child {
                 flex: 1;
                 min-width: 0;
                 width: auto;
@@ -1316,8 +1333,8 @@ $backLink = getDashboardByRole($_SESSION['role']);
             }
         }
 
-              
-                /* ── ROOM PAGE: compact hero on phones ── */
+
+        /* ── ROOM PAGE: compact hero on phones ── */
         @media (max-width: 576px) {
 
             .rm-hero {
@@ -1345,9 +1362,11 @@ $backLink = getDashboardByRole($_SESSION['role']);
                 color: rgba(255, 255, 255, .8);
             }
 
-            .rm-chip i { display: none; }
+            .rm-chip i {
+                display: none;
+            }
 
-            .rm-chip + .rm-chip::before {
+            .rm-chip+.rm-chip::before {
                 content: "·";
                 margin: 0 8px;
                 font-weight: 700;
@@ -1362,7 +1381,7 @@ $backLink = getDashboardByRole($_SESSION['role']);
                 justify-content: space-between;
             }
 
-            .rm-hero:has(.circle-progress) > div:first-child {
+            .rm-hero:has(.circle-progress)>div:first-child {
                 flex: 1;
                 min-width: 0;
             }
@@ -1400,7 +1419,9 @@ $backLink = getDashboardByRole($_SESSION['role']);
                 border-top: 1px solid rgba(255, 255, 255, .15);
             }
 
-            .rm-grid > .rm-col:last-child > .rm-card:first-child { display: none; }
+            .rm-grid>.rm-col:last-child>.rm-card:first-child {
+                display: none;
+            }
 
             .rm-tabs {
                 gap: 0;
@@ -1431,7 +1452,7 @@ $backLink = getDashboardByRole($_SESSION['role']);
         @media (max-width: 380px) {
             .rm-tab i {
                 display: none;
-            /* }
+                /* }
 
             .rm-hero:has(.circle-progress) {
                 flex-wrap: wrap;
@@ -1449,136 +1470,136 @@ $backLink = getDashboardByRole($_SESSION['role']);
             .rm-hero-right .text-end small {
                 text-align: left;
             } */
-        }
-
-        /* addtl e */
-
-        /* ── ADD PARTICIPANT (spacing fix) ── */
-        #addParticipantModal .modal-box {
-            display: flex;
-            flex-direction: column;
-            width: calc(100% - 32px);
-            max-width: 460px;
-            max-height: 85vh;
-            background: #fff;
-            border-radius: 14px;
-            overflow: hidden;
-        }
-
-        #addParticipantModal .modal-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 16px 20px;
-            background: #fff;
-            border-bottom: 1px solid #eef0f6;
-            flex-shrink: 0;
-        }
-
-        #addParticipantModal .modal-header h6 {
-            margin: 0;
-            font-size: 15px;
-            font-weight: 700;
-            color: #272f54;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        #addParticipantModal .modal-header h6 i {
-            margin: 0 !important;
-        }
-
-        #addParticipantModal .modal-close {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            background: #f1f3f8;
-            color: #64748b;
-            font-size: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        #addParticipantModal .modal-close:hover {
-            background: #e4572e;
-            color: #fff;
-        }
-
-        #addParticipantModal .modal-body {
-            flex: 1 1 auto;
-            min-height: 0;
-            display: flex;
-            flex-direction: column;
-            padding: 16px 20px 8px;
-        }
-
-        #addParticipantModal .search-input-wrap {
-            margin-bottom: 12px;
-            flex-shrink: 0;
-        }
-
-        #addParticipantModal .search-input-wrap input {
-            padding: 10px 14px 10px 36px;
-            border-radius: 10px;
-        }
-
-        #addParticipantModal .participant-list {
-            flex: 1 1 auto;
-            max-height: 300px;
-            overflow-y: auto;
-            margin-right: -8px;
-            padding-right: 8px;
-        }
-
-        #addParticipantModal .participant-item {
-            padding: 10px 8px;
-            gap: 12px;
-        }
-
-        #addParticipantModal .participant-avatar {
-            width: 38px;
-            height: 38px;
-            min-width: 38px;
-        }
-
-        #addParticipantModal .participant-info strong {
-            font-size: 15px;
-            font-weight: 600;
-            margin-bottom: 2px;
-            color: #1e293b;
-        }
-
-        #addParticipantModal .participant-info small {
-            font-size: 13px;
-        }
-
-        #addParticipantModal .modal-footer {
-            padding: 14px 20px;
-            border-top: 1px solid #eef0f6;
-            background: #fff;
-            flex-shrink: 0;
-            gap: 10px;
-        }
-
-        #addParticipantModal .btn-add-confirm {
-            padding: 8px 18px;
-            border-radius: 8px;
-        }
-
-        #addParticipantModal .modal-footer .btn-light {
-            padding: 8px 16px;
-            border-radius: 8px;
-        }
-
-        @media (min-width: 577px) and (max-width: 992px) {
-            .rm-grid > .rm-col:last-child {
-                display: grid;
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-                align-items: start;
             }
-        }
+
+            /* addtl e */
+
+            /* ── ADD PARTICIPANT (spacing fix) ── */
+            #addParticipantModal .modal-box {
+                display: flex;
+                flex-direction: column;
+                width: calc(100% - 32px);
+                max-width: 460px;
+                max-height: 85vh;
+                background: #fff;
+                border-radius: 14px;
+                overflow: hidden;
+            }
+
+            #addParticipantModal .modal-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 16px 20px;
+                background: #fff;
+                border-bottom: 1px solid #eef0f6;
+                flex-shrink: 0;
+            }
+
+            #addParticipantModal .modal-header h6 {
+                margin: 0;
+                font-size: 15px;
+                font-weight: 700;
+                color: #272f54;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            #addParticipantModal .modal-header h6 i {
+                margin: 0 !important;
+            }
+
+            #addParticipantModal .modal-close {
+                width: 30px;
+                height: 30px;
+                border-radius: 50%;
+                background: #f1f3f8;
+                color: #64748b;
+                font-size: 18px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            #addParticipantModal .modal-close:hover {
+                background: #e4572e;
+                color: #fff;
+            }
+
+            #addParticipantModal .modal-body {
+                flex: 1 1 auto;
+                min-height: 0;
+                display: flex;
+                flex-direction: column;
+                padding: 16px 20px 8px;
+            }
+
+            #addParticipantModal .search-input-wrap {
+                margin-bottom: 12px;
+                flex-shrink: 0;
+            }
+
+            #addParticipantModal .search-input-wrap input {
+                padding: 10px 14px 10px 36px;
+                border-radius: 10px;
+            }
+
+            #addParticipantModal .participant-list {
+                flex: 1 1 auto;
+                max-height: 300px;
+                overflow-y: auto;
+                margin-right: -8px;
+                padding-right: 8px;
+            }
+
+            #addParticipantModal .participant-item {
+                padding: 10px 8px;
+                gap: 12px;
+            }
+
+            #addParticipantModal .participant-avatar {
+                width: 38px;
+                height: 38px;
+                min-width: 38px;
+            }
+
+            #addParticipantModal .participant-info strong {
+                font-size: 15px;
+                font-weight: 600;
+                margin-bottom: 2px;
+                color: #1e293b;
+            }
+
+            #addParticipantModal .participant-info small {
+                font-size: 13px;
+            }
+
+            #addParticipantModal .modal-footer {
+                padding: 14px 20px;
+                border-top: 1px solid #eef0f6;
+                background: #fff;
+                flex-shrink: 0;
+                gap: 10px;
+            }
+
+            #addParticipantModal .btn-add-confirm {
+                padding: 8px 18px;
+                border-radius: 8px;
+            }
+
+            #addParticipantModal .modal-footer .btn-light {
+                padding: 8px 16px;
+                border-radius: 8px;
+            }
+
+            @media (min-width: 577px) and (max-width: 992px) {
+                .rm-grid>.rm-col:last-child {
+                    display: grid;
+                    grid-template-columns: repeat(2, minmax(0, 1fr));
+                    align-items: start;
+                }
+            }
     </style>
 </head>
 
@@ -1692,7 +1713,7 @@ $rmFmtTime = function ($ts): string {
                         <?= htmlspecialchars($room['school_year']) ?></span>
                 <?php endif; ?>
             <?php elseif (!empty($room['section'])): ?>
-                
+
                 <?php if (!empty($room['school_year'])): ?>
                     <span class="rm-chip"><i class="fa-solid fa-calendar"></i> S.Y.
                         <?= htmlspecialchars($room['school_year']) ?></span>
@@ -1775,10 +1796,13 @@ $rmFmtTime = function ($ts): string {
             <span class="text-muted ms-auto" style="font-size:14px;" id="memberCount">
                 <?= count($members) ?> participant(s)
             </span>
-            <button class="btn btn-sm text-white fw-semibold" style="background:#272f54;border-radius:8px;font-size:14px;"
-                onclick="openModal()">
-                <i class="fa-solid fa-user-plus me-1"></i> Add Participant
-            </button>
+
+            <?php if ($canManageMembers): ?>
+                <button class="btn btn-sm text-white fw-semibold" style="background:#272f54;border-radius:8px;font-size:14px;"
+                    onclick="openModal()">
+                    <i class="fa-solid fa-user-plus me-1"></i> Add Participant
+                </button>
+            <?php endif; ?>
         </div>
 
         <div id="memberList">
@@ -2015,57 +2039,58 @@ $rmFmtTime = function ($ts): string {
 </div>
 
 <!-- MODAL FOR ADD PARTICIPANT -->
-<div class="modal-overlay" id="addParticipantModal" onclick="if(event.target===this) closeModal()">
-    <div class="modal-box">
+<?php if ($canManageMembers): ?>
+    <div class="modal-overlay" id="addParticipantModal" onclick="if(event.target===this) closeModal()">
+        <div class="modal-box">
 
-        <div class="modal-header">
-            <h6><i class="fa-solid fa-user-plus me-2"></i>Add Participant</h6>
-            <button class="modal-close" name="add_participant" onclick="closeModal()">&times;</button>
-        </div>
-
-        <div class="modal-body">
-            <div class="search-input-wrap">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" id="participantSearch" placeholder="Search by name or email…"
-                    oninput="filterParticipants(this.value)">
+            <div class="modal-header">
+                <h6><i class="fa-solid fa-user-plus me-2"></i>Add Participant</h6>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
             </div>
 
-            <div class="participant-list" id="participantList">
-                <?php foreach ($users as $user): ?>
-                    <?php $key = $user['role'] . '_' . $user['id']; ?>
-                    <?php if (isset($alreadyExistingMap[$key]))
-                        continue;
-                    if ($isDepartmentRoom && $user['role'] === 'student')
-                        continue; ?>
-                    <div class="participant-item" data-id="<?= htmlspecialchars($user['id']) ?>"
-                        data-type="<?= $user['role'] ?>" data-name="<?= htmlspecialchars($user['full_name']) ?>"
-                        data-email="<?= htmlspecialchars($user['email']) ?>" onclick="toggleCheck(this)">
-                        <input type="checkbox">
-                        <div class="participant-avatar"><?= strtoupper(substr($user['full_name'], 0, 2)) ?></div>
-                        <div class="participant-info">
-                            <strong>
-                                <?= htmlspecialchars($user['full_name']) ?>
-                            </strong>
-                            <small>
-                                <?= htmlspecialchars($user['email']) ?> ·
-                                <?= htmlspecialchars($user['role']) ?>
-                            </small>
+            <div class="modal-body">
+                <div class="search-input-wrap">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="participantSearch" placeholder="Search by name or email…"
+                        oninput="filterParticipants(this.value)">
+                </div>
+
+                <div class="participant-list" id="participantList">
+                    <?php foreach ($users as $user): ?>
+                        <?php $key = $user['role'] . '_' . $user['id']; ?>
+                        <?php if (isset($alreadyExistingMap[$key]))
+                            continue;
+                        if ($isDepartmentRoom && $user['role'] === 'student')
+                            continue; ?>
+                        <div class="participant-item" data-id="<?= htmlspecialchars($user['id']) ?>"
+                            data-type="<?= $user['role'] ?>" data-name="<?= htmlspecialchars($user['full_name']) ?>"
+                            data-email="<?= htmlspecialchars($user['email']) ?>" onclick="toggleCheck(this)">
+                            <input type="checkbox">
+                            <div class="participant-avatar"><?= strtoupper(substr($user['full_name'], 0, 2)) ?></div>
+                            <div class="participant-info">
+                                <strong>
+                                    <?= htmlspecialchars($user['full_name']) ?>
+                                </strong>
+                                <small>
+                                    <?= htmlspecialchars($user['email']) ?> ·
+                                    <?= htmlspecialchars($user['role']) ?>
+                                </small>
+                            </div>
                         </div>
-                    </div>
-                <?php endforeach; ?>
+                    <?php endforeach; ?>
+                </div>
             </div>
-        </div>
 
-        <div class="modal-footer">
-            <button class="btn btn-sm btn-light" onclick="closeModal()">Cancel</button>
-            <button class="btn-add-confirm" id="addSelectedBtn" onclick="addSelected()">
-                Add Selected
-            </button>
-        </div>
+            <div class="modal-footer">
+                <button class="btn btn-sm btn-light" onclick="closeModal()">Cancel</button>
+                <button class="btn-add-confirm" id="addSelectedBtn" onclick="addSelected()">
+                    Add Selected
+                </button>
+            </div>
 
+        </div>
     </div>
-</div>
-
+<?php endif; ?>
 
 <script>
     function openModal() {
@@ -2101,36 +2126,41 @@ $rmFmtTime = function ($ts): string {
 
     function addSelected() {
         const btn = document.getElementById('addSelectedBtn');
-        if (!btn.classList.contains('has-selection')) return;
+        if (!btn.classList.contains('has-selection') || btn.disabled) return;
 
         const selected = [];
-
         document.querySelectorAll('.participant-item').forEach(item => {
             const cb = item.querySelector('input[type="checkbox"]');
             if (cb.checked) {
-                selected.push({
-                    id: item.dataset.id,
-                    type: item.dataset.type
-                });
+                selected.push({ id: item.dataset.id, type: item.dataset.type });
             }
         });
-
         if (selected.length === 0) return;
+
+        btn.disabled = true;
 
         fetch('chat-room-content-db.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: new URLSearchParams({
-                room_id: <?= $room_id ?>,
+                room_id: <?= (int) $room_id ?>,
                 users: JSON.stringify(selected)
             })
         })
-            .then(res => res.text())
-            .then(res => {
-                res = res.trim();
-                if (res === "success") location.reload();
-                else if (res === "none_added") alert("No eligible participants were added.");
-                else alert("Failed to add members");
+            .then(async res => {
+                const text = (await res.text()).trim();
+                if (res.status === 403) throw new Error("You're not authorized to add participants to this room.");
+                if (!res.ok) throw new Error("Failed to add members");
+                return text;
+            })
+            .then(text => {
+                if (text === 'success') location.reload();
+                else if (text === 'none_added') { alert('No eligible participants were added.'); btn.disabled = false; }
+                else throw new Error('Failed to add members');
+            })
+            .catch(err => {
+                alert(err.message || 'Failed to add members');
+                btn.disabled = false;
             });
     }
 
