@@ -50,7 +50,7 @@ select {
     min-height: 0;
 }
 
-.left-panel {
+/* .left-panel {
     background-image: url('../Sources/left image.png'); 
     background-size: cover;
     background-position: center left;
@@ -59,7 +59,7 @@ select {
     position: sticky;
     top: 0;
     height: 100vh;
-}
+} */
 
 .right-panel {
     display: flex;

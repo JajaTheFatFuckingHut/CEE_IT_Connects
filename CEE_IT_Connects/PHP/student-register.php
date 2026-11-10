@@ -61,7 +61,7 @@ session_start();
 
     <div class="container-fluid login-container">
         <div class="row h-100">
-            <div class="col-md-5 p-0 left-panel"></div>
+            <!-- <div class="col-md-5 p-0 left-panel"></div> -->
 
             <div class="col-md-7 right-panel">
 
