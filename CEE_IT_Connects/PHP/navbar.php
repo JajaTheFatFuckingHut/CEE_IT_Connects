@@ -873,13 +873,13 @@ function timeAgo($datetime)
                 <div>
                     <a href="<?php
                     if ($role == 'student') {
-                        echo 'rooms.php';
+                        echo 'rooms.php?section=home';
                     } else if ($role == 'superadmin' || $role == 'admin') {
                         echo 'systemadmin-rooms.php';
                     } else if ($role == 'internship_admin') {
                         echo 'internadmin-rooms.php';
                     } else {
-                        echo 'rooms.php';
+                        echo 'rooms.php?section=home';
 
                     } ?>" class="navbar-icon-btn" data-tip="Rooms">
                         <i class="fa-solid fa-users"></i>
