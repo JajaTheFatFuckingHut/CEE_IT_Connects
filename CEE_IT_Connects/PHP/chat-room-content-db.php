@@ -3,6 +3,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 require 'db.php';
+require_once 'helpers.php';
 
 if (!isset($_SESSION['user_id'])) {
     exit("Unauthorized");
