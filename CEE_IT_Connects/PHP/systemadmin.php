@@ -2261,6 +2261,7 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                                                 <i class="bi bi-check2-circle"></i> Restore
                                             </button>
                                         </form>
+                                        <br>
                                         <form method="POST" action="systemadmin-db.php"
                                             onsubmit="return confirm('Delete this user permanently?')">
                                             <input type="hidden" name="user_id" value="<?= $u['id'] ?>">
