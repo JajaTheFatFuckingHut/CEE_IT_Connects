@@ -211,6 +211,9 @@ if (isset($_POST['post_announcement'])) {
     header("Location: {$redirects[$role]}?room_id={$room_id}&tab=updates");
     exit;
 }
+
+
+
 if (isset($_POST['remove-member'])) {
     $roomId = (int) ($_POST['room_id'] ?? 0);
     $userId = (int) ($_POST['user_id'] ?? 0);
