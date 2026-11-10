@@ -482,5 +482,66 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         header('Location: internship-admin.php#upload_mou');
         exit;
     }
+
+    if (($_POST['form_type'] ?? '') === 'delete_internship') {
+        $role = $_SESSION['role'] ?? '';
+        if (!in_array($role, ['superadmin', 'internship_admin'], true)) {
+            http_response_code(403);
+            exit('Unauthorized');
+        }
+
+        $id = (int) ($_POST['id'] ?? 0);
+        if (!$id) {
+            $_SESSION['error'] = 'Invalid internship.';
+            header("Location: $back");
+            exit;
+        }
+
+        try {
+            $stmt = $pdo->prepare("SELECT company, title FROM internships WHERE id = ?");
+            $stmt->execute([$id]);
+            $posting = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$posting) {
+                $_SESSION['error'] = 'Posting not found.';
+                header("Location: $back");
+                exit;
+            }
+
+            // Don't delete postings students have already applied to
+            $apps = $pdo->prepare("SELECT COUNT(*) FROM ojt_applications WHERE internship_id = ?");
+            $apps->execute([$id]);
+            if ((int) $apps->fetchColumn() > 0) {
+                $_SESSION['error'] = "This posting has student applications, so it can't be deleted.";
+                header("Location: $back");
+                exit;
+            }
+
+            $pdo->beginTransaction();
+
+            // Unlink HTE advisers instead of leaving a dangling reference
+            $pdo->prepare("UPDATE advisers SET internship_id = NULL WHERE internship_id = ?")->execute([$id]);
+
+            $pdo->prepare("DELETE FROM internships WHERE id = ?")->execute([$id]);
+
+            $pdo->prepare("INSERT INTO audits (user_id, roles, activity, activity_date) VALUES (?, ?, ?, NOW())")
+                ->execute([
+                    $_SESSION['user_id'],
+                    $role,
+                    'Deleted internship posting: ' . ($posting['title'] ?? '') . ' (' . ($posting['company'] ?? '') . ')',
+                ]);
+
+            $pdo->commit();
+            $_SESSION['success'] = 'Internship posting deleted.';
+        } catch (Throwable $e) {
+            if ($pdo->inTransaction())
+                $pdo->rollBack();
+            error_log('Delete internship failed: ' . $e->getMessage());
+            $_SESSION['error'] = 'Could not delete the posting. It may still be referenced by other records.';
+        }
+
+        header("Location: $back");
+        exit;
+    }
 }
 ?>
