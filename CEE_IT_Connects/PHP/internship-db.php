@@ -504,7 +504,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             if (!$posting) {
                 $_SESSION['error'] = 'Posting not found.';
-                header("Location:internship-admin.php");
+                header("Location: internship-admin.php");
                 exit;
             }
 
@@ -524,12 +524,65 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             $pdo->prepare("DELETE FROM internships WHERE id = ?")->execute([$id]);
 
+            $label = trim(($posting['title'] ?? '') . ' at ' . ($posting['company'] ?? ''));
+
+            // Audit log
             $pdo->prepare("INSERT INTO audits (user_id, roles, activity, activity_date) VALUES (?, ?, ?, NOW())")
                 ->execute([
                     $_SESSION['user_id'],
                     $role,
                     'Deleted internship posting: ' . ($posting['title'] ?? '') . ' (' . ($posting['company'] ?? '') . ')',
                 ]);
+
+            // ── Notifications ──
+            // Page each role uses
+            $roomPages = [
+                'student' => 'rooms.php',
+                'hte_adviser' => 'hte-adviser.php',
+                'internship_adviser' => 'ojt-adviser.php',
+                'superadmin' => 'systemadmin-rooms.php',
+                'internship_admin' => 'internadmin-rooms.php',
+            ];
+
+            $actorId = (int) ($_SESSION['user_id'] ?? 0);
+
+            // Everyone active, with their role, except the person who deleted it
+            $recipientsStmt = $pdo->prepare("
+            SELECT id AS user_id, 'student' AS user_type, 'student' AS member_role
+            FROM students
+            WHERE is_archived = FALSE
+
+            UNION ALL
+
+            SELECT id, 'adviser', LOWER(role::text)
+            FROM advisers
+            WHERE is_archived = FALSE
+
+            UNION ALL
+
+            SELECT id, 'admin', LOWER(role::text)
+            FROM admins
+            WHERE is_archived = FALSE
+              AND id <> ?
+        ");
+            $recipientsStmt->execute([$actorId]);
+
+            $notifStmt = $pdo->prepare("
+            INSERT INTO notifications (user_id, user_type, title, message, link, is_read, created_at)
+            VALUES (:user_id, :user_type, :title, :message, :link, FALSE, NOW())
+        ");
+
+            foreach ($recipientsStmt->fetchAll(PDO::FETCH_ASSOC) as $m) {
+                $page = $roomPages[$m['member_role'] ?? ''] ?? 'rooms.php';   // fallback
+
+                $notifStmt->execute([
+                    'user_id' => $m['user_id'],
+                    'user_type' => $m['user_type'],
+                    'title' => 'Internship Posting Removed',
+                    'message' => 'The internship posting "' . $label . '" has been removed.',
+                    'link' => $page,
+                ]);
+            }
 
             $pdo->commit();
             $_SESSION['success'] = 'Internship posting deleted.';
