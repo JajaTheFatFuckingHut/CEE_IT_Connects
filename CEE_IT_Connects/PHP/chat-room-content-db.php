@@ -107,7 +107,7 @@ if (isset($_POST['post_announcement'])) {
     // Posting permission
     if ($isAdmin) {
         // superadmin: any room; internship_admin: department rooms only
-        if ($role === 'internship_admin' && $room['room_type'] !== 'department') {
+        if ($role === 'internship_admin' || $role === 'superadmin' && $room['room_type'] !== 'department') {
             http_response_code(403);
             exit("Unauthorized");
         }
@@ -115,7 +115,7 @@ if (isset($_POST['post_announcement'])) {
         // advisers: only rooms they own or belong to
         $memberChk = $pdo->prepare("
             SELECT 1 FROM room_members
-            WHERE room_id = ? AND user_id = ? AND user_type = 'adviser' AND is_archived = FALSE
+            WHERE room_id = ? AND user_id = ? AND user_type = 'adviser'
         ");
         $memberChk->execute([$room_id, $userId]);
         if ((int) $room['adviser_id'] !== $userId && !$memberChk->fetchColumn()) {
