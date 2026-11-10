@@ -7,7 +7,7 @@ $role = strtolower(trim($_SESSION['role'] ?? ''));
 
 
 if ($role !== 'superadmin') {
-    header("Location: student.php");
+    header("Location: index.php");
     exit();
 }
 // addtl s — admin credentials for sidebar account box
@@ -334,7 +334,8 @@ $archivedUsers = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 $stmt = $pdo->query("
     SELECT 
-        a.id, a.user_id, a.roles, a.activity, a.activity_date,
+        a.id, a.user_id, a.roles, a.activity, 
+        (a.activity_date AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') AS activity_date,
         COALESCE(u.name, 'Unknown (#' || a.user_id || ')') AS name
     FROM audits a
     LEFT JOIN (
@@ -454,7 +455,7 @@ $saProgRows = $pdo->query("
 ")->fetchAll(PDO::FETCH_ASSOC);
 $saProgColorMap = [
     'information technology' => '#29335C',
-    'civil engineering'      => '#E4572E',
+    'civil engineering' => '#E4572E',
     'electrical engineering' => '#f2b705',
 ];
 $saProgLabels = [];
@@ -1117,20 +1118,30 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                 margin: 0 0 16px 0 !important;
                 --bs-gutter-x: 0;
             }
-            .row.g-3.mb-4 > [class*="col-"] {
+
+            .row.g-3.mb-4>[class*="col-"] {
                 width: auto !important;
                 max-width: 100% !important;
                 min-width: 0 !important;
                 padding: 0 !important;
                 margin: 0 !important;
             }
-            .row.g-3.mb-4 .card-body { padding: 8px !important; }
+
+            .row.g-3.mb-4 .card-body {
+                padding: 8px !important;
+            }
+
             .row.g-3.mb-4 .card-body .d-flex {
                 flex-wrap: nowrap !important;
                 align-items: flex-start !important;
                 gap: 4px !important;
             }
-            .row.g-3.mb-4 .card-body .flex-grow-1 { min-width: 0 !important; } /* beats the inline min-width:90px */
+
+            .row.g-3.mb-4 .card-body .flex-grow-1 {
+                min-width: 0 !important;
+            }
+
+            /* beats the inline min-width:90px */
             .row.g-3.mb-4 .card-body p {
                 font-size: 8px !important;
                 letter-spacing: 0 !important;
@@ -1138,13 +1149,21 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                 margin-bottom: 2px !important;
                 word-break: break-word;
             }
-            .row.g-3.mb-4 .card-body h2 { font-size: 0.9rem !important; margin: 0 !important; }
+
+            .row.g-3.mb-4 .card-body h2 {
+                font-size: 0.9rem !important;
+                margin: 0 !important;
+            }
+
             .row.g-3.mb-4 .card-body .rounded-3 {
                 width: 22px !important;
                 height: 22px !important;
                 flex-shrink: 0;
             }
-            .row.g-3.mb-4 .card-body .rounded-3 i { font-size: 10px !important; }
+
+            .row.g-3.mb-4 .card-body .rounded-3 i {
+                font-size: 10px !important;
+            }
 
             /* TABLES — allow horizontal scroll */
             .sysAdm-table {
@@ -1247,9 +1266,18 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
             gap: 10px;
             margin-bottom: 16px;
         }
+
         .sa-toolbar-filters,
-        .sa-toolbar-actions { display: flex; gap: 10px; flex-wrap: wrap; }
-        .sa-toolbar-filters { flex: 1 1 auto; min-width: 0; }
+        .sa-toolbar-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .sa-toolbar-filters {
+            flex: 1 1 auto;
+            min-width: 0;
+        }
 
         .sa-field {
             height: 40px;
@@ -1261,6 +1289,7 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
             min-width: 200px;
             box-sizing: border-box;
         }
+
         .sa-toolbar .btn-update {
             display: inline-flex;
             align-items: center;
@@ -1274,20 +1303,46 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
 
         /* calendar fields match */
         #suspAdmin .sa-input,
-        #suspAdmin .sa-btn { height: 40px; }
+        #suspAdmin .sa-btn {
+            height: 40px;
+        }
 
         @media (max-width: 768px) {
+
             .sa-toolbar,
             .sa-toolbar-filters,
-            .sa-toolbar-actions { flex-direction: column; align-items: stretch; width: 100%; }
-            .sa-toolbar-filters .sa-field { width: 100%; min-width: 0; }
-            .sa-toolbar-actions .btn-update { width: 100%; }
+            .sa-toolbar-actions {
+                flex-direction: column;
+                align-items: stretch;
+                width: 100%;
+            }
 
-            #suspAdmin .sa-form { flex-direction: column; }
-            #suspAdmin .sa-form > * { width: 100%; flex: none; }
-            #suspAdmin .sa-head { flex-wrap: wrap; }
+            .sa-toolbar-filters .sa-field {
+                width: 100%;
+                min-width: 0;
+            }
+
+            .sa-toolbar-actions .btn-update {
+                width: 100%;
+            }
+
+            #suspAdmin .sa-form {
+                flex-direction: column;
+            }
+
+            #suspAdmin .sa-form>* {
+                width: 100%;
+                flex: none;
+            }
+
+            #suspAdmin .sa-head {
+                flex-wrap: wrap;
+            }
+
             #suspAdmin .sa-head form,
-            #suspAdmin .sa-head .sa-input { width: 100%; }
+            #suspAdmin .sa-head .sa-input {
+                width: 100%;
+            }
         }
 
         /* This is for the calendar */
@@ -1431,8 +1486,11 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
         }
 
         /* ===== bottom nav: phones + tablet portrait ===== */
-        @media (max-width: 768px), (max-width: 1024px) and (orientation: portrait) {
-            :root { --bn-h: 60px; }
+        @media (max-width: 768px),
+        (max-width: 1024px) and (orientation: portrait) {
+            :root {
+                --bn-h: 60px;
+            }
 
             .sidebar {
                 top: auto;
@@ -1452,10 +1510,14 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                 box-shadow: 0 -2px 10px rgba(0, 0, 0, .15);
             }
 
-            .sidebar::-webkit-scrollbar { display: none; }
+            .sidebar::-webkit-scrollbar {
+                display: none;
+            }
 
             .sidebar h3,
-            .sidebar-user { display: none !important; }
+            .sidebar-user {
+                display: none !important;
+            }
 
             .sidebar a {
                 flex: 1 0 68px;
@@ -1495,7 +1557,9 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                 color: #fff;
             }
 
-            .sidebar a:hover i { color: inherit; }
+            .sidebar a:hover i {
+                color: inherit;
+            }
 
             .sidebar a.active {
                 background: transparent;
@@ -1504,7 +1568,9 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                 border-top-color: #ff6b2c;
             }
 
-            .sidebar a.active i { color: #ff6b2c; }
+            .sidebar a.active i {
+                color: #ff6b2c;
+            }
 
             .main-content {
                 margin-left: 0 !important;
@@ -1513,50 +1579,60 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
         }
 
         @media (max-width: 768px) {
-        .row.g-3.mb-4 {
-            display: grid !important;
-            grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-            gap: 8px !important;
-            margin: 0 0 16px 0 !important;
-            --bs-gutter-x: 0;
-            --bs-gutter-y: 0;
+            .row.g-3.mb-4 {
+                display: grid !important;
+                grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+                gap: 8px !important;
+                margin: 0 0 16px 0 !important;
+                --bs-gutter-x: 0;
+                --bs-gutter-y: 0;
+            }
+
+            .row.g-3.mb-4>[class*="col-"] {
+                width: auto !important;
+                max-width: 100% !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+
+            .row.g-3.mb-4 .ojtc-stat-card {
+                border-radius: 14px !important;
+            }
+
+            .row.g-3.mb-4 .card-body {
+                padding: 12px 8px !important;
+            }
+
+            .row.g-3.mb-4 .card-body .d-flex {
+                display: block !important;
+            }
+
+            .row.g-3.mb-4 .card-body .rounded-3,
+            .row.g-3.mb-4 .card-body p.d-none {
+                display: none !important;
+            }
+
+            .row.g-3.mb-4 .card-body .flex-grow-1 {
+                min-width: 0 !important;
+            }
+
+            .row.g-3.mb-4 .card-body p {
+                font-size: 9px !important;
+                line-height: 1.25 !important;
+                letter-spacing: 0 !important;
+                margin: 0 0 6px 0 !important;
+                min-height: 2.5em;
+                word-break: normal !important;
+                overflow-wrap: normal !important;
+                hyphens: none !important;
+            }
+
+            .row.g-3.mb-4 .card-body h2 {
+                font-size: 1.15rem !important;
+                line-height: 1.1 !important;
+                margin: 0 !important;
+            }
         }
-
-        .row.g-3.mb-4 > [class*="col-"] {
-            width: auto !important;
-            max-width: 100% !important;
-            padding: 0 !important;
-            margin: 0 !important;
-        }
-
-        .row.g-3.mb-4 .ojtc-stat-card { border-radius: 14px !important; }
-
-        .row.g-3.mb-4 .card-body { padding: 12px 8px !important; }
-
-        .row.g-3.mb-4 .card-body .d-flex { display: block !important; }
-
-        .row.g-3.mb-4 .card-body .rounded-3,
-        .row.g-3.mb-4 .card-body p.d-none { display: none !important; }
-
-        .row.g-3.mb-4 .card-body .flex-grow-1 { min-width: 0 !important; }
-
-        .row.g-3.mb-4 .card-body p {
-            font-size: 9px !important;
-            line-height: 1.25 !important;
-            letter-spacing: 0 !important;
-            margin: 0 0 6px 0 !important;
-            min-height: 2.5em; 
-            word-break: normal !important;
-            overflow-wrap: normal !important;
-            hyphens: none !important;
-        }
-
-        .row.g-3.mb-4 .card-body h2 {
-            font-size: 1.15rem !important;
-            line-height: 1.1 !important;
-            margin: 0 !important;
-        }
-    }
     </style>
 </head>
 
@@ -2073,7 +2149,8 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
 
                 <div class="sa-toolbar">
                     <div class="sa-toolbar-filters">
-                        <input type="text" id="search-delete" oninput="filterDelete()" placeholder="Search for a student" class="sa-field">
+                        <input type="text" id="search-delete" oninput="filterDelete()"
+                            placeholder="Search for a student" class="sa-field">
                         <select id="filter-role" onchange="filterDelete()" class="sa-field">
                             <option value="">All Roles</option>
                             <option value="student">Student</option>
@@ -2102,10 +2179,10 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                                     <td><?= htmlspecialchars(ucwords(str_replace('_', ' ', $u['role']))) ?></td>
                                     <td>
                                         <form method="POST" action="systemadmin-db.php"
-                                            onsubmit="return confirm('Are you sure you want to delete this user?')">
+                                            onsubmit="return confirm('Are you sure you want to arhive this user?')">
                                             <input type="hidden" name="id" value="<?= $u['id'] ?>">
                                             <input type="hidden" name="source" value="<?= $u['source'] ?>">
-                                            <button type="submit" name="delete" class="btn-delete">
+                                            <button type="submit" name="archive" class="btn-delete">
                                                 <i class="bi bi-archive"></i> Archive
                                             </button>
                                         </form>
@@ -2133,7 +2210,8 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
 
                 <div class="sa-toolbar">
                     <div class="sa-toolbar-filters">
-                        <input type="text" id="search-archive" oninput="filterArchive()" placeholder="Search by name or email..." class="sa-field">
+                        <input type="text" id="search-archive" oninput="filterArchive()"
+                            placeholder="Search by name or email..." class="sa-field">
                         <select id="filter-role-archive" onchange="filterArchive()" class="sa-field">
                             <option value="">All Roles</option>
                             <option value="student">Student</option>
@@ -2171,6 +2249,16 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                                                 <i class="bi bi-check2-circle"></i> Restore
                                             </button>
                                         </form>
+                                        <form method="POST" action="systemadmin-db.php"
+                                            onsubmit="return confirm('Delete this user permanently?')">
+                                            <input type="hidden" name="user_id" value="<?= $u['id'] ?>">
+                                            <input type="hidden" name="source"
+                                                value="<?= htmlspecialchars($u['source']) ?>">
+                                            <input type="hidden" name="delete_permanently" value="1">
+                                            <button type="submit" class="btn-restore">
+                                                <i class="bi bi-trash"></i> Delete
+                                            </button>
+                                        </form>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -2196,7 +2284,8 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
 
                 <div class="sa-toolbar">
                     <div class="sa-toolbar-filters">
-                        <input type="text" id="search-roles" oninput="filterRoles()" placeholder="Search for an admin" class="sa-field">
+                        <input type="text" id="search-roles" oninput="filterRoles()" placeholder="Search for an admin"
+                            class="sa-field">
                         <select id="filter-role-admin" onchange="filterRoles()" class="sa-field">
                             <option value="">All Roles</option>
                             <option value="superadmin">System Admin</option>
@@ -2349,7 +2438,8 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                 </div>
                 <div class="sa-toolbar">
                     <div class="sa-toolbar-filters">
-                        <input type="text" id="search-monitor" oninput="filterMonitor()" placeholder="Search for a student" class="sa-field">
+                        <input type="text" id="search-monitor" oninput="filterMonitor()"
+                            placeholder="Search for a student" class="sa-field">
                         <select id="filter-role-monitor" onchange="filterMonitor()" class="sa-field">
                             <option value="">All Roles</option>
                             <option value="student">Student</option>
@@ -2425,7 +2515,8 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                     </div>
                     <form action="../auto-register-csv.php" method="POST" enctype="multipart/form-data">
                         <div class="d-flex flex-column gap-2">
-                            <input type="file" name="students_csv" accept=".csv" required class="form-control" style="font-size:13px;">
+                            <input type="file" name="students_csv" accept=".csv" required class="form-control"
+                                style="font-size:13px;">
                             <div>
                                 <button class="btn-update" type="submit">
                                     <i class="bi bi-upload me-1"></i>Replace CSV
@@ -2634,9 +2725,6 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                             </div>
                             <input type="hidden" id="col-count" value="<?= count($csvRows[0]) ?>">
                             <input type="hidden" id="row-count" value="<?= count($csvRows) ?>">
-                            <!-- CHANGED: buttons now reuse the existing .btn-update class (subtle yellow
-                                 by default, solid orange on hover) instead of bootstrap's btn-success/
-                                 btn-danger/submit-btn, for the same look as the dashboard buttons. -->
                             <div class="d-flex gap-2 mt-3">
                                 <button type="button" class="btn-update" onclick="addRow()">
                                     <i class="bi bi-plus-circle me-1"></i> Add Row
@@ -2743,12 +2831,15 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                 <!-- Search + filter -->
                 <div class="sa-toolbar">
                     <div class="sa-toolbar-filters">
-                        <input type="text" id="assign-search" oninput="filterAssignTable()" placeholder="Search for an adviser" class="sa-field">
+                        <input type="text" id="assign-search" oninput="filterAssignTable()"
+                            placeholder="Search for an adviser" class="sa-field">
                         <select id="assign-filter-adviser" onchange="filterAssignTable()" class="sa-field">
                             <option value="">All Advisers</option>
                             <option value="unassigned">Unassigned</option>
                             <?php foreach ($adviserList as $adv): ?>
-                                <option value="<?= htmlspecialchars($adv['full_name']) ?>"><?= htmlspecialchars($adv['full_name']) ?></option>
+                                <option value="<?= htmlspecialchars($adv['full_name']) ?>">
+                                    <?= htmlspecialchars($adv['full_name']) ?>
+                                </option>
                             <?php endforeach; ?>
                         </select>
                     </div>
@@ -3093,7 +3184,7 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                         ");
 
                         $cardStyles = [
-                            'Civil Engineering'      => ['color' => '#E4572E', 'icon' => 'bi-pc-display'],
+                            'Civil Engineering' => ['color' => '#E4572E', 'icon' => 'bi-pc-display'],
                             'Information Technology' => ['color' => '#29335C', 'icon' => 'bi-code-slash'],
                             'Electrical Engineering' => ['color' => '#f2b705', 'icon' => 'bi-lightning-charge'],
                         ];
@@ -3373,26 +3464,41 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                 const cells = [...row.querySelectorAll('td')].map(td => `"${td.innerText.trim().replace(/\n/g, ' ').replace(/"/g, '""')}"`);
                 if (cells.length) csv += cells.join(',') + '\n';
             });
-            csv += '\nRecently Interested Students\n"Name","Email","Company","Date"\n';
-            document.querySelectorAll('#table-interested .d-flex.align-items-center').forEach(row => {
-                const name = row.querySelector('.fw-semibold')?.innerText.trim() ?? '';
-                const email = row.querySelectorAll('p')[1]?.innerText.trim() ?? '';
-                const company = row.querySelector('.badge')?.innerText.trim() ?? '';
-                const date = row.querySelector('.text-muted.mb-0.mt-1')?.innerText.trim() ?? '';
-                csv += `"${name}","${email}","${company}","${date}"\n`;
-            });
-            csv += '\nRecent Announcements\n"Category","Title","Date"\n';
-            document.querySelectorAll('#table-announcements .d-flex.align-items-start').forEach(row => {
-                const category = row.querySelector('.badge')?.innerText.trim() ?? '';
-                const title = row.querySelector('.fw-semibold')?.innerText.trim() ?? '';
-                const date = row.querySelector('.text-muted')?.innerText.trim() ?? '';
-                csv += `"${category}","${title}","${date}"\n`;
-            });
             const blob = new Blob([csv], { type: 'text/csv' });
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
             a.download = 'dashboard_summary.csv';
             a.click();
+        }
+
+        function pdfChartRow(doc, y, items, gap = 6) {
+            const pageH = doc.internal.pageSize.getHeight();
+            const margin = 14;
+
+            // Measure first so we know whether the row fits on the current page
+            const prepared = items.map(it => {
+                const canvas = document.getElementById(it.id);
+                if (!canvas || !canvas.width) return null;
+                return { ...it, canvas, h: it.w * canvas.height / canvas.width };
+            }).filter(Boolean);
+            if (!prepared.length) return y;
+
+            const rowH = Math.max(...prepared.map(p => p.h)) + 8; // +8 for the title
+            if (y + rowH > pageH - margin) {
+                doc.addPage();
+                y = 15;
+            }
+
+            let x = margin;
+            prepared.forEach(p => {
+                doc.setFontSize(10);
+                doc.setTextColor(39, 47, 84);
+                doc.text(p.title, x, y + 4);
+                doc.addImage(p.canvas.toDataURL('image/png', 1.0), 'PNG', x, y + 7, p.w, p.h);
+                x += p.w + gap;
+            });
+            doc.setTextColor(0, 0, 0);
+            return y + rowH + 4;
         }
 
         function downloadDashboardPDF() {
@@ -3401,7 +3507,21 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
             let y = 15;
             doc.setFontSize(16); doc.setTextColor(39, 47, 84);
             doc.text('Dashboard Summary', 14, y); y += 10;
+
+            // ── Charts ──────────────────────────────────────────────
+            // Usable width = 210 - 28 = 182mm
+            y = pdfChartRow(doc, y, [
+                { id: 'saRoleChart', title: 'Accounts by Role', w: 88 },
+                { id: 'saProgramChart', title: 'Students by Program', w: 88 }
+            ]);
+            y = pdfChartRow(doc, y, [
+                { id: 'saActivityChart', title: 'System Activity (last 14 days)', w: 116 },
+                { id: 'saRoleActChart', title: 'Activity by Role', w: 60 }
+            ]);
+
+            // ── Tables (unchanged) ──────────────────────────────────
             doc.setFontSize(12); doc.setTextColor(0, 0, 0);
+            if (y > 260) { doc.addPage(); y = 15; }
             doc.text('Recent Internship Postings', 14, y); y += 2;
             const internshipRows = [];
             document.querySelectorAll('#table-internships tbody tr').forEach(row => {
@@ -3410,29 +3530,7 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
             });
             doc.autoTable({ head: [['Title', 'Company', 'Location', 'Posted']], body: internshipRows, startY: y, styles: { fontSize: 10 }, headStyles: { fillColor: [39, 47, 84], textColor: [255, 255, 255] } });
             y = doc.lastAutoTable.finalY + 10;
-            doc.text('Recently Interested Students', 14, y); y += 2;
-            const studentRows = [];
-            document.querySelectorAll('#table-interested .d-flex.align-items-center').forEach(row => {
-                studentRows.push([
-                    row.querySelector('.fw-semibold')?.innerText.trim() ?? '',
-                    row.querySelectorAll('p')[1]?.innerText.trim() ?? '',
-                    row.querySelector('.badge')?.innerText.trim() ?? '',
-                    row.querySelector('.text-muted.mb-0.mt-1')?.innerText.trim() ?? ''
-                ]);
-            });
-            doc.autoTable({ head: [['Name', 'Email', 'Company', 'Date']], body: studentRows, startY: y, styles: { fontSize: 10 }, headStyles: { fillColor: [255, 182, 47], textColor: [39, 47, 84] } });
-            y = doc.lastAutoTable.finalY + 10;
-            doc.text('Recent Announcements', 14, y); y += 2;
-            const announcementRows = [];
-            document.querySelectorAll('#table-announcements .d-flex.align-items-start').forEach(row => {
-                const title = row.querySelector('.fw-semibold')?.innerText.trim() ?? '';
-                if (title) announcementRows.push([
-                    row.querySelector('.badge')?.innerText.trim() ?? '',
-                    title,
-                    row.querySelector('.text-muted')?.innerText.trim() ?? ''
-                ]);
-            });
-            doc.autoTable({ head: [['Category', 'Title', 'Date']], body: announcementRows, startY: y, styles: { fontSize: 10 }, headStyles: { fillColor: [228, 87, 46], textColor: [255, 255, 255] } });
+
             doc.save('dashboard_summary.pdf');
         }
 

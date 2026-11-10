@@ -34,7 +34,7 @@ $now = new DateTime();
 //     $stmt = $pdo->prepare("SELECT id FROM students WHERE id = :id");
 //     $stmt->execute(['id' => $userId]);
 //     if ($stmt->fetch()) {
-//         header('Location: student.php');
+//         header('Location: index.php');
 //         exit;
 //     }
 // }
@@ -74,7 +74,7 @@ $now = new DateTime();
 
 // session_unset();
 // session_destroy();
-// header('Location: student.php');
+// header('Location: index.php');
 // exit;
 ?>
 <!DOCTYPE html>
@@ -162,13 +162,53 @@ $now = new DateTime();
 
 
         @media (max-width: 768px) {
-            body { background-attachment: scroll; }
+            body {
+                background-attachment: scroll;
+            }
         }
     </style>
 </head>
 
 <body>
+    <?php if (isset($_SESSION['success'])): ?>
+        <div class="alert alert-success alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3"
+            style="z-index:9999; min-width:350px;" role="alert" id="flashAlert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            <?= $_SESSION['success'] ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <?php unset($_SESSION['success']); ?>
+    <?php endif; ?>
 
+    <?php if (isset($_SESSION['warning'])): ?>
+        <div class="alert alert-warning alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3"
+            style="z-index:9999; min-width:400px;" role="alert" id="flashAlert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <?= $_SESSION['warning'] ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <?php unset($_SESSION['warning']); ?>
+    <?php endif; ?>
+
+    <?php if (isset($_SESSION['info'])): ?>
+        <div class="alert alert-info alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3"
+            style="z-index:9999; min-width:350px;" role="alert" id="flashAlert">
+            <i class="bi bi-info-circle-fill me-2"></i>
+            <?= $_SESSION['info'] ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <?php unset($_SESSION['info']); ?>
+    <?php endif; ?>
+
+    <?php if (isset($_SESSION['error'])): ?>
+        <div class="alert alert-danger alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3"
+            style="z-index:9999; min-width:350px;" role="alert" id="flashAlert">
+            <i class="bi bi-x-circle-fill me-2"></i>
+            <?= $_SESSION['error'] ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <?php unset($_SESSION['error']); ?>
+    <?php endif; ?>
     <?php include 'navbar.php'; ?>
 
     <!-- HERO SECTION -->
@@ -223,8 +263,7 @@ $now = new DateTime();
                 Everything students, advisers and partner companies need to run the
                 On-the-Job Training process in one place.
             </p>
-            <div class="mx-auto mb-5"
-                style="width: 72px; height: 4px; border-radius: 4px; background: #ff673a;"></div>
+            <div class="mx-auto mb-5" style="width: 72px; height: 4px; border-radius: 4px; background: #ff673a;"></div>
 
             <div class="row g-4">
                 <div class="col-lg-4 col-md-6">
@@ -240,7 +279,7 @@ $now = new DateTime();
                     <div class="feature-item animate-on-scroll animate-scale">
                         <i class="fa-solid fa-filter feature-icon"></i>
                         <h5>Internship Matching</h5>
-                        <p>Search and filter listings by program and preferences 
+                        <p>Search and filter listings by program and preferences
                             to find the right fit faster.</p>
                         <span class="feature-role">Students</span>
                     </div>
@@ -286,7 +325,7 @@ $now = new DateTime();
     </section>
 
     <!-- MAP SECTION -->
-        <section class="map-section">
+    <section class="map-section">
         <div class="map-section-wrapper">
             <div class="map-header">
                 <div class="d-flex align-items-center gap-3">
@@ -353,7 +392,7 @@ $now = new DateTime();
         </div>
     </section>
 
-        <!-- ABOUT -->
+    <!-- ABOUT -->
     <section class="about-section">
         <div class="container">
             <div class="row align-items-center g-5">

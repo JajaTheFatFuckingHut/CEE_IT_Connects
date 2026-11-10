@@ -354,9 +354,6 @@ if (isset($_POST['edit_csv'])) {
                 $added++;
                 $newStudentId = (int) $pdo->lastInsertId();
 
-                // -----------------------------------------------------
-                // ADD STUDENT TO THEIR MATCHING ROOM (by year_level + section)
-                // -----------------------------------------------------
                 if ($year_level !== '' && $section !== '') {
                     $roomStmt = $pdo->prepare("
                     SELECT id FROM rooms

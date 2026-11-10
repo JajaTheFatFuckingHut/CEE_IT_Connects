@@ -320,9 +320,9 @@ $chattableStmt = $pdo->prepare("
     FROM advisers a
     WHERE a.role = 'HTE_adviser'
     AND a.internship_id IN (
-        SELECT ib.internship_id
-        FROM internship_bookmarks ib
-        JOIN room_members rm ON ib.student_id = rm.user_id AND rm.user_type = 'student'
+        SELECT oa.internship_id
+        FROM ojt_applications oa
+        JOIN room_members rm ON oa.student_id = rm.user_id AND rm.user_type = 'student'
         JOIN rooms r ON r.id = rm.room_id
     WHERE r.adviser_id = ?
     AND r.is_archived = FALSE
@@ -370,7 +370,8 @@ $chatMessages = [];
 
 if ($chatSection_id && $section === 'chats') {
     $msgStmt = $pdo->prepare("
-        SELECT m.id, m.sender_id, m.sender_type, m.message, m.created_at,
+        SELECT m.id, m.sender_id, m.sender_type, m.message, 
+        (m.created_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') AS created_at,
                m.attachment_name, m.attachment_type,
                CASE WHEN m.attachment_data IS NOT NULL THEN 1 ELSE 0 END AS has_attachment,
                COALESCE(s.full_name, a.full_name) AS sender_name
@@ -1982,7 +1983,7 @@ $page = 'messages';
                 padding: 10px 12px;
             }
 
-            .dash-stat > div:not(.dash-stat-icon) {
+            .dash-stat>div:not(.dash-stat-icon) {
                 display: contents;
             }
 
@@ -1998,6 +1999,7 @@ $page = 'messages';
             .dash-stat-value {
                 font-size: 20px;
             }
+
             .dash-hours {
                 display: none;
             }
@@ -2544,8 +2546,13 @@ $page = 'messages';
             background: #eee;
         }
 
-        .room-day-sep::before { left: 0; }
-        .room-day-sep::after { right: 0; }
+        .room-day-sep::before {
+            left: 0;
+        }
+
+        .room-day-sep::after {
+            right: 0;
+        }
 
         .room-msg-delete {
             background: none;
@@ -2559,11 +2566,18 @@ $page = 'messages';
             transition: opacity .15s, color .15s;
         }
 
-        .room-msg-row.me:hover .room-msg-delete { opacity: 1; }
-        .room-msg-delete:hover { color: #dc2626; }
+        .room-msg-row.me:hover .room-msg-delete {
+            opacity: 1;
+        }
+
+        .room-msg-delete:hover {
+            color: #dc2626;
+        }
 
         @media (hover: none) {
-            .room-msg-row.me .room-msg-delete { opacity: .6; }
+            .room-msg-row.me .room-msg-delete {
+                opacity: .6;
+            }
         }
 
         /* ===== bottom nav: phones + tablet portrait ===== */

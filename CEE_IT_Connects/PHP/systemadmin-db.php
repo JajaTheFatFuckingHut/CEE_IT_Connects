@@ -7,6 +7,7 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'superadmin') {
     header("Location: login-page.php");
     exit();
 }
+
 function formatSection(?string $key): string
 {
     if (!$key)
@@ -546,89 +547,204 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         exit();
     }
-
-    if (isset($_POST['delete'])) {
-        $id = $_POST['id'];
-        $source = $_POST['source'];
+    if (isset($_POST['archive'])) {
+        $id = (int) ($_POST['id'] ?? 0);
+        $source = $_POST['source'] ?? '';
 
         $allowedTables = ['students', 'admins', 'advisers'];
-        if (!in_array($source, $allowedTables)) {
-            die('invalid table');
+        if (!$id || !in_array($source, $allowedTables, true)) {
+            die('Invalid request');
         }
 
-        if ($source === 'admins') {
-            $checkstmt = $pdo->prepare("SELECT role FROM admins WHERE id = ?");
-            $checkstmt->execute([$id]);
-            $user = $checkstmt->fetch();
+        // ── Fetch the account first (also confirms it exists and isn't already archived) ──
+        switch ($source) {
+            case 'admins':
+                $fetchStmt = $pdo->prepare("SELECT name, role FROM admins WHERE id = ? AND is_archived = FALSE");
+                break;
+            case 'advisers':
+                $fetchStmt = $pdo->prepare("SELECT full_name AS name, role FROM advisers WHERE id = ? AND is_archived = FALSE");
+                break;
+            default: // students
+                $fetchStmt = $pdo->prepare("SELECT full_name AS name, 'student' AS role FROM students WHERE id = ? AND is_archived = FALSE");
+        }
+        $fetchStmt->execute([$id]);
+        $archivedUser = $fetchStmt->fetch(PDO::FETCH_ASSOC);
 
-            if ($user && $user['role'] === 'superadmin') {
-                die("Cannot delete another superadmin");
+        if (!$archivedUser) {
+            $_SESSION['error'] = "Account not found or already archived.";
+            header("Location: systemadmin.php");
+            exit();
+        }
+
+        // ── Protections ──
+        if ($source === 'admins') {
+            if ($archivedUser['role'] === 'superadmin') {
+                die("Cannot archive a superadmin account");
+            }
+            if ($id === (int) $_SESSION['user_id']) {
+                die("You cannot archive your own account");
             }
         }
-        if ($source === 'admins') {
-            $fetchStmt = $pdo->prepare("SELECT name, role FROM admins WHERE id = ?");
-        } elseif ($source === 'advisers') {
-            $fetchStmt = $pdo->prepare("SELECT full_name AS name, role FROM advisers WHERE id = ?");
-            $cleanMembersStmt = $pdo->prepare("
-                DELETE FROM room_members
+
+        try {
+            $pdo->beginTransaction();
+
+            // ── Cascade: rooms / room membership ──
+            if ($source === 'advisers') {
+                // Archive members of this adviser's rooms, then the rooms themselves
+                $pdo->prepare("
+                UPDATE room_members
+                SET is_archived = TRUE
                 WHERE room_id IN (SELECT id FROM rooms WHERE adviser_id = ?)
-                ");
-            $cleanMembersStmt->execute([$id]);
+            ")->execute([$id]);
 
-            $cleanRoomStmt = $pdo->prepare("DELETE FROM rooms WHERE adviser_id = ?");
-            $cleanRoomStmt->execute([$id]);
-        } elseif ($source === 'students') {
-            $fetchStmt = $pdo->prepare("SELECT full_name AS name, 'student' AS role FROM students WHERE id = ?");
-            $cleanStmt = $pdo->prepare("DELETE FROM room_members WHERE user_id = ?");
-            $cleanStmt->execute([$id]);
-        }
+                $pdo->prepare("UPDATE rooms SET is_archived = TRUE WHERE adviser_id = ?")
+                    ->execute([$id]);
+            } elseif ($source === 'students') {
+                $pdo->prepare("
+                UPDATE room_members
+                SET is_archived = TRUE
+                WHERE user_id = ? AND user_type = 'student'
+            ")->execute([$id]);
+            }
 
-        $fetchStmt->execute([$id]);
-        $deletedUser = $fetchStmt->fetch(PDO::FETCH_ASSOC);
+            // ── Archive the account ──
+            $pdo->prepare("UPDATE $source SET is_archived = TRUE WHERE id = ?")->execute([$id]);
 
-        $stmt = $pdo->prepare("UPDATE $source SET is_archived = TRUE WHERE id = ?");
-        $stmt->execute([$id]);
+            // ── Audit log ──
+            $pdo->prepare("
+            INSERT INTO audits (user_id, roles, activity, activity_date)
+            VALUES (:user_id, :roles, :activity, NOW())
+        ")->execute([
+                        ':user_id' => $_SESSION['user_id'],
+                        ':roles' => $_SESSION['role'],
+                        ':activity' => 'Archived ' . $archivedUser['role'] . ' account: ' . $archivedUser['name'],
+                    ]);
 
-        $stmtActivity = $pdo->prepare("INSERT INTO audits (user_id, roles, activity, activity_date) VALUES (:user_id, :roles, :activity, NOW())");
-        $stmtActivity->execute([
-            ':user_id' => $_SESSION['user_id'],
-            ':roles' => $_SESSION['role'],
-            ':activity' => 'Deleted ' . $deletedUser['role'] . ' account: ' . $deletedUser['name']
-        ]);
-
-        // Notify superadmin(s)
-        $superAdmins = $pdo->query("SELECT id FROM admins WHERE role = 'superadmin'")->fetchAll(PDO::FETCH_ASSOC);
-        $superNotif = $pdo->prepare("
+            // ── Notifications ──
+            $notifStmt = $pdo->prepare("
             INSERT INTO notifications (user_id, user_type, title, message, link, is_read, created_at)
             VALUES (?, 'admin', ?, ?, ?, FALSE, NOW())
         ");
-        foreach ($superAdmins as $admin) {
-            $superNotif->execute([
-                $admin['id'],
-                'Account Deleted',
-                'The ' . $deletedUser['role'] . ' account of ' . $deletedUser['name'] . ' has been deleted.',
-                'systemadmin.php'
-            ]);
+            $notifyTargets = [
+                'superadmin' => ['systemadmin.php', 'has been archived.'],
+                'internship_admin' => ['internship-admin.php', 'has been archived and removed from active lists.'],
+            ];
+            $adminLookup = $pdo->prepare("SELECT id FROM admins WHERE role = ? AND is_archived = FALSE");
+
+            foreach ($notifyTargets as $targetRole => [$link, $suffix]) {
+                $adminLookup->execute([$targetRole]);
+                foreach ($adminLookup->fetchAll(PDO::FETCH_COLUMN) as $adminId) {
+                    $notifStmt->execute([
+                        $adminId,
+                        'Account Archived',
+                        'The ' . $archivedUser['role'] . ' account of ' . $archivedUser['name'] . ' ' . $suffix,
+                        $link,
+                    ]);
+                }
+            }
+
+            $pdo->commit();
+        } catch (Throwable $e) {
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+            error_log('Archive failed: ' . $e->getMessage());
+            $_SESSION['error'] = "Could not archive the account. Please try again.";
+            header("Location: systemadmin.php");
+            exit();
         }
 
-        // Notify internship_admin(s)
-        $internshipAdmins = $pdo->query("SELECT id FROM admins WHERE role = 'internship_admin'")->fetchAll(PDO::FETCH_ASSOC);
-        $internshipNotif = $pdo->prepare("
-            INSERT INTO notifications (user_id, user_type, title, message, link, is_read, created_at)
-            VALUES (?, 'admin', ?, ?, ?, FALSE, NOW())
-        ");
-        foreach ($internshipAdmins as $admin) {
-            $internshipNotif->execute([
-                $admin['id'],
-                'Account Deleted',
-                'The ' . $deletedUser['role'] . ' account of ' . $deletedUser['name'] . ' has been removed from the system.',
-                'internship-admin.php'
-            ]);
-        }
-
-        $_SESSION['success'] = "User " . $deletedUser['name'] . " has been deleted.";
-        header("Location: systemadmin.php?deleted=1");
+        $_SESSION['success'] = "User " . $archivedUser['name'] . " has been archived.";
+        header("Location: systemadmin.php?archived=1");
         exit();
+    }
+    if (isset($_POST['delete_permanently'])) {
+        $id = (int) ($_POST['user_id'] ?? 0);
+        $source = $_POST['source'] ?? '';
+
+        if (!$id || !in_array($source, ['students', 'admins', 'advisers'], true)) {
+            $_SESSION['error'] = "Invalid delete request.";
+            header("Location: systemadmin.php#archived");
+            exit;
+        }
+
+        // ── Load the archived account (replaces fetchAccount) ──
+        $accountSql = [
+            'admins' => "SELECT id, name, role FROM admins WHERE id = ? AND is_archived = TRUE",
+            'advisers' => "SELECT id, full_name AS name, role FROM advisers WHERE id = ? AND is_archived = TRUE",
+            'students' => "SELECT id, full_name AS name, 'student' AS role FROM students WHERE id = ? AND is_archived = TRUE",
+        ][$source];
+
+        $accountStmt = $pdo->prepare($accountSql);
+        $accountStmt->execute([$id]);
+        $user = $accountStmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$user) {
+            $_SESSION['error'] = "Archived account not found.";
+            header("Location: systemadmin.php#archived");
+            exit;
+        }
+        if ($source === 'admins' && $user['role'] === 'superadmin') {
+            $_SESSION['error'] = "A superadmin account can't be deleted.";
+            header("Location: systemadmin.php#archived");
+            exit;
+        }
+
+        try {
+            $pdo->beginTransaction();
+
+            // ── Clean up rooms / membership ──
+            if ($source === 'advisers') {
+                $pdo->prepare("DELETE FROM room_members WHERE room_id IN (SELECT id FROM rooms WHERE adviser_id = ?)")->execute([$id]);
+                $pdo->prepare("DELETE FROM rooms WHERE adviser_id = ?")->execute([$id]);
+            } elseif ($source === 'students') {
+                $pdo->prepare("DELETE FROM room_members WHERE user_id = ? AND user_type = 'student'")->execute([$id]);
+            }
+
+            // ── Delete the account ──
+            $pdo->prepare("DELETE FROM $source WHERE id = ? AND is_archived = TRUE")->execute([$id]);
+
+            // ── Audit log ──
+            $pdo->prepare("INSERT INTO audits (user_id, roles, activity, activity_date) VALUES (?, ?, ?, NOW())")
+                ->execute([
+                    $_SESSION['user_id'],
+                    $_SESSION['role'],
+                    'Permanently deleted ' . $user['role'] . ' account: ' . $user['name'],
+                ]);
+
+            // ── Notifications (replaces notifyAdmins) ──
+            $notifStmt = $pdo->prepare("
+            INSERT INTO notifications (user_id, user_type, title, message, link, is_read, created_at)
+            VALUES (?, 'admin', ?, ?, ?, FALSE, NOW())
+        ");
+            $lookupStmt = $pdo->prepare("SELECT id FROM admins WHERE role = ? AND is_archived = FALSE");
+
+            foreach (['superadmin' => 'systemadmin.php', 'internship_admin' => 'internship-admin.php'] as $targetRole => $link) {
+                $lookupStmt->execute([$targetRole]);
+                foreach ($lookupStmt->fetchAll(PDO::FETCH_COLUMN) as $adminId) {
+                    $notifStmt->execute([
+                        $adminId,
+                        'Account Permanently Deleted',
+                        'The ' . $user['role'] . ' account of ' . $user['name'] . ' has been permanently deleted.',
+                        $link,
+                    ]);
+                }
+            }
+
+            $pdo->commit();
+        } catch (Throwable $e) {
+            if ($pdo->inTransaction())
+                $pdo->rollBack();
+            error_log('Permanent delete failed: ' . $e->getMessage());
+            $_SESSION['error'] = "Could not delete the account. It may still be referenced by other records.";
+            header("Location: systemadmin.php#archived");
+            exit;
+        }
+
+        $_SESSION['success'] = "User " . $user['name'] . " has been permanently deleted.";
+        header("Location: systemadmin.php?deleted=1#archived");
+        exit;
     }
     if (isset($_POST['action']) && in_array($_POST['action'], ['approve', 'reject'])) {
 
@@ -811,34 +927,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (isset($_POST['restore'])) {
-
-        // die(print_r($_POST, true));
-        $tables = ['students' => 'students', 'admins' => 'admins', 'advisers' => 'advisers'];
-        $table = $tables[$_POST['source'] ?? ''] ?? null;
+        $table = ['students' => 'students', 'admins' => 'admins', 'advisers' => 'advisers'][$_POST['source'] ?? ''] ?? null;
         $userId = (int) ($_POST['user_id'] ?? 0);
 
         if (!$table || !$userId) {
             $_SESSION['error'] = "Invalid user.";
-            header("Location: systemadmin.php");
+            header("Location: systemadmin.php#archived");
             exit;
         }
 
         try {
-            $pdo->prepare("UPDATE {$table} SET is_archived = FALSE WHERE id = :id")
-                ->execute([':id' => $userId]);
+            $pdo->beginTransaction();
 
-            $pdo->prepare("
-            INSERT INTO audits (user_id, roles, activity, activity_date)
-            VALUES (:admin, :roles, :activity, NOW())
-        ")->execute([
-                        ':admin' => $_SESSION['user_id'],
-                        ':roles' => 'superadmin',
-                        ':activity' => "Restored {$table} user ID {$userId}",
-                    ]);
+            $pdo->prepare("UPDATE {$table} SET is_archived = FALSE WHERE id = ?")->execute([$userId]);
 
+            if ($table === 'advisers') {
+                $pdo->prepare("UPDATE rooms SET is_archived = FALSE WHERE adviser_id = ?")->execute([$userId]);
+                $pdo->prepare("
+                UPDATE room_members SET is_archived = FALSE
+                WHERE room_id IN (SELECT id FROM rooms WHERE adviser_id = ?)
+                  AND (user_type <> 'student'
+                       OR user_id IN (SELECT id FROM students WHERE is_archived = FALSE))
+            ")->execute([$userId]);
+            } elseif ($table === 'students') {
+                $pdo->prepare("
+                UPDATE room_members SET is_archived = FALSE
+                WHERE user_id = ? AND user_type = 'student'
+                  AND room_id IN (SELECT id FROM rooms WHERE is_archived = FALSE)
+            ")->execute([$userId]);
+            }
+
+            $pdo->prepare("INSERT INTO audits (user_id, roles, activity, activity_date) VALUES (?, ?, ?, NOW())")
+                ->execute([$_SESSION['user_id'], $_SESSION['role'], "Restored {$table} user ID {$userId}"]);
+
+            $pdo->commit();
             $_SESSION['success'] = "User restored.";
-        } catch (Exception $e) {
-            $_SESSION['error'] = "Could not restore user: " . $e->getMessage();
+        } catch (Throwable $e) {
+            if ($pdo->inTransaction())
+                $pdo->rollBack();
+            error_log('Restore failed: ' . $e->getMessage());
+            $_SESSION['error'] = "Could not restore user.";
         }
 
         header("Location: systemadmin.php#archived");

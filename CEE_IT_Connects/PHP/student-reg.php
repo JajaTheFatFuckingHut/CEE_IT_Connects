@@ -2,109 +2,83 @@
 session_start();
 
 require 'db.php';
-$stmt = $pdo->query("SELECT * FROM students");
-$stmt->execute();
-$students = $stmt->fetchAll(PDO::FETCH_ASSOC);
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+require 'mailer.php';
 
-    $full_name = $_POST['full_name'];
-
-    $prefix = $_POST['year_no'];
-    $suffix = $_POST['id_no'];
-    $email = $_POST['email'];
-
-    if (!preg_match('/^\d{4}$/', $suffix)) {
-        $_SESSION['error'] = "Student ID must be exactly 4 digits.";
-        header("Location: ../student-register.php");
-        exit();
-    }
-    foreach ($students as $student) {
-        if ($student['student_id'] === $prefix . '-' . $suffix) {
-            $_SESSION['error'] = "Student ID already exists.";
-            header("Location: ../student-register.php");
-            exit();
-        }
-        if ($email === $student['email']) {
-            $_SESSION['error'] = "Email already registered.";
-            header("Location: ../student-register.php");
-            exit();
-        }
-    }
-    // Combine final student ID
-    $student_id = $prefix . '-' . $suffix;
-
-    $program = $_POST['program'];
-    $year_level = 4; // Default year level to 4 since it is always 4th year for the students in this system
-    $section = $_POST['section'];
-    $contact_number = $_POST['contact_number'];
-
-    // VALIDATE PASSWORD
-    $passwordRegex = '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>_\-+=~`\[\];\'\/\\\\]).{8,16}$/';
-
-    if (!preg_match($passwordRegex, $_POST['password'])) {
-        $_SESSION['error'] = "Password must be 8-16 characters and include an uppercase letter, a lowercase letter, a number, and a special character.";
-        header("Location: ../student-register.php");
-        exit();
-    }
-
-    // HASH PASSWORD
-    $password_hash = password_hash($_POST['password'], PASSWORD_DEFAULT);
-
-    // UPLOAD
-    // $cor_path = null;
-    // $allowed_types = ['image/jpeg', 'image/png', 'application/pdf'];
-
-    // if (!in_array($_FILES['cor_upload']['type'], $allowed_types)) {
-    //     die("Only JPG, PNG, PDF allowed.");
-    // }
-    // if (!empty($_FILES['cor_upload']['name'])) {
-    //     $target_dir = "../uploads/";
-
-    //     $file_name = time() . "_" . basename($_FILES["cor_upload"]["name"]);
-    //     $full_path = $target_dir . $file_name;
-
-    //     if (move_uploaded_file($_FILES["cor_upload"]["tmp_name"], $full_path)) {
-    //         $cor_path = $file_name; // Save only filename
-    //     } else {
-    //         die("Upload failed.");
-    //     }
-    // }
-
-    // INSERT INTO DATABASE
-    $stmt = $pdo->prepare("
-        INSERT INTO students
-        (full_name, student_id, program, year_level, section, password_hash, contact_number, email, is_archived)
-        VALUES
-        (:full_name, :student_id, :program, :year_level, :section, :password_hash, :contact_number, :email, FALSE)
-    ");
-
-    $stmt->execute([
-        ':full_name' => $full_name,
-        ':student_id' => $student_id,
-        ':program' => $program,
-        ':year_level' => $year_level,
-        ':section' => $section,
-        ':password_hash' => $password_hash,
-        ':contact_number' => $contact_number,
-        ':email' => $email
-    ]);
-
-
-    $newStudentId = $pdo->lastInsertId();
-
-    session_regenerate_id(true);
-    $_SESSION['user_id'] = $newStudentId;
-    $_SESSION['role'] = 'student';
-
-    $stmt = $pdo->prepare("INSERT INTO audits (user_id, roles, activity, activity_date) VALUES (:user_id, :roles, :activity, NOW())");
-    $stmt->execute([
-        ':user_id' => $newStudentId,
-        ':roles' => 'student',
-        ':activity' => 'Student registered an account with schoold Id ' . $student_id
-    ]);
-    // Redirect after success
-    $_SESSION['success'] = "Successfully made your account!";
-    header("Location: ../student.php");
+if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+    header("Location: ../student-register.php");
     exit();
 }
+
+function regFail(string $msg): void
+{
+    $_SESSION['error'] = $msg;
+    header("Location: ../student-register.php");
+    exit();
+}
+
+$full_name = trim($_POST['full_name'] ?? '');
+$prefix = trim($_POST['year_no'] ?? '');
+$suffix = trim($_POST['id_no'] ?? '');
+$email = strtolower(trim($_POST['email'] ?? ''));
+$program = $_POST['program'] ?? '';
+$section = trim($_POST['section'] ?? '');
+$contact_number = trim($_POST['contact_number'] ?? '');
+$password = $_POST['password'] ?? '';
+
+if (empty($_POST['agree_terms'])) {
+    regFail("Please agree to the Terms of Use and Privacy Policy.");
+}
+if ($full_name === '' || $section === '' || $program === '') {
+    regFail("Please fill in all required fields.");
+}
+if (!preg_match('/^\d{2}$/', $prefix)) {
+    regFail("The first part of the Student ID must be exactly 2 digits.");
+}
+if (!preg_match('/^\d{4}$/', $suffix)) {
+    regFail("Student ID must be exactly 4 digits.");
+}
+if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    regFail("A valid email address is required to receive your verification code.");
+}
+
+$passwordRegex = '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>_\-+=~`\[\];\'\/\\\\]).{8,16}$/';
+if (!preg_match($passwordRegex, $password)) {
+    regFail("Password must be 8-16 characters and include an uppercase letter, a lowercase letter, a number, and a special character.");
+}
+
+$student_id = $prefix . '-' . $suffix;
+
+// Targeted duplicate check (instead of loading every student)
+$dup = $pdo->prepare("SELECT student_id, email FROM students WHERE student_id = ? OR LOWER(email) = ?");
+$dup->execute([$student_id, $email]);
+$existing = $dup->fetch(PDO::FETCH_ASSOC);
+if ($existing) {
+    regFail($existing['student_id'] === $student_id ? "Student ID already exists." : "Email already registered.");
+}
+
+// Generate the code and keep everything in the session until it's verified
+$code = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+
+$_SESSION['pending_reg'] = [
+    'full_name' => $full_name,
+    'student_id' => $student_id,
+    'program' => $program,
+    'section' => $section,
+    'contact_number' => $contact_number,
+    'email' => $email,
+    'password_hash' => password_hash($password, PASSWORD_DEFAULT),
+    'code_hash' => password_hash($code, PASSWORD_DEFAULT),
+    'expires' => time() + 600,
+    'attempts' => 0,
+    'last_sent' => time(),
+];
+
+if (!sendVerificationCode($email, $full_name, $code)) {
+    unset($_SESSION['pending_reg']);
+    regFail("We couldn't send the verification email. Please try again.");
+}
+
+$_SESSION['info'] = "We sent a 6-digit code to $email.";
+header("Location: verify-code.php");
+exit();
 ?>

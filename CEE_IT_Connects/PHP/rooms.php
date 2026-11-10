@@ -303,9 +303,9 @@ $chatHteAdvisersStmt = $pdo->prepare("
         a.full_name,
         'adviser'     AS user_type
     FROM advisers a
-    JOIN internship_bookmarks ib
-        ON a.internship_id = ib.internship_id
-    WHERE ib.student_id = ?
+    JOIN ojt_applications oa
+        ON a.internship_id = oa.internship_id
+    WHERE oa.student_id = ?
       AND a.role = 'HTE_adviser'
     ORDER BY a.full_name
 ");
@@ -337,7 +337,8 @@ $currentUserType = getUserType($_SESSION['role']);
 
 if ($chatSection_id) {
     $stmt = $pdo->prepare("
-        SELECT m.id, m.sender_id, m.sender_type, m.message, m.created_at,
+        SELECT m.id, m.sender_id, m.sender_type, m.message, 
+        (m.created_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') AS created_at,
                m.attachment_name, m.attachment_type,
                CASE WHEN m.attachment_data IS NOT NULL THEN 1 ELSE 0 END AS has_attachment,
                COALESCE(s.full_name, a.full_name) AS sender_name

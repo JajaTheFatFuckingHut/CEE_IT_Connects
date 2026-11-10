@@ -141,10 +141,15 @@ session_start();
                         <input type="email" name="email" class="form-control" placeholder="Email Address">
                     </div>
 
-                    <div class="terms-text">
-                        By clicking "Create Account," you agree to the
-                        <a href="#" class="terms-link" data-bs-toggle="modal" data-bs-target="#termsModal">Terms of Use
-                            and Privacy Policy.</a>
+                    <div class="form-check mb-3 terms-text">
+                        <input class="form-check-input" type="checkbox" name="agree_terms" id="agreeTerms" value="1"
+                            required>
+                        <label class="form-check-label" for="agreeTerms">
+                            I agree to the
+                            <a href="#" class="terms-link" data-bs-toggle="modal" data-bs-target="#termsModal">Terms of
+                                Use
+                                and Privacy Policy</a>.
+                        </label>
                     </div>
 
                     <button type="submit" class="btn-login mt-3">
@@ -152,7 +157,7 @@ session_start();
                     </button>
 
                     <div class="register-text mt-3">
-                        Already have an account? <a href="login-ui.php" class="register-link">Sign in</a>
+                        Already have an account? <a href="login-page.php" class="register-link">Sign in</a>
                     </div>
                 </form>
 

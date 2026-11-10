@@ -193,11 +193,11 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
 // addtl s
 // ── DASHBOARD ANALYTICS (percentages + charts) ──
 $totalApplicants = count($applicants);
-$phaseCounts     = ['Internship Confirmed' => 0, 'In Progress' => 0, 'No Progress' => 0];
-$reqComplete     = 0;
-$programCounts   = [];
-$companyCounts   = [];
-$appsByDay       = [];
+$phaseCounts = ['Internship Confirmed' => 0, 'In Progress' => 0, 'No Progress' => 0];
+$reqComplete = 0;
+$programCounts = [];
+$companyCounts = [];
+$appsByDay = [];
 
 foreach ($applicants as $ap) {
     if (isset($phaseCounts[$ap['current_phase']])) {
@@ -220,7 +220,7 @@ foreach ($applicants as $ap) {
 $reqIncomplete = $totalApplicants - $reqComplete;
 
 $pctOf = fn($n) => $totalApplicants > 0 ? (int) round(($n / $totalApplicants) * 100) : 0;
-$confirmedPct  = $pctOf($phaseCounts['Internship Confirmed']);
+$confirmedPct = $pctOf($phaseCounts['Internship Confirmed']);
 $inProgressPct = $pctOf($phaseCounts['In Progress']);
 $noProgressPct = $pctOf($phaseCounts['No Progress']);
 $reqCompletePct = $pctOf($reqComplete);
@@ -230,11 +230,11 @@ $companyCounts = array_slice($companyCounts, 0, 6, true);
 
 // Applications per day, last 14 days
 $trendLabels = [];
-$trendData   = [];
+$trendData = [];
 for ($t = 13; $t >= 0; $t--) {
     $dKey = date('Y-m-d', strtotime("-{$t} days"));
     $trendLabels[] = date('M j', strtotime($dKey));
-    $trendData[]   = $appsByDay[$dKey] ?? 0;
+    $trendData[] = $appsByDay[$dKey] ?? 0;
 }
 // addtl e
 ?>
@@ -327,7 +327,8 @@ for ($t = 13; $t >= 0; $t--) {
                 margin: -20px -20px 20px -20px;
                 width: calc(100% + 40px);
                 border-radius: 0;
-                padding: 20px 110px 20px 20px; /* keep text clear of the stripes */
+                padding: 20px 110px 20px 20px;
+                /* keep text clear of the stripes */
             }
         }
 
@@ -510,7 +511,8 @@ for ($t = 13; $t >= 0; $t--) {
             bottom: 0;
             overflow-y: auto;
         }
- /* s */
+
+        /* s */
         .sidebar-user {
             margin-top: auto;
             margin-left: -20px;
@@ -557,6 +559,7 @@ for ($t = 13; $t >= 0; $t--) {
             font-size: 11px;
             color: #9aa3c7;
         }
+
         /* e */
 
         .sidebar h3 {
@@ -692,7 +695,7 @@ for ($t = 13; $t >= 0; $t--) {
             font-size: 18px;
             color: #fff;
         }
-        
+
         .card-tint-applications {
             background: #FFF6E3;
         }
@@ -1016,8 +1019,11 @@ for ($t = 13; $t >= 0; $t--) {
         }
 
         /* ===== bottom nav: phones + tablet portrait ===== */
-        @media (max-width: 768px), (max-width: 1024px) and (orientation: portrait) {
-            :root { --bn-h: 60px; }
+        @media (max-width: 768px),
+        (max-width: 1024px) and (orientation: portrait) {
+            :root {
+                --bn-h: 60px;
+            }
 
             .sidebar {
                 top: auto;
@@ -1037,11 +1043,15 @@ for ($t = 13; $t >= 0; $t--) {
                 box-shadow: 0 -2px 10px rgba(0, 0, 0, .15);
             }
 
-            .sidebar::-webkit-scrollbar { display: none; }
+            .sidebar::-webkit-scrollbar {
+                display: none;
+            }
 
             /* the account box doesn't belong in a bottom bar */
             .sidebar h3,
-            .sidebar-user { display: none !important; }
+            .sidebar-user {
+                display: none !important;
+            }
 
             /* every link is a tab: 5 or fewer stretch, more will scroll */
             .sidebar a {
@@ -1083,7 +1093,9 @@ for ($t = 13; $t >= 0; $t--) {
                 color: #fff;
             }
 
-            .sidebar a:hover i { color: inherit; }
+            .sidebar a:hover i {
+                color: inherit;
+            }
 
             .sidebar a.active {
                 background: transparent;
@@ -1092,7 +1104,9 @@ for ($t = 13; $t >= 0; $t--) {
                 border-top-color: #ff6b2c;
             }
 
-            .sidebar a.active i { color: #ff6b2c; }
+            .sidebar a.active i {
+                color: #ff6b2c;
+            }
 
             /* this page scrolls inside .main-content, so the padding goes there */
             .main-content {
@@ -1108,6 +1122,7 @@ for ($t = 13; $t >= 0; $t--) {
                 align-items: stretch !important;
                 width: 100% !important;
             }
+
             .sysAdm-section .search-box,
             .sysAdm-section select.filter-select {
                 flex: none !important;
@@ -1135,12 +1150,12 @@ for ($t = 13; $t >= 0; $t--) {
         }
 
         .dash-table-scroll table {
-            min-width: 480px; 
+            min-width: 480px;
         }
 
         .dash-table-scroll th,
         .dash-table-scroll td {
-            white-space: nowrap; 
+            white-space: nowrap;
         }
     </style>
 </head>
@@ -1242,7 +1257,8 @@ for ($t = 13; $t >= 0; $t--) {
                 <div class="home-hero home-hero--flush">
                     <div class="home-hero-bar">
                         <h2>Welcome back, <?= htmlspecialchars($adminFullName) ?></h2>
-                        <p>Manage postings, track your interns and their documents, and keep announcements up to date — all in one place.</p>
+                        <p>Manage postings, track your interns and their documents, and keep announcements up to date —
+                            all in one place.</p>
                     </div>
                 </div>
 
@@ -1252,7 +1268,8 @@ for ($t = 13; $t >= 0; $t--) {
                         <div class="ojtc-stat-card card-tint-applications">
                             <div class="ojtc-stat-icon icon-applications"><i class="bi bi-file-earmark-fill"></i></div>
                             <div>
-                                <p class="small mb-1 fw-semibold text-uppercase" style="letter-spacing:.05em; font-size:11px; color:#7a5200;">Applications</p>
+                                <p class="small mb-1 fw-semibold text-uppercase"
+                                    style="letter-spacing:.05em; font-size:11px; color:#7a5200;">Applications</p>
                                 <h2 class="fw-bold mb-0" style="color:#3b2600;"><?= $totalApplications ?></h2>
                             </div>
                         </div>
@@ -1261,26 +1278,32 @@ for ($t = 13; $t >= 0; $t--) {
                         <div class="ojtc-stat-card card-tint-internships">
                             <div class="ojtc-stat-icon icon-internships"><i class="bi bi-briefcase-fill"></i></div>
                             <div>
-                                <p class="small mb-1 fw-semibold text-uppercase" style="letter-spacing:.05em; font-size:11px; color:#272f54;">Internship Postings</p>
+                                <p class="small mb-1 fw-semibold text-uppercase"
+                                    style="letter-spacing:.05em; font-size:11px; color:#272f54;">Internship Postings</p>
                                 <h2 class="fw-bold mb-0" style="color:#272f54;"><?= $totalInternships ?></h2>
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="col-6 col-md-6 col-xl-4">
                         <div class="ojtc-stat-card card-tint-documents">
-                            <div class="ojtc-stat-icon icon-documents"><i class="bi bi-file-earmark-text-fill"></i></div>
+                            <div class="ojtc-stat-icon icon-documents"><i class="bi bi-file-earmark-text-fill"></i>
+                            </div>
                             <div>
-                                <p class="small mb-1 fw-semibold text-uppercase" style="letter-spacing:.05em; font-size:11px; color:#a13d1f;">Documents</p>
+                                <p class="small mb-1 fw-semibold text-uppercase"
+                                    style="letter-spacing:.05em; font-size:11px; color:#a13d1f;">Documents</p>
                                 <h2 class="fw-bold mb-0" style="color:#a13d1f;"><?= $totalDocuments ?></h2>
                             </div>
                         </div>
                     </div>
                     <div class="col-6 col-md-6 col-xl-4">
                         <div class="ojtc-stat-card card-tint-internships">
-                            <div class="ojtc-stat-icon icon-internships"><i class="bi bi-clipboard-check-fill"></i></div>
+                            <div class="ojtc-stat-icon icon-internships"><i class="bi bi-clipboard-check-fill"></i>
+                            </div>
                             <div>
-                                <p class="small mb-1 fw-semibold text-uppercase" style="letter-spacing:.05em; font-size:11px; color:#272f54;">Requirements Complete</p>
+                                <p class="small mb-1 fw-semibold text-uppercase"
+                                    style="letter-spacing:.05em; font-size:11px; color:#272f54;">Requirements Complete
+                                </p>
                                 <h2 class="fw-bold mb-0" style="color:#272f54;"><?= $reqCompletePct ?>%</h2>
                             </div>
                         </div>
@@ -1289,7 +1312,8 @@ for ($t = 13; $t >= 0; $t--) {
                         <div class="ojtc-stat-card card-tint-applications">
                             <div class="ojtc-stat-icon icon-applications"><i class="bi bi-hourglass-split"></i></div>
                             <div>
-                                <p class="small mb-1 fw-semibold text-uppercase" style="letter-spacing:.05em; font-size:11px; color:#7a5200;">In Progress</p>
+                                <p class="small mb-1 fw-semibold text-uppercase"
+                                    style="letter-spacing:.05em; font-size:11px; color:#7a5200;">In Progress</p>
                                 <h2 class="fw-bold mb-0" style="color:#3b2600;"><?= $inProgressPct ?>%</h2>
                             </div>
                         </div>
@@ -1298,82 +1322,84 @@ for ($t = 13; $t >= 0; $t--) {
                         <div class="ojtc-stat-card card-tint-documents">
                             <div class="ojtc-stat-icon icon-documents"><i class="bi bi-dash-circle-fill"></i></div>
                             <div>
-                                <p class="small mb-1 fw-semibold text-uppercase" style="letter-spacing:.05em; font-size:11px; color:#a13d1f;">No Progress</p>
+                                <p class="small mb-1 fw-semibold text-uppercase"
+                                    style="letter-spacing:.05em; font-size:11px; color:#a13d1f;">No Progress</p>
                                 <h2 class="fw-bold mb-0" style="color:#a13d1f;"><?= $noProgressPct ?>%</h2>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                    <!-- ANALYTICS CHARTS -->
-                    <div class="row g-4 mb-4">
-                        <div class="col-12 col-md-6 col-xl-4">
-                            <div class="card border-0 shadow-sm h-100 ojtc-panel-card">
-                                <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
-                                    <i class="bi bi-pie-chart" style="color:#272f54;"></i>
-                                    <h6 class="fw-bold mb-0" style="color:#272f54;">Intern Phase</h6>
-                                </div>
-                                <div class="card-body px-4 pb-4 pt-2">
-                                    <p class="text-muted small mb-3">Confirmed vs. in progress vs. not started.</p>
-                                    <div style="position:relative; height:220px;"><canvas id="phaseChart"></canvas></div>
-                                </div>
+                <!-- ANALYTICS CHARTS -->
+                <div class="row g-4 mb-4">
+                    <div class="col-12 col-md-6 col-xl-4">
+                        <div class="card border-0 shadow-sm h-100 ojtc-panel-card">
+                            <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
+                                <i class="bi bi-pie-chart" style="color:#272f54;"></i>
+                                <h6 class="fw-bold mb-0" style="color:#272f54;">Intern Phase</h6>
                             </div>
-                        </div>
-
-                        <div class="col-12 col-md-6 col-xl-4">
-                            <div class="card border-0 shadow-sm h-100 ojtc-panel-card">
-                                <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
-                                    <i class="bi bi-clipboard-check" style="color:#272f54;"></i>
-                                    <h6 class="fw-bold mb-0" style="color:#272f54;">Requirements</h6>
-                                </div>
-                                <div class="card-body px-4 pb-4 pt-2">
-                                    <p class="text-muted small mb-3">Interns with complete documents.</p>
-                                    <div style="position:relative; height:220px;"><canvas id="reqChart"></canvas></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-12 col-xl-4">
-                            <div class="card border-0 shadow-sm h-100 ojtc-panel-card">
-                                <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
-                                    <i class="bi bi-bar-chart" style="color:#272f54;"></i>
-                                    <h6 class="fw-bold mb-0" style="color:#272f54;">Interns per Program</h6>
-                                </div>
-                                <div class="card-body px-4 pb-4 pt-2">
-                                    <p class="text-muted small mb-3">Number of interns by program.</p>
-                                    <div style="position:relative; height:220px;"><canvas id="programChart"></canvas></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-12 col-xl-7">
-                            <div class="card border-0 shadow-sm h-100 ojtc-panel-card">
-                                <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
-                                    <i class="bi bi-graph-up" style="color:#272f54;"></i>
-                                    <h6 class="fw-bold mb-0" style="color:#272f54;">Submissions Trend</h6>
-                                </div>
-                                <div class="card-body px-4 pb-4 pt-2">
-                                    <p class="text-muted small mb-3">Students' internship submitted per day, last 14 days.</p>
-                                    <div style="position:relative; height:220px;"><canvas id="trendChart"></canvas></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-12 col-xl-5">
-                            <div class="card border-0 shadow-sm h-100 ojtc-panel-card">
-                                <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
-                                    <i class="bi bi-buildings" style="color:#272f54;"></i>
-                                    <h6 class="fw-bold mb-0" style="color:#272f54;">Top Companies</h6>
-                                </div>
-                                <div class="card-body px-4 pb-4 pt-2">
-                                    <p class="text-muted small mb-3">Companies with the most interns.</p>
-                                    <div style="position:relative; height:220px;"><canvas id="companyChart"></canvas></div>
-                                </div>
+                            <div class="card-body px-4 pb-4 pt-2">
+                                <p class="text-muted small mb-3">Confirmed vs. in progress vs. not started.</p>
+                                <div style="position:relative; height:220px;"><canvas id="phaseChart"></canvas></div>
                             </div>
                         </div>
                     </div>
-                     <!-- addtl e -->
-                      <div class="row g-4">
+
+                    <div class="col-12 col-md-6 col-xl-4">
+                        <div class="card border-0 shadow-sm h-100 ojtc-panel-card">
+                            <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
+                                <i class="bi bi-clipboard-check" style="color:#272f54;"></i>
+                                <h6 class="fw-bold mb-0" style="color:#272f54;">Requirements</h6>
+                            </div>
+                            <div class="card-body px-4 pb-4 pt-2">
+                                <p class="text-muted small mb-3">Interns with complete documents.</p>
+                                <div style="position:relative; height:220px;"><canvas id="reqChart"></canvas></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-xl-4">
+                        <div class="card border-0 shadow-sm h-100 ojtc-panel-card">
+                            <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
+                                <i class="bi bi-bar-chart" style="color:#272f54;"></i>
+                                <h6 class="fw-bold mb-0" style="color:#272f54;">Interns per Program</h6>
+                            </div>
+                            <div class="card-body px-4 pb-4 pt-2">
+                                <p class="text-muted small mb-3">Number of interns by program.</p>
+                                <div style="position:relative; height:220px;"><canvas id="programChart"></canvas></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-xl-7">
+                        <div class="card border-0 shadow-sm h-100 ojtc-panel-card">
+                            <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
+                                <i class="bi bi-graph-up" style="color:#272f54;"></i>
+                                <h6 class="fw-bold mb-0" style="color:#272f54;">Submissions Trend</h6>
+                            </div>
+                            <div class="card-body px-4 pb-4 pt-2">
+                                <p class="text-muted small mb-3">Students' internship submitted per day, last 14 days.
+                                </p>
+                                <div style="position:relative; height:220px;"><canvas id="trendChart"></canvas></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-xl-5">
+                        <div class="card border-0 shadow-sm h-100 ojtc-panel-card">
+                            <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
+                                <i class="bi bi-buildings" style="color:#272f54;"></i>
+                                <h6 class="fw-bold mb-0" style="color:#272f54;">Top Companies</h6>
+                            </div>
+                            <div class="card-body px-4 pb-4 pt-2">
+                                <p class="text-muted small mb-3">Companies with the most interns.</p>
+                                <div style="position:relative; height:220px;"><canvas id="companyChart"></canvas></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- addtl e -->
+                <div class="row g-4">
                     <div class="col-lg-7">
                         <div class="card border-0 shadow-sm h-100 ojtc-panel-card">
                             <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
@@ -1385,46 +1411,46 @@ for ($t = 13; $t >= 0; $t--) {
                                     <p class="text-muted small mb-0">No applications yet.</p>
                                 <?php else: ?>
                                     <div class="dash-table-scroll">
-                                    <table style="width:100%; border-collapse:collapse; font-size:13px;">
-                                        <thead>
-                                            <tr class="ojtc-th-tab"
-                                                style="color:#aaa; font-size:12px; text-transform:uppercase; letter-spacing:.04em;">
-                                                <th
-                                                    style="padding:8px 10px; border-bottom:1px solid #f0f2f7; font-weight:600;">
-                                                    Student</th>
-                                                <th
-                                                    style="padding:8px 10px; border-bottom:1px solid #f0f2f7; font-weight:600;">
-                                                    Company</th>
-                                                <th
-                                                    style="padding:8px 10px; border-bottom:1px solid #f0f2f7; font-weight:600;">
-                                                    Date</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php foreach ($recentInterested as $ri): ?>
-                                                <tr class="ojtc-row-hover">
-                                                    <td style="padding:10px; border-bottom:1px solid #f0f2f7;">
-                                                        <div style="display:flex; align-items:center; gap:8px;">
-                                                            <div
-                                                                style="width:30px;height:30px;min-width:30px;border-radius:50%;background:#eef1ff;color:#272f54;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;">
-                                                                <?= strtoupper(substr($ri['full_name'], 0, 1)) ?>
-                                                            </div>
-                                                            <span
-                                                                style="font-weight:500;color:#272f54;"><?= htmlspecialchars($ri['full_name']) ?></span>
-                                                        </div>
-                                                    </td>
-                                                    <td
-                                                        style="padding:10px; border-bottom:1px solid #f0f2f7; color:#888; font-size:12px;">
-                                                        <?= htmlspecialchars($ri['company']) ?>
-                                                    </td>
-                                                    <td
-                                                        style="padding:10px; border-bottom:1px solid #f0f2f7; color:#aaa; font-size:12px;">
-                                                        <?= date("M d", strtotime($ri['created_at'])) ?>
-                                                    </td>
+                                        <table style="width:100%; border-collapse:collapse; font-size:13px;">
+                                            <thead>
+                                                <tr class="ojtc-th-tab"
+                                                    style="color:#aaa; font-size:12px; text-transform:uppercase; letter-spacing:.04em;">
+                                                    <th
+                                                        style="padding:8px 10px; border-bottom:1px solid #f0f2f7; font-weight:600;">
+                                                        Student</th>
+                                                    <th
+                                                        style="padding:8px 10px; border-bottom:1px solid #f0f2f7; font-weight:600;">
+                                                        Company</th>
+                                                    <th
+                                                        style="padding:8px 10px; border-bottom:1px solid #f0f2f7; font-weight:600;">
+                                                        Date</th>
                                                 </tr>
-                                            <?php endforeach; ?>
-                                        </tbody>
-                                    </table>
+                                            </thead>
+                                            <tbody>
+                                                <?php foreach ($recentInterested as $ri): ?>
+                                                    <tr class="ojtc-row-hover">
+                                                        <td style="padding:10px; border-bottom:1px solid #f0f2f7;">
+                                                            <div style="display:flex; align-items:center; gap:8px;">
+                                                                <div
+                                                                    style="width:30px;height:30px;min-width:30px;border-radius:50%;background:#eef1ff;color:#272f54;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;">
+                                                                    <?= strtoupper(substr($ri['full_name'], 0, 1)) ?>
+                                                                </div>
+                                                                <span
+                                                                    style="font-weight:500;color:#272f54;"><?= htmlspecialchars($ri['full_name']) ?></span>
+                                                            </div>
+                                                        </td>
+                                                        <td
+                                                            style="padding:10px; border-bottom:1px solid #f0f2f7; color:#888; font-size:12px;">
+                                                            <?= htmlspecialchars($ri['company']) ?>
+                                                        </td>
+                                                        <td
+                                                            style="padding:10px; border-bottom:1px solid #f0f2f7; color:#aaa; font-size:12px;">
+                                                            <?= date("M d", strtotime($ri['created_at'])) ?>
+                                                        </td>
+                                                    </tr>
+                                                <?php endforeach; ?>
+                                            </tbody>
+                                        </table>
                                     </div>
                                 <?php endif; ?>
                             </div>
@@ -1486,50 +1512,50 @@ for ($t = 13; $t >= 0; $t--) {
                                     <p class="text-muted small mb-0">No internships posted yet.</p>
                                 <?php else: ?>
                                     <div class="dash-table-scroll">
-                                    <table style="width:100%; border-collapse:collapse; font-size:13px;">
+                                        <table style="width:100%; border-collapse:collapse; font-size:13px;">
                                             <thead>
                                                 <tr class="ojtc-th-tab"
                                                     style="color:#aaa; font-size:12px; text-transform:uppercase; letter-spacing:.04em;">
                                                     <th
                                                         style="padding:8px 10px; border-bottom:1px solid #f0f2f7; font-weight:600;">
-                                                    Title</th>
-                                                <th
-                                                    style="padding:8px 10px; border-bottom:1px solid #f0f2f7; font-weight:600;">
-                                                    Company</th>
-                                                <th
-                                                    style="padding:8px 10px; border-bottom:1px solid #f0f2f7; font-weight:600;">
-                                                    Location</th>
-                                                <th
-                                                    style="padding:8px 10px; border-bottom:1px solid #f0f2f7; font-weight:600;">
-                                                    Posted</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php foreach ($recentInternships as $ri): ?>
-                                                <tr class="ojtc-row-hover">
-                                                    <td
-                                                        style="padding:10px; border-bottom:1px solid #f0f2f7; font-weight:500; color:#272f54;">
-                                                        <?= htmlspecialchars($ri['title']) ?>
-                                                    </td>
-                                                    <td
-                                                        style="padding:10px; border-bottom:1px solid #f0f2f7; color:#888; font-size:12px;">
-                                                        <?= htmlspecialchars($ri['company']) ?>
-                                                    </td>
-                                                    <td
-                                                        style="padding:10px; border-bottom:1px solid #f0f2f7; color:#888; font-size:12px;">
-                                                        <i
-                                                            class="bi bi-geo-alt me-1"></i><?= htmlspecialchars($ri['location']) ?>
-                                                    </td>
-                                                    <td style="padding:10px; border-bottom:1px solid #f0f2f7;">
-                                                        <span
-                                                            style="color:#888;font-size:11px;padding:3px 10px;border-radius:6px;font-weight:500;">
-                                                            <?= date("M d, Y", strtotime($ri['created_at'])) ?>
-                                                        </span>
-                                                    </td>
+                                                        Title</th>
+                                                    <th
+                                                        style="padding:8px 10px; border-bottom:1px solid #f0f2f7; font-weight:600;">
+                                                        Company</th>
+                                                    <th
+                                                        style="padding:8px 10px; border-bottom:1px solid #f0f2f7; font-weight:600;">
+                                                        Location</th>
+                                                    <th
+                                                        style="padding:8px 10px; border-bottom:1px solid #f0f2f7; font-weight:600;">
+                                                        Posted</th>
                                                 </tr>
-                                            <?php endforeach; ?>
-                                        </tbody>
-                                    </table>
+                                            </thead>
+                                            <tbody>
+                                                <?php foreach ($recentInternships as $ri): ?>
+                                                    <tr class="ojtc-row-hover">
+                                                        <td
+                                                            style="padding:10px; border-bottom:1px solid #f0f2f7; font-weight:500; color:#272f54;">
+                                                            <?= htmlspecialchars($ri['title']) ?>
+                                                        </td>
+                                                        <td
+                                                            style="padding:10px; border-bottom:1px solid #f0f2f7; color:#888; font-size:12px;">
+                                                            <?= htmlspecialchars($ri['company']) ?>
+                                                        </td>
+                                                        <td
+                                                            style="padding:10px; border-bottom:1px solid #f0f2f7; color:#888; font-size:12px;">
+                                                            <i
+                                                                class="bi bi-geo-alt me-1"></i><?= htmlspecialchars($ri['location']) ?>
+                                                        </td>
+                                                        <td style="padding:10px; border-bottom:1px solid #f0f2f7;">
+                                                            <span
+                                                                style="color:#888;font-size:11px;padding:3px 10px;border-radius:6px;font-weight:500;">
+                                                                <?= date("M d, Y", strtotime($ri['created_at'])) ?>
+                                                            </span>
+                                                        </td>
+                                                    </tr>
+                                                <?php endforeach; ?>
+                                            </tbody>
+                                        </table>
                                     </div>
                                 <?php endif; ?>
                             </div>
@@ -1612,7 +1638,7 @@ for ($t = 13; $t >= 0; $t--) {
                                 placeholder="Search by company or title..." oninput="filterPostings()">
                             <i class="bi bi-search" style="color:#272f54 !important;"></i>
                         </div>
-                        
+
                         <select class="filter-select"
                             style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px; min-width:200px;"
                             id="postings-program-filter" onchange="filterPostings()">
@@ -1648,10 +1674,15 @@ for ($t = 13; $t >= 0; $t--) {
                                     <td><?= !empty($p['program']) ? htmlspecialchars($p['program']) : '—' ?></td>
                                     <td><?= !empty($p['location']) ? htmlspecialchars($p['location']) : '—' ?></td>
                                     <td>
-                                        <button class="btn-delete" data-tooltip="Delete"
-                                            onclick="deleteRow(this)">
-                                            <i class="bi bi-trash-fill"></i>
-                                        </button>
+                                        <form method="POST" action="internship-db.php" style="display:inline;"
+                                            onsubmit="return confirm('Delete this internship posting? This cannot be undone.')">
+                                            <input type="hidden" name="id" value="<?= (int) $p['id'] ?>">
+                                            <input type="hidden" name="form_type" value="delete_internship">
+                                            <button type="submit" name="delete_internship" class="btn-delete"
+                                                data-tooltip="Delete">
+                                                <i class="bi bi-trash-fill"></i>
+                                            </button>
+                                        </form>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -1934,7 +1965,6 @@ for ($t = 13; $t >= 0; $t--) {
                                     $pc = $phaseColors[$a['current_phase']] ?? ['bg' => '#f3f4f6', 'color' => '#6b7280'];
                                     ?>
                                     <tr data-name="<?= strtolower(htmlspecialchars($a['full_name'])) ?>"
-                                        
                                         data-program="<?= strtolower(htmlspecialchars($a['program'])) ?>"
                                         data-phase="<?= htmlspecialchars($a['current_phase']) ?>"
                                         data-req="<?= htmlspecialchars($a['requirements']) ?>">
@@ -2112,7 +2142,7 @@ for ($t = 13; $t >= 0; $t--) {
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- editing to make the announce document availability popup instead na nakalabas -->
                 <div id="document-availability-form-panel" class="ojtc-modal-backdrop" style="display:none;"
                     onclick="if(event.target===this) hideDocAvailForm()">
@@ -2169,7 +2199,8 @@ for ($t = 13; $t >= 0; $t--) {
                     </div>
                 </div>
 
-                <div class="filter-row" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
+                <div class="filter-row"
+                    style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
                     <div class="filter-bar" style="display:flex; align-items:center; flex-wrap:wrap; gap:10px;">
                         <div class="search-box">
                             <input type="text" id="search-docavail"
@@ -2458,13 +2489,15 @@ for ($t = 13; $t >= 0; $t--) {
                                         <td><?= date("M d, Y", strtotime($a['created_at'])) ?></td>
                                         <td class="text-center">
                                             <input type="hidden" name="announcement_id" value="<?= $a['id'] ?>">
-                                            <button type="submit" name="edit_announcement" class="btn-delete" data-tooltip="Save Changes"
+                                            <button type="submit" name="edit_announcement" class="btn-delete"
+                                                data-tooltip="Save Changes"
                                                 style="color: #384887; border:1px solid #5766a68a; background-color: #dfe4f8; transition: background-color 0.2s ease;"
                                                 onmouseover="this.style.backgroundColor='#adbbe6';"
                                                 onmouseout="this.style.backgroundColor='#dfe4f8';">
                                                 <i class="bi bi-floppy2"></i>
                                             </button>
-                                            <button type="submit" name="delete_announcement" class="btn-delete" data-tooltip="Delete">
+                                            <button type="submit" name="delete_announcement" class="btn-delete"
+                                                data-tooltip="Delete">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </td>
@@ -2766,10 +2799,10 @@ for ($t = 13; $t >= 0; $t--) {
                 row.style.display = (matchP && matchS) ? '' : 'none';
             });
         }
-        function deleteRow(btn) {
-            if (!confirm('Delete this internship posting?')) return;
-            btn.closest('tr').remove();
-        }
+        // function deleteRow(btn) {
+        //     if (!confirm('Delete this internship posting?')) return;
+        //     btn.closest('tr').remove();
+        // }
 
 
         // added for manage announcements
