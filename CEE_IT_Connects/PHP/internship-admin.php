@@ -168,11 +168,11 @@ $recentInternshipsStmt = $pdo->query("
 $recentInternships = $recentInternshipsStmt->fetchAll(PDO::FETCH_ASSOC);
 
 $recentInterestedStmt = $pdo->query("
-    SELECT s.full_name, s.email, i.title AS internship_title, i.company, oa.created_at
+    SELECT s.full_name, s.email, i.title AS internship_title, i.company, oa.submitted_at
     FROM ojt_applications oa
     JOIN students s ON s.id = oa.student_id
     JOIN internships i ON i.id = oa.internship_id
-    ORDER BY oa.created_at DESC LIMIT 5
+    ORDER BY oa.submitted_at DESC LIMIT 5
 ");
 $recentInterested = $recentInterestedStmt->fetchAll(PDO::FETCH_ASSOC);
 
