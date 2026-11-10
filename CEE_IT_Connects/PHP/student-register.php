@@ -183,7 +183,7 @@ session_start();
                         agree to provide accurate personal and academic information, use the platform only for
                         legitimate internship documentation and communication with your adviser, and refrain from
                         submitting falsified time records or files.</p>
-                    <p>Your account and any uploaded documents (e.g. Certificate of Registration) may be reviewed by
+                    <p>Your account and any uploaded documents (e.g. Curriculum Vitae) may be reviewed by
                         your adviser and department administrators for verification purposes.</p>
 
                     <h6 class="mt-3">Privacy Policy</h6>
