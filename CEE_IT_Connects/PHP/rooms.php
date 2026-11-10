@@ -18,38 +18,6 @@ $student_id = $_SESSION['user_id'];
 $page = $page ?? "";
 $isAdviser = isset($_SESSION['role']) && $_SESSION['role'] === 'internship_adviser';
 
-$current_section = $_GET['section'] ?? 'home';
-$current_room_id = isset($_GET['room_id']) ? (int) $_GET['room_id'] : null;
-
-// A room link without a section should open the rooms section
-if ($current_room_id && !isset($_GET['section'])) {
-    $current_section = 'rooms';
-}
-
-// Home never carries a room
-if ($current_section === 'home') {
-    $current_room_id = null;
-}
-
-// Rooms section with no room picked: default to the first one
-if ($current_section === 'rooms' && !$current_room_id && !empty($rooms)) {
-    $current_room_id = (int) $rooms[0]['id'];
-}
-
-// Security: the student may only open a room they belong to
-if ($current_room_id) {
-    $allowedIds = array_map('intval', array_column($rooms, 'id'));
-    if (!in_array($current_room_id, $allowedIds, true)) {
-        $current_room_id = null;
-        $current_section = 'home';
-    }
-}
-if ($current_room_id !== null && $current_room_id !== '' && ctype_digit((string) $current_room_id)) {
-    $current_room_id = (int) $current_room_id;
-} else {
-    $current_room_id = null;
-}
-
 // If no room was picked by URL or auto-load, fall back to the student's first room
 // if ($current_room_id === null && !empty($rooms)) {
 //     $current_room_id = (int) $rooms[0]['id'];
@@ -194,6 +162,38 @@ $stmt = $pdo->prepare("
 ");
 $stmt->execute([$_SESSION['user_id']]);
 $rooms = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+$current_section = $_GET['section'] ?? 'home';
+$current_room_id = isset($_GET['room_id']) ? (int) $_GET['room_id'] : null;
+
+// A room link without a section should open the rooms section
+if ($current_room_id && !isset($_GET['section'])) {
+    $current_section = 'rooms';
+}
+
+// Home never carries a room
+if ($current_section === 'home') {
+    $current_room_id = null;
+}
+
+// Rooms section with no room picked: default to the first one
+if ($current_section === 'rooms' && !$current_room_id && !empty($rooms)) {
+    $current_room_id = (int) $rooms[0]['id'];
+}
+
+// Security: the student may only open a room they belong to
+if ($current_room_id) {
+    $allowedIds = array_map('intval', array_column($rooms, 'id'));
+    if (!in_array($current_room_id, $allowedIds, true)) {
+        $current_room_id = null;
+        $current_section = 'home';
+    }
+}
+if ($current_room_id !== null && $current_room_id !== '' && ctype_digit((string) $current_room_id)) {
+    $current_room_id = (int) $current_room_id;
+} else {
+    $current_room_id = null;
+}
 
 $current_section = $_GET['section'] ?? 'home';
 $current_chat_id = $_GET['chat_id'] ?? null;
