@@ -48,8 +48,6 @@ select {
 /* --- MAIN CONTAINER --- */
 .login-container {
     min-height: 100vh;
-    display: flex;
-    align-items: center;
 }
 
 .left-panel {
@@ -68,7 +66,7 @@ select {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: 1rem 2rem;
+    padding: 3rem 2rem; /* Added top/bottom padding for scrolling */
     min-height: 100vh;
     width: 100%;
 }
@@ -97,7 +95,6 @@ select {
 .form-wrapper {
     width: min(100%, 500px);
     margin: 0 auto;
-    transform: translateY(-10px);
 }
 
 .form-control, .form-select {
