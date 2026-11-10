@@ -160,19 +160,19 @@ if (isset($_POST['post_announcement'])) {
 
         // Notify all active members except the poster, and get each member's role
         $membersStmt = $pdo->prepare("
-    SELECT rm.user_id,
-           rm.user_type,
-           CASE rm.user_type
-                WHEN 'student' THEN 'student'
-                WHEN 'adviser' THEN LOWER(a.role)
-                WHEN 'admin'   THEN LOWER(ad.role)
-           END AS member_role
-    FROM room_members rm
-    LEFT JOIN advisers a  ON rm.user_type = 'adviser' AND a.id  = rm.user_id
-    LEFT JOIN admins   ad ON rm.user_type = 'admin'   AND ad.id = rm.user_id
-    WHERE rm.room_id = ? AND rm.is_archived = FALSE
-      AND NOT (rm.user_id = ? AND rm.user_type = ?)
-");
+        SELECT rm.user_id,
+            rm.user_type,
+            CASE rm.user_type
+                    WHEN 'student' THEN 'student'
+                    WHEN 'adviser' THEN LOWER(a.role::text)
+                    WHEN 'admin'   THEN LOWER(ad.role::text)
+            END AS member_role
+        FROM room_members rm
+        LEFT JOIN advisers a  ON rm.user_type = 'adviser' AND a.id  = rm.user_id
+        LEFT JOIN admins   ad ON rm.user_type = 'admin'   AND ad.id = rm.user_id
+        WHERE rm.room_id = ? AND rm.is_archived = FALSE
+        AND NOT (rm.user_id = ? AND rm.user_type = ?)
+    ");
         $membersStmt->execute([$room_id, $userId, $posterType]);
 
         $notifStmt = $pdo->prepare("
