@@ -64,12 +64,13 @@ select {
 .right-panel {
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
-    padding: 3rem 2rem; /* Added top/bottom padding for scrolling */
-    min-height: 100vh;
+    padding: 2rem;
     width: 100%;
 }
+
+.right-panel > :first-child { margin-top: auto; }
+.right-panel > :last-child  { margin-bottom: auto; }
 
 .logo-img {
     width: 250px;
