@@ -4693,18 +4693,165 @@ foreach ($roomStatuses as $s) {
             }
         }
 
+        const PDF_C = {
+            navy: [39, 47, 84], orange: [242, 107, 58], green: [22, 163, 106], blue: [47, 91, 216],
+            orangeBg: [255, 229, 217], greenBg: [216, 245, 234], blueBg: [229, 238, 255],
+            track: [226, 230, 240], muted: [107, 115, 144], border: [226, 230, 240]
+        };
+
+        function pdfCard(doc, x, y, w, h) {
+            doc.setFillColor(255, 255, 255);
+            doc.setDrawColor(...PDF_C.border);
+            doc.roundedRect(x, y, w, h, 3, 3, 'FD');
+        }
+
+        function pdfEnsureSpace(doc, y, needed) {
+            if (y + needed > doc.internal.pageSize.getHeight() - 14) {
+                doc.addPage();
+                return 16;
+            }
+            return y;
+        }
+
+        // OJT Progress card + 3 stat cards + Attendance per week chart. Returns new y.
+        function pdfDrawSummary(doc, data, s, y) {
+            const M = 14, W = 182;
+            const weekly = data.weeks.map(w => ({
+                label: w.week_label,
+                ...computeDtrStats({ student: data.student, weeks: [w] })
+            }));
+            const onTimeDays = s.loggedDays - s.lateDays;
+            const remaining = Math.max(0, s.requiredHours - s.totalHours);
+            const schedIn = fmtSchedTime(data.student.ojt_time_in);
+            const schedOut = fmtSchedTime(data.student.ojt_time_out);
+
+            // ── OJT Progress card ──
+            y = pdfEnsureSpace(doc, y, 36);
+            pdfCard(doc, M, y, W, 32);
+            doc.setFont(undefined, 'bold'); doc.setFontSize(11); doc.setTextColor(...PDF_C.navy);
+            doc.text('OJT Progress', M + 5, y + 8);
+            doc.setTextColor(...PDF_C.orange);
+            doc.text(`${s.progressPct}%`, M + W - 5, y + 8, { align: 'right' });
+
+            doc.setFillColor(...PDF_C.track);
+            doc.roundedRect(M + 5, y + 11, W - 10, 3, 1.5, 1.5, 'F');
+            const fillW = Math.max(0, Math.min(1, s.progressPct / 100)) * (W - 10);
+            if (fillW > 0) {
+                doc.setFillColor(...PDF_C.orange);
+                doc.roundedRect(M + 5, y + 11, fillW, 3, 1.5, 1.5, 'F');
+            }
+
+            doc.setFont(undefined, 'normal'); doc.setFontSize(9); doc.setTextColor(...PDF_C.muted);
+            doc.text(`${s.totalHours.toFixed(1)} of ${s.requiredHours} hrs rendered  |  ${remaining.toFixed(1)} hrs remaining`, M + 5, y + 20);
+            doc.text(
+                schedIn && schedOut
+                    ? `Office hours: ${schedIn} - ${schedOut}  |  Late if time-in is after ${schedIn}  |  Undertime if time-out is before ${schedOut}`
+                    : 'Office hours: Not set  |  status shows "Present" only',
+                M + 5, y + 26, { maxWidth: W - 10 }
+            );
+            y += 32 + 6;
+
+            // ── Stat cards ──
+            y = pdfEnsureSpace(doc, y, 28);
+            const gap = 4, cw = (W - gap * 2) / 3, ch = 24;
+            const stats = [
+                { label: 'LATE', value: s.lateDays, unit: s.lateDays === 1 ? 'time' : 'times', color: PDF_C.orange, bg: PDF_C.orangeBg },
+                { label: 'OVERTIME', value: s.overtimeDays, unit: s.overtimeDays === 1 ? 'time' : 'times', color: PDF_C.blue, bg: PDF_C.blueBg },
+                { label: 'ON TIME', value: onTimeDays, unit: onTimeDays === 1 ? 'day' : 'days', color: PDF_C.green, bg: PDF_C.greenBg },
+            ];
+            stats.forEach((st, i) => {
+                const x = M + i * (cw + gap);
+                pdfCard(doc, x, y, cw, ch);
+                doc.setFillColor(...st.bg);
+                doc.roundedRect(x + 4, y + 6, 12, 12, 3, 3, 'F');
+                doc.setFillColor(...st.color);
+                doc.circle(x + 10, y + 12, 2.5, 'F');
+
+                doc.setFont(undefined, 'normal'); doc.setFontSize(8); doc.setTextColor(...PDF_C.muted);
+                doc.text(st.label, x + 20, y + 7);
+                doc.setFont(undefined, 'bold'); doc.setFontSize(16); doc.setTextColor(...PDF_C.navy);
+                doc.text(String(st.value), x + 20, y + 15);
+                const vw = doc.getTextWidth(String(st.value));
+                doc.setFont(undefined, 'normal'); doc.setFontSize(8); doc.setTextColor(...PDF_C.muted);
+                doc.text(st.unit, x + 20 + vw + 2, y + 15);
+                doc.setFontSize(7);
+                doc.text(`out of ${s.loggedDays} logged day(s)`, x + 20, y + 20);
+            });
+            y += ch + 6;
+
+            // ── Attendance per week ──
+            const chartH = 34, cardH = 14 + chartH + 22;
+            y = pdfEnsureSpace(doc, y, cardH);
+            pdfCard(doc, M, y, W, cardH);
+
+            doc.setFont(undefined, 'bold'); doc.setFontSize(11); doc.setTextColor(...PDF_C.navy);
+            doc.text('Attendance per week', M + 5, y + 8);
+
+            // Legend (right aligned)
+            doc.setFont(undefined, 'normal'); doc.setFontSize(7); doc.setTextColor(...PDF_C.muted);
+            const legend = [['Late', PDF_C.orange], ['On time', PDF_C.green], ['OT = overtime days', PDF_C.blue]];
+            let lx = M + W - 5;
+            for (let i = legend.length - 1; i >= 0; i--) {
+                const [text, col] = legend[i];
+                const tw = doc.getTextWidth(text);
+                lx -= tw;
+                doc.text(text, lx, y + 7.5);
+                lx -= 4;
+                doc.setFillColor(...col);
+                doc.rect(lx, y + 5, 3, 3, 'F');
+                lx -= 5;
+            }
+
+            const baseY = y + 14 + chartH;
+            const cx = M + 5, cwid = W - 10;
+            doc.setDrawColor(...PDF_C.border);
+            doc.line(cx, baseY, cx + cwid, baseY);
+
+            if (weekly.length) {
+                const maxDays = Math.max(1, ...weekly.map(w => w.loggedDays));
+                const slot = Math.min(32, cwid / weekly.length);
+                const barW = Math.min(14, slot * 0.6);
+                weekly.forEach((w, i) => {
+                    const bx = cx + i * slot + (slot - barW) / 2;
+                    const midX = bx + barW / 2;
+                    const onTime = w.loggedDays - w.lateDays;
+                    const totalH = Math.max(3, (w.loggedDays / maxDays) * chartH);
+                    const lateH = w.loggedDays ? totalH * (w.lateDays / w.loggedDays) : 0;
+                    const onH = totalH - lateH;
+
+                    if (onH > 0) { doc.setFillColor(...PDF_C.green); doc.rect(bx, baseY - onH, barW, onH, 'F'); }
+                    if (lateH > 0) { doc.setFillColor(...PDF_C.orange); doc.rect(bx, baseY - onH - lateH, barW, lateH, 'F'); }
+
+                    doc.setFont(undefined, 'bold'); doc.setFontSize(8); doc.setTextColor(43, 58, 103);
+                    doc.text(String(w.label), midX, baseY + 5, { align: 'center', maxWidth: slot });
+                    doc.setFont(undefined, 'normal'); doc.setFontSize(7); doc.setTextColor(...PDF_C.muted);
+                    doc.text(`${w.lateDays}/${w.loggedDays} late`, midX, baseY + 9, { align: 'center', maxWidth: slot });
+
+                    if (w.overtimeDays > 0) {
+                        const label = `OT ${w.overtimeDays}`;
+                        const tw = doc.getTextWidth(label) + 4;
+                        doc.setFillColor(...PDF_C.blueBg);
+                        doc.roundedRect(midX - tw / 2, baseY + 11, tw, 4.5, 2, 2, 'F');
+                        doc.setTextColor(...PDF_C.blue);
+                        doc.text(label, midX, baseY + 14.3, { align: 'center' });
+                    }
+                });
+            } else {
+                doc.setFontSize(9); doc.setTextColor(140, 140, 140);
+                doc.text('No weekly data yet.', cx, baseY - 10);
+            }
+
+            return y + cardH + 8;
+        }
+
         function downloadStudentDtrPDF() {
-            if (!currentDtrData || !currentDtrData.weeks.length) {
+            const data = window.currentDtrData || currentDtrData;
+            if (!data || !data.weeks || !data.weeks.length) {
                 alert('No timesheet data to export yet.');
                 return;
             }
-            if (!window.jspdf) {
-                alert('PDF library failed to load.');
-                return;
-            }
+            if (!window.jspdf) { alert('PDF library failed to load.'); return; }
 
-            if (!currentDtrData) return;
-            const data = currentDtrData;
             const s = computeDtrStats(data);
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
@@ -4712,126 +4859,89 @@ foreach ($roomStatuses as $s) {
             let y = 16;
 
             // Header
-            doc.setFontSize(16); doc.setTextColor(39, 47, 84);
-            doc.text('Daily Time Record', margin, y); y += 8;
-            doc.setFontSize(11); doc.setTextColor(0, 0, 0);
-            doc.text(`${data.student.full_name} - ${data.student.company ?? ''}`, margin, y); y += 6;
+            doc.setFont(undefined, 'bold'); doc.setFontSize(16); doc.setTextColor(...PDF_C.navy);
+            doc.text('Daily Time Record', margin, y); y += 7;
+            doc.setFont(undefined, 'normal'); doc.setFontSize(11); doc.setTextColor(0, 0, 0);
+            doc.text(`${data.student.full_name} - ${data.student.company ?? ''}`, margin, y); y += 8;
 
-            // Summary
-            const schedIn = fmtSchedTime(data.student.ojt_time_in);
-            const schedOut = fmtSchedTime(data.student.ojt_time_out);
-            doc.setFontSize(10); doc.setTextColor(90, 90, 90);
-            doc.text(`Hours: ${s.totalHours.toFixed(1)} / ${s.requiredHours} (${s.progressPct}%)`, margin, y); y += 5;
-            doc.text(`Late: ${s.lateDays}   Overtime: ${s.overtimeDays}   Logged days: ${s.loggedDays}`, margin, y); y += 5;
-            doc.text(`Office hours: ${schedIn && schedOut ? schedIn + ' - ' + schedOut : 'Not set'}`, margin, y); y += 8;
-
-            // One table per week, read from what's already rendered in the modal
-            const weekEls = document.querySelectorAll('#dtr-view-modal-body table');
-            if (!weekEls.length) {
-                alert('Nothing to export yet.');
-                return;
+            function timeToMinutes(str) {
+                if (!str) return null;
+                const m = String(str).match(/^(\d{1,2}):(\d{2})/);
+                if (!m) return null;
+                return parseInt(m[1], 10) * 60 + parseInt(m[2], 10);
             }
-            weekEls.forEach((table, i) => {
-                const label = data.weeks[i]?.week_label ?? `Week ${i + 1}`;
-                doc.setFontSize(11); doc.setTextColor(39, 47, 84);
-                if (y > 265) { doc.addPage(); y = 16; }
-                doc.text(label, margin, y); y += 2;
 
-                doc.autoTable({
-                    html: table,
-                    startY: y,
-                    styles: { fontSize: 9 },
-                    headStyles: { fillColor: [39, 47, 84], textColor: [255, 255, 255] },
-                    margin: { left: margin, right: margin },
-                });
-                y = doc.lastAutoTable.finalY + 8;
-            });
+            function diffHours(inStr, outStr) {
+                const inMin = timeToMinutes(inStr);
+                const outMin = timeToMinutes(outStr);
+                if (inMin === null || outMin === null) return 0;
+                let diff = outMin - inMin;
+                if (diff < 0) diff += 24 * 60; // guard against overnight/bad data
+                return diff / 60;
+            }
 
-            const safeName = data.student.full_name.replace(/[^\w]+/g, '_');
-            doc.save(`DTR_${safeName}.pdf`);
-        }
+            /* ---------- stats ---------- */
 
+            function computeDtrStats(data, graceMinutes = 0) {
+                const scheduledIn = timeToMinutes(data.student.ojt_time_in);
+                const scheduledOut = timeToMinutes(data.student.ojt_time_out);
 
-        /* ---------- time helpers ---------- */
+                let totalHours = 0;
+                let loggedDays = 0;
+                let lateDays = 0;
+                let overtimeDays = 0;
 
-        function timeToMinutes(str) {
-            if (!str) return null;
-            const m = String(str).match(/^(\d{1,2}):(\d{2})/);
-            if (!m) return null;
-            return parseInt(m[1], 10) * 60 + parseInt(m[2], 10);
-        }
+                for (const week of data.weeks) {
+                    for (const row of week.rows) {
+                        const hasAnyTime = row.m_in || row.m_out || row.a_in || row.a_out;
+                        if (!hasAnyTime) continue;
 
-        function diffHours(inStr, outStr) {
-            const inMin = timeToMinutes(inStr);
-            const outMin = timeToMinutes(outStr);
-            if (inMin === null || outMin === null) return 0;
-            let diff = outMin - inMin;
-            if (diff < 0) diff += 24 * 60; // guard against overnight/bad data
-            return diff / 60;
-        }
+                        loggedDays++;
+                        totalHours += diffHours(row.m_in, row.m_out) + diffHours(row.a_in, row.a_out);
 
-        /* ---------- stats ---------- */
+                        // Late: morning time-in later than the scheduled start (+ grace)
+                        const actualIn = timeToMinutes(row.m_in);
+                        if (scheduledIn !== null && actualIn !== null && actualIn > scheduledIn + graceMinutes) {
+                            lateDays++;
+                        }
 
-        function computeDtrStats(data, graceMinutes = 0) {
-            const scheduledIn = timeToMinutes(data.student.ojt_time_in);
-            const scheduledOut = timeToMinutes(data.student.ojt_time_out);
-
-            let totalHours = 0;
-            let loggedDays = 0;
-            let lateDays = 0;
-            let overtimeDays = 0;
-
-            for (const week of data.weeks) {
-                for (const row of week.rows) {
-                    const hasAnyTime = row.m_in || row.m_out || row.a_in || row.a_out;
-                    if (!hasAnyTime) continue;
-
-                    loggedDays++;
-                    totalHours += diffHours(row.m_in, row.m_out) + diffHours(row.a_in, row.a_out);
-
-                    // Late: morning time-in later than the scheduled start (+ grace)
-                    const actualIn = timeToMinutes(row.m_in);
-                    if (scheduledIn !== null && actualIn !== null && actualIn > scheduledIn + graceMinutes) {
-                        lateDays++;
-                    }
-
-                    // Overtime: end of day (afternoon out, falling back to morning out) later than scheduled end
-                    const actualOut = timeToMinutes(row.a_out) ?? timeToMinutes(row.m_out);
-                    if (scheduledOut !== null && actualOut !== null && actualOut > scheduledOut + graceMinutes) {
-                        overtimeDays++;
+                        // Overtime: end of day (afternoon out, falling back to morning out) later than scheduled end
+                        const actualOut = timeToMinutes(row.a_out) ?? timeToMinutes(row.m_out);
+                        if (scheduledOut !== null && actualOut !== null && actualOut > scheduledOut + graceMinutes) {
+                            overtimeDays++;
+                        }
                     }
                 }
+
+                const requiredHours = parseFloat(data.student.required_hours) || 0;
+                const progressPct = requiredHours > 0
+                    ? Math.min(Math.round((totalHours / requiredHours) * 100), 100)
+                    : 0;
+                const latePct = loggedDays > 0 ? Math.round((lateDays / loggedDays) * 100) : 0;
+                const overtimePct = loggedDays > 0 ? Math.round((overtimeDays / loggedDays) * 100) : 0;
+
+                return { totalHours, requiredHours, progressPct, loggedDays, lateDays, overtimeDays, latePct, overtimePct };
             }
 
-            const requiredHours = parseFloat(data.student.required_hours) || 0;
-            const progressPct = requiredHours > 0
-                ? Math.min(Math.round((totalHours / requiredHours) * 100), 100)
-                : 0;
-            const latePct = loggedDays > 0 ? Math.round((lateDays / loggedDays) * 100) : 0;
-            const overtimePct = loggedDays > 0 ? Math.round((overtimeDays / loggedDays) * 100) : 0;
+            function fmtSchedTime(t) {
+                if (!t) return null;
+                const [H, M] = t.split(':').map(Number);
+                return `${String(H % 12 || 12).padStart(2, '0')}:${String(M).padStart(2, '0')} ${H >= 12 ? 'PM' : 'AM'}`;
+            }
+            function renderDtrSummary(data) {
+                const s = computeDtrStats(data);
+                const weekly = data.weeks.map(w => ({
+                    label: w.week_label,
+                    ...computeDtrStats({ student: data.student, weeks: [w] })
+                }));
+                const maxDays = Math.max(1, ...weekly.map(w => w.loggedDays));
+                const onTimeDays = s.loggedDays - s.lateDays;
+                const remaining = Math.max(0, s.requiredHours - s.totalHours);
 
-            return { totalHours, requiredHours, progressPct, loggedDays, lateDays, overtimeDays, latePct, overtimePct };
-        }
+                const schedIn = fmtSchedTime(data.student.ojt_time_in);
+                const schedOut = fmtSchedTime(data.student.ojt_time_out);
 
-        function fmtSchedTime(t) {
-            if (!t) return null;
-            const [H, M] = t.split(':').map(Number);
-            return `${String(H % 12 || 12).padStart(2, '0')}:${String(M).padStart(2, '0')} ${H >= 12 ? 'PM' : 'AM'}`;
-        }
-        function renderDtrSummary(data) {
-            const s = computeDtrStats(data);
-            const weekly = data.weeks.map(w => ({
-                label: w.week_label,
-                ...computeDtrStats({ student: data.student, weeks: [w] })
-            }));
-            const maxDays = Math.max(1, ...weekly.map(w => w.loggedDays));
-            const onTimeDays = s.loggedDays - s.lateDays;
-            const remaining = Math.max(0, s.requiredHours - s.totalHours);
-
-            const schedIn = fmtSchedTime(data.student.ojt_time_in);
-            const schedOut = fmtSchedTime(data.student.ojt_time_out);
-
-            const stat = (icon, tone, label, value, unit, sub) => `
+                const stat = (icon, tone, label, value, unit, sub) => `
         <div class="hrs-card hrs-stat">
             <div class="hrs-stat-icon ${tone}"><i class="fa-solid ${icon}"></i></div>
             <div>
@@ -4841,12 +4951,12 @@ foreach ($roomStatuses as $s) {
             </div>
         </div>`;
 
-            const bars = weekly.length === 0
-                ? `<div style="color:#8b93ab; font-size:13px; padding:20px 0;">No weekly data yet.</div>`
-                : weekly.map(w => {
-                    const onTime = w.loggedDays - w.lateDays;
-                    const h = Math.max(10, (w.loggedDays / maxDays) * 100);
-                    return `
+                const bars = weekly.length === 0
+                    ? `<div style="color:#8b93ab; font-size:13px; padding:20px 0;">No weekly data yet.</div>`
+                    : weekly.map(w => {
+                        const onTime = w.loggedDays - w.lateDays;
+                        const h = Math.max(10, (w.loggedDays / maxDays) * 100);
+                        return `
             <div style="flex:1; min-width:64px; max-width:110px; display:flex; flex-direction:column; align-items:center; gap:6px;"
                  title="${w.label}: ${w.lateDays} late, ${onTime} on time, ${w.overtimeDays} overtime">
                 <div style="height:100px; display:flex; align-items:flex-end; width:100%; justify-content:center;">
@@ -4858,12 +4968,12 @@ foreach ($roomStatuses as $s) {
                 <div style="font-size:12px; font-weight:600; color:#2b3a67; white-space:nowrap;">${w.label}</div>
                 <div style="font-size:11px; color:#8b93ab; white-space:nowrap;">${w.lateDays}/${w.loggedDays} late</div>
                 ${w.overtimeDays > 0
-                            ? `<span style="font-size:10px; font-weight:600; background:#e5eeff; color:#2f5bd8; padding:1px 8px; border-radius:99px;">OT ${w.overtimeDays}</span>`
-                            : ''}
+                                ? `<span style="font-size:10px; font-weight:600; background:#e5eeff; color:#2f5bd8; padding:1px 8px; border-radius:99px;">OT ${w.overtimeDays}</span>`
+                                : ''}
             </div>`;
-                }).join('');
+                    }).join('');
 
-            return `
+                return `
     <div style="margin-bottom:16px;">
 
         <div class="hrs-card" style="margin-bottom:12px;">
@@ -4880,9 +4990,9 @@ foreach ($roomStatuses as $s) {
                     <i class="fa-solid fa-clock" style="color:#f26b3a;"></i>
                     Office hours:
                     ${schedIn && schedOut
-                    ? `<b style="color:#1f2a55;">${schedIn} – ${schedOut}</b>
+                        ? `<b style="color:#1f2a55;">${schedIn} – ${schedOut}</b>
                         &middot; Late if time-in is after ${schedIn} &middot; Undertime if time-out is before ${schedOut}`
-                    : `<b style="color:#1f2a55;">Not set</b> &middot; status shows "Present" only`}
+                        : `<b style="color:#1f2a55;">Not set</b> &middot; status shows "Present" only`}
                 </div>
             </div>
         </div>
@@ -4910,20 +5020,20 @@ foreach ($roomStatuses as $s) {
         </div>
 
     </div>`;
-        }
+            }
 
-        function renderDtrWeekReadOnly(week) {
-            const rows = week.rows.length > 0 ? week.rows : Array.from({ length: 6 }, (_, i) => ({
-                row_index: i, date: '', m_in: '', m_out: '', a_in: '', a_out: ''
-            }));
+            function renderDtrWeekReadOnly(week) {
+                const rows = week.rows.length > 0 ? week.rows : Array.from({ length: 6 }, (_, i) => ({
+                    row_index: i, date: '', m_in: '', m_out: '', a_in: '', a_out: ''
+                }));
 
-            const rowsHtml = rows.map(row => {
-                const mHrs = calcHrs(row.m_in, row.m_out);
-                const aHrs = calcHrs(row.a_in, row.a_out);
-                const daily = (mHrs + aHrs).toFixed(2);
-                const dayName = row.date ? new Date(row.date + 'T00:00:00').toLocaleDateString(undefined, { weekday: 'short' }) : '—';
+                const rowsHtml = rows.map(row => {
+                    const mHrs = calcHrs(row.m_in, row.m_out);
+                    const aHrs = calcHrs(row.a_in, row.a_out);
+                    const daily = (mHrs + aHrs).toFixed(2);
+                    const dayName = row.date ? new Date(row.date + 'T00:00:00').toLocaleDateString(undefined, { weekday: 'short' }) : '—';
 
-                return `
+                    return `
             <tr>
                 <td>${row.date || '—'}</td>
                 <td style="text-align:center">${dayName}</td>
@@ -4935,9 +5045,9 @@ foreach ($roomStatuses as $s) {
                 <td class="td-afternoon">${aHrs ? aHrs.toFixed(2) : '—'}</td>
                 <td>${daily}</td>
             </tr>`;
-            }).join('');
+                }).join('');
 
-            return `
+                return `
         <div class="ojt-week-block mb-3">
             <div class="ojt-week-header">
                 <strong>${week.week_label}</strong>
@@ -4965,454 +5075,454 @@ foreach ($roomStatuses as $s) {
                 </table>
             </div>
         </div>`;
-        }
-
-        function calcHrs(t1, t2) {
-            if (!t1 || !t2) return 0;
-            const [h1, m1] = t1.split(':').map(Number);
-            const [h2, m2] = t2.split(':').map(Number);
-            return Math.max(0, (h2 * 60 + m2 - (h1 * 60 + m1)) / 60);
-        }
-
-        function showSection(sectionId, e) {
-            if (e) e.preventDefault();
-
-            document.querySelectorAll('.section-panel').forEach(sec => sec.classList.remove('active'));
-            document.getElementById(sectionId).classList.add('active');
-
-            document.querySelectorAll('.sidebar a').forEach(link => link.classList.remove('active'));
-            const navEl = document.getElementById('nav-' + sectionId);
-            if (navEl) navEl.classList.add('active');
-
-            const bnId = sectionId === 'rooms' ? 'home' : sectionId;
-            document.querySelectorAll('.bottom-nav a').forEach(a => a.classList.remove('active'));
-            document.getElementById('bn-' + bnId)?.classList.add('active');
-            if (sectionId !== 'rooms') {
-                document.querySelectorAll('.room-item.active-room').forEach(room => room.classList.remove('active-room'));
             }
 
-            if (sectionId === 'home') {
-                ['attendanceChart', 'hoursBarChart', 'completionChart'].forEach(id => Chart.getChart(id)?.resize());
+            function calcHrs(t1, t2) {
+                if (!t1 || !t2) return 0;
+                const [h1, m1] = t1.split(':').map(Number);
+                const [h2, m2] = t2.split(':').map(Number);
+                return Math.max(0, (h2 * 60 + m2 - (h1 * 60 + m1)) / 60);
             }
-        }
 
-        // function filterTable() {
-        //     const search = document.getElementById('statusSearchInput').value.toLowerCase();
-        //     const room = document.getElementById('statusRoomFilter').value.toLowerCase();
+            function showSection(sectionId, e) {
+                if (e) e.preventDefault();
 
-        //     document.querySelectorAll('#all-students-tbody tr').forEach(row => {
-        //         const name = row.querySelector('.student-cell h6')?.textContent.toLowerCase() ?? '';
-        //         const rowRoom = (row.dataset.room ?? '').toLowerCase();
+                document.querySelectorAll('.section-panel').forEach(sec => sec.classList.remove('active'));
+                document.getElementById(sectionId).classList.add('active');
 
-        //         const matchSearch = name.includes(search);
-        //         const matchRoom = room === '' || rowRoom === room;
+                document.querySelectorAll('.sidebar a').forEach(link => link.classList.remove('active'));
+                const navEl = document.getElementById('nav-' + sectionId);
+                if (navEl) navEl.classList.add('active');
 
-        //         row.style.display = (matchSearch && matchRoom) ? '' : 'none';
-        //     });
-        // }
-
-        function filterTable() {
-            const search = document.getElementById('searchInput')?.value.toLowerCase() ?? '';
-            document.querySelectorAll('#all-students-tbody tr').forEach(row => {
-                const name = row.querySelector('.student-cell span')?.textContent.toLowerCase() ?? '';
-                row.style.display = name.includes(search) ? '' : 'none';
-            });
-        }
-
-        function filterInfo() {
-            const search = document.getElementById('searchInfo')?.value.toLowerCase() ?? '';
-            document.querySelectorAll('#info-student tr').forEach(row => {
-                const name = row.querySelector('.student-cell p')?.textContent.toLowerCase() ?? '';
-                row.style.display = name.includes(search) ? '' : 'none';
-            });
-        }
-
-        function filterDtr() {
-            const search = document.getElementById('searchDtr')?.value.toLowerCase().trim() ?? '';
-            document.querySelectorAll('#dtr-student tr').forEach(row => {
-                const name = row.cells[0]?.textContent.toLowerCase() ?? '';
-                const company = row.cells[1]?.textContent.toLowerCase() ?? '';
-                row.style.display = (name.includes(search) || company.includes(search)) ? '' : 'none';
-            });
-        }
-
-        function filterRoomChats() {
-            const q = document.getElementById('roomChatSearch').value.toLowerCase().trim();
-            document.querySelectorAll('#roomChatEntries .room-chat-entry').forEach(el => {
-                el.style.display = el.dataset.name.includes(q) ? '' : 'none';
-            });
-        }
-
-        /* ── chat list: show / hide (back button on mobile) ── */
-        function roomSyncToggle() {
-            const wrap = document.getElementById('roomChatWrap');
-            const btn = document.getElementById('roomToggleList');
-            if (!wrap || !btn) return;
-            const label = wrap.classList.contains('rc-focus') ? 'Show chat list' : 'Hide chat list';
-            btn.title = label;
-            btn.setAttribute('aria-label', label);
-        }
-
-        function roomToggleList() {
-            const wrap = document.getElementById('roomChatWrap');
-            if (!wrap) return;
-            wrap.classList.toggle('rc-focus');
-            roomSyncToggle();
-        }
-
-        /* tapping a contact on a phone: slide the list away while the page loads */
-        document.querySelectorAll('#roomChatEntries .room-chat-entry').forEach(a => {
-            a.addEventListener('click', () => {
-                if (window.innerWidth <= 768) {
-                    document.getElementById('roomChatWrap')?.classList.add('rc-focus');
+                const bnId = sectionId === 'rooms' ? 'home' : sectionId;
+                document.querySelectorAll('.bottom-nav a').forEach(a => a.classList.remove('active'));
+                document.getElementById('bn-' + bnId)?.classList.add('active');
+                if (sectionId !== 'rooms') {
+                    document.querySelectorAll('.room-item.active-room').forEach(room => room.classList.remove('active-room'));
                 }
-            });
-        });
 
-        /* phone + chat already open: start with the list hidden */
-        (function () {
-            const wrap = document.getElementById('roomChatWrap');
-            if (wrap && document.getElementById('roomMsgBody') && window.innerWidth <= 768) {
-                wrap.classList.add('rc-focus');
+                if (sectionId === 'home') {
+                    ['attendanceChart', 'hoursBarChart', 'completionChart'].forEach(id => Chart.getChart(id)?.resize());
+                }
             }
-            roomSyncToggle();
-        })();
 
-        // Auto-scroll to bottom
-        const msgBody = document.getElementById('roomMsgBody');
-        if (msgBody) msgBody.scrollTop = msgBody.scrollHeight;
+            // function filterTable() {
+            //     const search = document.getElementById('statusSearchInput').value.toLowerCase();
+            //     const room = document.getElementById('statusRoomFilter').value.toLowerCase();
 
-        // Send on Enter (Shift+Enter for newline)
-        function roomChatEnterSend(e) {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                document.getElementById('roomChatForm').submit();
-            }
-        }
-        const ta = document.getElementById('roomChatInput');
-        if (ta) {
-            ta.addEventListener('input', () => {
-                ta.style.height = 'auto';
-                ta.style.height = Math.min(ta.scrollHeight, 100) + 'px';
-            });
-        }
-        function filterCards() {
-            const search = document.getElementById('remarksSearchInput').value.toLowerCase();
-            const room = document.getElementById('remarksRoomFilter').value.toLowerCase();
+            //     document.querySelectorAll('#all-students-tbody tr').forEach(row => {
+            //         const name = row.querySelector('.student-cell h6')?.textContent.toLowerCase() ?? '';
+            //         const rowRoom = (row.dataset.room ?? '').toLowerCase();
 
-            document.querySelectorAll('#student-list .student-card').forEach(card => {
-                const name = (card.dataset.name ?? '').toLowerCase();
-                const rowRoom = (card.dataset.room ?? '').toLowerCase();
+            //         const matchSearch = name.includes(search);
+            //         const matchRoom = room === '' || rowRoom === room;
 
-                const matchSearch = name.includes(search);
-                const matchRoom = room === '' || rowRoom === room;
+            //         row.style.display = (matchSearch && matchRoom) ? '' : 'none';
+            //     });
+            // }
 
-                card.closest('form, div.student-card').style.display =
-                    (matchSearch && matchRoom) ? '' : 'none';
-            });
-        }
-
-        function openSupEvalModal(studentId) {
-            const modalEl = document.getElementById('supEvalModal');
-            const form = document.getElementById('supEvalForm');
-
-            // Store the ID where the submit handler looks for it
-            modalEl.dataset.studentId = studentId;
-
-            // Reset previous student's answers and any old error
-            form.reset();
-            document.getElementById('sup-eval-error-msg').style.display = 'none';
-
-            fetch('get-student-eval.php?student_id=' + encodeURIComponent(studentId))
-                .then(res => res.json())
-                .then(data => {
-                    form.querySelector('[name="intern_name"]').value = data.intern_name || '';
-                    form.querySelector('[name="student_no"]').value = data.student_id || '';
-                    form.querySelector('[name="company_name"]').value = data.company_name || '';
-                    form.querySelector('[name="supervisor_name"]').value = data.supervisor_name || '';
-                    form.querySelector('[name="contact_details"]').value = data.contact_details || '';
-
-                    bootstrap.Modal.getOrCreateInstance(modalEl, {
-                        backdrop: 'static',
-                        keyboard: false
-                    }).show();
-                })
-                .catch(err => {
-                    console.error('Failed to load student data', err);
-                    alert('Could not load student details. Please try again.');
-                });
-        }
-
-        document.addEventListener('DOMContentLoaded', function () {
-
-            /* Later button */
-            const laterBtn = document.getElementById('supEvalLaterBtn');
-            if (laterBtn) {
-                laterBtn.addEventListener('click', function () {
-                    bootstrap.Modal.getInstance(document.getElementById('supEvalModal'))?.hide();
+            function filterTable() {
+                const search = document.getElementById('searchInput')?.value.toLowerCase() ?? '';
+                document.querySelectorAll('#all-students-tbody tr').forEach(row => {
+                    const name = row.querySelector('.student-cell span')?.textContent.toLowerCase() ?? '';
+                    row.style.display = name.includes(search) ? '' : 'none';
                 });
             }
 
-            /* Submit button */
-            const submitBtn = document.getElementById('supEvalSubmitBtn');
-            if (submitBtn) {
-                submitBtn.addEventListener('click', async function () {
-                    const form = document.getElementById('supEvalForm');
-                    const errorEl = document.getElementById('sup-eval-error-msg');
-                    errorEl.style.display = 'none';
+            function filterInfo() {
+                const search = document.getElementById('searchInfo')?.value.toLowerCase() ?? '';
+                document.querySelectorAll('#info-student tr').forEach(row => {
+                    const name = row.querySelector('.student-cell p')?.textContent.toLowerCase() ?? '';
+                    row.style.display = name.includes(search) ? '' : 'none';
+                });
+            }
 
-                    if (!form.checkValidity()) {
-                        form.reportValidity();
-                        errorEl.textContent = 'Please complete all required fields before submitting.';
-                        errorEl.style.display = 'block';
-                        return;
+            function filterDtr() {
+                const search = document.getElementById('searchDtr')?.value.toLowerCase().trim() ?? '';
+                document.querySelectorAll('#dtr-student tr').forEach(row => {
+                    const name = row.cells[0]?.textContent.toLowerCase() ?? '';
+                    const company = row.cells[1]?.textContent.toLowerCase() ?? '';
+                    row.style.display = (name.includes(search) || company.includes(search)) ? '' : 'none';
+                });
+            }
+
+            function filterRoomChats() {
+                const q = document.getElementById('roomChatSearch').value.toLowerCase().trim();
+                document.querySelectorAll('#roomChatEntries .room-chat-entry').forEach(el => {
+                    el.style.display = el.dataset.name.includes(q) ? '' : 'none';
+                });
+            }
+
+            /* ── chat list: show / hide (back button on mobile) ── */
+            function roomSyncToggle() {
+                const wrap = document.getElementById('roomChatWrap');
+                const btn = document.getElementById('roomToggleList');
+                if (!wrap || !btn) return;
+                const label = wrap.classList.contains('rc-focus') ? 'Show chat list' : 'Hide chat list';
+                btn.title = label;
+                btn.setAttribute('aria-label', label);
+            }
+
+            function roomToggleList() {
+                const wrap = document.getElementById('roomChatWrap');
+                if (!wrap) return;
+                wrap.classList.toggle('rc-focus');
+                roomSyncToggle();
+            }
+
+            /* tapping a contact on a phone: slide the list away while the page loads */
+            document.querySelectorAll('#roomChatEntries .room-chat-entry').forEach(a => {
+                a.addEventListener('click', () => {
+                    if (window.innerWidth <= 768) {
+                        document.getElementById('roomChatWrap')?.classList.add('rc-focus');
                     }
+                });
+            });
 
-                    submitBtn.disabled = true;
-                    submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> Submitting…';
+            /* phone + chat already open: start with the list hidden */
+            (function () {
+                const wrap = document.getElementById('roomChatWrap');
+                if (wrap && document.getElementById('roomMsgBody') && window.innerWidth <= 768) {
+                    wrap.classList.add('rc-focus');
+                }
+                roomSyncToggle();
+            })();
 
-                    const data = new FormData(form);
-                    data.append('action', 'submit_supervisor_evaluation');
+            // Auto-scroll to bottom
+            const msgBody = document.getElementById('roomMsgBody');
+            if (msgBody) msgBody.scrollTop = msgBody.scrollHeight;
 
-                    const studentId = document.getElementById('supEvalModal').dataset.studentId ?? '';
-                    if (studentId) data.append('student_id', studentId);
+            // Send on Enter (Shift+Enter for newline)
+            function roomChatEnterSend(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    document.getElementById('roomChatForm').submit();
+                }
+            }
+            const ta = document.getElementById('roomChatInput');
+            if (ta) {
+                ta.addEventListener('input', () => {
+                    ta.style.height = 'auto';
+                    ta.style.height = Math.min(ta.scrollHeight, 100) + 'px';
+                });
+            }
+            function filterCards() {
+                const search = document.getElementById('remarksSearchInput').value.toLowerCase();
+                const room = document.getElementById('remarksRoomFilter').value.toLowerCase();
 
-                    try {
-                        const res = await fetch('ojt-evaluation-submit.php', { method: 'POST', body: data });
-                        const json = await res.json();
+                document.querySelectorAll('#student-list .student-card').forEach(card => {
+                    const name = (card.dataset.name ?? '').toLowerCase();
+                    const rowRoom = (card.dataset.room ?? '').toLowerCase();
 
-                        if (json.success) {
-                            bootstrap.Modal.getInstance(document.getElementById('supEvalModal'))?.hide();
+                    const matchSearch = name.includes(search);
+                    const matchRoom = room === '' || rowRoom === room;
 
-                            /* open download in new tab */
-                            if (studentId) {
-                                window.open('ojt-evaluation-download.php?student_id=' + studentId, '_blank');
+                    card.closest('form, div.student-card').style.display =
+                        (matchSearch && matchRoom) ? '' : 'none';
+                });
+            }
+
+            function openSupEvalModal(studentId) {
+                const modalEl = document.getElementById('supEvalModal');
+                const form = document.getElementById('supEvalForm');
+
+                // Store the ID where the submit handler looks for it
+                modalEl.dataset.studentId = studentId;
+
+                // Reset previous student's answers and any old error
+                form.reset();
+                document.getElementById('sup-eval-error-msg').style.display = 'none';
+
+                fetch('get-student-eval.php?student_id=' + encodeURIComponent(studentId))
+                    .then(res => res.json())
+                    .then(data => {
+                        form.querySelector('[name="intern_name"]').value = data.intern_name || '';
+                        form.querySelector('[name="student_no"]').value = data.student_id || '';
+                        form.querySelector('[name="company_name"]').value = data.company_name || '';
+                        form.querySelector('[name="supervisor_name"]').value = data.supervisor_name || '';
+                        form.querySelector('[name="contact_details"]').value = data.contact_details || '';
+
+                        bootstrap.Modal.getOrCreateInstance(modalEl, {
+                            backdrop: 'static',
+                            keyboard: false
+                        }).show();
+                    })
+                    .catch(err => {
+                        console.error('Failed to load student data', err);
+                        alert('Could not load student details. Please try again.');
+                    });
+            }
+
+            document.addEventListener('DOMContentLoaded', function () {
+
+                /* Later button */
+                const laterBtn = document.getElementById('supEvalLaterBtn');
+                if (laterBtn) {
+                    laterBtn.addEventListener('click', function () {
+                        bootstrap.Modal.getInstance(document.getElementById('supEvalModal'))?.hide();
+                    });
+                }
+
+                /* Submit button */
+                const submitBtn = document.getElementById('supEvalSubmitBtn');
+                if (submitBtn) {
+                    submitBtn.addEventListener('click', async function () {
+                        const form = document.getElementById('supEvalForm');
+                        const errorEl = document.getElementById('sup-eval-error-msg');
+                        errorEl.style.display = 'none';
+
+                        if (!form.checkValidity()) {
+                            form.reportValidity();
+                            errorEl.textContent = 'Please complete all required fields before submitting.';
+                            errorEl.style.display = 'block';
+                            return;
+                        }
+
+                        submitBtn.disabled = true;
+                        submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> Submitting…';
+
+                        const data = new FormData(form);
+                        data.append('action', 'submit_supervisor_evaluation');
+
+                        const studentId = document.getElementById('supEvalModal').dataset.studentId ?? '';
+                        if (studentId) data.append('student_id', studentId);
+
+                        try {
+                            const res = await fetch('ojt-evaluation-submit.php', { method: 'POST', body: data });
+                            const json = await res.json();
+
+                            if (json.success) {
+                                bootstrap.Modal.getInstance(document.getElementById('supEvalModal'))?.hide();
+
+                                /* open download in new tab */
+                                if (studentId) {
+                                    window.open('ojt-evaluation-download.php?student_id=' + studentId, '_blank');
+                                }
+
+                                /* success toast */
+                                const toast = document.createElement('div');
+                                toast.style.cssText =
+                                    'position:fixed;bottom:24px;right:24px;background:#065f46;color:#fff;' +
+                                    'padding:14px 22px;border-radius:10px;font-size:14px;font-weight:600;z-index:9999;' +
+                                    'box-shadow:0 4px 20px rgba(0,0,0,.2);';
+                                toast.textContent = 'Supervisor evaluation submitted and PDF downloaded!';
+                                document.body.appendChild(toast);
+                                setTimeout(() => toast.remove(), 5000);
+
+                                /* refresh page so the green download button appears */
+                                setTimeout(() => location.reload(), 1200);
+
+                            } else {
+                                errorEl.textContent = json.message || 'Submission failed. Please try again.';
+                                errorEl.style.display = 'block';
+                                submitBtn.disabled = false;
+                                submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane me-1"></i> Submit Evaluation';
                             }
-
-                            /* success toast */
-                            const toast = document.createElement('div');
-                            toast.style.cssText =
-                                'position:fixed;bottom:24px;right:24px;background:#065f46;color:#fff;' +
-                                'padding:14px 22px;border-radius:10px;font-size:14px;font-weight:600;z-index:9999;' +
-                                'box-shadow:0 4px 20px rgba(0,0,0,.2);';
-                            toast.textContent = 'Supervisor evaluation submitted and PDF downloaded!';
-                            document.body.appendChild(toast);
-                            setTimeout(() => toast.remove(), 5000);
-
-                            /* refresh page so the green download button appears */
-                            setTimeout(() => location.reload(), 1200);
-
-                        } else {
-                            errorEl.textContent = json.message || 'Submission failed. Please try again.';
+                        } catch (err) {
+                            errorEl.textContent = 'Network error. Please try again.';
                             errorEl.style.display = 'block';
                             submitBtn.disabled = false;
                             submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane me-1"></i> Submit Evaluation';
                         }
-                    } catch (err) {
-                        errorEl.textContent = 'Network error. Please try again.';
-                        errorEl.style.display = 'block';
-                        submitBtn.disabled = false;
-                        submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane me-1"></i> Submit Evaluation';
-                    }
-                });
-            }
-        });
-        function openAssignSupModal(studentId, studentName, supName, supEmail, supDept) {
-            document.getElementById('assignSup_studentId').value = studentId;
-            document.getElementById('assignSup_studentName').textContent = studentName;
-            document.getElementById('assignSup_name').value = supName || '';
-            document.getElementById('assignSup_email').value = supEmail || '';
-            document.getElementById('assignSup_dept').value = supDept || '';
-            document.getElementById('assignSup_error').style.display = 'none';
-            new bootstrap.Modal(document.getElementById('assignSupModal')).show();
-        }
-
-        document.addEventListener('DOMContentLoaded', function () {
-
-            /* Save supervisor */
-            document.getElementById('assignSupSaveBtn')?.addEventListener('click', async function () {
-                const form = document.getElementById('assignSupForm');
-                const errEl = document.getElementById('assignSup_error');
-                errEl.style.display = 'none';
-
-                if (!form.checkValidity()) { form.reportValidity(); return; }
-
-                this.disabled = true;
-                this.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i> Saving…';
-
-                try {
-                    const res = await fetch('assign-supervisor.php', {
-                        method: 'POST',
-                        body: new FormData(form)
                     });
-                    const json = await res.json();
+                }
+            });
+            function openAssignSupModal(studentId, studentName, supName, supEmail, supDept) {
+                document.getElementById('assignSup_studentId').value = studentId;
+                document.getElementById('assignSup_studentName').textContent = studentName;
+                document.getElementById('assignSup_name').value = supName || '';
+                document.getElementById('assignSup_email').value = supEmail || '';
+                document.getElementById('assignSup_dept').value = supDept || '';
+                document.getElementById('assignSup_error').style.display = 'none';
+                new bootstrap.Modal(document.getElementById('assignSupModal')).show();
+            }
 
-                    if (json.success) {
-                        bootstrap.Modal.getInstance(
-                            document.getElementById('assignSupModal'))?.hide();
-                        location.reload();
-                    } else {
-                        errEl.textContent = json.message || 'Save failed.';
+            document.addEventListener('DOMContentLoaded', function () {
+
+                /* Save supervisor */
+                document.getElementById('assignSupSaveBtn')?.addEventListener('click', async function () {
+                    const form = document.getElementById('assignSupForm');
+                    const errEl = document.getElementById('assignSup_error');
+                    errEl.style.display = 'none';
+
+                    if (!form.checkValidity()) { form.reportValidity(); return; }
+
+                    this.disabled = true;
+                    this.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i> Saving…';
+
+                    try {
+                        const res = await fetch('assign-supervisor.php', {
+                            method: 'POST',
+                            body: new FormData(form)
+                        });
+                        const json = await res.json();
+
+                        if (json.success) {
+                            bootstrap.Modal.getInstance(
+                                document.getElementById('assignSupModal'))?.hide();
+                            location.reload();
+                        } else {
+                            errEl.textContent = json.message || 'Save failed.';
+                            errEl.style.display = 'block';
+                            this.disabled = false;
+                            this.innerHTML = '<i class="fa fa-save me-1"></i> Save Supervisor';
+                        }
+                    } catch {
+                        errEl.textContent = 'Network error. Please try again.';
                         errEl.style.display = 'block';
                         this.disabled = false;
                         this.innerHTML = '<i class="fa fa-save me-1"></i> Save Supervisor';
                     }
-                } catch {
-                    errEl.textContent = 'Network error. Please try again.';
-                    errEl.style.display = 'block';
-                    this.disabled = false;
-                    this.innerHTML = '<i class="fa fa-save me-1"></i> Save Supervisor';
-                }
+                });
+
             });
 
-        });
+            /* ── SEND EVAL EMAIL ── */
+            async function sendEvalEmail(studentId, supName, supEmail) {
+                const btn = document.getElementById('send-email-btn-' + studentId);
+                if (!btn) return;
 
-        /* ── SEND EVAL EMAIL ── */
-        async function sendEvalEmail(studentId, supName, supEmail) {
-            const btn = document.getElementById('send-email-btn-' + studentId);
-            if (!btn) return;
+                const orig = btn.innerHTML;
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i> Sending…';
 
-            const orig = btn.innerHTML;
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i> Sending…';
+                try {
+                    const fd = new FormData();
+                    fd.append('student_id', studentId);
+                    fd.append('supervisor_name', supName);
+                    fd.append('supervisor_email', supEmail);
 
-            try {
-                const fd = new FormData();
-                fd.append('student_id', studentId);
-                fd.append('supervisor_name', supName);
-                fd.append('supervisor_email', supEmail);
+                    const res = await fetch('send-eval-email.php', { method: 'POST', body: fd });
+                    const json = await res.json();
 
-                const res = await fetch('send-eval-email.php', { method: 'POST', body: fd });
-                const json = await res.json();
-
-                if (json.success) {
-                    btn.style.background = '#d1fae5';
-                    btn.style.color = '#065f46';
-                    btn.style.borderColor = '#6ee7b7';
-                    btn.innerHTML = '<i class="fa fa-check me-1"></i> Email Sent!';
-                    setTimeout(() => location.reload(), 1800);
-                } else {
-                    alert('Failed to send: ' + (json.message || 'Unknown error'));
+                    if (json.success) {
+                        btn.style.background = '#d1fae5';
+                        btn.style.color = '#065f46';
+                        btn.style.borderColor = '#6ee7b7';
+                        btn.innerHTML = '<i class="fa fa-check me-1"></i> Email Sent!';
+                        setTimeout(() => location.reload(), 1800);
+                    } else {
+                        alert('Failed to send: ' + (json.message || 'Unknown error'));
+                        btn.disabled = false;
+                        btn.innerHTML = orig;
+                    }
+                } catch {
+                    alert('Network error. Please try again.');
                     btn.disabled = false;
                     btn.innerHTML = orig;
                 }
-            } catch {
-                alert('Network error. Please try again.');
-                btn.disabled = false;
-                btn.innerHTML = orig;
             }
-        }
-        document.addEventListener('DOMContentLoaded', function () {
-            const supPreviewBtn = document.getElementById('supEvalPreviewBtn');
-            if (supPreviewBtn) {
-                supPreviewBtn.addEventListener('click', async function () {
-                    const form = document.getElementById('supEvalForm');
-                    const errorEl = document.getElementById('sup-eval-error-msg');
-                    errorEl.style.display = 'none';
+            document.addEventListener('DOMContentLoaded', function () {
+                const supPreviewBtn = document.getElementById('supEvalPreviewBtn');
+                if (supPreviewBtn) {
+                    supPreviewBtn.addEventListener('click', async function () {
+                        const form = document.getElementById('supEvalForm');
+                        const errorEl = document.getElementById('sup-eval-error-msg');
+                        errorEl.style.display = 'none';
 
-                    if (!form.checkValidity()) {
-                        form.reportValidity();
-                        errorEl.textContent = 'Please complete all required fields before previewing.';
-                        errorEl.style.display = 'block';
-                        return;
-                    }
+                        if (!form.checkValidity()) {
+                            form.reportValidity();
+                            errorEl.textContent = 'Please complete all required fields before previewing.';
+                            errorEl.style.display = 'block';
+                            return;
+                        }
 
-                    const originalHtml = supPreviewBtn.innerHTML;
-                    supPreviewBtn.disabled = true;
-                    supPreviewBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> Building preview…';
+                        const originalHtml = supPreviewBtn.innerHTML;
+                        supPreviewBtn.disabled = true;
+                        supPreviewBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> Building preview…';
 
-                    try {
-                        const data = new FormData(form);
-                        const res = await fetch('ojt-evaluation-preview-supervisor.php', { method: 'POST', body: data });
-                        if (!res.ok) throw new Error('Preview failed');
+                        try {
+                            const data = new FormData(form);
+                            const res = await fetch('ojt-evaluation-preview-supervisor.php', { method: 'POST', body: data });
+                            if (!res.ok) throw new Error('Preview failed');
 
-                        const blob = await res.blob();
-                        const url = URL.createObjectURL(blob);
-                        window.open(url, '_blank');
-                        setTimeout(() => URL.revokeObjectURL(url), 60000);
-                    } catch (err) {
-                        errorEl.textContent = 'Could not generate preview. Please try again.';
-                        errorEl.style.display = 'block';
-                    } finally {
-                        supPreviewBtn.disabled = false;
-                        supPreviewBtn.innerHTML = originalHtml;
-                    }
-                });
-            }
-        });
-        document.addEventListener('DOMContentLoaded', () => {
-            const params = new URLSearchParams(window.location.search);
-            const section = params.get('section');
-            if (section) {
-                showSection(section, null);
-            }
-        });
+                            const blob = await res.blob();
+                            const url = URL.createObjectURL(blob);
+                            window.open(url, '_blank');
+                            setTimeout(() => URL.revokeObjectURL(url), 60000);
+                        } catch (err) {
+                            errorEl.textContent = 'Could not generate preview. Please try again.';
+                            errorEl.style.display = 'block';
+                        } finally {
+                            supPreviewBtn.disabled = false;
+                            supPreviewBtn.innerHTML = originalHtml;
+                        }
+                    });
+                }
+            });
+            document.addEventListener('DOMContentLoaded', () => {
+                const params = new URLSearchParams(window.location.search);
+                const section = params.get('section');
+                if (section) {
+                    showSection(section, null);
+                }
+            });
 
-        function toMinutes(t) {
-            if (!t) return null;
-            const [h, m] = t.split(':').map(Number);
-            return h * 60 + m;
-        }
-
-        function getDtrStatus(row, schedule) {
-            const schedIn = toMinutes(schedule.ojt_time_in);
-            const schedOut = toMinutes(schedule.ojt_time_out);
-
-            const firstIn = toMinutes(row.m_in || row.a_in);
-            const lastOut = toMinutes(row.a_out || row.m_out);
-
-            // No entry at all
-            if (!row.date && firstIn === null && lastOut === null) {
-                return { label: '—', color: '#6b7280', bg: 'transparent' };
-            }
-            // Clocked in but never clocked out (or vice versa)
-            if (firstIn === null || lastOut === null) {
-                return { label: 'Incomplete', color: '#92400e', bg: '#fef3c7' };
-            }
-            // No schedule set on the internship
-            if (schedIn === null || schedOut === null) {
-                return { label: 'Present', color: '#065f46', bg: '#d1fae5' };
+            function toMinutes(t) {
+                if (!t) return null;
+                const [h, m] = t.split(':').map(Number);
+                return h * 60 + m;
             }
 
-            const late = firstIn > schedIn;
-            const undertime = lastOut < schedOut;
+            function getDtrStatus(row, schedule) {
+                const schedIn = toMinutes(schedule.ojt_time_in);
+                const schedOut = toMinutes(schedule.ojt_time_out);
 
-            if (late && undertime) return { label: 'Late + Undertime', color: '#991b1b', bg: '#fee2e2' };
-            if (late) return { label: 'Late', color: '#991b1b', bg: '#fee2e2' };
-            if (undertime) return { label: 'Undertime', color: '#9a3412', bg: '#ffedd5' };
-            return { label: 'On time', color: '#065f46', bg: '#d1fae5' };
-        }
+                const firstIn = toMinutes(row.m_in || row.a_in);
+                const lastOut = toMinutes(row.a_out || row.m_out);
 
-        function renderDtrWeekReadOnly(week, schedule) {
-            const rows = week.rows.length > 0 ? week.rows : Array.from({ length: 6 }, (_, i) => ({
-                row_index: i, date: '', m_in: '', m_out: '', a_in: '', a_out: ''
-            }));
+                // No entry at all
+                if (!row.date && firstIn === null && lastOut === null) {
+                    return { label: '—', color: '#6b7280', bg: 'transparent' };
+                }
+                // Clocked in but never clocked out (or vice versa)
+                if (firstIn === null || lastOut === null) {
+                    return { label: 'Incomplete', color: '#92400e', bg: '#fef3c7' };
+                }
+                // No schedule set on the internship
+                if (schedIn === null || schedOut === null) {
+                    return { label: 'Present', color: '#065f46', bg: '#d1fae5' };
+                }
 
-            const fmtH = h => {
-                if (!h || h <= 0) return '—';
-                const m = Math.round(h * 60), hh = Math.floor(m / 60), mm = m % 60;
-                return mm ? `${hh}h ${mm}m` : `${hh}h`;
-            };
-            const fmtT = t => {
-                if (!t) return '—';
-                const [H, M] = t.split(':').map(Number);
-                return `${String(H % 12 || 12).padStart(2, '0')}:${String(M).padStart(2, '0')} ${H >= 12 ? 'PM' : 'AM'}`;
-            };
-            const fmtD = d => d ? `${d.slice(5, 7)}/${d.slice(8, 10)}/${d.slice(0, 4)}` : '—';
+                const late = firstIn > schedIn;
+                const undertime = lastOut < schedOut;
 
-            let weekTotal = 0;
+                if (late && undertime) return { label: 'Late + Undertime', color: '#991b1b', bg: '#fee2e2' };
+                if (late) return { label: 'Late', color: '#991b1b', bg: '#fee2e2' };
+                if (undertime) return { label: 'Undertime', color: '#9a3412', bg: '#ffedd5' };
+                return { label: 'On time', color: '#065f46', bg: '#d1fae5' };
+            }
 
-            const rowsHtml = rows.map(row => {
-                const mHrs = calcHrs(row.m_in, row.m_out);
-                const aHrs = calcHrs(row.a_in, row.a_out);
-                const daily = mHrs + aHrs;
-                weekTotal += daily;
-                const dayName = row.date
-                    ? new Date(row.date + 'T00:00:00').toLocaleDateString(undefined, { weekday: 'short' }).toUpperCase()
-                    : '';
-                const st = getDtrStatus(row, schedule);
+            function renderDtrWeekReadOnly(week, schedule) {
+                const rows = week.rows.length > 0 ? week.rows : Array.from({ length: 6 }, (_, i) => ({
+                    row_index: i, date: '', m_in: '', m_out: '', a_in: '', a_out: ''
+                }));
 
-                return `
+                const fmtH = h => {
+                    if (!h || h <= 0) return '—';
+                    const m = Math.round(h * 60), hh = Math.floor(m / 60), mm = m % 60;
+                    return mm ? `${hh}h ${mm}m` : `${hh}h`;
+                };
+                const fmtT = t => {
+                    if (!t) return '—';
+                    const [H, M] = t.split(':').map(Number);
+                    return `${String(H % 12 || 12).padStart(2, '0')}:${String(M).padStart(2, '0')} ${H >= 12 ? 'PM' : 'AM'}`;
+                };
+                const fmtD = d => d ? `${d.slice(5, 7)}/${d.slice(8, 10)}/${d.slice(0, 4)}` : '—';
+
+                let weekTotal = 0;
+
+                const rowsHtml = rows.map(row => {
+                    const mHrs = calcHrs(row.m_in, row.m_out);
+                    const aHrs = calcHrs(row.a_in, row.a_out);
+                    const daily = mHrs + aHrs;
+                    weekTotal += daily;
+                    const dayName = row.date
+                        ? new Date(row.date + 'T00:00:00').toLocaleDateString(undefined, { weekday: 'short' }).toUpperCase()
+                        : '';
+                    const st = getDtrStatus(row, schedule);
+
+                    return `
         <tr>
             <td>${fmtD(row.date)}</td>
             <td>${dayName}</td>
@@ -5427,9 +5537,9 @@ foreach ($roomStatuses as $s) {
                 <span class="ojt-status-badge" style="color:${st.color}; background:${st.bg};">${st.label}</span>
             </td>
         </tr>`;
-            }).join('');
+                }).join('');
 
-            return `
+                return `
     <div class="ojt-week-block">
         <div class="ojt-week-header">
             <strong>${week.week_label}</strong>
@@ -5459,7 +5569,7 @@ foreach ($roomStatuses as $s) {
             </table>
       </div>
     </div>`;
-        }
+            }
     </script>
 </body>
 
