@@ -64,9 +64,9 @@ select {
 .right-panel {
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;  /* start at the top */
-    align-items: center;          /* still centered horizontally */
-    padding: 2rem 2rem 3rem;
+    justify-content: flex-start;
+    align-items: center;        
+    /* padding: 2rem 2rem 3rem; */
     width: 100%;
 }
 
