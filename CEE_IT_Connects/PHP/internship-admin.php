@@ -1677,6 +1677,7 @@ for ($t = 13; $t >= 0; $t--) {
                                         <form method="POST" action="internship-db.php" style="display:inline;"
                                             onsubmit="return confirm('Delete this internship posting? This cannot be undone.')">
                                             <input type="hidden" name="id" value="<?= (int) $p['id'] ?>">
+                                            <input type="hidden" name="form_type" value="delete_internship">
                                             <button type="submit" name="delete_internship" class="btn-delete"
                                                 data-tooltip="Delete">
                                                 <i class="bi bi-trash-fill"></i>
