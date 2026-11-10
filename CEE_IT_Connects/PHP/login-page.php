@@ -1,8 +1,9 @@
 <?php
 $role = $_GET['role'] ?? 'student';
-$statePath = __DIR__ . '/register_toggle.txt';
-$registerVisible = file_exists($statePath) ? trim(file_get_contents($statePath)) : 'show';
 
+$stateStmt = $pdo->prepare("SELECT value FROM settings WHERE key = 'register_visible'");
+$stateStmt->execute();
+$registerVisible = $stateStmt->fetchColumn() ?: 'show';
 
 ?>
 <!DOCTYPE html>
@@ -31,14 +32,14 @@ $registerVisible = file_exists($statePath) ? trim(file_get_contents($statePath))
         <img src="../Sources/CEE IT Connects Logo.png" alt="Logo" class="loading-logo">
     </div> -->
 
-        <div class="container-fluid login-container">
-            <!-- <img class="wave-bg" src="../Sources/wave.svg" alt="" aria-hidden="true"> -->
-            <div class="wave-bg" aria-hidden="true"></div>
+    <div class="container-fluid login-container">
+        <!-- <img class="wave-bg" src="../Sources/wave.svg" alt="" aria-hidden="true"> -->
+        <div class="wave-bg" aria-hidden="true"></div>
         <div class="row g-0">
 
             <!-- LEFT BRAND PANEL (text is now real HTML so it scales instead of being cropped) -->
             <div class="col-lg-5 left-panel">
-                
+
 
                 <div class="left-inner">
                     <div class="brand">
@@ -50,8 +51,10 @@ $registerVisible = file_exists($statePath) ? trim(file_get_contents($statePath))
                     </div>
 
                     <div class="hero">
-                        <h1 class="hero-title">Learn. <span class="c-orange">Experience.</span> <span class="c-yellow">Grow.</span></h1>
-                        <p class="hero-text">Connect with your advisers, explore internship opportunities, and keep your OJT journey organized all in one platform.</p>
+                        <h1 class="hero-title">Learn. <span class="c-orange">Experience.</span> <span
+                                class="c-yellow">Grow.</span></h1>
+                        <p class="hero-text">Connect with your advisers, explore internship opportunities, and keep your
+                            OJT journey organized all in one platform.</p>
                     </div>
 
                     <ul class="school-info">
@@ -71,13 +74,16 @@ $registerVisible = file_exists($statePath) ? trim(file_get_contents($statePath))
 
                     <!-- ROLE TOGGLE -->
                     <div class="role-toggle">
-                        <a href="login-page.php?role=student" class="btn-role <?= $role === 'student' ? 'active' : 'inactive' ?>">
+                        <a href="login-page.php?role=student"
+                            class="btn-role <?= $role === 'student' ? 'active' : 'inactive' ?>">
                             <i class="fa-solid fa-graduation-cap"></i> Students
                         </a>
-                        <a href="login-page.php?role=adviser" class="btn-role <?= $role === 'adviser' ? 'active' : 'inactive' ?>">
+                        <a href="login-page.php?role=adviser"
+                            class="btn-role <?= $role === 'adviser' ? 'active' : 'inactive' ?>">
                             <i class="fa-regular fa-user"></i> Adviser
                         </a>
-                        <a href="login-page.php?role=admin" class="btn-role <?= $role === 'admin' ? 'active' : 'inactive' ?>">
+                        <a href="login-page.php?role=admin"
+                            class="btn-role <?= $role === 'admin' ? 'active' : 'inactive' ?>">
                             <i class="fa-solid fa-user-shield"></i> Admins
                         </a>
                     </div>
@@ -112,7 +118,8 @@ $registerVisible = file_exists($statePath) ? trim(file_get_contents($statePath))
                     </form>
 
                     <?php if ($registerVisible === 'show' && $role === 'student'): ?>
-                        <div class="register-text">Click <a href="student-register.php" class="register-link">here</a> to register</div>
+                        <div class="register-text">Click <a href="student-register.php" class="register-link">here</a> to
+                            register</div>
                     <?php endif; ?>
                 </div>
             </div>
