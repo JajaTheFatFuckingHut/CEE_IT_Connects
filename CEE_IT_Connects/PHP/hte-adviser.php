@@ -4540,6 +4540,10 @@ foreach ($roomStatuses as $s) {
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="dtr-view-modal-title">Student Timesheet</h5>
+                    <button type="button" id="dtr-download-btn" class="btn btn-sm text-white fw-semibold"
+                        style="background:#272f54;border-radius:8px;" onclick="downloadStudentDtrPDF()" disabled>
+                        <i class="fa-solid fa-download me-1"></i> Download PDF
+                    </button>
                     <button type="button" class="btn-close" onclick="closeDtrModal()"></button>
                 </div>
                 <div class="modal-body">
@@ -4552,8 +4556,10 @@ foreach ($roomStatuses as $s) {
         </div>
     </div>
 
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
     <script>
         if (document.getElementById('attendanceChart')) {
             new Chart(document.getElementById('attendanceChart'), {
@@ -4631,8 +4637,8 @@ foreach ($roomStatuses as $s) {
                 }
             });
         }
-    </script>
-    <script>
+
+        let currentDtrData = null;
         function openDtrModal() {
             document.getElementById('dtr-view-modal').style.display = 'block';
             document.getElementById('dtr-view-modal').classList.add('show');
@@ -4685,6 +4691,56 @@ foreach ($roomStatuses as $s) {
         `;
             }
         }
+
+        function downloadStudentDtrPDF() {
+            if (!currentDtrData) return;
+            const data = currentDtrData;
+            const s = computeDtrStats(data);
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const margin = 14;
+            let y = 16;
+
+            // Header
+            doc.setFontSize(16); doc.setTextColor(39, 47, 84);
+            doc.text('Daily Time Record', margin, y); y += 8;
+            doc.setFontSize(11); doc.setTextColor(0, 0, 0);
+            doc.text(`${data.student.full_name} - ${data.student.company ?? ''}`, margin, y); y += 6;
+
+            // Summary
+            const schedIn = fmtSchedTime(data.student.ojt_time_in);
+            const schedOut = fmtSchedTime(data.student.ojt_time_out);
+            doc.setFontSize(10); doc.setTextColor(90, 90, 90);
+            doc.text(`Hours: ${s.totalHours.toFixed(1)} / ${s.requiredHours} (${s.progressPct}%)`, margin, y); y += 5;
+            doc.text(`Late: ${s.lateDays}   Overtime: ${s.overtimeDays}   Logged days: ${s.loggedDays}`, margin, y); y += 5;
+            doc.text(`Office hours: ${schedIn && schedOut ? schedIn + ' - ' + schedOut : 'Not set'}`, margin, y); y += 8;
+
+            // One table per week, read from what's already rendered in the modal
+            const weekEls = document.querySelectorAll('#dtr-view-modal-body table');
+            if (!weekEls.length) {
+                alert('Nothing to export yet.');
+                return;
+            }
+            weekEls.forEach((table, i) => {
+                const label = data.weeks[i]?.week_label ?? `Week ${i + 1}`;
+                doc.setFontSize(11); doc.setTextColor(39, 47, 84);
+                if (y > 265) { doc.addPage(); y = 16; }
+                doc.text(label, margin, y); y += 2;
+
+                doc.autoTable({
+                    html: table,
+                    startY: y,
+                    styles: { fontSize: 9 },
+                    headStyles: { fillColor: [39, 47, 84], textColor: [255, 255, 255] },
+                    margin: { left: margin, right: margin },
+                });
+                y = doc.lastAutoTable.finalY + 8;
+            });
+
+            const safeName = data.student.full_name.replace(/[^\w]+/g, '_');
+            doc.save(`DTR_${safeName}.pdf`);
+        }
+
 
         /* ---------- time helpers ---------- */
 
