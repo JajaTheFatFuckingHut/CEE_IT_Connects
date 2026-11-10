@@ -221,10 +221,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             $stmt = $pdo->prepare("
             SELECT ib.student_id, i.title, i.company, s.full_name
-            FROM internship_bookmarks ib
+            FROM ojt_applications oa
             JOIN internships i ON i.id = ib.internship_id
-            JOIN students s ON s.id = ib.student_id
-            WHERE ib.id = ?
+            JOIN students s ON s.id = oa.student_id
+            WHERE oa.id = ?
         ");
             $stmt->execute([$bookmark_id]);
             $bookmark = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -248,7 +248,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 
             $_SESSION['success'] = "Feedback to " . $bookmark['full_name'] . " has been sent.";
-            $stmtDelete = $pdo->prepare("DELETE FROM internship_bookmarks WHERE id = ?");
+            $stmtDelete = $pdo->prepare("DELETE FROM ojt_applications WHERE id = ?");
             $stmtDelete->execute([$bookmark_id]);
 
 

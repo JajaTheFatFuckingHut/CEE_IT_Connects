@@ -151,7 +151,7 @@ $internships = $internshipStmt->fetchAll(PDO::FETCH_ASSOC);
 $statsStmt = $pdo->query("SELECT COUNT(*) AS total FROM internships");
 $totalInternships = $statsStmt->fetchColumn();
 
-$interestedStmt = $pdo->query("SELECT COUNT(*) AS total FROM internship_bookmarks");
+$interestedStmt = $pdo->query("SELECT COUNT(*) AS total FROM ojt_applications");
 $totalInterested = $interestedStmt->fetchColumn();
 
 $applicationsStmt = $pdo->query("SELECT COUNT(*) AS total FROM ojt_applications");
@@ -168,11 +168,11 @@ $recentInternshipsStmt = $pdo->query("
 $recentInternships = $recentInternshipsStmt->fetchAll(PDO::FETCH_ASSOC);
 
 $recentInterestedStmt = $pdo->query("
-    SELECT s.full_name, s.email, i.title AS internship_title, i.company, ib.created_at
-    FROM internship_bookmarks ib
-    JOIN students s ON s.id = ib.student_id
-    JOIN internships i ON i.id = ib.internship_id
-    ORDER BY ib.created_at DESC LIMIT 5
+    SELECT s.full_name, s.email, i.title AS internship_title, i.company, oa.created_at
+    FROM ojt_applications oa
+    JOIN students s ON s.id = oa.student_id
+    JOIN internships i ON i.id = oa.internship_id
+    ORDER BY oa.created_at DESC LIMIT 5
 ");
 $recentInterested = $recentInterestedStmt->fetchAll(PDO::FETCH_ASSOC);
 
