@@ -4540,10 +4540,6 @@ foreach ($roomStatuses as $s) {
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="dtr-view-modal-title">Student Timesheet</h5>
-                    <button type="button" id="dtr-download-btn" class="btn btn-sm text-white fw-semibold"
-                        style="background:#272f54;border-radius:8px;" onclick="downloadStudentDtrPDF()" disabled>
-                        <i class="fa-solid fa-download me-1"></i> Download PDF
-                    </button>
                     <button type="button" class="btn-close" onclick="closeDtrModal()"></button>
                 </div>
                 <div class="modal-body">
@@ -4551,6 +4547,13 @@ foreach ($roomStatuses as $s) {
                     <div id="dtr-view-modal-body">
                         <div class="text-center py-5"><i class="fa fa-spinner fa-spin fa-2x text-muted"></i></div>
                     </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-sm btn-light" onclick="closeDtrModal()">Close</button>
+                    <button type="button" id="dtr-download-btn" class="btn btn-sm text-white fw-semibold"
+                        style="background:#272f54;border-radius:8px;" onclick="downloadStudentDtrPDF()" disabled>
+                        <i class="fa-solid fa-download me-1"></i> Download PDF
+                    </button>
                 </div>
             </div>
         </div>
