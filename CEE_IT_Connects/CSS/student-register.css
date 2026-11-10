@@ -47,7 +47,7 @@ select {
 
 /* --- MAIN CONTAINER --- */
 .login-container {
-    min-height: 100vh;
+    min-height: 0;
 }
 
 .left-panel {
@@ -64,13 +64,11 @@ select {
 .right-panel {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    padding: 2rem;
+    justify-content: flex-start;  /* start at the top */
+    align-items: center;          /* still centered horizontally */
+    padding: 2rem 2rem 3rem;
     width: 100%;
 }
-
-.right-panel > :first-child { margin-top: auto; }
-.right-panel > :last-child  { margin-bottom: auto; }
 
 .logo-img {
     width: 250px;
