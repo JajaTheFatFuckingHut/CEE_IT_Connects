@@ -63,7 +63,7 @@ session_start();
         <div class="row h-100">
             <!-- <div class="col-md-5 p-0 left-panel"></div> -->
 
-            <div class="col-md-7 right-panel">
+            <div class="col-12 right-panel">
 
                 <img src="../Sources/CEE IT Connects Logo.png" alt="CEE IT Logo" class="logo-img">
                 <h2 class="login-title">CEE IT CONNECTS</h2>
