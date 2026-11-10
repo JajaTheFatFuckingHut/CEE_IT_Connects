@@ -1445,7 +1445,7 @@ for ($t = 13; $t >= 0; $t--) {
                                                         </td>
                                                         <td
                                                             style="padding:10px; border-bottom:1px solid #f0f2f7; color:#aaa; font-size:12px;">
-                                                            <?= date("M d", strtotime($ri['created_at'])) ?>
+                                                            <?= date("M d", strtotime($ri['submitted_at'])) ?>
                                                         </td>
                                                     </tr>
                                                 <?php endforeach; ?>
