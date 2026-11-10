@@ -170,7 +170,7 @@ if (isset($_POST['post_announcement'])) {
         FROM room_members rm
         LEFT JOIN advisers a  ON rm.user_type = 'adviser' AND a.id  = rm.user_id
         LEFT JOIN admins   ad ON rm.user_type = 'admin'   AND ad.id = rm.user_id
-        WHERE rm.room_id = ? AND rm.is_archived = FALSE
+        WHERE rm.room_id = ?
         AND NOT (rm.user_id = ? AND rm.user_type = ?)
     ");
         $membersStmt->execute([$room_id, $userId, $posterType]);
