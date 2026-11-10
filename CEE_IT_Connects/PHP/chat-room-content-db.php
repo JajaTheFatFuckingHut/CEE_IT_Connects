@@ -199,7 +199,7 @@ if (isset($_POST['post_announcement'])) {
             $pdo->rollBack();
         error_log('Post announcement failed: ' . $e->getMessage());
         http_response_code(500);
-        exit("Could not post");
+        exit("Could not post: " . $e->getMessage());
     }
 
     $redirects = [
