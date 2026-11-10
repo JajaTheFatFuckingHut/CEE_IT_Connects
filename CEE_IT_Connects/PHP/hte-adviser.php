@@ -4641,7 +4641,6 @@ foreach ($roomStatuses as $s) {
             });
         }
 
-        let currentDtrData = null;
         function openDtrModal() {
             document.getElementById('dtr-view-modal').style.display = 'block';
             document.getElementById('dtr-view-modal').classList.add('show');
@@ -4652,8 +4651,11 @@ foreach ($roomStatuses as $s) {
             document.getElementById('dtr-view-modal').classList.remove('show');
         }
 
+        let currentDtrData = null;
+
         async function viewStudentDtr(studentId) {
             openDtrModal();
+            currentDtrData = null;
 
             const summaryEl = document.getElementById('dtr-summary-section');
             const body = document.getElementById('dtr-view-modal-body');
@@ -4666,17 +4668,17 @@ foreach ($roomStatuses as $s) {
                     `/get-student-dtr.php?student_id=${encodeURIComponent(studentId)}`,
                     { credentials: 'same-origin' }
                 );
-                const text = await res.text();
-                const data = JSON.parse(text);
+                const data = JSON.parse(await res.text());
 
                 if (!data.success) {
                     body.innerHTML = `<p class="text-danger">${data.message}</p>`;
                     return;
                 }
 
+                currentDtrData = data;
+
                 document.getElementById('dtr-view-modal-title').textContent =
                     `${data.student.full_name} — ${data.student.company}`;
-
                 summaryEl.innerHTML = renderDtrSummary(data);
 
                 if (data.weeks.length === 0) {
@@ -4685,13 +4687,9 @@ foreach ($roomStatuses as $s) {
                 }
 
                 body.innerHTML = data.weeks.map(week => renderDtrWeekReadOnly(week, data.student)).join('');
-
             } catch (err) {
                 console.error('DTR ERROR:', err);
-                body.innerHTML = `
-            <p class="text-danger">Failed to load timesheet.</p>
-            <p class="small text-muted">${err.message}</p>
-        `;
+                body.innerHTML = `<p class="text-danger">Failed to load timesheet.</p><p class="small text-muted">${err.message}</p>`;
             }
         }
 
