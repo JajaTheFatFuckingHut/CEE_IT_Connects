@@ -4551,7 +4551,7 @@ foreach ($roomStatuses as $s) {
                 <div class="modal-footer">
                     <button type="button" class="btn btn-sm btn-light" onclick="closeDtrModal()">Close</button>
                     <button type="button" id="dtr-download-btn" class="btn btn-sm text-white fw-semibold"
-                        style="background:#272f54;border-radius:8px;" onclick="downloadStudentDtrPDF()" disabled>
+                        style="background:#272f54;border-radius:8px;" onclick="downloadStudentDtrPDF()">
                         <i class="fa-solid fa-download me-1"></i> Download PDF
                     </button>
                 </div>
@@ -4696,6 +4696,15 @@ foreach ($roomStatuses as $s) {
         }
 
         function downloadStudentDtrPDF() {
+            if (!currentDtrData || !currentDtrData.weeks.length) {
+                alert('No timesheet data to export yet.');
+                return;
+            }
+            if (!window.jspdf) {
+                alert('PDF library failed to load.');
+                return;
+            }
+
             if (!currentDtrData) return;
             const data = currentDtrData;
             const s = computeDtrStats(data);
