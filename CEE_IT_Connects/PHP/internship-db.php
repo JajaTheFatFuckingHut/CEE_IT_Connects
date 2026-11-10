@@ -493,7 +493,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $id = (int) ($_POST['id'] ?? 0);
         if (!$id) {
             $_SESSION['error'] = 'Invalid internship.';
-            header("Location: $back");
+            header("Location: internship-admin.php");
             exit;
         }
 
@@ -504,7 +504,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             if (!$posting) {
                 $_SESSION['error'] = 'Posting not found.';
-                header("Location: $back");
+                header("Location:internship-admin.php");
                 exit;
             }
 
@@ -513,7 +513,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $apps->execute([$id]);
             if ((int) $apps->fetchColumn() > 0) {
                 $_SESSION['error'] = "This posting has student applications, so it can't be deleted.";
-                header("Location: $back");
+                header("Location: internship-admin.php");
                 exit;
             }
 
@@ -540,7 +540,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $_SESSION['error'] = 'Could not delete the posting. It may still be referenced by other records.';
         }
 
-        header("Location: $back");
+        header("Location: internship-admin.php");
         exit;
     }
 }
