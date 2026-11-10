@@ -16,12 +16,24 @@ $adminInfoStmt->execute([$_SESSION['user_id']]);
 $adminFullName = $adminInfoStmt->fetchColumn() ?: 'Admin';
 // addtl e
 
-$statePath = __DIR__ . '/register_toggle.txt';
-$registerVisible = file_exists($statePath) ? trim(file_get_contents($statePath)) : 'show';
+// Read the current state
+$stateStmt = $pdo->prepare("SELECT value FROM settings WHERE key = 'register_visible'");
+$stateStmt->execute();
+$registerVisible = $stateStmt->fetchColumn() ?: 'show';
 
 if (isset($_POST['toggle_register'])) {
+    if (($_SESSION['role'] ?? '') !== 'superadmin') {
+        http_response_code(403);
+        exit('Unauthorized');
+    }
+
     $newState = $registerVisible === 'show' ? 'hide' : 'show';
-    file_put_contents($statePath, $newState);
+
+    $pdo->prepare("
+        INSERT INTO settings (key, value) VALUES ('register_visible', ?)
+        ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value
+    ")->execute([$newState]);
+
     $registerVisible = $newState;
 }
 
