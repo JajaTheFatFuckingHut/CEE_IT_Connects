@@ -1,4 +1,5 @@
 <?php
+require 'db.php';
 $role = $_GET['role'] ?? 'student';
 
 $stateStmt = $pdo->prepare("SELECT value FROM settings WHERE key = 'register_visible'");
