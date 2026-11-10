@@ -68,6 +68,7 @@ select {
     align-items: center;
     padding: 3rem 2rem; /* Added top/bottom padding for scrolling */
     min-height: 100vh;
+    width: 100%;
 }
 
 .logo-img {
@@ -92,8 +93,8 @@ select {
 
 /* --- FORM STYLES --- */
 .form-wrapper {
-    width: 100%;
-    max-width: 500px;
+    width: min(100%, 500px);
+    margin: 0 auto;
 }
 
 .form-control, .form-select {
