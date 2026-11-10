@@ -1912,7 +1912,8 @@ $rmFmtTime = function ($ts): string {
 
                 <?php if ($rmCanPost): ?>
                     <div class="rm-card rm-composer">
-                        <form action="chat-room-content-db.php" method="POST">
+                        <form action="
+                        .php" method="POST">
                             <!-- tells the backend WHICH room this post belongs to -->
                             <input type="hidden" name="room_id" value="<?= $room_id ?>">
                             <!-- triggers the post_announcement block in chat-room-content-db.php -->
