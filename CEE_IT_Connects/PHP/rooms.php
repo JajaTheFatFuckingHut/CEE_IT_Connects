@@ -3832,149 +3832,146 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
     <!-- HOME SECTION -->
     <!-- addtl s dashboard ni student -->
     <div id="home" class="section <?= $current_section === 'home' ? 'active' : '' ?>">
+        <?php var_dump($current_section, $current_room_id); ?>
         <div class="main">
-            <?php if ($current_room_id): ?>
-                <?php include 'chat-room-content.php'; ?>
-            <?php else: ?>
-                <?php
-                $hmFirst = explode(' ', trim($displayName ?? 'there'))[0];
-                $hmHasRoom = !empty($rooms);
-                $hmSteps = [
-                    [
-                        'done' => !empty($application_internship_id),
-                        'title' => 'Pick your host company',
-                        'desc' => 'Choose the company where you will do your OJT.',
-                        'link' => '?section=application',
-                        'cta' => 'Choose company',
-                    ],
-                    [
-                        'done' => !empty($hasActiveProgress),
-                        'title' => 'Complete your requirements',
-                        'desc' => 'Once your MOU, Recommendation Letter and Waiver are marked done, Hours and Progress Report unlock.',
-                        'link' => '?section=application',
-                        'cta' => 'Open checklist',
-                    ],
-                    [
-                        'done' => $hmHasRoom,
-                        'title' => 'Join your OJT room',
-                        'desc' => $hmHasRoom
-                            ? 'You are in a room. Open it to see updates from your adviser.'
-                            : 'Your adviser will add you to a room. It will show up in the sidebar once you are added.',
-                        'link' => null,
-                        'cta' => null,
-                    ],
-                ];
-                $hmDone = count(array_filter($hmSteps, fn($s) => $s['done']));
-                $hmCurrent = null;
-                foreach ($hmSteps as $i => $s) {
-                    if (!$s['done']) {
-                        $hmCurrent = $i;
-                        break;
-                    }
+            <?php
+            $hmFirst = explode(' ', trim($displayName ?? 'there'))[0];
+            $hmHasRoom = !empty($rooms);
+            $hmSteps = [
+                [
+                    'done' => !empty($application_internship_id),
+                    'title' => 'Pick your host company',
+                    'desc' => 'Choose the company where you will do your OJT.',
+                    'link' => '?section=application',
+                    'cta' => 'Choose company',
+                ],
+                [
+                    'done' => !empty($hasActiveProgress),
+                    'title' => 'Complete your requirements',
+                    'desc' => 'Once your MOU, Recommendation Letter and Waiver are marked done, Hours and Progress Report unlock.',
+                    'link' => '?section=application',
+                    'cta' => 'Open checklist',
+                ],
+                [
+                    'done' => $hmHasRoom,
+                    'title' => 'Join your OJT room',
+                    'desc' => $hmHasRoom
+                        ? 'You are in a room. Open it to see updates from your adviser.'
+                        : 'Your adviser will add you to a room. It will show up in the sidebar once you are added.',
+                    'link' => null,
+                    'cta' => null,
+                ],
+            ];
+            $hmDone = count(array_filter($hmSteps, fn($s) => $s['done']));
+            $hmCurrent = null;
+            foreach ($hmSteps as $i => $s) {
+                if (!$s['done']) {
+                    $hmCurrent = $i;
+                    break;
                 }
-                ?>
+            }
+            ?>
 
-                <div class="pg-header">
-                    <div class="pg-header-left">
-                        <div class="pg-header-icon"><i class="fa-solid fa-house"></i></div>
+            <div class="pg-header">
+                <div class="pg-header-left">
+                    <div class="pg-header-icon"><i class="fa-solid fa-house"></i></div>
+                    <div>
+                        <h2>Welcome, <?= htmlspecialchars($hmFirst) ?></h2>
+                        <p><?= date('l, F j') ?> · <?= $hmDone === 3
+                               ? 'All set. Open your room to keep updated from announcements.'
+                               : 'Here is what you need to do to get started with your OJT.' ?></p>
+                    </div>
+                </div>
+                <div class="hm-meter">
+                    <div class="hm-meter-top">
+                        <span>Setup progress</span><b><?= $hmDone ?> of 3</b>
+                    </div>
+                    <div class="hm-meter-track">
+                        <div class="hm-meter-fill" style="width:<?= round($hmDone / 3 * 100) ?>%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-3 mb-3 hm-stats">
+                <div class="col-md-4">
+                    <div class="hrs-card hrs-stat">
+                        <div class="hrs-stat-icon blue"><i class="fa-solid fa-list-check"></i></div>
                         <div>
-                            <h2>Welcome, <?= htmlspecialchars($hmFirst) ?></h2>
-                            <p><?= date('l, F j') ?> · <?= $hmDone === 3
-                                   ? 'All set. Open your room to keep updated from announcements.'
-                                   : 'Here is what you need to do to get started with your OJT.' ?></p>
-                        </div>
-                    </div>
-                    <div class="hm-meter">
-                        <div class="hm-meter-top">
-                            <span>Setup progress</span><b><?= $hmDone ?> of 3</b>
-                        </div>
-                        <div class="hm-meter-track">
-                            <div class="hm-meter-fill" style="width:<?= round($hmDone / 3 * 100) ?>%;"></div>
+                            <div class="hrs-stat-label">Setup progress</div>
+                            <div class="hrs-stat-value"><?= $hmDone ?> / 3</div>
                         </div>
                     </div>
                 </div>
-
-                <div class="row g-3 mb-3 hm-stats">
-                    <div class="col-md-4">
-                        <div class="hrs-card hrs-stat">
-                            <div class="hrs-stat-icon blue"><i class="fa-solid fa-list-check"></i></div>
-                            <div>
-                                <div class="hrs-stat-label">Setup progress</div>
-                                <div class="hrs-stat-value"><?= $hmDone ?> / 3</div>
-                            </div>
+                <div class="col-md-4">
+                    <div class="hrs-card hrs-stat">
+                        <div class="hrs-stat-icon green"><i class="fa-solid fa-users"></i></div>
+                        <div>
+                            <div class="hrs-stat-label">My rooms</div>
+                            <div class="hrs-stat-value"><?= count($rooms) ?></div>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <div class="hrs-card hrs-stat">
-                            <div class="hrs-stat-icon green"><i class="fa-solid fa-users"></i></div>
-                            <div>
-                                <div class="hrs-stat-label">My rooms</div>
-                                <div class="hrs-stat-value"><?= count($rooms) ?></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="hrs-card hrs-stat">
-                            <div class="hrs-stat-icon orange"><i class="fa-solid fa-hourglass-half"></i></div>
-                            <div>
-                                <div class="hrs-stat-label">OJT hours required</div>
-                                <div class="hrs-stat-value">
-                                    <?php if ($hasApplied): ?>
-                                        <?= $requiredHours ?> hrs
-                                    <?php else: ?>
-                                        <span class="text-muted" style="font-size:.9rem;">Haven't applied yet</span>
-                                    <?php endif; ?>
-                                </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="hrs-card hrs-stat">
+                        <div class="hrs-stat-icon orange"><i class="fa-solid fa-hourglass-half"></i></div>
+                        <div>
+                            <div class="hrs-stat-label">OJT hours required</div>
+                            <div class="hrs-stat-value">
+                                <?php if ($hasApplied): ?>
+                                    <?= $requiredHours ?> hrs
+                                <?php else: ?>
+                                    <span class="text-muted" style="font-size:.9rem;">Haven't applied yet</span>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <div class="hm-card">
-                    <div class="hm-title">Your OJT checklist</div>
+            <div class="hm-card">
+                <div class="hm-title">Your OJT checklist</div>
 
-                    <?php foreach ($hmSteps as $i => $s):
-                        $state = $s['done'] ? 'done' : ($i === $hmCurrent ? 'current' : 'todo'); ?>
-                        <div class="hm-step <?= $state ?>">
-                            <div class="hm-dot">
-                                <?= $s['done'] ? '<i class="fa-solid fa-check"></i>' : ($i + 1) ?>
-                            </div>
-                            <div class="hm-text">
-                                <strong><?= htmlspecialchars($s['title']) ?></strong>
-                                <span><?= htmlspecialchars($s['desc']) ?></span>
-                            </div>
-                            <?php if ($s['done']): ?>
-                                <span class="hm-tag ok">Done</span>
-                            <?php elseif ($s['link'] && $i === $hmCurrent): ?>
-                                <a href="<?= $s['link'] ?>" class="hm-btn"><?= htmlspecialchars($s['cta']) ?></a>
-                            <?php elseif ($s['link']): ?>
-                                <span class="hm-tag">Up next</span>
-                            <?php else: ?>
-                                <span class="hm-tag">In progress</span>
-                            <?php endif; ?>
+                <?php foreach ($hmSteps as $i => $s):
+                    $state = $s['done'] ? 'done' : ($i === $hmCurrent ? 'current' : 'todo'); ?>
+                    <div class="hm-step <?= $state ?>">
+                        <div class="hm-dot">
+                            <?= $s['done'] ? '<i class="fa-solid fa-check"></i>' : ($i + 1) ?>
                         </div>
+                        <div class="hm-text">
+                            <strong><?= htmlspecialchars($s['title']) ?></strong>
+                            <span><?= htmlspecialchars($s['desc']) ?></span>
+                        </div>
+                        <?php if ($s['done']): ?>
+                            <span class="hm-tag ok">Done</span>
+                        <?php elseif ($s['link'] && $i === $hmCurrent): ?>
+                            <a href="<?= $s['link'] ?>" class="hm-btn"><?= htmlspecialchars($s['cta']) ?></a>
+                        <?php elseif ($s['link']): ?>
+                            <span class="hm-tag">Up next</span>
+                        <?php else: ?>
+                            <span class="hm-tag">In progress</span>
+                        <?php endif; ?>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+
+            <?php if ($hmHasRoom): ?>
+                <div class="hm-title mt-4 mb-2" style="padding:0 4px;">Your room</div>
+                <div class="hm-rooms">
+                    <?php foreach ($rooms as $hmRoom): ?>
+                        <a href="?room_id=<?= (int) $hmRoom['id'] ?>" class="hm-room">
+                            <div class="hm-room-ic"><i class="fa-solid fa-users"></i></div>
+                            <div class="hm-room-info">
+                                <strong><?= htmlspecialchars($hmRoom['room_name']) ?></strong>
+                                <?php if (!empty($hmRoom['full_name'])): ?>
+                                    <small>Adviser: <?= htmlspecialchars($hmRoom['full_name']) ?></small>
+                                <?php elseif (!empty($hmRoom['school_year'])): ?>
+                                    <small>S.Y. <?= htmlspecialchars($hmRoom['school_year']) ?></small>
+                                <?php endif; ?>
+                            </div>
+                            <i class="fa-solid fa-chevron-right hm-room-go"></i>
+                        </a>
                     <?php endforeach; ?>
                 </div>
-
-                <?php if ($hmHasRoom): ?>
-                    <div class="hm-title mt-4 mb-2" style="padding:0 4px;">Your room</div>
-                    <div class="hm-rooms">
-                        <?php foreach ($rooms as $hmRoom): ?>
-                            <a href="?room_id=<?= (int) $hmRoom['id'] ?>" class="hm-room">
-                                <div class="hm-room-ic"><i class="fa-solid fa-users"></i></div>
-                                <div class="hm-room-info">
-                                    <strong><?= htmlspecialchars($hmRoom['room_name']) ?></strong>
-                                    <?php if (!empty($hmRoom['full_name'])): ?>
-                                        <small>Adviser: <?= htmlspecialchars($hmRoom['full_name']) ?></small>
-                                    <?php elseif (!empty($hmRoom['school_year'])): ?>
-                                        <small>S.Y. <?= htmlspecialchars($hmRoom['school_year']) ?></small>
-                                    <?php endif; ?>
-                                </div>
-                                <i class="fa-solid fa-chevron-right hm-room-go"></i>
-                            </a>
-                        <?php endforeach; ?>
-                    </div>
-                <?php endif; ?>
             <?php endif; ?>
         </div>
     </div>
