@@ -395,6 +395,49 @@ if ($chatSection_id && $section === 'chats') {
     $chatMessages = $msgStmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
+$adviserDtrStmt = $pdo->prepare("
+    SELECT
+        s.id AS student_id,
+        s.student_id AS student_no,
+        s.full_name,
+        s.year_level,
+        s.section,
+        i.company,
+        i.required_hours,
+        COALESCE(
+            SUM(
+                CASE WHEN oh.m_in IS NOT NULL AND oh.m_out IS NOT NULL
+                    THEN EXTRACT(EPOCH FROM (oh.m_out - oh.m_in)) / 3600
+                    ELSE 0
+                END
+                +
+                CASE WHEN oh.a_in IS NOT NULL AND oh.a_out IS NOT NULL
+                    THEN EXTRACT(EPOCH FROM (oh.a_out - oh.a_in)) / 3600
+                    ELSE 0
+                END
+            ), 0
+        ) AS total_hours
+    FROM rooms r
+    JOIN advisers a ON a.id = r.adviser_id
+    JOIN students s
+        ON s.section::text = r.section::text
+       AND s.year_level = r.year_level
+       AND LOWER(s.program) = LOWER(a.department)
+       AND s.is_archived = false
+    LEFT JOIN ojt_applications oa ON oa.student_id = s.id
+    LEFT JOIN internships i ON i.id = oa.internship_id
+    LEFT JOIN ojt_hours oh ON oh.user_id = s.id AND oh.user_type = 'student'
+    WHERE r.adviser_id = ?
+      AND r.room_type = 'regular'
+      AND r.is_archived = false
+      AND r.section IS NOT NULL
+    GROUP BY s.id, s.student_id, s.full_name, s.year_level, s.section, i.company, i.required_hours
+    ORDER BY s.full_name
+");
+$adviserDtrStmt->execute([$adviserId]); // the logged-in OJT adviser's id (advisers.id)
+$adviserDtrRows = $adviserDtrStmt->fetchAll(PDO::FETCH_ASSOC);
+
+
 // helper — get name for a chat list entry
 function getRoomChatName($pdo, $id, $type)
 {
@@ -2742,6 +2785,11 @@ $page = 'messages';
                 <i class="fa fa-list-ul me-2"></i> <span class="sidebar-text">Requirements</span>
             </a>
 
+            <a href="ojt-adviser.php?room_id=<?= $current_room_id ?>&section=dtr_summary"
+                class="<?= $section === 'dtr_summary' ? 'active' : '' ?>" data-tooltip="Timesheet">
+                <i class="fa fa-list-ul me-2"></i> <span class="sidebar-text">Timesheet</span>
+            </a>
+
             <a href="ojt-adviser.php?room_id=<?= $current_room_id ?>&section=weekly_reports"
                 class="<?= $section === 'weekly_reports' ? 'active' : '' ?>" data-tooltip="Progress Reports">
                 <i class="fa-solid fa-file-lines me-2"></i> <span class="sidebar-text">Progress Reports</span>
@@ -2787,6 +2835,10 @@ $page = 'messages';
         <a href="ojt-adviser.php?room_id=<?= $current_room_id ?>&section=ojt_applications"
             class="<?= $section === 'ojt_applications' ? 'active' : '' ?>">
             <i class="fa fa-list-ul"></i><span>Reqs</span>
+        </a>
+        <a href="ojt-adviser.php?room_id=<?= $current_room_id ?>&section=dtr_summary"
+            class="<?= $section === 'dtr_summary' ? 'active' : '' ?>" data-tooltip="Timesheet">
+            <i class="fa fa-list-ul me-2"></i> <span class="sidebar-text">Timesheet</span>
         </a>
         <a href="ojt-adviser.php?room_id=<?= $current_room_id ?>&section=weekly_reports"
             class="<?= $section === 'weekly_reports' ? 'active' : '' ?>">
@@ -3616,6 +3668,98 @@ $page = 'messages';
                 </div>
             </div>
 
+        <?php elseif ($section === 'dtr_summary'): ?>
+            <div id="dtr_summary">
+                <div class="sysAdm-header--danger sysAdm-header--blue mb-4">
+                    <div class="sysAdm-header-left">
+                        <div class="sysAdm-header-icon">
+                            <i class="bi bi-pencil-fill"></i>
+                        </div>
+                        <div class="sysAdm-header-text">
+                            <h2>Student Daily Time Record Summary</h2>
+                            <p>Overview of rendered OJT hours per student</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div
+                    style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
+                    <div style="position:relative; flex:1; min-width:200px;">
+                        <i class="fa fa-search"
+                            style="position:absolute; color: #f97316; left:10px; top:50%; transform:translateY(-50%); font-size:13px;"></i>
+                        <input type="text" id="searchDtr" placeholder="Search student or company..." oninput="filterDtr()"
+                            style="width:25%; padding:8px 12px 8px 32px; border:1.5px solid #aeaeae; border-radius:22px;
+                            font-size:13px; font-family:inherit; outline:none; transition:border-color .2s;"
+                            onfocus="this.style.borderColor='#f97316'" onblur="this.style.borderColor='#e5e7eb'">
+                    </div>
+                </div>
+
+                <?php if (empty($adviserDtrRows)): ?>
+                    <div class="text-center mt-5 py-5">
+                        <i class="fa fa-inbox fa-3x text-muted mb-3 d-block"></i>
+                        <h5 class="fw-bold text-muted">No Students Yet</h5>
+                        <p class="text-muted" style="font-size:14px;">
+                            You don't have any students under your supervision yet.
+                        </p>
+                    </div>
+                <?php else: ?>
+                    <div class="sysAdm-table-wrapper">
+                        <table class="sysAdm-table" id="dtr-summary-table">
+                            <thead>
+                                <tr>
+                                    <th>Student</th>
+                                    <th>Company</th>
+                                    <th>Required Hours</th>
+                                    <th>Completed</th>
+                                    <th>Remaining</th>
+                                    <th>Progress</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="dtr-student">
+                                <?php foreach ($adviserDtrRows as $row): ?>
+                                    <tr>
+                                        <td>
+                                            <div class="student-cell">
+                                                <span class="avatar" style="background:#ff6b2c;">
+                                                    <?= strtoupper(substr(trim($row['full_name']), 0, 1)) ?>
+                                                </span>
+                                                <?= htmlspecialchars($row['full_name']) ?>
+                                            </div>
+                                        </td>
+                                        <td data-label="Company"><?= htmlspecialchars($row['company']) ?></td>
+                                        <td data-label="Required"><?= number_format($row['required_hours'], 1) ?> hrs</td>
+                                        <td data-label="Completed"><?= number_format($row['total_hours'], 1) ?> hrs</td>
+                                        <td data-label="Remaining"><?= number_format($row['remaining'], 1) ?> hrs</td>
+                                        <td data-label="Progress">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <div class="progress-bar-bg">
+                                                    <div class="progress-bar-fill" style="width:<?= $row['percent'] ?>%;"></div>
+                                                </div>
+                                                <span style="font-size:12px; color:#888;"><?= $row['percent'] ?>%</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <!-- <button class="btn-delete" onclick="viewStudentDtr(<?= $row['student_id'] ?>)">
+                                        <i class="bi bi-eye"></i>
+                                    </button> -->
+
+                                            <button class="btn-update" onclick="viewStudentDtr(<?= $row['student_id'] ?>)"
+                                                target="_blank" target="_blank" class="btn-update" data-tooltip="View Timesheet"
+                                                title="View Timesheet"
+                                                style="text-decoration: none; background: #FFE7B3;
+                                            color: #7a5200; border:2px solid #7a5200; background-color: #FFE7B3; transition: background-color 0.2s ease;"
+                                                onmouseover="this.style.backgroundColor='#dbbe83';"
+                                                onmouseout="this.style.backgroundColor='#FFE7B3';"><i class="bi bi-eye"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                <?php endif; ?>
+            </div>
         <?php elseif ($section === 'remarks'): ?>
             <div>
                 <h4 class="fw-bold mb-1">Requirements & Remarks</h4>
@@ -4931,6 +5075,237 @@ $page = 'messages';
                 if (f === '100') progOk = p === 100;
                 row.style.display = (textOk && progOk) ? '' : 'none';
             });
+        }
+
+        async function viewStudentDtr(studentId) {
+            openDtrModal();
+            currentDtrData = null;
+
+            const summaryEl = document.getElementById('dtr-summary-section');
+            const body = document.getElementById('dtr-view-modal-body');
+
+            summaryEl.innerHTML = '';
+            body.innerHTML = `<div class="text-center py-5"><i class="fa fa-spinner fa-spin fa-2x text-muted"></i></div>`;
+
+            try {
+                const res = await fetch(
+                    `/get-student-dtr.php?student_id=${encodeURIComponent(studentId)}`,
+                    { credentials: 'same-origin' }
+                );
+                const data = JSON.parse(await res.text());
+
+                if (!data.success) {
+                    body.innerHTML = `<p class="text-danger">${data.message}</p>`;
+                    return;
+                }
+
+                currentDtrData = data;
+
+                document.getElementById('dtr-view-modal-title').textContent =
+                    `${data.student.full_name} — ${data.student.company}`;
+                summaryEl.innerHTML = renderDtrSummary(data);
+
+                if (data.weeks.length === 0) {
+                    body.innerHTML = '<p class="text-muted">No timesheet entries logged yet.</p>';
+                    return;
+                }
+
+                body.innerHTML = data.weeks.map(week => renderDtrWeekReadOnly(week, data.student)).join('');
+            } catch (err) {
+                console.error('DTR ERROR:', err);
+                body.innerHTML = `<p class="text-danger">Failed to load timesheet.</p><p class="small text-muted">${err.message}</p>`;
+            }
+        }
+
+        const PDF_C = {
+            navy: [39, 47, 84], orange: [242, 107, 58], green: [22, 163, 106], blue: [47, 91, 216],
+            orangeBg: [255, 229, 217], greenBg: [216, 245, 234], blueBg: [229, 238, 255],
+            track: [226, 230, 240], muted: [107, 115, 144], border: [226, 230, 240]
+        };
+
+        function pdfCard(doc, x, y, w, h) {
+            doc.setFillColor(255, 255, 255);
+            doc.setDrawColor(...PDF_C.border);
+            doc.roundedRect(x, y, w, h, 3, 3, 'FD');
+        }
+
+        function pdfEnsureSpace(doc, y, needed) {
+            if (y + needed > doc.internal.pageSize.getHeight() - 14) {
+                doc.addPage();
+                return 16;
+            }
+            return y;
+        }
+
+        function pdfDrawSummary(doc, data, s, y) {
+            const M = 14, W = 182;
+            const weekly = data.weeks.map(w => ({
+                label: w.week_label,
+                ...computeDtrStats({ student: data.student, weeks: [w] })
+            }));
+            const onTimeDays = s.loggedDays - s.lateDays;
+            const remaining = Math.max(0, s.requiredHours - s.totalHours);
+            const schedIn = fmtSchedTime(data.student.ojt_time_in);
+            const schedOut = fmtSchedTime(data.student.ojt_time_out);
+
+            // ── OJT Progress card ──
+            y = pdfEnsureSpace(doc, y, 36);
+            pdfCard(doc, M, y, W, 32);
+            doc.setFont(undefined, 'bold'); doc.setFontSize(11); doc.setTextColor(...PDF_C.navy);
+            doc.text('OJT Progress', M + 5, y + 8);
+            doc.setTextColor(...PDF_C.orange);
+            doc.text(`${s.progressPct}%`, M + W - 5, y + 8, { align: 'right' });
+
+            doc.setFillColor(...PDF_C.track);
+            doc.roundedRect(M + 5, y + 11, W - 10, 3, 1.5, 1.5, 'F');
+            const fillW = Math.max(0, Math.min(1, s.progressPct / 100)) * (W - 10);
+            if (fillW > 0) {
+                doc.setFillColor(...PDF_C.orange);
+                doc.roundedRect(M + 5, y + 11, fillW, 3, 1.5, 1.5, 'F');
+            }
+
+            doc.setFont(undefined, 'normal'); doc.setFontSize(9); doc.setTextColor(...PDF_C.muted);
+            doc.text(`${s.totalHours.toFixed(1)} of ${s.requiredHours} hrs rendered  |  ${remaining.toFixed(1)} hrs remaining`, M + 5, y + 20);
+            doc.text(
+                schedIn && schedOut
+                    ? `Office hours: ${schedIn} - ${schedOut}  |  Late if time-in is after ${schedIn}  |  Undertime if time-out is before ${schedOut}`
+                    : 'Office hours: Not set  |  status shows "Present" only',
+                M + 5, y + 26, { maxWidth: W - 10 }
+            );
+            y += 32 + 6;
+
+            // ── Stat cards ──
+            y = pdfEnsureSpace(doc, y, 28);
+            const gap = 4, cw = (W - gap * 2) / 3, ch = 24;
+            const stats = [
+                { label: 'LATE', value: s.lateDays, unit: s.lateDays === 1 ? 'time' : 'times', color: PDF_C.orange, bg: PDF_C.orangeBg },
+                { label: 'OVERTIME', value: s.overtimeDays, unit: s.overtimeDays === 1 ? 'time' : 'times', color: PDF_C.blue, bg: PDF_C.blueBg },
+                { label: 'ON TIME', value: onTimeDays, unit: onTimeDays === 1 ? 'day' : 'days', color: PDF_C.green, bg: PDF_C.greenBg },
+            ];
+            stats.forEach((st, i) => {
+                const x = M + i * (cw + gap);
+                pdfCard(doc, x, y, cw, ch);
+                doc.setFillColor(...st.bg);
+                doc.roundedRect(x + 4, y + 6, 12, 12, 3, 3, 'F');
+                doc.setFillColor(...st.color);
+                doc.circle(x + 10, y + 12, 2.5, 'F');
+
+                doc.setFont(undefined, 'normal'); doc.setFontSize(8); doc.setTextColor(...PDF_C.muted);
+                doc.text(st.label, x + 20, y + 7);
+                doc.setFont(undefined, 'bold'); doc.setFontSize(16); doc.setTextColor(...PDF_C.navy);
+                doc.text(String(st.value), x + 20, y + 15);
+                const vw = doc.getTextWidth(String(st.value));
+                doc.setFont(undefined, 'normal'); doc.setFontSize(8); doc.setTextColor(...PDF_C.muted);
+                doc.text(st.unit, x + 20 + vw + 2, y + 15);
+                doc.setFontSize(7);
+                doc.text(`out of ${s.loggedDays} logged day(s)`, x + 20, y + 20);
+            });
+            y += ch + 6;
+
+            // ── Attendance per week ──
+            const chartH = 34, cardH = 14 + chartH + 22;
+            y = pdfEnsureSpace(doc, y, cardH);
+            pdfCard(doc, M, y, W, cardH);
+
+            doc.setFont(undefined, 'bold'); doc.setFontSize(11); doc.setTextColor(...PDF_C.navy);
+            doc.text('Attendance per week', M + 5, y + 8);
+
+            // Legend (right aligned)
+            doc.setFont(undefined, 'normal'); doc.setFontSize(7); doc.setTextColor(...PDF_C.muted);
+            const legend = [['Late', PDF_C.orange], ['On time', PDF_C.green], ['OT = overtime days', PDF_C.blue]];
+            let lx = M + W - 5;
+            for (let i = legend.length - 1; i >= 0; i--) {
+                const [text, col] = legend[i];
+                const tw = doc.getTextWidth(text);
+                lx -= tw;
+                doc.text(text, lx, y + 7.5);
+                lx -= 4;
+                doc.setFillColor(...col);
+                doc.rect(lx, y + 5, 3, 3, 'F');
+                lx -= 5;
+            }
+
+            const baseY = y + 14 + chartH;
+            const cx = M + 5, cwid = W - 10;
+            doc.setDrawColor(...PDF_C.border);
+            doc.line(cx, baseY, cx + cwid, baseY);
+
+            if (weekly.length) {
+                const maxDays = Math.max(1, ...weekly.map(w => w.loggedDays));
+                const slot = Math.min(32, cwid / weekly.length);
+                const barW = Math.min(14, slot * 0.6);
+                weekly.forEach((w, i) => {
+                    const bx = cx + i * slot + (slot - barW) / 2;
+                    const midX = bx + barW / 2;
+                    const onTime = w.loggedDays - w.lateDays;
+                    const totalH = Math.max(3, (w.loggedDays / maxDays) * chartH);
+                    const lateH = w.loggedDays ? totalH * (w.lateDays / w.loggedDays) : 0;
+                    const onH = totalH - lateH;
+
+                    if (onH > 0) { doc.setFillColor(...PDF_C.green); doc.rect(bx, baseY - onH, barW, onH, 'F'); }
+                    if (lateH > 0) { doc.setFillColor(...PDF_C.orange); doc.rect(bx, baseY - onH - lateH, barW, lateH, 'F'); }
+
+                    doc.setFont(undefined, 'bold'); doc.setFontSize(8); doc.setTextColor(43, 58, 103);
+                    doc.text(String(w.label), midX, baseY + 5, { align: 'center', maxWidth: slot });
+                    doc.setFont(undefined, 'normal'); doc.setFontSize(7); doc.setTextColor(...PDF_C.muted);
+                    doc.text(`${w.lateDays}/${w.loggedDays} late`, midX, baseY + 9, { align: 'center', maxWidth: slot });
+
+                    if (w.overtimeDays > 0) {
+                        const label = `OT ${w.overtimeDays}`;
+                        const tw = doc.getTextWidth(label) + 4;
+                        doc.setFillColor(...PDF_C.blueBg);
+                        doc.roundedRect(midX - tw / 2, baseY + 11, tw, 4.5, 2, 2, 'F');
+                        doc.setTextColor(...PDF_C.blue);
+                        doc.text(label, midX, baseY + 14.3, { align: 'center' });
+                    }
+                });
+            } else {
+                doc.setFontSize(9); doc.setTextColor(140, 140, 140);
+                doc.text('No weekly data yet.', cx, baseY - 10);
+            }
+
+            return y + cardH + 8;
+        }
+
+        function downloadStudentDtrPDF() {
+            const data = window.currentDtrData || currentDtrData;
+            if (!data || !data.weeks || !data.weeks.length) {
+                alert('No timesheet data to export yet.');
+                return;
+            }
+            if (!window.jspdf) { alert('PDF library failed to load.'); return; }
+
+            const s = computeDtrStats(data);
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const margin = 14;
+            let y = 16;
+
+            // Header
+            doc.setFont(undefined, 'bold'); doc.setFontSize(16); doc.setTextColor(...PDF_C.navy);
+            doc.text('Daily Time Record', margin, y); y += 7;
+            doc.setFont(undefined, 'normal'); doc.setFontSize(11); doc.setTextColor(0, 0, 0);
+            doc.text(`${data.student.full_name} - ${data.student.company ?? ''}`, margin, y); y += 8;
+
+            y = pdfDrawSummary(doc, data, s, y);
+
+            document.querySelectorAll('#dtr-view-modal-body table').forEach((table, i) => {
+                const label = data.weeks[i]?.week_label ?? `Week ${i + 1}`;
+                y = pdfEnsureSpace(doc, y, 30);
+                doc.setFont(undefined, 'bold'); doc.setFontSize(11); doc.setTextColor(...PDF_C.navy);
+                doc.text(label, margin, y); y += 2;
+                doc.autoTable({
+                    html: table,
+                    startY: y,
+                    styles: { fontSize: 9 },
+                    headStyles: { fillColor: PDF_C.navy, textColor: [255, 255, 255] },
+                    margin: { left: margin, right: margin },
+                });
+                y = doc.lastAutoTable.finalY + 8;
+            });
+
+            const safeName = data.student.full_name.replace(/[^\w]+/g, '_');
+            doc.save(`DTR_${safeName}.pdf`);
         }
     </script>
 </body>
