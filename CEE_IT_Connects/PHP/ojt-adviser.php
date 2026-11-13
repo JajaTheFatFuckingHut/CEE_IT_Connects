@@ -3645,12 +3645,12 @@ $page = 'messages';
                 $docs = [];
                 foreach ($stepLabels as $key => $label) {
                     $entry = $checklist[$key] ?? null;
-                    if (!empty($entry['done'])) {
-                        $docs[] = [
-                            'label' => $label,
-                            'file' => $entry['file_path'] ?? '',
-                        ];
-                    }
+                    $done = !empty($entry['done']);
+                    $docs[] = [
+                        'label' => $label,
+                        'done' => $done,
+                        'file' => $done ? ($entry['file_path'] ?? '') : '',
+                    ];
                 }
                 $reqData[(int) $app['application_id']] = [
                     'name' => $app['full_name'],
@@ -4811,16 +4811,29 @@ $page = 'messages';
             document.getElementById('reqModalTitle').textContent = st.name + ' — Requirements';
 
             document.getElementById('reqList').innerHTML = currentDocs.length
-                ? currentDocs.map((d, i) => `
-            <button type="button" data-i="${i}" ${d.file ? '' : 'disabled'} onclick="selectRequirement(${i})"
+                ? currentDocs.map((d, i) => {
+                    const passed = !!d.done;
+                    const clickable = !!d.file;
+                    const bg = passed ? '#fff' : '#fee2e2';
+                    const bd = passed ? '#e5e7eb' : '#fca5a5';
+                    const fg = passed ? '#111827' : '#991b1b';
+                    const icon = passed
+                        ? '<i class="fa fa-circle-check" style="color:#059669; font-size:11px;"></i>'
+                        : '<i class="fa fa-circle-xmark" style="color:#dc2626; font-size:11px;"></i>';
+                    const note = !passed
+                        ? '<br><small style="color:#b91c1c;">Not submitted</small>'
+                        : (!d.file ? '<br><small style="color:#6b7280;">No file attached</small>' : '');
+                    return `
+            <button type="button" data-i="${i}" ${clickable ? '' : 'disabled'} onclick="selectRequirement(${i})"
                 style="display:block; width:100%; text-align:left; padding:10px 12px; margin-bottom:6px;
-                       border:1px solid #e5e7eb; border-radius:10px; background:#fff;
-                       cursor:${d.file ? 'pointer' : 'not-allowed'}; opacity:${d.file ? 1 : 0.6};">
-                <i class="fa fa-circle-check" style="color:#059669; font-size:11px;"></i>
+                       border:1px solid ${bd}; border-radius:10px; background:${bg}; color:${fg};
+                       cursor:${clickable ? 'pointer' : 'not-allowed'};">
+                ${icon}
                 <strong>${escH(d.label)}</strong>
-                ${d.file ? '' : '<br><small style="color:#6b7280;">No file attached</small>'}
-            </button>`).join('')
-                : '<div style="color:#6b7280; font-size:13px;">No completed documents yet.</div>';
+                ${note}
+            </button>`;
+                }).join('')
+                : '<div style="color:#6b7280; font-size:13px;">No requirements found.</div>';
 
             document.getElementById('reqModal').style.display = 'flex';
 
