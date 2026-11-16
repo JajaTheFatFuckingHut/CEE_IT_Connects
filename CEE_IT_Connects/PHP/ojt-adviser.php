@@ -5083,6 +5083,16 @@ $page = 'messages';
             });
         }
 
+        function openDtrModal() {
+            document.getElementById('dtr-view-modal').style.display = 'block';
+            document.getElementById('dtr-view-modal').classList.add('show');
+        }
+
+        function closeDtrModal() {
+            document.getElementById('dtr-view-modal').style.display = 'none';
+            document.getElementById('dtr-view-modal').classList.remove('show');
+        }
+
         async function viewStudentDtr(studentId) {
             openDtrModal();
             currentDtrData = null;
