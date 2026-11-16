@@ -68,6 +68,8 @@ if (!$hteStudent && !$ojtStudent) {
     exit;
 }
 
+$student = $hteStudent ?: $ojtStudent;
+
 // Pull weeks
 $weeksStmt = $pdo->prepare("
     SELECT week_index, week_label
@@ -116,10 +118,10 @@ echo json_encode([
     'debug_version' => 'v2',   // temporary marker
     'student' => [
         'full_name' => $student['full_name'],
-        'company' => $student['company'],
-        'required_hours' => (float) $student['required_hours'],
-        'ojt_time_in' => $student['ojt_time_in'],
-        'ojt_time_out' => $student['ojt_time_out'],
+        'company' => $student['company'] ?? null,
+        'required_hours' => (float) ($student['required_hours'] ?? 0),
+        'ojt_time_in' => $student['ojt_time_in'] ?? null,
+        'ojt_time_out' => $student['ojt_time_out'] ?? null,
     ],
     'weeks' => $ojtWeeks,
 ]);
