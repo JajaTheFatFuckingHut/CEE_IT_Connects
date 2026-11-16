@@ -58,7 +58,7 @@ $ojtAccessStmt = $pdo->prepare("
       AND r.section IS NOT NULL
     LIMIT 1
 ");
-$ojtAccessStmt->execute([$student_id, $adviserId]);
+$ojtAccessStmt->execute([$student_id, $adviser_id]);
 $ojtStudent = $ojtAccessStmt->fetch(PDO::FETCH_ASSOC);
 
 
