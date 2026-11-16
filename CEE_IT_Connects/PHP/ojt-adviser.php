@@ -3728,7 +3728,8 @@ $page = 'messages';
                                         <td>
                                             <div class="student-cell">
                                                 <span class="avatar" style="background:#ff6b2c;">
-                                                    <?= strtoupper(substr(trim($row['full_name']), 0, 1)) ?>
+                                                    <?= htmlspecialchars($row['student_id']) ?> -
+                                                    <?= htmlspecialchars($row['full_name']) //strtoupper(substr(trim($row['full_name']), 0, 1)) ?>
                                                 </span>
                                                 <?= htmlspecialchars($row['full_name']) ?>
                                             </div>
