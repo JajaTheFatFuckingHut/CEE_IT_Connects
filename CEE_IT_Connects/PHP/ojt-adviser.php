@@ -424,8 +424,8 @@ $adviserDtrStmt = $pdo->prepare("
        AND s.year_level = r.year_level
        AND LOWER(s.program) = LOWER(a.department)
        AND s.is_archived = false
-    LEFT JOIN ojt_applications oa ON oa.student_id = s.id
-    LEFT JOIN internships i ON i.id = oa.internship_id
+    JOIN ojt_applications oa ON oa.student_id = s.id
+    JOIN internships i ON i.id = oa.internship_id
     LEFT JOIN ojt_hours oh ON oh.user_id = s.id AND oh.user_type = 'student'
     WHERE r.adviser_id = ?
       AND r.room_type = 'regular'
@@ -3729,8 +3729,7 @@ $page = 'messages';
                                         <td>
                                             <div class="student-cell">
                                                 <span class="avatar" style="background:#ff6b2c;">
-                                                    <?= htmlspecialchars($row['student_id']) ?> -
-                                                    <?= htmlspecialchars($row['full_name']) //strtoupper(substr(trim($row['full_name']), 0, 1)) ?>
+                                                    <?= strtoupper(substr(trim($row['full_name']), 0, 1)) ?>
                                                 </span>
                                                 <?= htmlspecialchars($row['full_name']) ?>
                                             </div>
