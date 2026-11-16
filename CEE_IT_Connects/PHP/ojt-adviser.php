@@ -437,6 +437,12 @@ $adviserDtrStmt = $pdo->prepare("
 $adviserDtrStmt->execute([$adviser_id]);
 $adviserDtrRows = $adviserDtrStmt->fetchAll(PDO::FETCH_ASSOC);
 
+foreach ($adviserDtrRows as &$row) {
+    $required = (float) $row['required_hours'];
+    $completed = (float) $row['total_hours'];
+    $row['remaining'] = max($required - $completed, 0);
+    $row['percent'] = $required > 0 ? min(100, round(($completed / $required) * 100)) : 0;
+}
 
 // helper — get name for a chat list entry
 function getRoomChatName($pdo, $id, $type)
