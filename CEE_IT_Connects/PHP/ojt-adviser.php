@@ -434,7 +434,7 @@ $adviserDtrStmt = $pdo->prepare("
     GROUP BY s.id, s.student_id, s.full_name, s.year_level, s.section, i.company, i.required_hours
     ORDER BY s.full_name
 ");
-$adviserDtrStmt->execute([$advise_id]);
+$adviserDtrStmt->execute([$adviser_id]);
 $adviserDtrRows = $adviserDtrStmt->fetchAll(PDO::FETCH_ASSOC);
 
 
