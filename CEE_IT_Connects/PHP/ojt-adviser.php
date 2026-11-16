@@ -5348,6 +5348,228 @@ $page = 'messages';
             const safeName = data.student.full_name.replace(/[^\w]+/g, '_');
             doc.save(`DTR_${safeName}.pdf`);
         }
+
+        /* ---------- time helpers ---------- */
+
+        function timeToMinutes(str) {
+            if (!str) return null;
+            const m = String(str).match(/^(\d{1,2}):(\d{2})/);
+            if (!m) return null;
+            return parseInt(m[1], 10) * 60 + parseInt(m[2], 10);
+        }
+
+        function diffHours(inStr, outStr) {
+            const inMin = timeToMinutes(inStr);
+            const outMin = timeToMinutes(outStr);
+            if (inMin === null || outMin === null) return 0;
+            let diff = outMin - inMin;
+            if (diff < 0) diff += 24 * 60; // guard against overnight/bad data
+            return diff / 60;
+        }
+
+        /* ---------- stats ---------- */
+
+        function computeDtrStats(data, graceMinutes = 0) {
+            const scheduledIn = timeToMinutes(data.student.ojt_time_in);
+            const scheduledOut = timeToMinutes(data.student.ojt_time_out);
+
+            let totalHours = 0;
+            let loggedDays = 0;
+            let lateDays = 0;
+            let overtimeDays = 0;
+
+            for (const week of data.weeks) {
+                for (const row of week.rows) {
+                    const hasAnyTime = row.m_in || row.m_out || row.a_in || row.a_out;
+                    if (!hasAnyTime) continue;
+
+                    loggedDays++;
+                    totalHours += diffHours(row.m_in, row.m_out) + diffHours(row.a_in, row.a_out);
+
+                    // Late: morning time-in later than the scheduled start (+ grace)
+                    const actualIn = timeToMinutes(row.m_in);
+                    if (scheduledIn !== null && actualIn !== null && actualIn > scheduledIn + graceMinutes) {
+                        lateDays++;
+                    }
+
+                    // Overtime: end of day (afternoon out, falling back to morning out) later than scheduled end
+                    const actualOut = timeToMinutes(row.a_out) ?? timeToMinutes(row.m_out);
+                    if (scheduledOut !== null && actualOut !== null && actualOut > scheduledOut + graceMinutes) {
+                        overtimeDays++;
+                    }
+                }
+            }
+
+            const requiredHours = parseFloat(data.student.required_hours) || 0;
+            const progressPct = requiredHours > 0
+                ? Math.min(Math.round((totalHours / requiredHours) * 100), 100)
+                : 0;
+            const latePct = loggedDays > 0 ? Math.round((lateDays / loggedDays) * 100) : 0;
+            const overtimePct = loggedDays > 0 ? Math.round((overtimeDays / loggedDays) * 100) : 0;
+
+            return { totalHours, requiredHours, progressPct, loggedDays, lateDays, overtimeDays, latePct, overtimePct };
+        }
+
+        function fmtSchedTime(t) {
+            if (!t) return null;
+            const [H, M] = t.split(':').map(Number);
+            return `${String(H % 12 || 12).padStart(2, '0')}:${String(M).padStart(2, '0')} ${H >= 12 ? 'PM' : 'AM'}`;
+        }
+        function renderDtrSummary(data) {
+            const s = computeDtrStats(data);
+            const weekly = data.weeks.map(w => ({
+                label: w.week_label,
+                ...computeDtrStats({ student: data.student, weeks: [w] })
+            }));
+            const maxDays = Math.max(1, ...weekly.map(w => w.loggedDays));
+            const onTimeDays = s.loggedDays - s.lateDays;
+            const remaining = Math.max(0, s.requiredHours - s.totalHours);
+
+            const schedIn = fmtSchedTime(data.student.ojt_time_in);
+            const schedOut = fmtSchedTime(data.student.ojt_time_out);
+
+            const stat = (icon, tone, label, value, unit, sub) => `
+        <div class="hrs-card hrs-stat">
+            <div class="hrs-stat-icon ${tone}"><i class="fa-solid ${icon}"></i></div>
+            <div>
+                <div class="hrs-stat-label">${label}</div>
+                <div class="hrs-stat-value">${value} <span style="font-size:13px; font-weight:500; color:#6b7390;">${unit}</span></div>
+                <div style="font-size:11.5px; color:#8b93ab;">${sub}</div>
+            </div>
+        </div>`;
+
+            const bars = weekly.length === 0
+                ? `<div style="color:#8b93ab; font-size:13px; padding:20px 0;">No weekly data yet.</div>`
+                : weekly.map(w => {
+                    const onTime = w.loggedDays - w.lateDays;
+                    const h = Math.max(10, (w.loggedDays / maxDays) * 100);
+                    return `
+            <div style="flex:1; min-width:64px; max-width:110px; display:flex; flex-direction:column; align-items:center; gap:6px;"
+                 title="${w.label}: ${w.lateDays} late, ${onTime} on time, ${w.overtimeDays} overtime">
+                <div style="height:100px; display:flex; align-items:flex-end; width:100%; justify-content:center;">
+                    <div style="width:44px; max-width:100%; height:${h}px; display:flex; flex-direction:column; border-radius:8px; overflow:hidden; background:#eef2f9;">
+                        <div style="flex:${w.lateDays}; background:#f26b3a;"></div>
+                        <div style="flex:${onTime}; background:#16a36a;"></div>
+                    </div>
+                </div>
+                <div style="font-size:12px; font-weight:600; color:#2b3a67; white-space:nowrap;">${w.label}</div>
+                <div style="font-size:11px; color:#8b93ab; white-space:nowrap;">${w.lateDays}/${w.loggedDays} late</div>
+                ${w.overtimeDays > 0
+                            ? `<span style="font-size:10px; font-weight:600; background:#e5eeff; color:#2f5bd8; padding:1px 8px; border-radius:99px;">OT ${w.overtimeDays}</span>`
+                            : ''}
+            </div>`;
+                }).join('');
+
+            return `
+    <div style="margin-bottom:16px;">
+
+        <div class="hrs-card" style="margin-bottom:12px;">
+            <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-1">
+                <span class="hrs-progress-title">OJT Progress</span>
+                <span class="hrs-progress-pct">${s.progressPct}%</span>
+            </div>
+            <div class="hrs-track"><div class="hrs-fill" style="width:${s.progressPct}%;"></div></div>
+            <div style="font-size:12.5px; color:#6b7390; margin-top:8px;">
+                <b style="color:#1f2a55;">${s.totalHours.toFixed(1)}</b> of ${s.requiredHours} hrs rendered
+                &middot; ${remaining.toFixed(1)} hrs remaining
+
+                <div style="font-size:12.5px; color:#6b7390; margin-top:4px;">
+                    <i class="fa-solid fa-clock" style="color:#f26b3a;"></i>
+                    Office hours:
+                    ${schedIn && schedOut
+                    ? `<b style="color:#1f2a55;">${schedIn} – ${schedOut}</b>
+                        &middot; Late if time-in is after ${schedIn} &middot; Undertime if time-out is before ${schedOut}`
+                    : `<b style="color:#1f2a55;">Not set</b> &middot; status shows "Present" only`}
+                </div>
+            </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(210px, 1fr)); gap:12px; margin-bottom:12px;">
+            ${stat('fa-clock', 'orange', 'Late', s.lateDays, s.lateDays === 1 ? 'time' : 'times', `out of ${s.loggedDays} logged day(s)`)}
+            ${stat('fa-business-time', 'blue', 'Overtime', s.overtimeDays, s.overtimeDays === 1 ? 'time' : 'times', `out of ${s.loggedDays} logged day(s)`)}
+            ${stat('fa-circle-check', 'green', 'On time', onTimeDays, onTimeDays === 1 ? 'day' : 'days', `out of ${s.loggedDays} logged day(s)`)}
+        </div>
+
+        <div class="hrs-card">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                <span class="hrs-progress-title">Attendance per week</span>
+                <div style="display:flex; gap:12px; font-size:11.5px; color:#6b7390;">
+                    <span><i class="fa-solid fa-square" style="color:#f26b3a;"></i> Late</span>
+                    <span><i class="fa-solid fa-square" style="color:#16a36a;"></i> On time</span>
+                    <span><i class="fa-solid fa-square" style="color:#2f5bd8;"></i> OT = overtime days</span>
+                </div>
+            </div>
+            <div style="overflow-x:auto;">
+                <div style="display:flex; gap:16px; align-items:flex-end; border-bottom:1px solid #e8ebf3; padding-bottom:10px; min-width:max-content;">
+                    ${bars}
+                </div>
+            </div>
+        </div>
+
+    </div>`;
+        }
+
+        function renderDtrWeekReadOnly(week) {
+            const rows = week.rows.length > 0 ? week.rows : Array.from({ length: 6 }, (_, i) => ({
+                row_index: i, date: '', m_in: '', m_out: '', a_in: '', a_out: ''
+            }));
+
+            const rowsHtml = rows.map(row => {
+                const mHrs = calcHrs(row.m_in, row.m_out);
+                const aHrs = calcHrs(row.a_in, row.a_out);
+                const daily = (mHrs + aHrs).toFixed(2);
+                const dayName = row.date ? new Date(row.date + 'T00:00:00').toLocaleDateString(undefined, { weekday: 'short' }) : '—';
+
+                return `
+            <tr>
+                <td>${row.date || '—'}</td>
+                <td style="text-align:center">${dayName}</td>
+                <td class="td-morning">${row.m_in || '—'}</td>
+                <td class="td-morning">${row.m_out || '—'}</td>
+                <td class="td-morning">${mHrs ? mHrs.toFixed(2) : '—'}</td>
+                <td class="td-afternoon">${row.a_in || '—'}</td>
+                <td class="td-afternoon">${row.a_out || '—'}</td>
+                <td class="td-afternoon">${aHrs ? aHrs.toFixed(2) : '—'}</td>
+                <td>${daily}</td>
+            </tr>`;
+            }).join('');
+
+            return `
+        <div class="ojt-week-block mb-3">
+            <div class="ojt-week-header">
+                <strong>${week.week_label}</strong>
+            </div>
+            <div class="ojt-table-scroll">
+                <table class="ojt-table">
+                    <thead>
+                        <tr>
+                            <th rowspan="2" class="ojt-group">Date</th>
+                            <th rowspan="2" class="ojt-group">Day</th>
+                            <th colspan="3" style="background:#FFB62F;">Morning</th>
+                            <th colspan="3" style="background:#FF673A;">Afternoon</th>
+                            <th rowspan="2" class="ojt-group">Daily<br>Hours</th>
+                        </tr>
+                        <tr>
+                            <th style="background:#f9c565;">In</th>
+                            <th style="background:#f9c565;">Out</th>
+                            <th style="background:#f9c565;">Hrs</th>
+                            <th style="background:#f49679;">In</th>
+                            <th style="background:#f49679;">Out</th>
+                            <th style="background:#f49679;">Hrs</th>
+                        </tr>
+                    </thead>
+                    <tbody>${rowsHtml}</tbody>
+                </table>
+            </div>
+        </div>`;
+        }
+
+        function calcHrs(t1, t2) {
+            if (!t1 || !t2) return 0;
+            const [h1, m1] = t1.split(':').map(Number);
+            const [h2, m2] = t2.split(':').map(Number);
+            return Math.max(0, (h2 * 60 + m2 - (h1 * 60 + m1)) / 60);
+        }
     </script>
 </body>
 
