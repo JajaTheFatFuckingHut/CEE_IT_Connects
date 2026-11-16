@@ -4440,6 +4440,31 @@ $page = 'messages';
         </div>
     </div>
 
+    <!-- Student dtr summary -->
+    <div id="dtr-view-modal" class="modal" tabindex="-1" style="display:none;">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="dtr-view-modal-title">Student Timesheet</h5>
+                    <button type="button" class="btn-close" onclick="closeDtrModal()"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="dtr-summary-section"></div>
+                    <div id="dtr-view-modal-body">
+                        <div class="text-center py-5"><i class="fa fa-spinner fa-spin fa-2x text-muted"></i></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-sm btn-light" onclick="closeDtrModal()">Close</button>
+                    <button type="button" id="dtr-download-btn" class="btn btn-sm text-white fw-semibold"
+                        style="background:#272f54;border-radius:8px;" onclick="downloadStudentDtrPDF()">
+                        <i class="fa-solid fa-download me-1"></i> Download PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- addtl s -->
     <script>
