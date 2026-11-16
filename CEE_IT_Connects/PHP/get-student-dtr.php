@@ -26,7 +26,7 @@ $adviserStmt->execute([$adviser_id]);
 $adviserInternshipId = $adviserStmt->fetchColumn();
 
 // Confirm this adviser actually oversees this student before exposing any DTR data
-$accessStmt = $pdo->prepare("
+$hteAccessStmt = $pdo->prepare("
     SELECT s.id, s.full_name, i.company, i.required_hours,
            i.ojt_time_in, i.ojt_time_out
     FROM students s
@@ -35,10 +35,34 @@ $accessStmt = $pdo->prepare("
     WHERE s.id = ? AND oa.internship_id = ?
     LIMIT 1
 ");
-$accessStmt->execute([$student_id, $adviserInternshipId]);
-$student = $accessStmt->fetch(PDO::FETCH_ASSOC);
+$hteAccessStmt->execute([$student_id, $adviserInternshipId]);
+$hteStudent = $hteAccessStmt->fetch(PDO::FETCH_ASSOC);
 
-if (!$student) {
+
+$ojtAccessStmt = $pdo->prepare("
+    SELECT s.id, s.full_name, i.company, i.required_hours,
+           i.ojt_time_in, i.ojt_time_out
+    FROM rooms r
+    JOIN advisers a ON a.id = r.adviser_id
+    JOIN students s
+        ON s.section::text = r.section::text
+       AND s.year_level = r.year_level
+       AND LOWER(s.program) = LOWER(a.department)
+       AND s.is_archived = false
+    LEFT JOIN ojt_applications oa ON oa.student_id = s.id
+    LEFT JOIN internships i ON i.id = oa.internship_id
+    WHERE s.id = ?
+      AND r.adviser_id = ?
+      AND r.room_type = 'regular'
+      AND r.is_archived = false
+      AND r.section IS NOT NULL
+    LIMIT 1
+");
+$ojtAccessStmt->execute([$student_id, $adviserId]);
+$ojtStudent = $ojtAccessStmt->fetch(PDO::FETCH_ASSOC);
+
+
+if (!$hteStudent && !$ojtStudent) {
     http_response_code(403);
     echo json_encode(['success' => false, 'message' => 'You do not have access to this student.']);
     exit;
