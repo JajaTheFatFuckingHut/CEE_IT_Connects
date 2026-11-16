@@ -443,6 +443,7 @@ foreach ($adviserDtrRows as &$row) {
     $row['remaining'] = max($required - $completed, 0);
     $row['percent'] = $required > 0 ? min(100, round(($completed / $required) * 100)) : 0;
 }
+unset($row);
 
 // helper — get name for a chat list entry
 function getRoomChatName($pdo, $id, $type)
