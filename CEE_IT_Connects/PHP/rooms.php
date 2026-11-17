@@ -163,7 +163,7 @@ $stmt = $pdo->prepare("
 $stmt->execute([$_SESSION['user_id']]);
 $rooms = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-$current_section = $_GET['section'] ?? 'home';
+$current_section = $_GET['section'] ?? ($current_room_id ? 'rooms' : 'home');
 $current_room_id = isset($_GET['room_id']) ? (int) $_GET['room_id'] : null;
 
 // A room link without a section should open the rooms section
@@ -4703,7 +4703,6 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
     </div>
 
     <!-- PROGRESS REPORT SECTION -->
-
     <div class="section <?= $current_section === 'progress_report' ? 'active' : '' ?>">
         <div class="main" style="padding-bottom:60px;">
             <div class="pg-header">
@@ -4764,6 +4763,23 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                 </div>
             </form>
         </div>
+    </div>
+
+    <div id="rooms" class="section <?= $current_section === 'room' ? 'active' : '' ?>">
+        <?php
+        $roomAllowed = false;
+        foreach ($rooms as $r) {
+            if ((int) $r['id'] === (int) $current_room_id) {
+                $roomAllowed = true;
+                break;
+            }
+        }
+        ?>
+        <?php if ($current_room_id && $roomAllowed): ?>
+            <?php include 'chat-room-content.php'; ?>
+        <?php else: ?>
+            <p class="text-muted">Room not found or you don't have access.</p>
+        <?php endif; ?>
     </div>
 
     <!-- ===== OJT COMPLETION EVALUATION MODAL ===== -->
