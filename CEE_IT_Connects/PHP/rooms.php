@@ -3772,17 +3772,18 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
             <hr><br>
             <h6>ROOMS</h6>
             <?php foreach ($rooms as $room): ?>
-                <?php if ($current_room_id == $room['id']): ?>
+                <?php $isActiveRoom = ($current_section === 'rooms' && (int) $current_room_id === (int) $room['id']); ?>
+                <?php if ($isActiveRoom): ?>
                     <div class="room-item active-room" data-tooltip="<?= htmlspecialchars($room['room_name']) ?>">
                         <span class="room-initial"><?= strtoupper(substr(trim($room['room_name']), 0, 1)) ?></span>
-                        <span class="sidebar-text"><?= $room['room_name'] ?></span>
+                        <span class="sidebar-text"><?= htmlspecialchars($room['room_name']) ?></span>
                     </div>
                 <?php else: ?>
-                    <a href="?room_id=<?= $room['id'] ?>" class="room-link"
+                    <a href="?section=room&room_id=<?= (int) $room['id'] ?>" class="room-link"
                         data-tooltip="<?= htmlspecialchars($room['room_name']) ?>">
                         <div class="room-item">
                             <span class="room-initial"><?= strtoupper(substr(trim($room['room_name']), 0, 1)) ?></span>
-                            <span class="sidebar-text"><?= $room['room_name'] ?></span>
+                            <span class="sidebar-text"><?= htmlspecialchars($room['room_name']) ?></span>
                         </div>
                     </a>
                 <?php endif; ?>
@@ -3958,7 +3959,7 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                 <div class="hm-title mt-4 mb-2" style="padding:0 4px;">Your room</div>
                 <div class="hm-rooms">
                     <?php foreach ($rooms as $hmRoom): ?>
-                        <a href="?room_id=<?= (int) $hmRoom['id'] ?>" class="hm-room">
+                        <a href="?section=rooms&room_id=<?= (int) $hmRoom['id'] ?>" class="hm-room">
                             <div class="hm-room-ic"><i class="fa-solid fa-users"></i></div>
                             <div class="hm-room-info">
                                 <strong><?= htmlspecialchars($hmRoom['room_name']) ?></strong>
