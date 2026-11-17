@@ -3779,7 +3779,7 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                         <span class="sidebar-text"><?= htmlspecialchars($room['room_name']) ?></span>
                     </div>
                 <?php else: ?>
-                    <a href="?section=room&room_id=<?= (int) $room['id'] ?>" class="room-link"
+                    <a href="?section=rooms&room_id=<?= (int) $room['id'] ?>" class="room-link"
                         data-tooltip="<?= htmlspecialchars($room['room_name']) ?>">
                         <div class="room-item">
                             <span class="room-initial"><?= strtoupper(substr(trim($room['room_name']), 0, 1)) ?></span>
@@ -4766,7 +4766,8 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
         </div>
     </div>
 
-    <div id="rooms" class="section <?= $current_section === 'room' ? 'active' : '' ?>">
+    <!-- ROOMS SECTION -->
+    <div id="rooms" class="section <?= $current_section === 'rooms' ? 'active' : '' ?>">
         <div class="main">
             <?php
             $roomAllowed = false;
