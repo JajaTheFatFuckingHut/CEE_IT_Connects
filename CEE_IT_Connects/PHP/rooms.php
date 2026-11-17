@@ -4767,20 +4767,22 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
     </div>
 
     <div id="rooms" class="section <?= $current_section === 'room' ? 'active' : '' ?>">
-        <?php
-        $roomAllowed = false;
-        foreach ($rooms as $r) {
-            if ((int) $r['id'] === (int) $current_room_id) {
-                $roomAllowed = true;
-                break;
+        <div class="main">
+            <?php
+            $roomAllowed = false;
+            foreach ($rooms as $r) {
+                if ((int) $r['id'] === (int) $current_room_id) {
+                    $roomAllowed = true;
+                    break;
+                }
             }
-        }
-        ?>
-        <?php if ($current_room_id && $roomAllowed): ?>
-            <?php include 'chat-room-content.php'; ?>
-        <?php else: ?>
-            <p class="text-muted">Room not found or you don't have access.</p>
-        <?php endif; ?>
+            ?>
+            <?php if ($current_room_id && $roomAllowed): ?>
+                <?php include 'chat-room-content.php'; ?>
+            <?php else: ?>
+                <p class="text-muted">Room not found or you don't have access.</p>
+            <?php endif; ?>
+        </div>
     </div>
 
     <!-- ===== OJT COMPLETION EVALUATION MODAL ===== -->
