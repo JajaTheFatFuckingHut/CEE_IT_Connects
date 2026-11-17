@@ -21,13 +21,13 @@ require 'db.php';
 
 // // echo "Passwords updated!";
 
-$id = 16;
+$id = 221;
 $newPassword = "12345";
 
 $hashed = password_hash($newPassword, PASSWORD_DEFAULT);
 
 $update = $pdo->prepare("
-    UPDATE advisers
+    UPDATE students
     SET password_hash = ?
     WHERE id = ?
 ");
