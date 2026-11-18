@@ -11,9 +11,14 @@ if ($role !== 'superadmin') {
     exit();
 }
 // addtl s — admin credentials for sidebar account box
-$adminInfoStmt = $pdo->prepare("SELECT name FROM admins WHERE id = ?");
+// $adminInfoStmt = $pdo->prepare("SELECT name FROM admins WHERE id = ?");
+// $adminInfoStmt->execute([$_SESSION['user_id']]);
+// $adminFullName = $adminInfoStmt->fetchColumn() ?: 'Admin';
+$adminInfoStmt = $pdo->prepare("SELECT name, department FROM admins WHERE id = ?");
 $adminInfoStmt->execute([$_SESSION['user_id']]);
-$adminFullName = $adminInfoStmt->fetchColumn() ?: 'Admin';
+$adminRow = $adminInfoStmt->fetch(PDO::FETCH_ASSOC) ?: [];
+$adminFullName = ($adminRow['name'] ?? '') ?: 'Admin';
+$adminDept = strtolower(trim($adminRow['department'] ?? ''));
 // addtl e
 
 // Read the current state
@@ -403,121 +408,310 @@ $programHoursStmt = $pdo->query("
     ORDER BY program ASC
 ");
 $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
-// ── DASHBOARD ANALYTICS (cards + charts) ──
-// All variables are prefixed "sa" so they can't clash with names used further down the page.
+// addtl s
+// // ── DASHBOARD ANALYTICS (cards + charts) ──
+// // All variables are prefixed "sa" so they can't clash with names used further down the page.
 
-// Supervisor requests by status (already loaded in $supervisorRequests)
-$saReq = ['Pending' => 0, 'Approved' => 0, 'Returned' => 0];
-foreach ($supervisorRequests as $saRq) {
-    if ($saRq['status'] === 'pending') {
-        $saReq['Pending']++;
-    } elseif ($saRq['status'] === 'approved') {
-        $saReq['Approved']++;
-    } elseif ($saRq['status'] === 'rejected') {
-        $saReq['Returned']++;
-    }
-}
-$saPending = $saReq['Pending'];
+// // Supervisor requests by status (already loaded in $supervisorRequests)
+// $saReq = ['Pending' => 0, 'Approved' => 0, 'Returned' => 0];
+// foreach ($supervisorRequests as $saRq) {
+//     if ($saRq['status'] === 'pending') {
+//         $saReq['Pending']++;
+//     } elseif ($saRq['status'] === 'approved') {
+//         $saReq['Approved']++;
+//     } elseif ($saRq['status'] === 'rejected') {
+//         $saReq['Returned']++;
+//     }
+// }
+// $saPending = $saReq['Pending'];
 
-// Active vs. archived accounts
+// // Active vs. archived accounts
+// $saAcc = $pdo->query("
+//     SELECT
+//         (SELECT COUNT(*) FROM students) + (SELECT COUNT(*) FROM advisers) + (SELECT COUNT(*) FROM admins) AS total,
+//         (SELECT COUNT(*) FROM students WHERE is_archived = TRUE)
+//       + (SELECT COUNT(*) FROM advisers WHERE is_archived = TRUE)
+//       + (SELECT COUNT(*) FROM admins   WHERE is_archived = TRUE) AS archived
+// ")->fetch(PDO::FETCH_ASSOC);
+// $saAccTotal = (int) $saAcc['total'];
+// $saArchived = (int) $saAcc['archived'];
+// $saActivePct = $saAccTotal > 0 ? (int) round((($saAccTotal - $saArchived) / $saAccTotal) * 100) : 0;
+
+// // System admin seats (the 3-admin limit is the same one enforced in the role-update form above)
+// $saSeatMax = 3;
+// $saSeatsUsed = count(array_filter($admins, fn($a) => $a['role'] === 'superadmin'));
+// $saSeatsOpen = max(0, $saSeatMax - $saSeatsUsed);
+
+// // Accounts by role (active accounts only)
+// $saRoleRows = $pdo->query("
+//     SELECT 'Students' AS label, COUNT(*) AS total FROM students
+//         WHERE COALESCE(is_archived, FALSE) = FALSE
+//     UNION ALL
+//     SELECT 'HTE Advisers', COUNT(*) FROM advisers
+//         WHERE LOWER(role::text) = 'hte_adviser' AND COALESCE(is_archived, FALSE) = FALSE
+//     UNION ALL
+//     SELECT 'Internship Advisers', COUNT(*) FROM advisers
+//         WHERE LOWER(role::text) = 'internship_adviser' AND COALESCE(is_archived, FALSE) = FALSE
+//     UNION ALL
+//     SELECT 'Admins', COUNT(*) FROM admins
+//         WHERE COALESCE(is_archived, FALSE) = FALSE
+// ")->fetchAll(PDO::FETCH_KEY_PAIR);
+// $saRoleCounts = [
+//     'Students' => (int) ($saRoleRows['Students'] ?? 0),
+//     'HTE Advisers' => (int) ($saRoleRows['HTE Advisers'] ?? 0),
+//     'Internship Advisers' => (int) ($saRoleRows['Internship Advisers'] ?? 0),
+//     'Admins' => (int) ($saRoleRows['Admins'] ?? 0),
+// ];
+
+// // Students by program (active students only)
+// $saProgRows = $pdo->query("
+//     SELECT LOWER(TRIM(program)) AS program, COUNT(*) AS total
+//     FROM students
+//     WHERE program IS NOT NULL AND TRIM(program) <> '' AND COALESCE(is_archived, FALSE) = FALSE
+//     GROUP BY LOWER(TRIM(program))
+//     ORDER BY total DESC
+// ")->fetchAll(PDO::FETCH_ASSOC);
+// $saProgColorMap = [
+//     'information technology' => '#29335C',
+//     'civil engineering' => '#E4572E',
+//     'electrical engineering' => '#f2b705',
+// ];
+// $saProgLabels = [];
+// $saProgData = [];
+// $saProgColors = [];
+// foreach ($saProgRows as $saP) {
+//     $saProgLabels[] = deptCode($saP['program']);
+//     $saProgData[] = (int) $saP['total'];
+//     $saProgColors[] = $saProgColorMap[$saP['program']] ?? '#6b7280';
+// }
+
+// // System activity per day, last 14 days
+// $saActStmt = $pdo->query("
+//     SELECT activity_date::date AS day, COUNT(*) AS total
+//     FROM audits
+//     WHERE activity_date >= (CURRENT_DATE - INTERVAL '13 days')
+//     GROUP BY activity_date::date
+// ");
+// $saActByDay = [];
+// foreach ($saActStmt->fetchAll(PDO::FETCH_ASSOC) as $saR) {
+//     $saActByDay[$saR['day']] = (int) $saR['total'];
+// }
+// $saTrendLabels = [];
+// $saTrendData = [];
+// for ($saT = 13; $saT >= 0; $saT--) {
+//     $saKey = date('Y-m-d', strtotime("-{$saT} days"));
+//     $saTrendLabels[] = date('M j', strtotime($saKey));
+//     $saTrendData[] = $saActByDay[$saKey] ?? 0;
+// }
+
+// // Activity by role, last 14 days
+// $saRoleActRows = $pdo->query("
+//     SELECT LOWER(roles) AS role, COUNT(*) AS total
+//     FROM audits
+//     WHERE activity_date >= (CURRENT_DATE - INTERVAL '13 days')
+//     GROUP BY LOWER(roles)
+//     ORDER BY total DESC
+// ")->fetchAll(PDO::FETCH_ASSOC);
+// $saRoleActLabels = [];
+// $saRoleActData = [];
+// foreach ($saRoleActRows as $saRa) {
+//     if ($saRa['role'] === 'superadmin') {
+//         $saRoleActLabels[] = 'System Admin';
+//     } elseif ($saRa['role'] === 'hte_adviser') {
+//         $saRoleActLabels[] = 'HTE Adviser';
+//     } else {
+//         $saRoleActLabels[] = ucwords(str_replace('_', ' ', $saRa['role']));
+//     }
+//     $saRoleActData[] = (int) $saRa['total'];
+// }
+// ── DASHBOARD ANALYTICS (scoped to the logged-in admin's department) ──
+$saDept      = $adminDept;
+$saDeptQ     = $pdo->quote($saDept);           // safely quoted for the queries below
+$saDeptLabel = $saDept !== '' ? ucwords($saDept) : '';
+
+// Card: internships in this department's program
+$totalInternships = (int) $pdo->query("
+    SELECT COUNT(*) FROM internships WHERE LOWER(TRIM(program)) = $saDeptQ
+")->fetchColumn();
+
+// Card: accounts in this department (students + advisers + admins), active vs archived
 $saAcc = $pdo->query("
     SELECT
-        (SELECT COUNT(*) FROM students) + (SELECT COUNT(*) FROM advisers) + (SELECT COUNT(*) FROM admins) AS total,
-        (SELECT COUNT(*) FROM students WHERE is_archived = TRUE)
-      + (SELECT COUNT(*) FROM advisers WHERE is_archived = TRUE)
-      + (SELECT COUNT(*) FROM admins   WHERE is_archived = TRUE) AS archived
+        (SELECT COUNT(*) FROM students WHERE LOWER(TRIM(program))    = $saDeptQ)
+      + (SELECT COUNT(*) FROM advisers WHERE LOWER(TRIM(department)) = $saDeptQ)
+      + (SELECT COUNT(*) FROM admins   WHERE LOWER(TRIM(department)) = $saDeptQ) AS total,
+        (SELECT COUNT(*) FROM students WHERE LOWER(TRIM(program))    = $saDeptQ AND COALESCE(is_archived, FALSE) = TRUE)
+      + (SELECT COUNT(*) FROM advisers WHERE LOWER(TRIM(department)) = $saDeptQ AND COALESCE(is_archived, FALSE) = TRUE)
+      + (SELECT COUNT(*) FROM admins   WHERE LOWER(TRIM(department)) = $saDeptQ AND COALESCE(is_archived, FALSE) = TRUE) AS archived
 ")->fetch(PDO::FETCH_ASSOC);
-$saAccTotal = (int) $saAcc['total'];
-$saArchived = (int) $saAcc['archived'];
+$saAccTotal  = (int) $saAcc['total'];
+$saArchived  = (int) $saAcc['archived'];
 $saActivePct = $saAccTotal > 0 ? (int) round((($saAccTotal - $saArchived) / $saAccTotal) * 100) : 0;
 
-// System admin seats (the 3-admin limit is the same one enforced in the role-update form above)
-$saSeatMax = 3;
-$saSeatsUsed = count(array_filter($admins, fn($a) => $a['role'] === 'superadmin'));
-$saSeatsOpen = max(0, $saSeatMax - $saSeatsUsed);
-
-// Accounts by role (active accounts only)
+// Accounts by role (active only, this department). Also feeds the OJT / HTE adviser cards.
 $saRoleRows = $pdo->query("
     SELECT 'Students' AS label, COUNT(*) AS total FROM students
-        WHERE COALESCE(is_archived, FALSE) = FALSE
+        WHERE LOWER(TRIM(program)) = $saDeptQ AND COALESCE(is_archived, FALSE) = FALSE
     UNION ALL
     SELECT 'HTE Advisers', COUNT(*) FROM advisers
-        WHERE LOWER(role::text) = 'hte_adviser' AND COALESCE(is_archived, FALSE) = FALSE
+        WHERE LOWER(role::text) = 'hte_adviser' AND LOWER(TRIM(department)) = $saDeptQ
+          AND COALESCE(is_archived, FALSE) = FALSE
     UNION ALL
     SELECT 'Internship Advisers', COUNT(*) FROM advisers
-        WHERE LOWER(role::text) = 'internship_adviser' AND COALESCE(is_archived, FALSE) = FALSE
+        WHERE LOWER(role::text) = 'internship_adviser' AND LOWER(TRIM(department)) = $saDeptQ
+          AND COALESCE(is_archived, FALSE) = FALSE
     UNION ALL
     SELECT 'Admins', COUNT(*) FROM admins
-        WHERE COALESCE(is_archived, FALSE) = FALSE
+        WHERE LOWER(TRIM(department)) = $saDeptQ AND COALESCE(is_archived, FALSE) = FALSE
 ")->fetchAll(PDO::FETCH_KEY_PAIR);
 $saRoleCounts = [
-    'Students' => (int) ($saRoleRows['Students'] ?? 0),
-    'HTE Advisers' => (int) ($saRoleRows['HTE Advisers'] ?? 0),
+    'Students'            => (int) ($saRoleRows['Students'] ?? 0),
+    'HTE Advisers'        => (int) ($saRoleRows['HTE Advisers'] ?? 0),
     'Internship Advisers' => (int) ($saRoleRows['Internship Advisers'] ?? 0),
-    'Admins' => (int) ($saRoleRows['Admins'] ?? 0),
+    'Admins'              => (int) ($saRoleRows['Admins'] ?? 0),
 ];
 
-// Students by program (active students only)
-$saProgRows = $pdo->query("
-    SELECT LOWER(TRIM(program)) AS program, COUNT(*) AS total
-    FROM students
-    WHERE program IS NOT NULL AND TRIM(program) <> '' AND COALESCE(is_archived, FALSE) = FALSE
-    GROUP BY LOWER(TRIM(program))
-    ORDER BY total DESC
-")->fetchAll(PDO::FETCH_ASSOC);
-$saProgColorMap = [
-    'information technology' => '#29335C',
-    'civil engineering' => '#E4572E',
-    'electrical engineering' => '#f2b705',
-];
-$saProgLabels = [];
-$saProgData = [];
-$saProgColors = [];
-foreach ($saProgRows as $saP) {
-    $saProgLabels[] = deptCode($saP['program']);
-    $saProgData[] = (int) $saP['total'];
-    $saProgColors[] = $saProgColorMap[$saP['program']] ?? '#6b7280';
-}
-
-// System activity per day, last 14 days
+// System activity per day, last 14 days — only actions done by users of this department
 $saActStmt = $pdo->query("
-    SELECT activity_date::date AS day, COUNT(*) AS total
-    FROM audits
-    WHERE activity_date >= (CURRENT_DATE - INTERVAL '13 days')
-    GROUP BY activity_date::date
+    WITH u AS (
+        SELECT id, 'student' AS role, LOWER(TRIM(program)) AS dept FROM students
+        UNION ALL
+        SELECT id, LOWER(role::text), LOWER(TRIM(department)) FROM admins
+        UNION ALL
+        SELECT id, LOWER(role::text), LOWER(TRIM(department)) FROM advisers
+    )
+    SELECT a.activity_date::date AS day, COUNT(*) AS total
+    FROM audits a
+    JOIN u ON a.user_id = u.id AND LOWER(a.roles) = u.role
+    WHERE u.dept = $saDeptQ
+      AND a.activity_date >= (CURRENT_DATE - INTERVAL '13 days')
+    GROUP BY a.activity_date::date
 ");
 $saActByDay = [];
 foreach ($saActStmt->fetchAll(PDO::FETCH_ASSOC) as $saR) {
     $saActByDay[$saR['day']] = (int) $saR['total'];
 }
 $saTrendLabels = [];
-$saTrendData = [];
+$saTrendData   = [];
 for ($saT = 13; $saT >= 0; $saT--) {
     $saKey = date('Y-m-d', strtotime("-{$saT} days"));
     $saTrendLabels[] = date('M j', strtotime($saKey));
-    $saTrendData[] = $saActByDay[$saKey] ?? 0;
+    $saTrendData[]   = $saActByDay[$saKey] ?? 0;
 }
 
-// Activity by role, last 14 days
-$saRoleActRows = $pdo->query("
-    SELECT LOWER(roles) AS role, COUNT(*) AS total
-    FROM audits
-    WHERE activity_date >= (CURRENT_DATE - INTERVAL '13 days')
-    GROUP BY LOWER(roles)
-    ORDER BY total DESC
-")->fetchAll(PDO::FETCH_ASSOC);
-$saRoleActLabels = [];
-$saRoleActData = [];
-foreach ($saRoleActRows as $saRa) {
-    if ($saRa['role'] === 'superadmin') {
-        $saRoleActLabels[] = 'System Admin';
-    } elseif ($saRa['role'] === 'hte_adviser') {
-        $saRoleActLabels[] = 'HTE Adviser';
-    } else {
-        $saRoleActLabels[] = ucwords(str_replace('_', ' ', $saRa['role']));
+// Sections for the selected term (school year) whose adviser belongs to this department,
+// with the students enrolled in each section's room.
+$saSections = [];
+$secStmt = $pdo->prepare("
+    SELECT r.id AS room_id, r.year_level, r.section, a.full_name AS adviser_name,
+           s.id AS student_id, s.full_name AS student_name
+    FROM rooms r
+    JOIN advisers a ON a.id = r.adviser_id
+    LEFT JOIN room_members rm ON rm.room_id = r.id AND rm.user_type = 'student'
+    LEFT JOIN students s ON s.id = rm.user_id AND COALESCE(s.is_archived, FALSE) = FALSE
+    WHERE COALESCE(r.is_archived, FALSE) = FALSE
+      AND r.school_year = ?
+      AND r.section IS NOT NULL AND r.section <> '' AND r.year_level IS NOT NULL
+      AND LOWER(TRIM(a.department)) = $saDeptQ
+    ORDER BY r.year_level, r.section, s.full_name
+");
+$secStmt->execute([$schoolYear]);
+$saStudentIds = [];
+foreach ($secStmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
+    $rid = $r['room_id'];
+    if (!isset($saSections[$rid])) {
+        $saSections[$rid] = [
+            'label'    => "Year {$r['year_level']} - Section {$r['section']}",
+            'adviser'  => $r['adviser_name'],
+            'students' => [],   // student_id => name
+        ];
     }
-    $saRoleActData[] = (int) $saRa['total'];
+    if ($r['student_id'] !== null) {
+        $saSections[$rid]['students'][(int) $r['student_id']] = $r['student_name'];
+        $saStudentIds[(int) $r['student_id']] = true;
+    }
 }
+$saStudentIds = array_keys($saStudentIds);
+
+// ── DOCUMENTS (from student_progress: student_id, step_key, is_done) ──────
+// Optional: list the step_key values that count as documents, e.g. ['mou', 'waiver'].
+// Leave it empty to count every step_key found in student_progress.
+$saDocSteps = [];
+
+$saDocTypes  = [];   // step_key => display label
+$saSubmitted = [];   // student_id => [step_key => true]  (only rows where is_done = TRUE)
+$saDocError  = false;
+try {
+    $allKeys = $pdo->query("
+        SELECT DISTINCT step_key FROM student_progress ORDER BY step_key
+    ")->fetchAll(PDO::FETCH_COLUMN);
+    foreach ($allKeys as $k) {
+        if ($saDocSteps && !in_array($k, $saDocSteps, true)) {
+            continue;
+        }
+        // "mou" -> "MOU", "company_profile" -> "Company Profile"
+        $saDocTypes[$k] = strlen($k) <= 4 ? strtoupper($k) : ucwords(str_replace('_', ' ', $k));
+    }
+
+    if ($saDocTypes && $saStudentIds) {
+        $idList = implode(',', array_map('intval', $saStudentIds));
+        $subRows = $pdo->query("
+            SELECT student_id, step_key
+            FROM student_progress
+            WHERE is_done = TRUE AND student_id IN ($idList)
+        ")->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($subRows as $sr) {
+            $saSubmitted[$sr['student_id']][$sr['step_key']] = true;
+        }
+    }
+} catch (PDOException $e) {
+    $saDocError = true;
+    $saDocTypes = [];
+}
+
+// Documents by type: submitted vs. not submitted across this term's students
+$saTypeStats = [];
+foreach ($saDocTypes as $tid => $tname) {
+    $sub = 0;
+    foreach ($saStudentIds as $sid) {
+        if (isset($saSubmitted[$sid][$tid])) {
+            $sub++;
+        }
+    }
+    $saTypeStats[$tname] = ['submitted' => $sub, 'total' => count($saStudentIds)];
+}
+
+// Per section + per student document status, and the follow-up list
+$saFollow = [];
+foreach ($saSections as $rid => $sec) {
+    $slots = 0;
+    $done  = 0;
+    $rows  = [];
+    foreach ($sec['students'] as $sid => $sname) {
+        $docs = [];
+        $miss = [];
+        foreach ($saDocTypes as $tid => $tname) {
+            $slots++;
+            $ok = isset($saSubmitted[$sid][$tid]);
+            $docs[$tname] = $ok;
+            if ($ok) {
+                $done++;
+            } else {
+                $miss[] = $tname;
+            }
+        }
+        $rows[$sid] = ['name' => $sname, 'docs' => $docs];
+        if ($miss) {
+            $saFollow[] = ['name' => $sname, 'section' => $sec['label'], 'missing' => $miss];
+        }
+    }
+    $saSections[$rid]['rows']  = $rows;
+    $saSections[$rid]['slots'] = $slots;
+    $saSections[$rid]['done']  = $done;
+    $saSections[$rid]['pct']   = $slots > 0 ? (int) round($done / $slots * 100) : 0;
+}
+usort($saFollow, fn($a, $b) => count($b['missing']) <=> count($a['missing']));
+// addtl e
 function deptCode($department)
 {
     $department = strtolower(trim($department));
@@ -1862,9 +2056,33 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                     }
                 </style>
 
+                <!-- addtl s : docs - sys ad tab -->
+                <?php if ($saDept === ''): ?>
+                    <div class="alert alert-warning small">
+                        Your account has no department set, so no department data can be shown.
+                    </div>
+                <?php endif; ?>
+
+                <!-- 1. TERM -->
+                <form method="GET" class="d-flex align-items-center flex-wrap gap-2 mb-4">
+                    <label for="saTermSelect" class="fw-semibold small mb-0" style="color:#272f54;">
+                        <i class="bi bi-calendar3 me-1"></i> Term
+                    </label>
+                    <select id="saTermSelect" name="sy" class="sa-field" onchange="this.form.submit()">
+                        <?php foreach ($schoolYearOptions as $opt): ?>
+                            <option value="<?= htmlspecialchars($opt) ?>" <?= $opt === $schoolYear ? 'selected' : '' ?>>
+                                S.Y. <?= htmlspecialchars($opt) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <?php if ($saDeptLabel !== ''): ?>
+                        <span class="badge rounded-pill px-3 ojtc-badge-default"><?= htmlspecialchars($saDeptLabel) ?></span>
+                    <?php endif; ?>
+                </form>
+
+                <!-- 2. CARDS -->
                 <div class="row g-3 mb-4">
-                    <!-- INTERNSHIPS (blue, unchanged) -->
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <div class="card border-0 rounded-4 h-100 ojtc-stat-card" style="background:#EEF3FF;">
                             <div class="card-body p-4">
                                 <div class="d-flex flex-wrap align-items-center gap-3">
@@ -1874,19 +2092,16 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                                     </div>
                                     <div class="flex-grow-1" style="min-width:90px;">
                                         <p class="small mb-1 fw-semibold text-uppercase"
-                                            style="letter-spacing:.05em; font-size:11px; color:#272f54;">Internships</p>
-                                        <h2 class="fw-bold mb-0" style="color:#272f54;"><?= (int) $totalInternships ?>
-                                        </h2>
+                                            style="letter-spacing:.05em;font-size:11px;color:#272f54;">Internships</p>
+                                        <h2 class="fw-bold mb-0" style="color:#272f54;"><?= (int) $totalInternships ?></h2>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- ACCOUNTS + ACTIVE ACCOUNTS (merged, orange) -->
-                    <div class="col-md-4">
-                        <div class="card border-0 rounded-4 h-100 ojtc-stat-card" data-go="restore"
-                            style="background:#FDEEE8;">
+                    <div class="col-md-3">
+                        <div class="card border-0 rounded-4 h-100 ojtc-stat-card" data-go="restore" style="background:#FDEEE8;">
                             <div class="card-body p-4">
                                 <div class="d-flex flex-wrap align-items-center gap-3">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0"
@@ -1896,7 +2111,7 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                                     <div class="flex-grow-1" style="min-width:90px;">
                                         <p class="small mb-1 fw-semibold text-uppercase"
                                             style="letter-spacing:.05em;font-size:11px;color:#a13d1f;">Accounts</p>
-                                        <h2 class="fw-bold mb-0" style="color:#a13d1f;"><?= (int) $totalAccounts ?></h2>
+                                        <h2 class="fw-bold mb-0" style="color:#a13d1f;"><?= (int) $saAccTotal ?></h2>
                                         <p class="mb-0 mt-1 d-none d-md-block" style="font-size:11px;color:#a13d1f;">
                                             <?= $saActivePct ?>% active &middot; <?= (int) $saArchived ?> archived
                                         </p>
@@ -1906,26 +2121,36 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                         </div>
                     </div>
 
-                    <!-- SYSTEM ADMIN SEATS (yellow) -->
-                    <div class="col-md-4">
-                        <div class="card border-0 rounded-4 h-100 ojtc-stat-card" data-go="roles"
-                            style="background:#FFF6E3;">
+                    <div class="col-md-3">
+                        <div class="card border-0 rounded-4 h-100 ojtc-stat-card" data-go="assign_adviser" style="background:#FFF6E3;">
                             <div class="card-body p-4">
                                 <div class="d-flex flex-wrap align-items-center gap-3">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0"
                                         style="width:44px;height:44px;background:#FFB62F;">
-                                        <i class="bi bi-shield-lock-fill fs-5" style="color:#3b2600;"></i>
+                                        <i class="bi bi-person-badge-fill fs-5" style="color:#3b2600;"></i>
                                     </div>
                                     <div class="flex-grow-1" style="min-width:90px;">
                                         <p class="small mb-1 fw-semibold text-uppercase"
-                                            style="letter-spacing:.05em;font-size:11px;color:#7a5200;">System Admin
-                                            Seats</p>
-                                        <h2 class="fw-bold mb-0" style="color:#3b2600;">
-                                            <?= (int) $saSeatsUsed ?> of <?= (int) $saSeatMax ?>
-                                        </h2>
-                                        <p class="mb-0 mt-1 d-none d-md-block" style="font-size:11px;color:#7a5200;">
-                                            <?= (int) $saSeatsOpen ?> open
-                                        </p>
+                                            style="letter-spacing:.05em;font-size:11px;color:#7a5200;">OJT Advisers</p>
+                                        <h2 class="fw-bold mb-0" style="color:#3b2600;"><?= (int) $saRoleCounts['Internship Advisers'] ?></h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="card border-0 rounded-4 h-100 ojtc-stat-card" data-go="roles" style="background:#EAF7F1;">
+                            <div class="card-body p-4">
+                                <div class="d-flex flex-wrap align-items-center gap-3">
+                                    <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0"
+                                        style="width:44px;height:44px;background:#1D9E75;">
+                                        <i class="bi bi-building-fill text-white fs-5"></i>
+                                    </div>
+                                    <div class="flex-grow-1" style="min-width:90px;">
+                                        <p class="small mb-1 fw-semibold text-uppercase"
+                                            style="letter-spacing:.05em;font-size:11px;color:#14614a;">HTE Advisers</p>
+                                        <h2 class="fw-bold mb-0" style="color:#0f4a38;"><?= (int) $saRoleCounts['HTE Advisers'] ?></h2>
                                     </div>
                                 </div>
                             </div>
@@ -1933,12 +2158,9 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                     </div>
                 </div>
 
-                <!-- Recent Internship Postings -->
-                <!-- ADMIN SUMMARY CARDS -->
-
-                <!-- ANALYTICS CHARTS -->
+                <!-- 3. ACCOUNTS BY ROLE + SYSTEM ACTIVITY -->
                 <div class="row g-4 mb-4">
-                    <div class="col-12 col-md-6 col-xl-6">
+                    <div class="col-12 col-lg-5">
                         <div class="card border-0 rounded-4 shadow-sm h-100 ojtc-stat-card" data-go="roles">
                             <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
                                 <i class="bi bi-pie-chart" style="color:#272f54;"></i>
@@ -1950,35 +2172,7 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                             </div>
                         </div>
                     </div>
-
-                    <!-- <div class="col-12 col-md-6 col-xl-4">
-                        <div class="card border-0 rounded-4 shadow-sm h-100 ojtc-stat-card" data-go="supervisor_requests">
-                            <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
-                                <i class="bi bi-person-check" style="color:#272f54;"></i>
-                                <h6 class="fw-bold mb-0" style="color:#272f54;">Supervisor Requests</h6>
-                            </div>
-                            <div class="card-body px-4 pb-4 pt-2">
-                                <p class="text-muted small mb-3">Pending, approved, and returned.</p>
-                                <div style="position:relative; height:220px;"><canvas id="saReqChart"></canvas></div>
-                            </div>
-                        </div>
-                    </div> -->
-
-                    <div class="col-12 col-md-6 col-xl-6">
-                        <div class="card border-0 rounded-4 shadow-sm h-100 ojtc-stat-card" data-go="student_register">
-                            <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
-                                <i class="bi bi-bar-chart" style="color:#272f54;"></i>
-                                <h6 class="fw-bold mb-0" style="color:#272f54;">Students by Program</h6>
-                            </div>
-                            <div class="card-body px-4 pb-4 pt-2">
-                                <p class="text-muted small mb-3">Active students per program.</p>
-                                <div style="position:relative; height:220px;"><canvas id="saProgramChart"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-12 col-xl-8">
+                    <div class="col-12 col-lg-7">
                         <div class="card border-0 rounded-4 shadow-sm h-100 ojtc-stat-card" data-go="monitor">
                             <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
                                 <i class="bi bi-graph-up" style="color:#272f54;"></i>
@@ -1986,63 +2180,179 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                             </div>
                             <div class="card-body px-4 pb-4 pt-2">
                                 <p class="text-muted small mb-3">Logged actions per day, last 14 days.</p>
-                                <div style="position:relative; height:220px;"><canvas id="saActivityChart"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-12 col-xl-4">
-                        <div class="card border-0 rounded-4 shadow-sm h-100 ojtc-stat-card" data-go="monitor">
-                            <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
-                                <i class="bi bi-people" style="color:#272f54;"></i>
-                                <h6 class="fw-bold mb-0" style="color:#272f54;">Activity by Role</h6>
-                            </div>
-                            <div class="card-body px-4 pb-4 pt-2">
-                                <p class="text-muted small mb-3">Who is using the system, last 14 days.</p>
-                                <div style="position:relative; height:220px;"><canvas id="saRoleActChart"></canvas>
-                                </div>
+                                <div style="position:relative; height:220px;"><canvas id="saActivityChart"></canvas></div>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <!-- 4. DOCUMENTS PASSED BY TYPE -->
                 <div class="card border-0 rounded-4 shadow-sm mb-4">
                     <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
-                        <i class="bi bi-briefcase" style="color:#272f54;"></i>
-                        <h6 class="fw-bold mb-0" style="color:#272f54;">Recent Internship Postings</h6>
+                        <i class="bi bi-file-earmark-check" style="color:#272f54;"></i>
+                        <h6 class="fw-bold mb-0" style="color:#272f54;">Documents Passed by Type</h6>
                     </div>
                     <div class="card-body px-4 pb-4 pt-2">
-                        <?php if (empty($recentInternships)): ?>
-                            <p class="text-muted small mb-0">No internships posted yet.</p>
+                        <p class="text-muted small mb-3">Students who submitted each document, S.Y. <?= htmlspecialchars($schoolYear) ?>.</p>
+                        <?php if ($saDocError): ?>
+                            <p class="text-muted small mb-0">Document data could not be loaded.</p>
+                        <?php elseif (empty($saTypeStats) || empty($saStudentIds)): ?>
+                            <p class="text-muted small mb-0">No document data for this term yet.</p>
+                        <?php else: ?>
+                            <?php foreach ($saTypeStats as $tname => $ts):
+                                $subPct = $ts['total'] > 0 ? $ts['submitted'] / $ts['total'] * 100 : 0; ?>
+                                <div class="d-flex align-items-center gap-3 mb-2">
+                                    <span class="small fw-semibold" style="width:170px;color:#272f54;"><?= htmlspecialchars($tname) ?></span>
+                                    <div class="progress flex-grow-1" style="height:10px;">
+                                        <div class="progress-bar" style="width:<?= $subPct ?>%;background:#1D9E75;"></div>
+                                        <div class="progress-bar" style="width:<?= 100 - $subPct ?>%;background:#dee2e6;"></div>
+                                    </div>
+                                    <span class="small text-muted text-end" style="width:64px;"><?= (int) $ts['submitted'] ?>/<?= (int) $ts['total'] ?></span>
+                                </div>
+                            <?php endforeach; ?>
+                            <div class="d-flex gap-3 mt-3 small text-muted">
+                                <span><i class="bi bi-square-fill me-1" style="color:#1D9E75;"></i>Submitted</span>
+                                <span><i class="bi bi-square-fill me-1" style="color:#dee2e6;"></i>Not submitted</span>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+                <!-- 5. STUDENTS PER SECTION (+ documents each student submitted) -->
+                <div class="card border-0 rounded-4 shadow-sm mb-4">
+                    <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
+                        <i class="bi bi-diagram-3" style="color:#272f54;"></i>
+                        <h6 class="fw-bold mb-0" style="color:#272f54;">Students per Section</h6>
+                    </div>
+                    <div class="card-body px-4 pb-4 pt-2">
+                        <p class="text-muted small mb-3">Term, section, adviser, and the documents each student submitted. Open a section to see them.</p>
+                        <?php if (empty($saSections)): ?>
+                            <p class="text-muted small mb-0">No sections with an assigned adviser for this term.</p>
                         <?php else: ?>
                             <div class="table-responsive">
-                                <table id="table-internships" class="table table-hover align-middle mb-0"
-                                    style="font-size:14px;">
+                                <table class="table align-middle mb-0" style="font-size:14px;">
                                     <thead>
-                                        <!-- CHANGED: added ojtc-th-tab class for the subtle blue column-header
-                                             indicator. No data/columns removed, inline styles kept. -->
-                                        <tr
-                                            style="color:#aaa;font-size:12px;text-transform:uppercase;letter-spacing:.04em;">
-                                            <th class="border-0 pb-2 fw-semibold ojtc-th-tab">Title</th>
-                                            <th class="border-0 pb-2 fw-semibold ojtc-th-tab">Company</th>
-                                            <th class="border-0 pb-2 fw-semibold ojtc-th-tab">Location</th>
-                                            <th class="border-0 pb-2 fw-semibold ojtc-th-tab">Posted</th>
+                                        <tr style="color:#aaa;font-size:12px;text-transform:uppercase;letter-spacing:.04em;">
+                                            <th class="border-0 pb-2 fw-semibold ojtc-th-tab">Section</th>
+                                            <th class="border-0 pb-2 fw-semibold ojtc-th-tab">Term</th>
+                                            <th class="border-0 pb-2 fw-semibold ojtc-th-tab">Adviser</th>
+                                            <th class="border-0 pb-2 fw-semibold ojtc-th-tab">Students</th>
+                                            <th class="border-0 pb-2 fw-semibold ojtc-th-tab">Documents submitted</th>
+                                            <th class="border-0 pb-2 fw-semibold ojtc-th-tab"></th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <?php foreach ($recentInternships as $ri): ?>
+                                        <?php foreach ($saSections as $rid => $sec): ?>
                                             <tr>
-                                                <td class="fw-semibold" style="color:#272f54;">
-                                                    <?= htmlspecialchars($ri['title']) ?>
+                                                <td class="fw-semibold" style="color:#272f54;"><?= htmlspecialchars($sec['label']) ?></td>
+                                                <td class="text-muted">S.Y. <?= htmlspecialchars($schoolYear) ?></td>
+                                                <td><?= htmlspecialchars($sec['adviser']) ?></td>
+                                                <td><?= count($sec['students']) ?></td>
+                                                <td>
+                                                    <?php if ($sec['slots'] > 0): ?>
+                                                        <?= (int) $sec['done'] ?>/<?= (int) $sec['slots'] ?>
+                                                        <span class="text-muted">(<?= (int) $sec['pct'] ?>%)</span>
+                                                    <?php else: ?>
+                                                        <span class="text-muted">&mdash;</span>
+                                                    <?php endif; ?>
                                                 </td>
-                                                <td><?= htmlspecialchars($ri['company']) ?></td>
-                                                <td class="text-muted"><i
-                                                        class="bi bi-geo-alt me-1"></i><?= htmlspecialchars($ri['location']) ?>
+                                                <td class="text-end">
+                                                    <?php if (!empty($sec['students'])): ?>
+                                                        <button type="button" class="btn-update" style="padding:6px 12px;font-size:12px;"
+                                                            data-bs-toggle="collapse" data-bs-target="#saSec<?= (int) $rid ?>">
+                                                            <i class="bi bi-chevron-down me-1"></i> Students
+                                                        </button>
+                                                    <?php endif; ?>
                                                 </td>
-                                                <!-- CHANGED: removed the highlighted pill background on the
-                                                     Posted date, now plain muted text as requested. -->
-                                                <td class="text-muted" style="font-size:13px;">
-                                                    <?= date("M d, Y", strtotime($ri['created_at'])) ?>
+                                            </tr>
+                                            <?php if (!empty($sec['students'])): ?>
+                                                <tr id="saSec<?= (int) $rid ?>" class="collapse">
+                                                    <td colspan="6" class="bg-light">
+                                                        <?php foreach ($sec['rows'] as $stu): ?>
+                                                            <div class="d-flex flex-wrap align-items-center gap-2 py-2">
+                                                                <span class="fw-semibold small" style="width:200px;color:#272f54;">
+                                                                    <?= htmlspecialchars($stu['name']) ?>
+                                                                </span>
+                                                                <?php if (empty($stu['docs'])): ?>
+                                                                    <span class="text-muted small">No required documents listed.</span>
+                                                                <?php endif; ?>
+                                                                <?php foreach ($stu['docs'] as $dname => $ok): ?>
+                                                                    <span class="badge rounded-pill px-3"
+                                                                        style="font-weight:500;font-size:12px;background:<?= $ok ? '#e6f4ea' : '#fdeaea' ?>;color:<?= $ok ? '#1b7a3d' : '#a32d2d' ?>;">
+                                                                        <i class="bi <?= $ok ? 'bi-check-circle-fill' : 'bi-x-circle-fill' ?> me-1"></i><?= htmlspecialchars($dname) ?>
+                                                                    </span>
+                                                                <?php endforeach; ?>
+                                                            </div>
+                                                        <?php endforeach; ?>
+                                                    </td>
+                                                </tr>
+                                            <?php endif; ?>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+                <!-- 6. DOCUMENTS PASSED BY SECTION -->
+                <div class="card border-0 rounded-4 shadow-sm mb-4">
+                    <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
+                        <i class="bi bi-bar-chart-steps" style="color:#272f54;"></i>
+                        <h6 class="fw-bold mb-0" style="color:#272f54;">Documents Passed by Section</h6>
+                    </div>
+                    <div class="card-body px-4 pb-4 pt-2">
+                        <p class="text-muted small mb-3">Share of required documents submitted in each section.</p>
+                        <?php
+                        $saSecWithDocs = array_filter($saSections, fn($s) => $s['slots'] > 0);
+                        if (empty($saSecWithDocs)): ?>
+                            <p class="text-muted small mb-0">No document data for this term yet.</p>
+                        <?php else: ?>
+                            <?php foreach ($saSecWithDocs as $sec): ?>
+                                <div class="d-flex align-items-center gap-3 mb-2">
+                                    <span class="small fw-semibold" style="width:170px;color:#272f54;"><?= htmlspecialchars($sec['label']) ?></span>
+                                    <div class="progress flex-grow-1" style="height:10px;">
+                                        <div class="progress-bar" style="width:<?= (int) $sec['pct'] ?>%;background:#E4572E;"></div>
+                                    </div>
+                                    <span class="small text-muted text-end" style="width:64px;"><?= (int) $sec['pct'] ?>%</span>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+                <!-- 7. NEEDS FOLLOW-UP -->
+                <div class="card border-0 rounded-4 shadow-sm mb-4">
+                    <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
+                        <i class="bi bi-exclamation-circle" style="color:#272f54;"></i>
+                        <h6 class="fw-bold mb-0" style="color:#272f54;">Needs Follow-up</h6>
+                    </div>
+                    <div class="card-body px-4 pb-4 pt-2">
+                        <p class="text-muted small mb-3">Students with documents not yet submitted, most missing first.</p>
+                        <?php if (empty($saFollow)): ?>
+                            <p class="text-muted small mb-0">No students need follow-up.</p>
+                        <?php else: ?>
+                            <div class="table-responsive" style="max-height:340px;overflow-y:auto;">
+                                <table class="table table-hover align-middle mb-0" style="font-size:14px;">
+                                    <thead>
+                                        <tr style="color:#aaa;font-size:12px;text-transform:uppercase;letter-spacing:.04em;">
+                                            <th class="border-0 pb-2 fw-semibold ojtc-th-tab">Student</th>
+                                            <th class="border-0 pb-2 fw-semibold ojtc-th-tab">Section</th>
+                                            <th class="border-0 pb-2 fw-semibold ojtc-th-tab">Not submitted</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($saFollow as $f): ?>
+                                            <tr>
+                                                <td class="fw-semibold" style="color:#272f54;"><?= htmlspecialchars($f['name']) ?></td>
+                                                <td class="text-muted"><?= htmlspecialchars($f['section']) ?></td>
+                                                <td>
+                                                    <?php foreach ($f['missing'] as $m): ?>
+                                                        <span class="badge rounded-pill px-3 me-1"
+                                                            style="font-weight:500;font-size:12px;background:#fdeaea;color:#a32d2d;">
+                                                            <?= htmlspecialchars($m) ?>
+                                                        </span>
+                                                    <?php endforeach; ?>
                                                 </td>
                                             </tr>
                                         <?php endforeach; ?>
@@ -2052,69 +2362,7 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                         <?php endif; ?>
                     </div>
                 </div>
-
-                <!-- Bottom Row -->
-                <div class="row g-4">
-
-                    <div class="col-lg-12">
-                        <div class="card border-0 rounded-4 shadow-sm h-100">
-                            <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
-                                <i class="bi bi-clock-history" style="color:#272f54;"></i>
-                                <h6 class="fw-bold mb-0" style="color:#272f54;">OJT Hours by Program</h6>
-                            </div>
-                            <div id="table-hours-summary" class="card-body px-4 pb-4 pt-2">
-                                <?php if (empty($programHoursList)): ?>
-                                    <p class="text-muted small mb-0">No programs configured yet.</p>
-                                <?php else: ?>
-                                    <div class="d-flex flex-column gap-2">
-                                        <?php foreach ($programHoursList as $ph): ?>
-                                            <?php
-                                            // ADDED: presentation-only color mapping for the hours badge.
-                                            // Does not change $ph['program'] or how it is stored/echoed —
-                                            // only picks which existing badge class to apply below.
-                                            $ojtcProgramName = strtoupper((string) $ph['program']);
-                                            // if (strpos($ojtcProgramName, 'IT') !== false) {
-                                            //     $ojtcBadgeClass = 'ojtc-badge-it';
-                                            // } elseif (strpos($ojtcProgramName, 'CE') !== false) {
-                                            //     $ojtcBadgeClass = 'ojtc-badge-ce';
-                                            // } elseif (strpos($ojtcProgramName, 'EE') !== false) {
-                                            //     $ojtcBadgeClass = 'ojtc-badge-ee';
-                                            // } else {
-                                            //     $ojtcBadgeClass = 'ojtc-badge-default';
-                                            // }
-                                            $ojtcBadgeClass = [
-                                                'BSIT' => 'ojtc-badge-it',
-                                                'BSCE' => 'ojtc-badge-ce',
-                                                'BSEE' => 'ojtc-badge-ee',
-                                            ][deptCode($ph['program'])] ?? 'ojtc-badge-default';
-                                            ?>
-                                            <!-- CHANGED: added ojtc-hours-row class for a subtle row hover. -->
-                                            <div class="d-flex align-items-center justify-content-between ojtc-hours-row">
-                                                <p class="fw-semibold mb-0" style="color:#272f54;font-size:14px;">
-                                                    <?= htmlspecialchars($ph['program']) ?>
-                                                </p>
-                                                <!-- CHANGED: badge now uses the color-coded class above instead
-                                                     of a single fixed blue background. -->
-                                                <span class="badge rounded-pill px-3 <?= $ojtcBadgeClass ?>"
-                                                    style="font-weight:500;font-size:12px;">
-                                                    <?= (int) $ph['required_hours'] ?> hrs
-                                                </span>
-                                            </div>
-                                        <?php endforeach; ?>
-                                    </div>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="d-flex justify-content-end gap-2 mt-4 mb-3">
-                        <button onclick="downloadDashboardCSV()" class="btn-update">
-                            <i class="bi bi-filetype-csv me-1"></i> Download CSV
-                        </button>
-                        <button onclick="downloadDashboardPDF()" class="btn-update">
-                            <i class="bi bi-file-earmark-pdf me-1"></i> Download PDF
-                        </button>
-                    </div>
-                </div>
+                <!-- addtl e : docs - sys ad tab -->
 
                 <!-- Registration Toggle -->
                 <div id="register-toggle" class="card border-0 rounded-4 shadow-sm mt-2">
@@ -3470,82 +3718,82 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
             });
         }
 
-        function downloadDashboardCSV() {
-            let csv = '';
-            csv += 'Recent Internship Postings\n"Title","Company","Location","Posted"\n';
-            document.querySelectorAll('#table-internships tbody tr').forEach(row => {
-                const cells = [...row.querySelectorAll('td')].map(td => `"${td.innerText.trim().replace(/\n/g, ' ').replace(/"/g, '""')}"`);
-                if (cells.length) csv += cells.join(',') + '\n';
-            });
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = 'dashboard_summary.csv';
-            a.click();
-        }
+        // function downloadDashboardCSV() {
+        //     let csv = '';
+        //     csv += 'Recent Internship Postings\n"Title","Company","Location","Posted"\n';
+        //     document.querySelectorAll('#table-internships tbody tr').forEach(row => {
+        //         const cells = [...row.querySelectorAll('td')].map(td => `"${td.innerText.trim().replace(/\n/g, ' ').replace(/"/g, '""')}"`);
+        //         if (cells.length) csv += cells.join(',') + '\n';
+        //     });
+        //     const blob = new Blob([csv], { type: 'text/csv' });
+        //     const a = document.createElement('a');
+        //     a.href = URL.createObjectURL(blob);
+        //     a.download = 'dashboard_summary.csv';
+        //     a.click();
+        // }
 
-        function pdfChartRow(doc, y, items, gap = 6) {
-            const pageH = doc.internal.pageSize.getHeight();
-            const margin = 14;
+        // function pdfChartRow(doc, y, items, gap = 6) {
+        //     const pageH = doc.internal.pageSize.getHeight();
+        //     const margin = 14;
 
-            // Measure first so we know whether the row fits on the current page
-            const prepared = items.map(it => {
-                const canvas = document.getElementById(it.id);
-                if (!canvas || !canvas.width) return null;
-                return { ...it, canvas, h: it.w * canvas.height / canvas.width };
-            }).filter(Boolean);
-            if (!prepared.length) return y;
+        //     // Measure first so we know whether the row fits on the current page
+        //     const prepared = items.map(it => {
+        //         const canvas = document.getElementById(it.id);
+        //         if (!canvas || !canvas.width) return null;
+        //         return { ...it, canvas, h: it.w * canvas.height / canvas.width };
+        //     }).filter(Boolean);
+        //     if (!prepared.length) return y;
 
-            const rowH = Math.max(...prepared.map(p => p.h)) + 8; // +8 for the title
-            if (y + rowH > pageH - margin) {
-                doc.addPage();
-                y = 15;
-            }
+        //     const rowH = Math.max(...prepared.map(p => p.h)) + 8; // +8 for the title
+        //     if (y + rowH > pageH - margin) {
+        //         doc.addPage();
+        //         y = 15;
+        //     }
 
-            let x = margin;
-            prepared.forEach(p => {
-                doc.setFontSize(10);
-                doc.setTextColor(39, 47, 84);
-                doc.text(p.title, x, y + 4);
-                doc.addImage(p.canvas.toDataURL('image/png', 1.0), 'PNG', x, y + 7, p.w, p.h);
-                x += p.w + gap;
-            });
-            doc.setTextColor(0, 0, 0);
-            return y + rowH + 4;
-        }
+        //     let x = margin;
+        //     prepared.forEach(p => {
+        //         doc.setFontSize(10);
+        //         doc.setTextColor(39, 47, 84);
+        //         doc.text(p.title, x, y + 4);
+        //         doc.addImage(p.canvas.toDataURL('image/png', 1.0), 'PNG', x, y + 7, p.w, p.h);
+        //         x += p.w + gap;
+        //     });
+        //     doc.setTextColor(0, 0, 0);
+        //     return y + rowH + 4;
+        // }
 
-        function downloadDashboardPDF() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            let y = 15;
-            doc.setFontSize(16); doc.setTextColor(39, 47, 84);
-            doc.text('Dashboard Summary', 14, y); y += 10;
+        // function downloadDashboardPDF() {
+        //     const { jsPDF } = window.jspdf;
+        //     const doc = new jsPDF();
+        //     let y = 15;
+        //     doc.setFontSize(16); doc.setTextColor(39, 47, 84);
+        //     doc.text('Dashboard Summary', 14, y); y += 10;
 
-            // ── Charts ──────────────────────────────────────────────
-            // Usable width = 210 - 28 = 182mm
-            y = pdfChartRow(doc, y, [
-                { id: 'saRoleChart', title: 'Accounts by Role', w: 88 },
-                { id: 'saProgramChart', title: 'Students by Program', w: 88 }
-            ]);
-            y = pdfChartRow(doc, y, [
-                { id: 'saActivityChart', title: 'System Activity (last 14 days)', w: 116 },
-                { id: 'saRoleActChart', title: 'Activity by Role', w: 60 }
-            ]);
+        //     // ── Charts ──────────────────────────────────────────────
+        //     // Usable width = 210 - 28 = 182mm
+        //     y = pdfChartRow(doc, y, [
+        //         { id: 'saRoleChart', title: 'Accounts by Role', w: 88 },
+        //         { id: 'saProgramChart', title: 'Students by Program', w: 88 }
+        //     ]);
+        //     y = pdfChartRow(doc, y, [
+        //         { id: 'saActivityChart', title: 'System Activity (last 14 days)', w: 116 },
+        //         { id: 'saRoleActChart', title: 'Activity by Role', w: 60 }
+        //     ]);
 
-            // ── Tables (unchanged) ──────────────────────────────────
-            doc.setFontSize(12); doc.setTextColor(0, 0, 0);
-            if (y > 260) { doc.addPage(); y = 15; }
-            doc.text('Recent Internship Postings', 14, y); y += 2;
-            const internshipRows = [];
-            document.querySelectorAll('#table-internships tbody tr').forEach(row => {
-                const cells = [...row.querySelectorAll('td')].map(td => td.innerText.trim().replace(/\n/g, ' '));
-                if (cells.length) internshipRows.push(cells);
-            });
-            doc.autoTable({ head: [['Title', 'Company', 'Location', 'Posted']], body: internshipRows, startY: y, styles: { fontSize: 10 }, headStyles: { fillColor: [39, 47, 84], textColor: [255, 255, 255] } });
-            y = doc.lastAutoTable.finalY + 10;
+        //     // ── Tables (unchanged) ──────────────────────────────────
+        //     doc.setFontSize(12); doc.setTextColor(0, 0, 0);
+        //     if (y > 260) { doc.addPage(); y = 15; }
+        //     doc.text('Recent Internship Postings', 14, y); y += 2;
+        //     const internshipRows = [];
+        //     document.querySelectorAll('#table-internships tbody tr').forEach(row => {
+        //         const cells = [...row.querySelectorAll('td')].map(td => td.innerText.trim().replace(/\n/g, ' '));
+        //         if (cells.length) internshipRows.push(cells);
+        //     });
+        //     doc.autoTable({ head: [['Title', 'Company', 'Location', 'Posted']], body: internshipRows, startY: y, styles: { fontSize: 10 }, headStyles: { fillColor: [39, 47, 84], textColor: [255, 255, 255] } });
+        //     y = doc.lastAutoTable.finalY + 10;
 
-            doc.save('dashboard_summary.pdf');
-        }
+        //     doc.save('dashboard_summary.pdf');
+        // }
 
         function addRow() {
             const tbody = document.getElementById('csv-tbody');
@@ -3721,24 +3969,24 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
 
 
             // Students by program
-            make('saProgramChart', {
-                type: 'bar',
-                data: {
-                    labels: <?= json_encode($saProgLabels) ?>,
-                    datasets: [{
-                        label: 'Students',
-                        data: <?= json_encode($saProgData) ?>,
-                        backgroundColor: <?= json_encode($saProgColors) ?>,
-                        borderRadius: 6
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
-                }
-            });
+            // make('saProgramChart', {
+                // type: 'bar',
+                // data: {
+                //     labels: json_encode($saProgLabels) ?>,
+                //     datasets: [{
+                //         label: 'Students',
+                //         data: json_encode($saProgData) ?>,
+                //         backgroundColor: json_encode($saProgColors) ?>,
+                //         borderRadius: 6
+                //     }]
+                // },
+                // options: {
+                //     responsive: true,
+                //     maintainAspectRatio: false,
+                //     plugins: { legend: { display: false } },
+                //     scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+                // }
+            // });
 
             // System activity (14 days)
             make('saActivityChart', {
@@ -3767,25 +4015,25 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
             });
 
             // Activity by role (horizontal bar)
-            make('saRoleActChart', {
-                type: 'bar',
-                data: {
-                    labels: <?= json_encode($saRoleActLabels) ?>,
-                    datasets: [{
-                        label: 'Actions',
-                        data: <?= json_encode($saRoleActData) ?>,
-                        backgroundColor: '#272F54',
-                        borderRadius: 6
-                    }]
-                },
-                options: {
-                    indexAxis: 'y',
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: { x: { beginAtZero: true, ticks: { precision: 0 } } }
-                }
-            });
+            // make('saRoleActChart', {
+            //     type: 'bar',
+            //     data: {
+            //         labels: json_encode($saRoleActLabels),
+            //         datasets: [{
+            //             label: 'Actions',
+            //             data: json_encode($saRoleActData),
+            //             backgroundColor: '#272F54',
+            //             borderRadius: 6
+            //         }]
+            //     },
+            //     options: {
+            //         indexAxis: 'y',
+            //         responsive: true,
+            //         maintainAspectRatio: false,
+            //         plugins: { legend: { display: false } },
+            //         scales: { x: { beginAtZero: true, ticks: { precision: 0 } } }
+            //     }
+            // });
         })();
 
         // Click any card to jump to the section with the full details
