@@ -2167,7 +2167,7 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                     </div>
 
                     <div class="col-md-3">
-                        <div class="card border-0 rounded-4 h-100 ojtc-stat-card" data-go="roles" style="background:#EAF7F1;">
+                        <div class="card border-0 rounded-4 h-100 ojtc-stat-card" style="background:#EAF7F1;">
                             <div class="card-body p-4">
                                 <div class="d-flex flex-wrap align-items-center gap-3">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0"
@@ -3822,77 +3822,73 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
         //     doc.save('dashboard_summary.pdf');
         // }
 
-        <script>
-            const saExport = <?= json_encode($saExportData, JSON_HEX_TAG | JSON_HEX_AMP) ?>;
+        const saExport = <?= json_encode($saExportData, JSON_HEX_TAG | JSON_HEX_AMP) ?>;
 
-            function saCsvRow(cells) {
-                return cells.map(c => `"${String(c ?? '').replace(/"/g, '""')}"`).join(',');
-            }
+        function saCsvRow(cells) {
+            return cells.map(c => `"${String(c ?? '').replace(/"/g, '""')}"`).join(',');
+        }
 
-            function downloadDashboardCSV() {
-                const d = saExport;
-                const out = [
-                    saCsvRow(['Department', d.department]),
-                    saCsvRow(['Term', 'S.Y. ' + d.term]),
-                    '',
-                    'Summary', saCsvRow(['Item', 'Count']), ...d.cards.map(saCsvRow),
-                    '',
-                    'Documents Passed by Type', saCsvRow(['Document', 'Submitted', 'Students']), ...d.types.map(saCsvRow),
-                    '',
-                    'Students per Section', saCsvRow(['Section', 'Adviser', 'Students', 'Documents submitted', 'Documents required', 'Percent']), ...d.sections.map(saCsvRow),
-                    '',
-                    'Student Documents', saCsvRow(['Section', 'Student', 'Document', 'Status']), ...d.students.map(saCsvRow),
-                    '',
-                    'Needs Follow-up', saCsvRow(['Student', 'Section', 'Not submitted']), ...d.follow.map(saCsvRow)
-                ];
-                const blob = new Blob(['\ufeff' + out.join('\n')], { type: 'text/csv;charset=utf-8;' });
-                const a = document.createElement('a');
-                a.href = URL.createObjectURL(blob);
-                a.download = 'dashboard_summary.csv';
-                a.click();
-            }
+        function downloadDashboardCSV() {
+            const d = saExport;
+            const out = [
+                saCsvRow(['Department', d.department]),
+                saCsvRow(['Term', 'S.Y. ' + d.term]),
+                '',
+                'Summary', saCsvRow(['Item', 'Count']), ...d.cards.map(saCsvRow),
+                '',
+                'Documents Passed by Type', saCsvRow(['Document', 'Submitted', 'Students']), ...d.types.map(saCsvRow),
+                '',
+                'Students per Section', saCsvRow(['Section', 'Adviser', 'Students', 'Documents submitted', 'Documents required', 'Percent']), ...d.sections.map(saCsvRow),
+                '',
+                'Student Documents', saCsvRow(['Section', 'Student', 'Document', 'Status']), ...d.students.map(saCsvRow),
+                '',
+                'Needs Follow-up', saCsvRow(['Student', 'Section', 'Not submitted']), ...d.follow.map(saCsvRow)
+            ];
+            const blob = new Blob(['\ufeff' + out.join('\n')], { type: 'text/csv;charset=utf-8;' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'dashboard_summary.csv';
+            a.click();
+        }
 
-            function downloadDashboardPDF() {
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF();
-                const d = saExport;
-                let y = 15;
+        function downloadDashboardPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const d = saExport;
+            let y = 15;
 
-                doc.setFontSize(16); doc.setTextColor(39, 47, 84);
-                doc.text('Dashboard Summary', 14, y); y += 7;
-                doc.setFontSize(10); doc.setTextColor(100, 100, 100);
-                doc.text(d.department + '  |  S.Y. ' + d.term, 14, y); y += 8;
+            doc.setFontSize(16); doc.setTextColor(39, 47, 84);
+            doc.text('Dashboard Summary', 14, y); y += 7;
+            doc.setFontSize(10); doc.setTextColor(100, 100, 100);
+            doc.text(d.department + '  |  S.Y. ' + d.term, 14, y); y += 8;
 
-                // Charts (usable width = 182mm)
-                y = pdfChartRow(doc, y, [
-                    { id: 'saRoleChart', title: 'Accounts by Role', w: 80 },
-                    { id: 'saActivityChart', title: 'System Activity (last 14 days)', w: 96 }
-                ]);
+            // Charts (usable width = 182mm)
+            y = pdfChartRow(doc, y, [
+                { id: 'saRoleChart', title: 'Accounts by Role', w: 80 },
+                { id: 'saActivityChart', title: 'System Activity (last 14 days)', w: 96 }
+            ]);
 
-                const addTable = (title, head, body) => {
-                    if (!body.length) return;
-                    if (y > 255) { doc.addPage(); y = 15; }
-                    doc.setFontSize(12); doc.setTextColor(0, 0, 0);
-                    doc.text(title, 14, y);
-                    doc.autoTable({
-                        head: [head],
-                        body: body.map(r => r.map(c => String(c ?? ''))),
-                        startY: y + 3,
-                        styles: { fontSize: 9 },
-                        headStyles: { fillColor: [39, 47, 84], textColor: [255, 255, 255] }
-                    });
-                    y = doc.lastAutoTable.finalY + 10;
-                };
-
-                addTable('Summary', ['Item', 'Count'], d.cards);
-                addTable('Documents Passed by Type', ['Document', 'Submitted', 'Students'], d.types);
-                addTable('Students per Section', ['Section', 'Adviser', 'Students', 'Submitted', 'Required', 'Percent'], d.sections);
-                addTable('Student Documents', ['Section', 'Student', 'Document', 'Status'], d.students);
-                addTable('Needs Follow-up', ['Student', 'Section', 'Not submitted'], d.follow);
-
-                doc.save('dashboard_summary.pdf');
-            }
-        </script>
+            const addTable = (title, head, body) => {
+                if (!body.length) return;
+                if (y > 255) { doc.addPage(); y = 15; }
+                doc.setFontSize(12); doc.setTextColor(0, 0, 0);
+                doc.text(title, 14, y);
+                doc.autoTable({
+                    head: [head],
+                    body: body.map(r => r.map(c => String(c ?? ''))),
+                    startY: y + 3,
+                    styles: { fontSize: 9 },
+                    headStyles: { fillColor: [39, 47, 84], textColor: [255, 255, 255] }
+                });
+                y = doc.lastAutoTable.finalY + 10;
+            };
+            addTable('Summary', ['Item', 'Count'], d.cards);
+            addTable('Documents Passed by Type', ['Document', 'Submitted', 'Students'], d.types);
+            addTable('Students per Section', ['Section', 'Adviser', 'Students', 'Submitted', 'Required', 'Percent'], d.sections);
+            addTable('Student Documents', ['Section', 'Student', 'Document', 'Status'], d.students);
+            addTable('Needs Follow-up', ['Student', 'Section', 'Not submitted'], d.follow);
+            doc.save('dashboard_summary.pdf');
+        }
 
         function addRow() {
             const tbody = document.getElementById('csv-tbody');
