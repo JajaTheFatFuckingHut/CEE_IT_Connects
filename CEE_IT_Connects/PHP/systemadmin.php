@@ -2105,6 +2105,14 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                     <?php if ($saDeptLabel !== ''): ?>
                         <span class="badge rounded-pill px-3 ojtc-badge-default"><?= htmlspecialchars($saDeptLabel) ?></span>
                     <?php endif; ?>
+                    <div class="d-flex flex-wrap gap-2 ms-md-auto">
+                        <button type="button" class="btn btn-update" onclick="downloadDashboardCSV()">
+                            <i class="bi bi-file-earmark-spreadsheet me-1"></i>Download CSV
+                        </button>
+                        <button type="button" class="btn btn-update" onclick="downloadDashboardPDF()">
+                            <i class="bi bi-file-earmark-pdf me-1"></i>Download PDF
+                        </button>
+                    </div>
                 </form>
 
                 <!-- 2. CARDS -->
