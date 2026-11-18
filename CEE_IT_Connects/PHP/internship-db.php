@@ -68,37 +68,37 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $required_hours = $hoursStmt->fetchColumn();
 
             $stmt = $pdo->prepare(
-                "INSERT INTO internships (title, company, email, location, description, 
-                program, latitude, longtitude, phone_numbers, available, time_open, time_close, 
-                admin_id, is_plv_internal, is_valenzuela_lgu, required_hours, company_classification,
-                ojt_time_in, ojt_time_out) 
-                VALUES (:title, :company, :email, :location, :description, :program, :latitude, 
-                :longtitude, :phonenumber, :available, :openTime, :closeTime, :admin_id, 
-                :is_plv_ojt, :is_valenzuela_lgu, :required_hours, :company_classification,
-                :ojt_time_in, :ojt_time_out)"
+                "INSERT INTO internships (title, company, email, location, description,
+    program, latitude, longtitude, phone_numbers, available, time_open, time_close,
+    admin_id, is_plv_internal, is_valenzuela_lgu, required_hours, company_classification,
+    ojt_time_in, ojt_time_out)
+    VALUES (:title, :company, :email, :location, :description, :program, :latitude,
+    :longtitude, :phonenumber, :available, :openTime, :closeTime, :admin_id,
+    :is_plv_ojt, :is_valenzuela_lgu, :required_hours, :company_classification,
+    :ojt_time_in, :ojt_time_out)"
             );
 
-            $stmt->execute([
-                'title' => $title,
-                'company' => $company,
-                'email' => $email,
-                'location' => $location,
-                'description' => $description,
-                'program' => $program,
-                'latitude' => $latitude,
-                'longtitude' => $longitude,
-                'phonenumber' => $phonenumber,
-                'available' => true,
-                'openTime' => $openTime,
-                'closeTime' => $closeTime,
-                'admin_id' => $admin_id,
-                'is_plv_ojt' => $is_plv_ojt,
-                'is_valenzuela_lgu' => $is_valenzuela_lgu,
-                'required_hours' => $required_hours,
-                'company_classification' => $company_classification,
-                'ojt_time_in' => $ojt_time_in,
-                'ojt_time_out' => $ojt_time_out
-            ]);
+            $stmt->bindValue(':title', $title);
+            $stmt->bindValue(':company', $company);
+            $stmt->bindValue(':email', $email);
+            $stmt->bindValue(':location', $location);
+            $stmt->bindValue(':description', $description);
+            $stmt->bindValue(':program', $program);
+            $stmt->bindValue(':latitude', $latitude);
+            $stmt->bindValue(':longtitude', $longitude);
+            $stmt->bindValue(':phonenumber', $phonenumber);
+            $stmt->bindValue(':available', true, PDO::PARAM_BOOL);
+            $stmt->bindValue(':openTime', $openTime);
+            $stmt->bindValue(':closeTime', $closeTime);
+            $stmt->bindValue(':admin_id', $admin_id);
+            $stmt->bindValue(':is_plv_ojt', $is_plv_ojt, PDO::PARAM_BOOL);
+            $stmt->bindValue(':is_valenzuela_lgu', $is_valenzuela_lgu, PDO::PARAM_BOOL);
+            $stmt->bindValue(':required_hours', $required_hours);
+            $stmt->bindValue(':company_classification', $company_classification);
+            $stmt->bindValue(':ojt_time_in', $ojt_time_in);
+            $stmt->bindValue(':ojt_time_out', $ojt_time_out);
+
+            $stmt->execute();
 
             // This is for notifying students about the new internship posting
             $stmtStudents = $pdo->query("SELECT id FROM students");
