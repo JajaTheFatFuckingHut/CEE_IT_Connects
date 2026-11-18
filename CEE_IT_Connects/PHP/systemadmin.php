@@ -711,6 +711,33 @@ foreach ($saSections as $rid => $sec) {
     $saSections[$rid]['pct']   = $slots > 0 ? (int) round($done / $slots * 100) : 0;
 }
 usort($saFollow, fn($a, $b) => count($b['missing']) <=> count($a['missing']));
+
+// Data for the Download CSV / PDF buttons
+$saExportStudents = [];
+foreach ($saSections as $sec) {
+    foreach ($sec['rows'] as $stu) {
+        foreach ($stu['docs'] as $dname => $ok) {
+            $saExportStudents[] = [$sec['label'], $stu['name'], $dname, $ok ? 'Submitted' : 'Not submitted'];
+        }
+    }
+}
+$saExportData = [
+    'department' => $saDeptLabel,
+    'term'       => $schoolYear,
+    'cards'      => [
+        ['Internships', $totalInternships],
+        ['Accounts', $saAccTotal],
+        ['OJT Advisers', $saRoleCounts['Internship Advisers']],
+        ['HTE Advisers', $saRoleCounts['HTE Advisers']],
+    ],
+    'types'      => array_map(fn($n, $t) => [$n, $t['submitted'], $t['total']], array_keys($saTypeStats), $saTypeStats),
+    'sections'   => array_values(array_map(
+        fn($s) => [$s['label'], $s['adviser'], count($s['students']), $s['done'], $s['slots'], $s['pct'] . '%'],
+        $saSections
+    )),
+    'students'   => $saExportStudents,
+    'follow'     => array_map(fn($f) => [$f['name'], $f['section'], implode('; ', $f['missing'])], $saFollow),
+];
 // addtl e
 function deptCode($department)
 {
@@ -3732,35 +3759,35 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
         //     a.click();
         // }
 
-        // function pdfChartRow(doc, y, items, gap = 6) {
-        //     const pageH = doc.internal.pageSize.getHeight();
-        //     const margin = 14;
+        function pdfChartRow(doc, y, items, gap = 6) {
+            const pageH = doc.internal.pageSize.getHeight();
+            const margin = 14;
 
-        //     // Measure first so we know whether the row fits on the current page
-        //     const prepared = items.map(it => {
-        //         const canvas = document.getElementById(it.id);
-        //         if (!canvas || !canvas.width) return null;
-        //         return { ...it, canvas, h: it.w * canvas.height / canvas.width };
-        //     }).filter(Boolean);
-        //     if (!prepared.length) return y;
+            // Measure first so we know whether the row fits on the current page
+            const prepared = items.map(it => {
+                const canvas = document.getElementById(it.id);
+                if (!canvas || !canvas.width) return null;
+                return { ...it, canvas, h: it.w * canvas.height / canvas.width };
+            }).filter(Boolean);
+            if (!prepared.length) return y;
 
-        //     const rowH = Math.max(...prepared.map(p => p.h)) + 8; // +8 for the title
-        //     if (y + rowH > pageH - margin) {
-        //         doc.addPage();
-        //         y = 15;
-        //     }
+            const rowH = Math.max(...prepared.map(p => p.h)) + 8; // +8 for the title
+            if (y + rowH > pageH - margin) {
+                doc.addPage();
+                y = 15;
+            }
 
-        //     let x = margin;
-        //     prepared.forEach(p => {
-        //         doc.setFontSize(10);
-        //         doc.setTextColor(39, 47, 84);
-        //         doc.text(p.title, x, y + 4);
-        //         doc.addImage(p.canvas.toDataURL('image/png', 1.0), 'PNG', x, y + 7, p.w, p.h);
-        //         x += p.w + gap;
-        //     });
-        //     doc.setTextColor(0, 0, 0);
-        //     return y + rowH + 4;
-        // }
+            let x = margin;
+            prepared.forEach(p => {
+                doc.setFontSize(10);
+                doc.setTextColor(39, 47, 84);
+                doc.text(p.title, x, y + 4);
+                doc.addImage(p.canvas.toDataURL('image/png', 1.0), 'PNG', x, y + 7, p.w, p.h);
+                x += p.w + gap;
+            });
+            doc.setTextColor(0, 0, 0);
+            return y + rowH + 4;
+        }
 
         // function downloadDashboardPDF() {
         //     const { jsPDF } = window.jspdf;
@@ -3794,6 +3821,78 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
 
         //     doc.save('dashboard_summary.pdf');
         // }
+
+        <script>
+            const saExport = <?= json_encode($saExportData, JSON_HEX_TAG | JSON_HEX_AMP) ?>;
+
+            function saCsvRow(cells) {
+                return cells.map(c => `"${String(c ?? '').replace(/"/g, '""')}"`).join(',');
+            }
+
+            function downloadDashboardCSV() {
+                const d = saExport;
+                const out = [
+                    saCsvRow(['Department', d.department]),
+                    saCsvRow(['Term', 'S.Y. ' + d.term]),
+                    '',
+                    'Summary', saCsvRow(['Item', 'Count']), ...d.cards.map(saCsvRow),
+                    '',
+                    'Documents Passed by Type', saCsvRow(['Document', 'Submitted', 'Students']), ...d.types.map(saCsvRow),
+                    '',
+                    'Students per Section', saCsvRow(['Section', 'Adviser', 'Students', 'Documents submitted', 'Documents required', 'Percent']), ...d.sections.map(saCsvRow),
+                    '',
+                    'Student Documents', saCsvRow(['Section', 'Student', 'Document', 'Status']), ...d.students.map(saCsvRow),
+                    '',
+                    'Needs Follow-up', saCsvRow(['Student', 'Section', 'Not submitted']), ...d.follow.map(saCsvRow)
+                ];
+                const blob = new Blob(['\ufeff' + out.join('\n')], { type: 'text/csv;charset=utf-8;' });
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = 'dashboard_summary.csv';
+                a.click();
+            }
+
+            function downloadDashboardPDF() {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                const d = saExport;
+                let y = 15;
+
+                doc.setFontSize(16); doc.setTextColor(39, 47, 84);
+                doc.text('Dashboard Summary', 14, y); y += 7;
+                doc.setFontSize(10); doc.setTextColor(100, 100, 100);
+                doc.text(d.department + '  |  S.Y. ' + d.term, 14, y); y += 8;
+
+                // Charts (usable width = 182mm)
+                y = pdfChartRow(doc, y, [
+                    { id: 'saRoleChart', title: 'Accounts by Role', w: 80 },
+                    { id: 'saActivityChart', title: 'System Activity (last 14 days)', w: 96 }
+                ]);
+
+                const addTable = (title, head, body) => {
+                    if (!body.length) return;
+                    if (y > 255) { doc.addPage(); y = 15; }
+                    doc.setFontSize(12); doc.setTextColor(0, 0, 0);
+                    doc.text(title, 14, y);
+                    doc.autoTable({
+                        head: [head],
+                        body: body.map(r => r.map(c => String(c ?? ''))),
+                        startY: y + 3,
+                        styles: { fontSize: 9 },
+                        headStyles: { fillColor: [39, 47, 84], textColor: [255, 255, 255] }
+                    });
+                    y = doc.lastAutoTable.finalY + 10;
+                };
+
+                addTable('Summary', ['Item', 'Count'], d.cards);
+                addTable('Documents Passed by Type', ['Document', 'Submitted', 'Students'], d.types);
+                addTable('Students per Section', ['Section', 'Adviser', 'Students', 'Submitted', 'Required', 'Percent'], d.sections);
+                addTable('Student Documents', ['Section', 'Student', 'Document', 'Status'], d.students);
+                addTable('Needs Follow-up', ['Student', 'Section', 'Not submitted'], d.follow);
+
+                doc.save('dashboard_summary.pdf');
+            }
+        </script>
 
         function addRow() {
             const tbody = document.getElementById('csv-tbody');
