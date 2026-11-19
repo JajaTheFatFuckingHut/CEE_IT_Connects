@@ -238,8 +238,6 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
 // }
 
 // ── DASHBOARD FILTERS (school year + program) ──
-$SY_START_MONTH = 8; // CONFIRM: month your school year starts (8 = August)
-
 $progMap = ['ce' => 'Civil Engineering', 'ee' => 'Electrical Engineering', 'it' => 'Information Technology'];
 $progKey = strtolower($_GET['program'] ?? 'all');
 if (!isset($progMap[$progKey])) $progKey = 'all';
@@ -247,21 +245,15 @@ $activePrograms = $progKey === 'all' ? $progMap : [$progKey => $progMap[$progKey
 $progSql  = $progKey === 'all' ? '' : ' AND LOWER(s.program) = ' . $pdo->quote(strtolower($progMap[$progKey]));
 $progLike = $progKey === 'all' ? '' : ' AND i.program ILIKE ' . $pdo->quote('%' . $progMap[$progKey] . '%');
 
-// school years derived from real submitted_at values
-$syExpr = "(EXTRACT(YEAR FROM submitted_at)::int - CASE WHEN EXTRACT(MONTH FROM submitted_at) < $SY_START_MONTH THEN 1 ELSE 0 END)";
-$syOptions = $pdo->query("SELECT DISTINCT $syExpr AS sy FROM ojt_applications WHERE submitted_at IS NOT NULL ORDER BY sy DESC")->fetchAll(PDO::FETCH_COLUMN);
-$termSel = $_GET['term'] ?? (!empty($syOptions) ? (string) $syOptions[0] : 'all');
-$termSql = '';
-if ($termSel !== 'all' && ctype_digit($termSel)) {
-    $sy = (int) $termSel;
-    $termStart = sprintf('%04d-%02d-01', $sy, $SY_START_MONTH);
-    $termEnd   = sprintf('%04d-%02d-01', $sy + 1, $SY_START_MONTH);
-    $termSql = " AND oa.submitted_at >= '$termStart' AND oa.submitted_at < '$termEnd'";
-} else {
-    $termSel = 'all';
+// school years: same source as the system admin
+$schoolYearOptions = $pdo->query("SELECT school_year FROM school_years ORDER BY school_year")->fetchAll(PDO::FETCH_COLUMN);
+$schoolYear = $_GET['sy'] ?? '';
+if (!in_array($schoolYear, $schoolYearOptions, true)) {
+    $schoolYear = !empty($schoolYearOptions) ? end($schoolYearOptions) : '';
 }
+$syQ = $pdo->quote($schoolYear);
 
-// required steps, same as your "Internship Confirmed" logic
+// documents (same steps as your "Internship Confirmed" logic, plus MOU)
 $docTypes = [
     'company_profile' => 'Company Profile',
     'resume'          => 'Resume',
@@ -272,63 +264,84 @@ $docTypes = [
     'oath'            => 'Oath',
     'reco_letter'     => 'Reco Letter',
     'waiver'          => 'Waiver',
+    'mou'             => 'MOU',
 ];
 $stepValues = implode(',', array_map(fn($k) => "('$k')", array_keys($docTypes)));
 $reqRule = "(st.step_key <> 'waiver' OR i.is_plv_internal IS NOT TRUE)
         AND (st.step_key <> 'reco_letter' OR (i.is_plv_internal IS NOT TRUE AND i.is_valenzuela_lgu IS NOT TRUE))";
 
-// ── ONE ROW PER APPLICATION: required vs. not-submitted docs ──
-$appRows = $pdo->query("
-    SELECT oa.id, s.id AS sid, s.full_name, s.section,
-           COUNT(*) AS required,
-           COUNT(*) FILTER (WHERE sp.is_done IS NOT TRUE) AS not_submitted
-    FROM ojt_applications oa
-    JOIN students s ON s.id = oa.student_id
-    JOIN internships i ON i.id = oa.internship_id
-    CROSS JOIN (VALUES $stepValues) AS st(step_key)
-    LEFT JOIN student_progress sp ON sp.student_id = s.id AND sp.internship_id = oa.internship_id AND sp.step_key = st.step_key
-    WHERE $reqRule $progSql $termSql
-    GROUP BY oa.id, s.id, s.full_name, s.section
-")->fetchAll(PDO::FETCH_ASSOC);
+// ── ONE ROW PER APPLICATION x REQUIRED DOCUMENT, for students in this school year's sections ──
+$docRows = [];
+if ($schoolYear !== '') {
+    $docRows = $pdo->query("
+        SELECT oa.id AS app_id, s.id AS sid, s.full_name, LOWER(s.program) AS prog,
+               r.year_level, r.section, st.step_key,
+               CASE WHEN sp.is_done IS TRUE THEN 1 ELSE 0 END AS done
+        FROM ojt_applications oa
+        JOIN students s ON s.id = oa.student_id AND COALESCE(s.is_archived, FALSE) = FALSE
+        JOIN internships i ON i.id = oa.internship_id
+        JOIN room_members rm ON rm.user_id = s.id AND rm.user_type = 'student'
+        JOIN rooms r ON r.id = rm.room_id
+             AND COALESCE(r.is_archived, FALSE) = FALSE
+             AND r.school_year = $syQ
+             AND r.section IS NOT NULL AND r.section <> '' AND r.year_level IS NOT NULL
+        CROSS JOIN (VALUES $stepValues) AS st(step_key)
+        LEFT JOIN student_progress sp ON sp.student_id = s.id AND sp.internship_id = oa.internship_id AND sp.step_key = st.step_key
+        WHERE $reqRule $progSql
+        ORDER BY s.full_name
+    ")->fetchAll(PDO::FETCH_ASSOC);
+}
 
-$totalApplicants = count($appRows);
-$deployed        = count(array_filter($appRows, fn($r) => (int) $r['not_submitted'] === 0));
-$docsRequired    = (int) array_sum(array_column($appRows, 'required'));
-$docsPassed      = $docsRequired - (int) array_sum(array_column($appRows, 'not_submitted'));
+$apps = [];
+$typeStats = [];
+foreach ($docRows as $r) {
+    $id = $r['app_id'];
+    if (!isset($apps[$id])) {
+        $apps[$id] = [
+            'sid'         => $r['sid'],
+            'name'        => $r['full_name'],
+            'section'     => "Year {$r['year_level']} - Section {$r['section']}",
+            'required'    => 0,
+            'missing'     => [],
+            'core_missing' => 0, // missing docs other than MOU (matches "Internship Confirmed")
+        ];
+    }
+    $apps[$id]['required']++;
+    $done = (int) $r['done'] === 1;
+    if (!$done) {
+        $apps[$id]['missing'][] = $docTypes[$r['step_key']];
+        if ($r['step_key'] !== 'mou') $apps[$id]['core_missing']++;
+    }
+    $ts = &$typeStats[$r['prog']][$r['step_key']];
+    $ts['required'] = ($ts['required'] ?? 0) + 1;
+    $ts['passed']   = ($ts['passed'] ?? 0) + ($done ? 1 : 0);
+    unset($ts);
+}
+
+$totalApplicants = count($apps);
+$deployed        = count(array_filter($apps, fn($a) => $a['core_missing'] === 0));
+$docsRequired    = (int) array_sum(array_column($apps, 'required'));
+$docsMissing     = 0;
+foreach ($apps as $a) { $docsMissing += count($a['missing']); }
+$docsPassed      = $docsRequired - $docsMissing;
 $docsPassedPct   = $docsRequired > 0 ? (int) round($docsPassed / $docsRequired * 100) : 0;
 
-$followUps = array_values(array_filter($appRows, fn($r) => (int) $r['not_submitted'] > 0));
-usort($followUps, fn($a, $b) => $b['not_submitted'] <=> $a['not_submitted']);
-$followUps = array_slice($followUps, 0, 5);
+// needs follow-up: students with missing documents, most missing first
+$followUps = array_values(array_filter($apps, fn($a) => !empty($a['missing'])));
+usort($followUps, fn($a, $b) => count($b['missing']) <=> count($a['missing']));
 
+// students per section (distinct students)
 $secStudents = [];
-foreach ($appRows as $r) {
-    $secStudents[$r['section'] ?: 'Unassigned'][$r['sid']] = true;
-}
-ksort($secStudents);
+foreach ($apps as $a) { $secStudents[$a['section']][$a['sid']] = true; }
+ksort($secStudents, SORT_NATURAL);
 $sectionCounts = array_map('count', $secStudents);
 
-// ── DOCUMENTS PASSED BY TYPE, PER PROGRAM ──
-$docTypeStats = [];
-$docTypeStmt = $pdo->query("
-    SELECT LOWER(s.program) AS prog, st.step_key,
-           COUNT(*) AS required,
-           COUNT(*) FILTER (WHERE sp.is_done IS TRUE) AS passed
-    FROM ojt_applications oa
-    JOIN students s ON s.id = oa.student_id
-    JOIN internships i ON i.id = oa.internship_id
-    CROSS JOIN (VALUES $stepValues) AS st(step_key)
-    LEFT JOIN student_progress sp ON sp.student_id = s.id AND sp.internship_id = oa.internship_id AND sp.step_key = st.step_key
-    WHERE $reqRule $termSql
-    GROUP BY LOWER(s.program), st.step_key
-");
-foreach ($docTypeStmt as $r) { $docTypeStats[$r['prog']][$r['step_key']] = $r; }
-
+// documents passed by type, per program
 $docCharts = [];
 foreach ($activePrograms as $k => $name) {
     $ap = $np = [];
     foreach ($docTypes as $key => $label) {
-        $st = $docTypeStats[strtolower($name)][$key] ?? null;
+        $st = $typeStats[strtolower($name)][$key] ?? null;
         $p = (int) ($st['passed'] ?? 0);
         $q = (int) ($st['required'] ?? 0);
         $ap[] = $p;
@@ -337,11 +350,16 @@ foreach ($activePrograms as $k => $name) {
     $docCharts[$k] = ['title' => $name, 'approved' => $ap, 'missing' => $np];
 }
 
-// ── PARTNER COMPANIES ──
+// ── PARTNER COMPANIES (applications from this school year's students) ──
 $partners = $pdo->query("
     SELECT i.company, i.title, COUNT(oa.id) AS applicants
     FROM internships i
-    LEFT JOIN ojt_applications oa ON oa.internship_id = i.id $termSql
+    LEFT JOIN ojt_applications oa ON oa.internship_id = i.id
+         AND oa.student_id IN (
+             SELECT rm.user_id FROM room_members rm
+             JOIN rooms r ON r.id = rm.room_id
+             WHERE rm.user_type = 'student' AND COALESCE(r.is_archived, FALSE) = FALSE AND r.school_year = $syQ
+         )
     WHERE 1=1 $progLike
     GROUP BY i.id, i.company, i.title
     ORDER BY applicants DESC, i.company
@@ -1399,10 +1417,10 @@ for ($t = 13; $t >= 0; $t--) {
                     <!-- FILTERS -->
                     <form method="get" class="filter-bar d-flex align-items-center flex-wrap gap-2 mb-3">
                         <label class="fw-bold d-flex align-items-center gap-1 mb-0" style="color:#272f54;"><i class="bi bi-calendar3"></i> Term</label>
-                        <select name="term" class="filter-select" onchange="this.form.submit()">
-                            <option value="all" <?= $termSel === 'all' ? 'selected' : '' ?>>All school years</option>
-                            <?php foreach ($syOptions as $sy): ?>
-                                <option value="<?= (int) $sy ?>" <?= (string) $sy === $termSel ? 'selected' : '' ?>>S.Y. <?= (int) $sy ?>-<?= (int) $sy + 1 ?></option>
+                        <select name="sy" class="filter-select" onchange="this.form.submit()">
+                            <?php if (empty($schoolYearOptions)): ?><option value="">No school years yet</option><?php endif; ?>
+                            <?php foreach ($schoolYearOptions as $opt): ?>
+                                <option value="<?= htmlspecialchars($opt) ?>" <?= $opt === $schoolYear ? 'selected' : '' ?>>S.Y. <?= htmlspecialchars($opt) ?></option>
                             <?php endforeach; ?>
                         </select>
                         <select name="program" class="filter-select" onchange="this.form.submit()">
@@ -1486,11 +1504,11 @@ for ($t = 13; $t >= 0; $t--) {
                                     <h6 class="fw-bold mb-0" style="color:#272f54;">Needs Follow-up</h6>
                                 </div>
                                 <div class="card-body px-4 pb-4 pt-2">
-                                    <p class="text-muted small mb-3">Students with documents not submitted.</p>
+                                    <p class="text-muted small mb-3">Students with documents not yet submitted, most missing first.</p>
                                     <?php if (empty($followUps)): ?>
-                                        <p class="text-muted small mb-0">Everyone is up to date.</p>
+                                        <p class="text-muted small mb-0">No students need follow-up.</p>
                                     <?php else: ?>
-                                        <div class="dash-table-scroll">
+                                        <div class="dash-table-scroll" style="max-height:340px; overflow-y:auto;">
                                             <table style="width:100%; border-collapse:collapse; font-size:13px;">
                                                 <thead>
                                                     <tr class="ojtc-th-tab" style="font-size:12px; text-transform:uppercase; letter-spacing:.04em;">
@@ -1502,9 +1520,14 @@ for ($t = 13; $t >= 0; $t--) {
                                                 <tbody>
                                                     <?php foreach ($followUps as $f): ?>
                                                         <tr class="ojtc-row-hover">
-                                                            <td style="padding:10px; border-bottom:1px solid #f0f2f7; font-weight:500; color:#272f54;"><?= htmlspecialchars($f['full_name']) ?></td>
-                                                            <td style="padding:10px; border-bottom:1px solid #f0f2f7; color:#888; font-size:12px;"><?= htmlspecialchars($f['section'] ?: '—') ?></td>
-                                                            <td style="padding:10px; border-bottom:1px solid #f0f2f7; color:#a13d1f; font-weight:600;"><?= (int) $f['not_submitted'] ?></td>
+                                                            <td style="padding:10px; border-bottom:1px solid #f0f2f7; font-weight:500; color:#272f54;"><?= htmlspecialchars($f['name']) ?></td>
+                                                            <td style="padding:10px; border-bottom:1px solid #f0f2f7; color:#888; font-size:12px;"><?= htmlspecialchars($f['section']) ?></td>
+                                                            <td style="padding:10px; border-bottom:1px solid #f0f2f7; white-space:normal;">
+                                                                <?php foreach ($f['missing'] as $m): ?>
+                                                                    <span class="badge rounded-pill px-3 me-1 mb-1"
+                                                                        style="font-weight:500;font-size:12px;background:#fdeaea;color:#a32d2d;"><?= htmlspecialchars($m) ?></span>
+                                                                <?php endforeach; ?>
+                                                            </td>
                                                         </tr>
                                                     <?php endforeach; ?>
                                                 </tbody>
@@ -1523,8 +1546,7 @@ for ($t = 13; $t >= 0; $t--) {
                                     <h6 class="fw-bold mb-0" style="color:#272f54;">Students per Section</h6>
                                 </div>
                                 <div class="card-body px-4 pb-4 pt-2">
-                                    <p class="text-muted small mb-3">Students with an application, by section.</p>
-                                    <div style="position:relative; height:220px;"><canvas id="sectionChart"></canvas></div>
+                                    <p class="text-muted small mb-3">Students with an application, by section, S.Y. <?= htmlspecialchars($schoolYear) ?>.</p>                                    <div style="position:relative; height:220px;"><canvas id="sectionChart"></canvas></div>
                                 </div>
                             </div>
                         </div>
@@ -1537,7 +1559,7 @@ for ($t = 13; $t >= 0; $t--) {
                                     <h6 class="fw-bold mb-0" style="color:#272f54;">Partner Companies</h6>
                                 </div>
                                 <div class="card-body px-4 pb-4 pt-2">
-                                    <p class="text-muted small mb-3">Applicants per company posting.</p>
+                                    <p class="text-muted small mb-3">Applicants per company posting, S.Y. <?= htmlspecialchars($schoolYear) ?>.</p>
                                     <?php if (empty($partners)): ?>
                                         <p class="text-muted small mb-0">No partner companies yet.</p>
                                     <?php else: ?>
