@@ -3960,53 +3960,6 @@ $page = 'messages';
 
             <!-- start of weekly reports logic -->
             <!-- SUBMITTED REPORTS LIST -->
-            <!-- <h6 class="fw-bold mb-2" style="font-size:14px;">Your Submitted Reports</h6>
-            <div class="card  shadow-sm rounded-3" style="overflow:hidden; border:1px solid #e5e7eb;">
-                <table class="w-100" style="font-size:13px; border-collapse:collapse;">
-                    <thead style="background:#f8f9fa;">
-                        <tr>
-                            <th class="p-3 text-start">Week</th>
-                            <th class="p-3 text-start">Submitted</th>
-                            <th class="p-3 text-start">File</th>
-                            <th class="p-3 text-start">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php
-                        $reportsStmt = $pdo->prepare("
-                        SELECT id, week_number, wr_filepath, created_at
-                        FROM weekly_reports
-                        WHERE student_id = ?
-                        ORDER BY week_number DESC
-                    ");
-                        $reportsStmt->execute([$student_id]);
-                        $reports = $reportsStmt->fetchAll(PDO::FETCH_ASSOC);
-                        ?>
-                        <?php if (empty($reports)): ?>
-                            <tr>
-                                <td colspan="4" class="text-center text-muted p-4">No reports submitted yet.</td>
-                            </tr>
-                        <?php else: ?>
-                            <?php foreach ($reports as $r): ?>
-                                <tr style="border-top:1px solid #f0f0f0;">
-                                    <td class="p-3">Week <?= (int) $r['week_number'] ?></td>
-                                    <td class="p-3"><?= date('M d, Y', strtotime($r['created_at'])) ?></td>
-                                    <td class="p-3">
-                                        <i class="fa-solid fa-file-lines me-1" style="color:#888;"></i>
-                                        <?= htmlspecialchars(basename($r['wr_filepath'])) ?>
-                                    </td>
-                                    <td class="p-3">
-                                        <a href="<?= htmlspecialchars($r['wr_filepath']) ?>" target="_blank" class="btn btn-sm"
-                                            style="background:#eef2ff;color:#272f54;border-radius:6px;">
-                                            <i class="fa-solid fa-eye me-1"></i> Preview
-                                        </a>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
-            </div> -->
         <?php elseif ($section === 'weekly_reports'): ?>
             <div id="status" class="section-panel section sysAdm-section">
                 <div class="sysAdm-header--danger sysAdm-header--blue mb-4">
