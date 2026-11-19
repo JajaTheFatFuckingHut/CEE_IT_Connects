@@ -4711,13 +4711,190 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                     <div class="pg-header-icon"><i class="fa-solid fa-file-lines"></i></div>
                     <div>
                         <h2>Weekly Progress Report</h2>
-                        <p>Download the template, fill it out in Google Docs, then paste the link below.</p>
+                        <p>Download the template, fill it out, then upload your report for the week.</p>
                     </div>
                 </div>
             </div>
 
             <!-- TEMPLATE DOWNLOAD -->
             <div class="card shadow-sm rounded-3 p-3 mb-3 d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center justify-content-between gap-3"
+                style="border:1px solid #e5e7eb;">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="flex-shrink-0"
+                        style="width:42px;height:42px;border-radius:10px;background:#fde3d8;display:flex;align-items:center;justify-content:center;">
+                        <i class="fa-solid fa-file-lines" style="color:#ff6b2c;"></i>
+                    </div>
+                    <div>
+                        <strong style="font-size:14px;">Weekly Report Template</strong>
+                        <div class="text-muted" style="font-size:12px;">DOCX · Download and fill out before uploading
+                        </div>
+                    </div>
+                </div>
+                <a href="/Sources/weekly-report-template.docx" download class="btn btn-sm fw-semibold"
+                    style="background:#272f54;color:#fff;border-radius:8px;">
+                    <i class="fa-solid fa-download me-1"></i> Download
+                </a>
+            </div>
+
+            <?php
+            $wrStmt = $pdo->prepare("
+            SELECT id, week_number, file_name, created_at
+            FROM weekly_reports
+            WHERE student_id = ?
+            ORDER BY week_number ASC
+        ");
+            $wrStmt->execute([$student_id]);
+            $weeklyReports = $wrStmt->fetchAll(PDO::FETCH_ASSOC);
+            ?>
+
+            <!-- UPLOAD FORM -->
+            <form method="POST" action="progress-report-db.php" enctype="multipart/form-data">
+                <input type="hidden" name="action" value="upload">
+                <input type="hidden" name="room_id" value="<?= htmlspecialchars($current_room_id ?? '') ?>">
+
+                <div class="card shadow-sm rounded-3 p-3 p-sm-4 mb-3" style="border:1px solid #e5e7eb;">
+                    <label style="font-size:15px; font-weight:bold;">Upload Weekly Report</label>
+
+                    <div class="row g-3 mt-1">
+                        <div class="col-12 col-sm-3">
+                            <label for="weekNumber" class="form-label" style="font-size:13px;">Week number</label>
+                            <input type="number" id="weekNumber" name="week_number" class="form-control" min="1"
+                                max="60" placeholder="e.g. 1" required>
+                        </div>
+                        <div class="col-12 col-sm-9">
+                            <label for="wrFile" class="form-label" style="font-size:13px;">Document</label>
+                            <input type="file" id="wrFile" name="wr_file" class="form-control" accept=".pdf,.doc,.docx"
+                                required>
+                        </div>
+                    </div>
+
+                    <div class="text-muted mt-2" style="font-size:12px;">
+                        PDF, DOC or DOCX · max 10 MB · only one report per week.
+                    </div>
+
+                    <button type="submit" class="btn btn-sm fw-semibold mt-3 align-self-stretch align-self-sm-start"
+                        style="background:#ff6b2c;color:#fff;border-radius:8px;padding:8px 18px;">
+                        <i class="fa-solid fa-upload me-1"></i> Upload Report
+                    </button>
+                </div>
+            </form>
+
+            <!-- SUBMITTED REPORTS TABLE -->
+            <div class="card shadow-sm rounded-3 p-3 p-sm-4" style="border:1px solid #e5e7eb;">
+                <label style="font-size:15px; font-weight:bold;" class="mb-2">My Submitted Reports</label>
+
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0" style="font-size:14px;">
+                        <thead>
+                            <tr>
+                                <th>Week</th>
+                                <th>Document</th>
+                                <th>Date Submitted</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (!$weeklyReports): ?>
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted py-4">No reports submitted yet.</td>
+                                </tr>
+                            <?php else: ?>
+                                <?php foreach ($weeklyReports as $wr): ?>
+                                    <tr>
+                                        <td><strong>Week
+                                                <?= (int) $wr['week_number'] ?>
+                                            </strong></td>
+                                        <td>
+                                            <a href="download-wr.php?id=<?= (int) $wr['id'] ?>" style="text-decoration:none;">
+                                                <i class="fa-solid fa-file-lines me-1" style="color:#ff6b2c;"></i>
+                                                <?= htmlspecialchars($wr['file_name']) ?>
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <?= htmlspecialchars(date('M d, Y', strtotime($wr['created_at']))) ?>
+                                        </td>
+                                        <td class="text-end text-nowrap">
+                                            <button type="button" class="btn btn-sm btn-outline-secondary wr-edit-btn"
+                                                data-bs-toggle="modal" data-bs-target="#editWrModal"
+                                                data-id="<?= (int) $wr['id'] ?>" data-week="<?= (int) $wr['week_number'] ?>"
+                                                title="Edit">
+                                                <i class="fa-solid fa-pen"></i>
+                                            </button>
+
+                                            <form method="POST" action="progress-report-db.php" class="d-inline"
+                                                onsubmit="return confirm('Delete the report for Week <?= (int) $wr['week_number'] ?>?');">
+                                                <input type="hidden" name="action" value="delete">
+                                                <input type="hidden" name="id" value="<?= (int) $wr['id'] ?>">
+                                                <input type="hidden" name="room_id"
+                                                    value="<?= htmlspecialchars($current_room_id ?? '') ?>">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
+                                                    <i class="fa-solid fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- EDIT MODAL -->
+        <div class="modal fade" id="editWrModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <form method="POST" action="progress-report-db.php" enctype="multipart/form-data" class="modal-content">
+                    <input type="hidden" name="action" value="update">
+                    <input type="hidden" name="id" id="editWrId">
+                    <input type="hidden" name="room_id" value="<?= htmlspecialchars($current_room_id ?? '') ?>">
+
+                    <div class="modal-header">
+                        <h5 class="modal-title">Edit Weekly Report</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <label for="editWrWeek" class="form-label" style="font-size:13px;">Week number</label>
+                        <input type="number" name="week_number" id="editWrWeek" class="form-control mb-3" min="1"
+                            max="60" required>
+
+                        <label for="editWrFile" class="form-label" style="font-size:13px;">Replace document</label>
+                        <input type="file" name="wr_file" id="editWrFile" class="form-control" accept=".pdf,.doc,.docx">
+                        <div class="text-muted mt-1" style="font-size:12px;">Leave empty to keep the current file.</div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-sm btn-light" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-sm fw-semibold"
+                            style="background:#ff6b2c;color:#fff;border-radius:8px;">Save changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <script>
+            document.querySelectorAll('.wr-edit-btn').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    document.getElementById('editWrId').value = btn.dataset.id;
+                    document.getElementById('editWrWeek').value = btn.dataset.week;
+                    document.getElementById('editWrFile').value = '';
+                });
+            });
+        </script>
+    </div>
+    <!-- <div class="section <?= $current_section === 'progress_report' ? 'active' : '' ?>">
+        <div class="main" style="padding-bottom:60px;">
+            <div class="pg-header">
+                <div class="pg-header-left">
+                    <div class="pg-header-icon"><i class="fa-solid fa-file-lines"></i></div>
+                    <div>
+                        <h2>Weekly Progress Report</h2>
+                        <p>Download the template, fill it out in Google Docs, then paste the link below.</p>
+                    </div>
+                </div>
+            </div> -->
+
+    <!-- TEMPLATE DOWNLOAD -->
+    <!-- <div class="card shadow-sm rounded-3 p-3 mb-3 d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center justify-content-between gap-3"
                 style="border:1px solid #e5e7eb;">
                 <div class="d-flex align-items-center gap-3">
                     <div class="flex-shrink-0"
@@ -4741,10 +4918,10 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
             $linkStmt = $pdo->prepare("SELECT link FROM report_links WHERE student_id = ?");
             $linkStmt->execute([$student_id]);
             $savedLink = $linkStmt->fetchColumn() ?: '';
-            ?>
+            ?> -->
 
-            <!-- LINK FORM -->
-            <form method="POST" action="progress-report-db.php">
+    <!-- LINK FORM -->
+    <!-- <form method="POST" action="progress-report-db.php">
                 <input type="hidden" name="room_id" value="<?= htmlspecialchars($current_room_id ?? '') ?>">
 
                 <div class="card shadow-sm rounded-3 p-3 p-sm-4" style="border:1px solid #e5e7eb;"> <label
@@ -4764,7 +4941,7 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                 </div>
             </form>
         </div>
-    </div>
+    </div> -->
 
     <!-- ROOMS SECTION -->
     <div id="rooms" class="section <?= $current_section === 'rooms' ? 'active' : '' ?>">
