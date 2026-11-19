@@ -4549,10 +4549,10 @@ $page = 'messages';
             new Chart(document.getElementById('attendanceChart'), {
                 type: 'line',
                 data: {
-                    labels: <?= json_encode($attLabels) ?>,
+                    labels: <?= json_encode($attLabels ?? []) ?>,
                     datasets: [{
                         label: 'Hours logged',
-                        data: <?= json_encode($attData) ?>,
+                        data: <?= json_encode($attData ?? []) ?>,
                         borderColor: '#ff6b2c',
                         backgroundColor: 'rgba(255,107,44,0.1)',
                         tension: 0.3,
@@ -4578,7 +4578,7 @@ $page = 'messages';
                 data: {
                     labels: ['Completed', 'Incomplete'],
                     datasets: [{
-                        data: [<?= (int) $completeCount ?>, <?= (int) $incompleteCount ?>],
+                        data: [<?= (int) ($completeCount ?? 0) ?>, <?= (int) ($incompleteCount ?? 0) ?>],
                         backgroundColor: ['#3d55b3d3', '#e7bd63'],
                         borderWidth: 0
                     }]
