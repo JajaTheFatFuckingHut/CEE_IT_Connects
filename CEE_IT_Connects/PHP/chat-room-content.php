@@ -1759,7 +1759,7 @@ $rmFmtTime = function ($ts): string {
     </div>
 </div>
 
-<!-- TABS -->
+/* <!-- TABS --> */
 <div class="rm-tabs">
     <!-- addtl s / e &section=<?= $rmSec ?> -->
     <a href="?room_id=<?= $room_id ?>&tab=updates&section=<?= $rmSec ?>"
@@ -1772,7 +1772,7 @@ $rmFmtTime = function ($ts): string {
     </a>
 </div>
 
-<!-- CONTENT -->
+/* <!-- CONTENT --> */
 <div class="mt-3">
 
     <?php if ($tab === 'members'): ?>
@@ -2042,13 +2042,13 @@ $rmFmtTime = function ($ts): string {
 
 </div>
 
-<!-- MODAL FOR ADD PARTICIPANT -->
+/* <!-- MODAL FOR ADD PARTICIPANT --> */
 <?php if ($canManageMembers): ?>
     <div class="modal-overlay" id="addParticipantModal" onclick="if(event.target===this) closeModal()">
         <div class="modal-box">
 
             <div class="modal-header">
-                <h6><i class="fa-solid fa-user-plus me-2"></i>Add Participant</h6>
+                <h6><i class="fa-solid fa-user-plus me-2"></i>Add Student</h6>
                 <button class="modal-close" onclick="closeModal()">&times;</button>
             </div>
 
