@@ -4738,7 +4738,7 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
 
             <?php
             $wrStmt = $pdo->prepare("
-            SELECT id, week_number, wr_filepath, created_at
+            SELECT id, week_number, file_name, created_at
             FROM weekly_reports
             WHERE student_id = ?
             ORDER BY week_number ASC
@@ -4807,7 +4807,7 @@ foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                                         <td>
                                             <a href="download-wr.php?id=<?= (int) $wr['id'] ?>" style="text-decoration:none;">
                                                 <i class="fa-solid fa-file-lines me-1" style="color:#ff6b2c;"></i>
-                                                <?= htmlspecialchars($wr['wr_filepath']) ?>
+                                                <?= htmlspecialchars($wr['file_name']) ?>
                                             </a>
                                         </td>
                                         <td>
