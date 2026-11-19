@@ -4621,10 +4621,6 @@ $page = 'messages';
                 }
             });
         }
-    </script>
-    <!-- addtl e -->
-
-    <script>
         // Flash alert auto-dismiss
         setTimeout(() => {
             const alert = document.getElementById('flashAlert');
