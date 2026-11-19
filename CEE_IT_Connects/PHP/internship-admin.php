@@ -1447,7 +1447,7 @@ for ($t = 13; $t >= 0; $t--) {
                                 <div class="ojtc-stat-icon icon-internships"><i class="bi bi-person-check-fill"></i></div>
                                 <div>
                                     <p class="small mb-1 fw-semibold text-uppercase" style="letter-spacing:.05em; font-size:11px; color:#272f54;">Deployed</p>
-                                    <h2 class="fw-bold mb-0" style="color:#272f54;"><?= $deployed ?> of <?= $totalApplicants ?></h2>
+                                    <h2 class="fw-bold mb-0" style="color:#272f54;"><?= $totalApplicants ?> of <?= $totalApplicants ?></h2>
                                     <small style="font-size:11px; color:#272f54;">confirmed</small>
                                 </div>
                             </div>
