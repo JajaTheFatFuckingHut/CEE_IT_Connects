@@ -1759,7 +1759,6 @@ $rmFmtTime = function ($ts): string {
     </div>
 </div>
 
-/* <!-- TABS --> */
 <div class="rm-tabs">
     <!-- addtl s / e &section=<?= $rmSec ?> -->
     <a href="?room_id=<?= $room_id ?>&tab=updates&section=<?= $rmSec ?>"
@@ -1772,7 +1771,6 @@ $rmFmtTime = function ($ts): string {
     </a>
 </div>
 
-/* <!-- CONTENT --> */
 <div class="mt-3">
 
     <?php if ($tab === 'members'): ?>
@@ -2042,7 +2040,6 @@ $rmFmtTime = function ($ts): string {
 
 </div>
 
-/* <!-- MODAL FOR ADD PARTICIPANT --> */
 <?php if ($canManageMembers): ?>
     <div class="modal-overlay" id="addParticipantModal" onclick="if(event.target===this) closeModal()">
         <div class="modal-box">
@@ -2169,7 +2166,6 @@ $rmFmtTime = function ($ts): string {
     }
 
 
-    /* ── CHAT ── */
     function autoResize(el) {
         el.style.height = 'auto';
         el.style.height = Math.min(el.scrollHeight, 110) + 'px';
