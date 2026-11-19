@@ -437,6 +437,48 @@ $adviserDtrStmt = $pdo->prepare("
 $adviserDtrStmt->execute([$adviser_id]);
 $adviserDtrRows = $adviserDtrStmt->fetchAll(PDO::FETCH_ASSOC);
 
+
+if (isset($_GET['wr_file'])) {
+    $wrId = (int) $_GET['wr_file'];
+
+    // Only serve the file if the student is in one of this adviser's active rooms
+    $wrStmt = $pdo->prepare("
+        SELECT wr.file_name, wr.file_mime, wr.file_data
+        FROM weekly_reports wr
+        WHERE wr.id = :id
+          AND EXISTS (
+              SELECT 1
+              FROM room_members rm
+              JOIN rooms r ON r.id = rm.room_id
+              WHERE rm.user_id = wr.student_id AND rm.user_type = 'student'
+                AND r.adviser_id = :aid AND r.is_archived = FALSE
+          )
+    ");
+    $wrStmt->bindValue(':id', $wrId, PDO::PARAM_INT);
+    $wrStmt->bindValue(':aid', (int) $adviser_id, PDO::PARAM_INT);
+    $wrStmt->execute();
+    $wrStmt->bindColumn('file_name', $wrName);
+    $wrStmt->bindColumn('file_mime', $wrMime);
+    $wrStmt->bindColumn('file_data', $wrData, PDO::PARAM_LOB);
+
+    if (!$wrStmt->fetch(PDO::FETCH_BOUND)) {
+        http_response_code(404);
+        exit('File not found');
+    }
+
+    $wrSafe = str_replace(['"', "\r", "\n"], '', $wrName);
+    header('Content-Type: ' . ($wrMime ?: 'application/octet-stream'));
+    header('Content-Disposition: ' . (isset($_GET['download']) ? 'attachment' : 'inline') . '; filename="' . $wrSafe . '"');
+    header('X-Content-Type-Options: nosniff');
+
+    if (is_resource($wrData)) {
+        fpassthru($wrData);
+    } else {
+        echo $wrData;
+    }
+    exit;
+}
+
 foreach ($adviserDtrRows as &$row) {
     $required = (float) $row['required_hours'];
     $completed = (float) $row['total_hours'];
@@ -3969,37 +4011,54 @@ $page = 'messages';
                         </div>
                         <div class="sysAdm-header-text">
                             <h2>Weekly Progress Reports</h2>
-                            <p>View the Google Document report links submitted by students in this room.</p>
+                            <p>View the weekly reports uploaded by students in this room.</p>
                         </div>
                     </div>
                 </div>
 
                 <?php
+                // One row per (student, report). Students with no reports still appear (wr_id is NULL).
+                // file_data is NOT selected here, so the page stays light.
                 $reportsStmt = $pdo->prepare("
-            SELECT rl.student_id, rl.link, rl.updated_at,
-                   s.full_name AS student_name
-            FROM report_links rl
-            JOIN students s ON s.id = rl.student_id
-            WHERE EXISTS (
-                SELECT 1
-                FROM room_members rm
-                JOIN rooms r ON r.id = rm.room_id
-                WHERE rm.user_id = s.id AND rm.user_type = 'student'
-                AND r.adviser_id = ? AND r.is_archived = FALSE
-            )
-            ORDER BY s.full_name
-        ");
+                    SELECT s.id AS student_id, s.full_name AS student_name,
+                           wr.id AS wr_id, wr.week_number, wr.file_name, wr.file_mime, wr.created_at
+                    FROM students s
+                    LEFT JOIN weekly_reports wr ON wr.student_id = s.id
+                    WHERE EXISTS (
+                        SELECT 1
+                        FROM room_members rm
+                        JOIN rooms r ON r.id = rm.room_id
+                        WHERE rm.user_id = s.id AND rm.user_type = 'student'
+                        AND r.adviser_id = ? AND r.is_archived = FALSE
+                    )
+                    ORDER BY s.full_name, wr.week_number
+                ");
                 $reportsStmt->execute([$adviser_id]);
-                $reportRows = $reportsStmt->fetchAll(PDO::FETCH_ASSOC);
 
-                // turn a normal Google Docs link into an embeddable /preview link
-                function gdocPreviewUrl(string $url): string
-                {
-                    $url = preg_replace('/[?#].*$/', '', $url);
-                    if (preg_match('#/(edit|view|preview)$#', $url)) {
-                        return preg_replace('#/(edit|view|preview)$#', '/preview', $url);
+                // Group by student. $byStudent is also printed into the page's JS (studentReports).
+                $byStudent = [];
+                foreach ($reportsStmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
+                    $sid = (int) $r['student_id'];
+                    if (!isset($byStudent[$sid])) {
+                        $byStudent[$sid] = [
+                            'name' => $r['student_name'],
+                            'last' => null,
+                            'reports' => [],
+                        ];
                     }
-                    return rtrim($url, '/') . '/preview';
+                    if ($r['wr_id'] !== null) {
+                        $byStudent[$sid]['reports'][] = [
+                            'id' => (int) $r['wr_id'],
+                            'week' => (int) $r['week_number'],
+                            'name' => $r['file_name'],
+                            'mime' => $r['file_mime'],
+                            'date' => date('M d, Y', strtotime($r['created_at'])),
+                            'file' => 'ojt-adviser.php?wr_file=' . (int) $r['wr_id'],
+                        ];
+                        if ($byStudent[$sid]['last'] === null || $r['created_at'] > $byStudent[$sid]['last']) {
+                            $byStudent[$sid]['last'] = $r['created_at'];
+                        }
+                    }
                 }
                 ?>
 
@@ -4020,75 +4079,53 @@ $page = 'messages';
                         <thead style="background:#f8f9fa;">
                             <tr>
                                 <th>Student</th>
-                                <th>Last Updated</th>
+                                <th>Reports Submitted</th>
+                                <th>Last Submitted</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody id="reports-tbody">
-                            <?php if (empty($reportRows)): ?>
+                            <?php if (empty($byStudent)): ?>
                                 <tr>
-                                    <td colspan="3" class="text-center text-muted py-4">No report links submitted yet.</td>
+                                    <td colspan="4" class="text-center text-muted py-4">No students in this room yet.</td>
                                 </tr>
                             <?php else: ?>
-                                <?php foreach ($reportRows as $row):
+                                <?php foreach ($byStudent as $sid => $st):
                                     $avatarColors = ['#ff2c8f', '#2c6fff', '#1abc9c', '#9b59b6', '#e67e22'];
-                                    $avatarColor = $avatarColors[crc32($row['student_name']) % count($avatarColors)];
+                                    $avatarColor = $avatarColors[crc32($st['name']) % count($avatarColors)];
+                                    $count = count($st['reports']);
                                     ?>
                                     <tr>
                                         <td>
                                             <div class="student-cell">
                                                 <div class="avatar" style="background:<?= $avatarColor ?>;">
-                                                    <strong><?= strtoupper(substr($row['student_name'], 0, 1)) ?></strong>
+                                                    <strong><?= strtoupper(substr($st['name'], 0, 1)) ?></strong>
                                                 </div>
-                                                <span><?= htmlspecialchars($row['student_name']) ?></span>
+                                                <span><?= htmlspecialchars($st['name']) ?></span>
                                             </div>
                                         </td>
-                                        <td><?= date('M d, Y', strtotime($row['updated_at'])) ?></td>
                                         <td>
-                                            <button type="button" data-name="<?= htmlspecialchars($row['student_name']) ?>"
-                                                data-link="<?= htmlspecialchars($row['link']) ?>"
-                                                data-preview="<?= htmlspecialchars(gdocPreviewUrl($row['link'])) ?>"
-                                                onclick="openReport(this)"
+                                            <span
+                                                style="background:<?= $count ? '#d1fae5' : '#fef3c7' ?>; color:<?= $count ? '#065f46' : '#92400e' ?>;
+                                                border:1px solid <?= $count ? '#6ee7b7' : '#fde68a' ?>;
+                                                font-size:11px; font-weight:600; padding:2px 8px; border-radius:99px; white-space:nowrap;">
+                                                <?= $count ?>             <?= $count === 1 ? 'report' : 'reports' ?>
+                                            </span>
+                                        </td>
+                                        <td><?= $st['last'] ? date('M d, Y', strtotime($st['last'])) : '—' ?></td>
+                                        <td>
+                                            <button type="button" onclick="openReports(<?= (int) $sid ?>)"
                                                 style="display:inline-flex; align-items:center; gap:5px; padding:5px 10px;
                                         background:#dbeafe; color:#1e40af; border-radius:6px; font-size:11px;
                                         font-weight:600; border:1px solid #93c5fd; cursor:pointer; white-space:nowrap;">
                                                 <i class="fa fa-eye"></i> View
                                             </button>
-                                            <a href="<?= htmlspecialchars($row['link']) ?>" target="_blank"
-                                                rel="noopener noreferrer"
-                                                style="display:inline-flex; align-items:center; gap:5px; padding:5px 10px;
-                                        background:#eef2ff; color:#272f54; border-radius:6px; font-size:11px;
-                                        font-weight:600; border:1px solid #c7d2fe; text-decoration:none; white-space:nowrap;">
-                                                <i class="fa fa-up-right-from-square"></i> Open
-                                            </a>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
                             <?php endif; ?>
                         </tbody>
                     </table>
-                </div>
-
-                <!-- PREVIEW MODAL -->
-                <div id="reportsModal" onclick="if(event.target===this) closeReport()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:2000;
-            align-items:center; justify-content:center; padding:16px;">
-                    <div style="background:#fff; border-radius:14px; width:100%; max-width:1000px; height:85vh;
-                display:flex; flex-direction:column; overflow:hidden;">
-
-                        <div style="display:flex; justify-content:space-between; align-items:center;
-                    padding:14px 18px; border-bottom:1px solid #e5e7eb; gap:8px;">
-                            <h5 id="reportsModalTitle" style="margin:0; color:#272f54;"></h5>
-                            <span style="display:flex; align-items:center; gap:10px;">
-                                <a id="reportsOpen" href="#" target="_blank" rel="noopener noreferrer"
-                                    class="btn btn-sm btn-outline-primary">
-                                    <i class="fa fa-up-right-from-square"></i> Open in Google Docs</a>
-                                <button type="button" onclick="closeReport()"
-                                    style="border:none; background:none; font-size:24px; cursor:pointer;">&times;</button>
-                            </span>
-                        </div>
-
-                        <iframe id="reportsFrame" style="flex:1; border:0; width:100%;"></iframe>
-                    </div>
                 </div>
             </div>
 
@@ -4418,6 +4455,48 @@ $page = 'messages';
             </div>
         </div>
     </div>
+
+    <!-- WEEKLY REPORTS MODAL -->
+    <div id="reportsModal" onclick="if(event.target===this) closeReports()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:2000;
+            align-items:center; justify-content:center; padding:16px;">
+        <div style="background:#fff; border-radius:14px; width:100%; max-width:1000px; height:85vh;
+                display:flex; flex-direction:column; overflow:hidden;">
+
+            <div style="display:flex; justify-content:space-between; align-items:center;
+                    padding:14px 18px; border-bottom:1px solid #e5e7eb;">
+                <h5 id="reportsModalTitle" style="margin:0; color:#272f54;"></h5>
+                <button type="button" onclick="closeReports()"
+                    style="border:none; background:none; font-size:24px; cursor:pointer;">&times;</button>
+            </div>
+
+            <div style="display:flex; flex:1; min-height:0; flex-wrap:wrap;">
+                <!-- submitted weeks -->
+                <div id="reportsList" style="width:230px; max-width:100%; overflow:auto; padding:12px;
+                                     border-right:1px solid #e5e7eb; background:#f8f9fa;"></div>
+
+                <!-- preview -->
+                <div style="flex:1; min-width:280px; display:flex; flex-direction:column;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;
+                            padding:8px 14px; border-bottom:1px solid #e5e7eb; gap:8px;">
+                        <strong id="reportsCurrent" style="font-size:14px;"></strong>
+                        <span>
+                            <a id="reportsOpen" href="#" target="_blank" rel="noopener"
+                                class="btn btn-sm btn-outline-primary">
+                                <i class="fa fa-up-right-from-square"></i> Open</a>
+                            <a id="reportsDl" href="#" class="btn btn-sm btn-outline-secondary">
+                                <i class="fa fa-download"></i> Download</a>
+                        </span>
+                    </div>
+                    <iframe id="reportsFrame" style="flex:1; border:0; width:100%;"></iframe>
+                    <div id="reportsNoPreview" style="display:none; flex:1; align-items:center; justify-content:center;
+                                              text-align:center; color:#6b7280; padding:20px;">
+                        Word documents can't be previewed here. Use Download to open the file.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
@@ -4859,73 +4938,75 @@ $page = 'messages';
             return d.innerHTML;
         }
 
-        function openReport(btn) {
-            document.getElementById('reportsModalTitle').textContent = btn.dataset.name + "'s Weekly Report";
-            document.getElementById('reportsOpen').href = btn.dataset.link;
-            document.getElementById('reportsFrame').src = btn.dataset.preview;
+
+        function openReports(sid) {
+            const st = studentReports[sid];
+            if (!st) return;
+
+            currentReports = st.reports || [];
+            document.getElementById('reportsModalTitle').textContent = st.name + ' — Weekly Reports';
+
+            document.getElementById('reportsList').innerHTML = currentReports.length
+                ? currentReports.map((r, i) => `
+            <button type="button" data-i="${i}" onclick="selectReport(${i})"
+                style="display:block; width:100%; text-align:left; padding:10px 12px; margin-bottom:6px;
+                       border:1px solid #e5e7eb; border-radius:10px; background:#fff; cursor:pointer;">
+                <i class="fa fa-circle-check" style="color:#059669; font-size:11px;"></i>
+                <strong>Week ${r.week}</strong><br>
+                <small style="color:#6b7280;">${escH(r.date)}</small>
+            </button>`).join('')
+                : '<div style="color:#6b7280; font-size:13px;">No reports submitted yet.</div>';
+
             document.getElementById('reportsModal').style.display = 'flex';
+
+            if (currentReports.length) selectReport(currentReports.length - 1); // latest week first
+            else clearReportPreview();
         }
 
-        function closeReport() {
+        function clearReportPreview() {
+            document.getElementById('reportsCurrent').textContent = '';
+            document.getElementById('reportsOpen').href = '#';
+            document.getElementById('reportsDl').href = '#';
+            document.getElementById('reportsFrame').style.display = 'none';
+            document.getElementById('reportsFrame').src = 'about:blank';
+            const none = document.getElementById('reportsNoPreview');
+            none.textContent = 'No report to preview.';
+            none.style.display = 'flex';
+        }
+
+        function selectReport(i) {
+            const r = currentReports[i];
+            if (!r) return;
+
+            document.querySelectorAll('#reportsList button').forEach(b => {
+                const on = Number(b.dataset.i) === i;
+                b.style.background = on ? '#dbeafe' : '#fff';
+                b.style.borderColor = on ? '#93c5fd' : '#e5e7eb';
+            });
+
+            document.getElementById('reportsCurrent').textContent = 'Week ' + r.week + ' — ' + r.name;
+            document.getElementById('reportsOpen').href = r.file;
+            document.getElementById('reportsDl').href = r.file + '&download=1';
+
+            const frame = document.getElementById('reportsFrame');
+            const none = document.getElementById('reportsNoPreview');
+
+            if (r.mime === 'application/pdf') {
+                none.style.display = 'none';
+                frame.style.display = 'block';
+                frame.src = r.file;
+            } else {
+                frame.style.display = 'none';
+                frame.src = 'about:blank';
+                none.textContent = "Word documents can't be previewed here. Use Download to open the file.";
+                none.style.display = 'flex';
+            }
+        }
+
+        function closeReports() {
             document.getElementById('reportsModal').style.display = 'none';
             document.getElementById('reportsFrame').src = 'about:blank';
         }
-
-        // function openReports(sid) {
-        //     const st = studentReports[sid];
-        //     if (!st) return;
-
-        //     currentReports = st.reports;
-        //     document.getElementById('reportsModalTitle').textContent = st.name + ' — Weekly Reports';
-
-        //     document.getElementById('reportsList').innerHTML = currentReports.map((r, i) => `
-        // <button type="button" data-i="${i}" onclick="selectReport(${i})"
-        //     style="display:block; width:100%; text-align:left; padding:10px 12px; margin-bottom:6px;
-        //            border:1px solid #e5e7eb; border-radius:10px; background:#fff; cursor:pointer;">
-        //     <strong>Week ${r.week}</strong><br>
-        //     <small style="color:#6b7280;">${escH(r.date)}</small>
-        // </button>`).join('');
-
-        //     document.getElementById('reportsModal').style.display = 'flex';
-        //     selectReport(currentReports.length - 1);   // open the latest week first
-        // }
-
-        // function selectReport(i) {
-        //     const r = currentReports[i];
-        //     if (!r) return;
-
-        //     document.querySelectorAll('#reportsList button').forEach(b => {
-        //         const on = Number(b.dataset.i) === i;
-        //         b.style.background = on ? '#dbeafe' : '#fff';
-        //         b.style.borderColor = on ? '#93c5fd' : '#e5e7eb';
-        //     });
-
-        //     const isDb = r.file.includes('view-report.php');
-        //     const dl = isDb ? r.file + '&download=1' : r.file;
-        //     const previewable = r.mime ? r.mime === 'application/pdf' : /\.pdf($|\?)/i.test(r.file) || isDb;
-
-        //     document.getElementById('reportsCurrent').textContent = 'Week ' + r.week;
-        //     document.getElementById('reportsOpen').href = r.file;
-        //     document.getElementById('reportsDl').href = dl;
-
-        //     const frame = document.getElementById('reportsFrame');
-        //     const none = document.getElementById('reportsNoPreview');
-        //     if (previewable) {
-        //         frame.style.display = 'block';
-        //         none.style.display = 'none';
-        //         frame.src = r.file;
-        //     } else {
-        //         frame.style.display = 'none';
-        //         frame.src = 'about:blank';
-        //         none.style.display = 'flex';
-        //     }
-        // }
-
-        // function closeReports() {
-        //     document.getElementById('reportsModal').style.display = 'none';
-        //     document.getElementById('reportsFrame').src = 'about:blank';
-        // }
-
 
         const requirementsData = <?= json_encode((object) ($reqData ?? []), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
         let currentDocs = [];
