@@ -192,49 +192,183 @@ $docAvailability = $docAvailStmt->fetchAll(PDO::FETCH_ASSOC);
 
 // addtl s
 // ── DASHBOARD ANALYTICS (percentages + charts) ──
-$totalApplicants = count($applicants);
-$phaseCounts = ['Internship Confirmed' => 0, 'In Progress' => 0, 'No Progress' => 0];
-$reqComplete = 0;
-$programCounts = [];
-$companyCounts = [];
-$appsByDay = [];
+// $totalApplicants = count($applicants);
+// $phaseCounts = ['Internship Confirmed' => 0, 'In Progress' => 0, 'No Progress' => 0];
+// $reqComplete = 0;
+// $programCounts = [];
+// $companyCounts = [];
+// $appsByDay = [];
 
-foreach ($applicants as $ap) {
-    if (isset($phaseCounts[$ap['current_phase']])) {
-        $phaseCounts[$ap['current_phase']]++;
-    }
-    if ($ap['requirements'] === 'Complete') {
-        $reqComplete++;
-    }
-    $prog = ucwords(strtolower($ap['program'] ?: 'Unspecified'));
-    $programCounts[$prog] = ($programCounts[$prog] ?? 0) + 1;
+// foreach ($applicants as $ap) {
+//     if (isset($phaseCounts[$ap['current_phase']])) {
+//         $phaseCounts[$ap['current_phase']]++;
+//     }
+//     if ($ap['requirements'] === 'Complete') {
+//         $reqComplete++;
+//     }
+//     $prog = ucwords(strtolower($ap['program'] ?: 'Unspecified'));
+//     $programCounts[$prog] = ($programCounts[$prog] ?? 0) + 1;
 
-    $comp = $ap['company'] ?: 'Unknown';
-    $companyCounts[$comp] = ($companyCounts[$comp] ?? 0) + 1;
+//     $comp = $ap['company'] ?: 'Unknown';
+//     $companyCounts[$comp] = ($companyCounts[$comp] ?? 0) + 1;
 
-    if (!empty($ap['submitted_at'])) {
-        $day = date('Y-m-d', strtotime($ap['submitted_at']));
-        $appsByDay[$day] = ($appsByDay[$day] ?? 0) + 1;
-    }
+//     if (!empty($ap['submitted_at'])) {
+//         $day = date('Y-m-d', strtotime($ap['submitted_at']));
+//         $appsByDay[$day] = ($appsByDay[$day] ?? 0) + 1;
+//     }
+// }
+// $reqIncomplete = $totalApplicants - $reqComplete;
+
+// $pctOf = fn($n) => $totalApplicants > 0 ? (int) round(($n / $totalApplicants) * 100) : 0;
+// $confirmedPct = $pctOf($phaseCounts['Internship Confirmed']);
+// $inProgressPct = $pctOf($phaseCounts['In Progress']);
+// $noProgressPct = $pctOf($phaseCounts['No Progress']);
+// $reqCompletePct = $pctOf($reqComplete);
+
+// arsort($companyCounts);
+// $companyCounts = array_slice($companyCounts, 0, 6, true);
+
+// // Applications per day, last 14 days
+// $trendLabels = [];
+// $trendData = [];
+// for ($t = 13; $t >= 0; $t--) {
+//     $dKey = date('Y-m-d', strtotime("-{$t} days"));
+//     $trendLabels[] = date('M j', strtotime($dKey));
+//     $trendData[] = $appsByDay[$dKey] ?? 0;
+// }
+
+// ── DASHBOARD FILTERS (school year + program) ──
+$SY_START_MONTH = 8; // CONFIRM: month your school year starts (8 = August)
+
+$progMap = ['ce' => 'Civil Engineering', 'ee' => 'Electrical Engineering', 'it' => 'Information Technology'];
+$progKey = strtolower($_GET['program'] ?? 'all');
+if (!isset($progMap[$progKey])) $progKey = 'all';
+$activePrograms = $progKey === 'all' ? $progMap : [$progKey => $progMap[$progKey]];
+$progSql  = $progKey === 'all' ? '' : ' AND LOWER(s.program) = ' . $pdo->quote(strtolower($progMap[$progKey]));
+$progLike = $progKey === 'all' ? '' : ' AND i.program ILIKE ' . $pdo->quote('%' . $progMap[$progKey] . '%');
+
+// school years derived from real submitted_at values
+$syExpr = "(EXTRACT(YEAR FROM submitted_at)::int - CASE WHEN EXTRACT(MONTH FROM submitted_at) < $SY_START_MONTH THEN 1 ELSE 0 END)";
+$syOptions = $pdo->query("SELECT DISTINCT $syExpr AS sy FROM ojt_applications WHERE submitted_at IS NOT NULL ORDER BY sy DESC")->fetchAll(PDO::FETCH_COLUMN);
+$termSel = $_GET['term'] ?? (!empty($syOptions) ? (string) $syOptions[0] : 'all');
+$termSql = '';
+if ($termSel !== 'all' && ctype_digit($termSel)) {
+    $sy = (int) $termSel;
+    $termStart = sprintf('%04d-%02d-01', $sy, $SY_START_MONTH);
+    $termEnd   = sprintf('%04d-%02d-01', $sy + 1, $SY_START_MONTH);
+    $termSql = " AND oa.submitted_at >= '$termStart' AND oa.submitted_at < '$termEnd'";
+} else {
+    $termSel = 'all';
 }
-$reqIncomplete = $totalApplicants - $reqComplete;
 
-$pctOf = fn($n) => $totalApplicants > 0 ? (int) round(($n / $totalApplicants) * 100) : 0;
-$confirmedPct = $pctOf($phaseCounts['Internship Confirmed']);
-$inProgressPct = $pctOf($phaseCounts['In Progress']);
-$noProgressPct = $pctOf($phaseCounts['No Progress']);
-$reqCompletePct = $pctOf($reqComplete);
+// required steps, same as your "Internship Confirmed" logic
+$docTypes = [
+    'company_profile' => 'Company Profile',
+    'resume'          => 'Resume',
+    'addendum'        => 'Addendum',
+    'medical_cert'    => 'Medical Cert',
+    'internship_plan' => 'Internship Plan',
+    'vicinity_map'    => 'Vicinity Map',
+    'oath'            => 'Oath',
+    'reco_letter'     => 'Reco Letter',
+    'waiver'          => 'Waiver',
+];
+$stepValues = implode(',', array_map(fn($k) => "('$k')", array_keys($docTypes)));
+$reqRule = "(st.step_key <> 'waiver' OR i.is_plv_internal IS NOT TRUE)
+        AND (st.step_key <> 'reco_letter' OR (i.is_plv_internal IS NOT TRUE AND i.is_valenzuela_lgu IS NOT TRUE))";
 
-arsort($companyCounts);
-$companyCounts = array_slice($companyCounts, 0, 6, true);
+// ── ONE ROW PER APPLICATION: required vs. not-submitted docs ──
+$appRows = $pdo->query("
+    SELECT oa.id, s.id AS sid, s.full_name, s.section,
+           COUNT(*) AS required,
+           COUNT(*) FILTER (WHERE sp.is_done IS NOT TRUE) AS not_submitted
+    FROM ojt_applications oa
+    JOIN students s ON s.id = oa.student_id
+    JOIN internships i ON i.id = oa.internship_id
+    CROSS JOIN (VALUES $stepValues) AS st(step_key)
+    LEFT JOIN student_progress sp ON sp.student_id = s.id AND sp.internship_id = oa.internship_id AND sp.step_key = st.step_key
+    WHERE $reqRule $progSql $termSql
+    GROUP BY oa.id, s.id, s.full_name, s.section
+")->fetchAll(PDO::FETCH_ASSOC);
 
-// Applications per day, last 14 days
+$totalApplicants = count($appRows);
+$deployed        = count(array_filter($appRows, fn($r) => (int) $r['not_submitted'] === 0));
+$docsRequired    = (int) array_sum(array_column($appRows, 'required'));
+$docsPassed      = $docsRequired - (int) array_sum(array_column($appRows, 'not_submitted'));
+$docsPassedPct   = $docsRequired > 0 ? (int) round($docsPassed / $docsRequired * 100) : 0;
+
+$followUps = array_values(array_filter($appRows, fn($r) => (int) $r['not_submitted'] > 0));
+usort($followUps, fn($a, $b) => $b['not_submitted'] <=> $a['not_submitted']);
+$followUps = array_slice($followUps, 0, 5);
+
+$secStudents = [];
+foreach ($appRows as $r) {
+    $secStudents[$r['section'] ?: 'Unassigned'][$r['sid']] = true;
+}
+ksort($secStudents);
+$sectionCounts = array_map('count', $secStudents);
+
+// ── DOCUMENTS PASSED BY TYPE, PER PROGRAM ──
+$docTypeStats = [];
+$docTypeStmt = $pdo->query("
+    SELECT LOWER(s.program) AS prog, st.step_key,
+           COUNT(*) AS required,
+           COUNT(*) FILTER (WHERE sp.is_done IS TRUE) AS passed
+    FROM ojt_applications oa
+    JOIN students s ON s.id = oa.student_id
+    JOIN internships i ON i.id = oa.internship_id
+    CROSS JOIN (VALUES $stepValues) AS st(step_key)
+    LEFT JOIN student_progress sp ON sp.student_id = s.id AND sp.internship_id = oa.internship_id AND sp.step_key = st.step_key
+    WHERE $reqRule $termSql
+    GROUP BY LOWER(s.program), st.step_key
+");
+foreach ($docTypeStmt as $r) { $docTypeStats[$r['prog']][$r['step_key']] = $r; }
+
+$docCharts = [];
+foreach ($activePrograms as $k => $name) {
+    $ap = $np = [];
+    foreach ($docTypes as $key => $label) {
+        $st = $docTypeStats[strtolower($name)][$key] ?? null;
+        $p = (int) ($st['passed'] ?? 0);
+        $q = (int) ($st['required'] ?? 0);
+        $ap[] = $p;
+        $np[] = $q - $p;
+    }
+    $docCharts[$k] = ['title' => $name, 'approved' => $ap, 'missing' => $np];
+}
+
+// ── PARTNER COMPANIES ──
+$partners = $pdo->query("
+    SELECT i.company, i.title, COUNT(oa.id) AS applicants
+    FROM internships i
+    LEFT JOIN ojt_applications oa ON oa.internship_id = i.id $termSql
+    WHERE 1=1 $progLike
+    GROUP BY i.id, i.company, i.title
+    ORDER BY applicants DESC, i.company
+    LIMIT 5
+")->fetchAll(PDO::FETCH_ASSOC);
+
+// ── POSTINGS (count + recent), program-filtered ──
+$totalInternships = $pdo->query("SELECT COUNT(*) FROM internships i WHERE 1=1 $progLike")->fetchColumn();
+$recentInternships = $pdo->query("
+    SELECT i.title, i.company, i.location, i.created_at
+    FROM internships i WHERE 1=1 $progLike
+    ORDER BY i.created_at DESC LIMIT 5
+")->fetchAll(PDO::FETCH_ASSOC);
+
+// ── DOCUMENTS (recent list + 14-day trend), program-filtered ──
+$dashDocs = array_filter($documents, fn($d) => $progKey === 'all' || strtolower($d['program']) === strtolower($progMap[$progKey]));
+$docsByDay = [];
+foreach ($dashDocs as $d) {
+    $day = date('Y-m-d', strtotime($d['uploaded_at']));
+    $docsByDay[$day] = ($docsByDay[$day] ?? 0) + 1;
+}
 $trendLabels = [];
 $trendData = [];
 for ($t = 13; $t >= 0; $t--) {
     $dKey = date('Y-m-d', strtotime("-{$t} days"));
     $trendLabels[] = date('M j', strtotime($dKey));
-    $trendData[] = $appsByDay[$dKey] ?? 0;
+    $trendData[] = $docsByDay[$dKey] ?? 0;
 }
 // addtl e
 ?>
@@ -1262,243 +1396,192 @@ for ($t = 13; $t >= 0; $t--) {
                     </div>
                 </div>
 
-                <!-- SUMMARY CARDS -->
-                <div class="row g-3 mb-4">
-                    <div class="col-6 col-md-6 col-xl-4">
-                        <div class="ojtc-stat-card card-tint-applications">
-                            <div class="ojtc-stat-icon icon-applications"><i class="bi bi-file-earmark-fill"></i></div>
-                            <div>
-                                <p class="small mb-1 fw-semibold text-uppercase"
-                                    style="letter-spacing:.05em; font-size:11px; color:#7a5200;">Applications</p>
-                                <h2 class="fw-bold mb-0" style="color:#3b2600;"><?= $totalApplications ?></h2>
+                    <!-- FILTERS -->
+                    <form method="get" class="filter-bar d-flex align-items-center flex-wrap gap-2 mb-3">
+                        <label class="fw-bold d-flex align-items-center gap-1 mb-0" style="color:#272f54;"><i class="bi bi-calendar3"></i> Term</label>
+                        <select name="term" class="filter-select" onchange="this.form.submit()">
+                            <option value="all" <?= $termSel === 'all' ? 'selected' : '' ?>>All school years</option>
+                            <?php foreach ($syOptions as $sy): ?>
+                                <option value="<?= (int) $sy ?>" <?= (string) $sy === $termSel ? 'selected' : '' ?>>S.Y. <?= (int) $sy ?>-<?= (int) $sy + 1 ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <select name="program" class="filter-select" onchange="this.form.submit()">
+                            <option value="all">All programs</option>
+                            <?php foreach ($progMap as $k => $n): ?>
+                                <option value="<?= $k ?>" <?= $k === $progKey ? 'selected' : '' ?>><?= $n ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </form>
+
+                    <!-- SUMMARY CARDS -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-6 col-xl-3">
+                            <div class="ojtc-stat-card card-tint-applications">
+                                <div class="ojtc-stat-icon icon-applications"><i class="bi bi-file-earmark-fill"></i></div>
+                                <div>
+                                    <p class="small mb-1 fw-semibold text-uppercase" style="letter-spacing:.05em; font-size:11px; color:#7a5200;">Applicants</p>
+                                    <h2 class="fw-bold mb-0" style="color:#3b2600;"><?= $totalApplicants ?></h2>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-6 col-md-6 col-xl-4">
-                        <div class="ojtc-stat-card card-tint-internships">
-                            <div class="ojtc-stat-icon icon-internships"><i class="bi bi-briefcase-fill"></i></div>
-                            <div>
-                                <p class="small mb-1 fw-semibold text-uppercase"
-                                    style="letter-spacing:.05em; font-size:11px; color:#272f54;">Internship Postings</p>
-                                <h2 class="fw-bold mb-0" style="color:#272f54;"><?= $totalInternships ?></h2>
+                        <div class="col-6 col-xl-3">
+                            <div class="ojtc-stat-card card-tint-internships">
+                                <div class="ojtc-stat-icon icon-internships"><i class="bi bi-person-check-fill"></i></div>
+                                <div>
+                                    <p class="small mb-1 fw-semibold text-uppercase" style="letter-spacing:.05em; font-size:11px; color:#272f54;">Deployed</p>
+                                    <h2 class="fw-bold mb-0" style="color:#272f54;"><?= $deployed ?> of <?= $totalApplicants ?></h2>
+                                    <small style="font-size:11px; color:#272f54;">confirmed</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-xl-3">
+                            <div class="ojtc-stat-card card-tint-documents">
+                                <div class="ojtc-stat-icon icon-documents"><i class="bi bi-file-earmark-text-fill"></i></div>
+                                <div>
+                                    <p class="small mb-1 fw-semibold text-uppercase" style="letter-spacing:.05em; font-size:11px; color:#a13d1f;">Documents passed</p>
+                                    <h2 class="fw-bold mb-0" style="color:#a13d1f;"><?= $docsPassedPct ?>%</h2>
+                                    <small style="font-size:11px; color:#a13d1f;"><?= $docsPassed ?> of <?= $docsRequired ?></small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-xl-3">
+                            <div class="ojtc-stat-card card-tint-announcements">
+                                <div class="ojtc-stat-icon icon-announcements"><i class="bi bi-briefcase-fill"></i></div>
+                                <div>
+                                    <p class="small mb-1 fw-semibold text-uppercase" style="letter-spacing:.05em; font-size:11px; color:#27500a;">Internship Postings</p>
+                                    <h2 class="fw-bold mb-0" style="color:#27500a;"><?= $totalInternships ?></h2>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="col-6 col-md-6 col-xl-4">
-                        <div class="ojtc-stat-card card-tint-documents">
-                            <div class="ojtc-stat-icon icon-documents"><i class="bi bi-file-earmark-text-fill"></i>
-                            </div>
-                            <div>
-                                <p class="small mb-1 fw-semibold text-uppercase"
-                                    style="letter-spacing:.05em; font-size:11px; color:#a13d1f;">Documents</p>
-                                <h2 class="fw-bold mb-0" style="color:#a13d1f;"><?= $totalDocuments ?></h2>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-6 col-md-6 col-xl-4">
-                        <div class="ojtc-stat-card card-tint-internships">
-                            <div class="ojtc-stat-icon icon-internships"><i class="bi bi-clipboard-check-fill"></i>
-                            </div>
-                            <div>
-                                <p class="small mb-1 fw-semibold text-uppercase"
-                                    style="letter-spacing:.05em; font-size:11px; color:#272f54;">Requirements Complete
-                                </p>
-                                <h2 class="fw-bold mb-0" style="color:#272f54;"><?= $reqCompletePct ?>%</h2>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-6 col-md-6 col-xl-4">
-                        <div class="ojtc-stat-card card-tint-applications">
-                            <div class="ojtc-stat-icon icon-applications"><i class="bi bi-hourglass-split"></i></div>
-                            <div>
-                                <p class="small mb-1 fw-semibold text-uppercase"
-                                    style="letter-spacing:.05em; font-size:11px; color:#7a5200;">In Progress</p>
-                                <h2 class="fw-bold mb-0" style="color:#3b2600;"><?= $inProgressPct ?>%</h2>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-6 col-md-6 col-xl-4">
-                        <div class="ojtc-stat-card card-tint-documents">
-                            <div class="ojtc-stat-icon icon-documents"><i class="bi bi-dash-circle-fill"></i></div>
-                            <div>
-                                <p class="small mb-1 fw-semibold text-uppercase"
-                                    style="letter-spacing:.05em; font-size:11px; color:#a13d1f;">No Progress</p>
-                                <h2 class="fw-bold mb-0" style="color:#a13d1f;"><?= $noProgressPct ?>%</h2>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ANALYTICS CHARTS -->
-                <div class="row g-4 mb-4">
-                    <div class="col-12 col-md-6 col-xl-4">
-                        <div class="card border-0 shadow-sm h-100 ojtc-panel-card">
-                            <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
-                                <i class="bi bi-pie-chart" style="color:#272f54;"></i>
-                                <h6 class="fw-bold mb-0" style="color:#272f54;">Intern Phase</h6>
-                            </div>
-                            <div class="card-body px-4 pb-4 pt-2">
-                                <p class="text-muted small mb-3">Confirmed vs. in progress vs. not started.</p>
-                                <div style="position:relative; height:220px;"><canvas id="phaseChart"></canvas></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-12 col-md-6 col-xl-4">
-                        <div class="card border-0 shadow-sm h-100 ojtc-panel-card">
-                            <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
-                                <i class="bi bi-clipboard-check" style="color:#272f54;"></i>
-                                <h6 class="fw-bold mb-0" style="color:#272f54;">Requirements</h6>
-                            </div>
-                            <div class="card-body px-4 pb-4 pt-2">
-                                <p class="text-muted small mb-3">Interns with complete documents.</p>
-                                <div style="position:relative; height:220px;"><canvas id="reqChart"></canvas></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-12 col-xl-4">
-                        <div class="card border-0 shadow-sm h-100 ojtc-panel-card">
-                            <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
-                                <i class="bi bi-bar-chart" style="color:#272f54;"></i>
-                                <h6 class="fw-bold mb-0" style="color:#272f54;">Interns per Program</h6>
-                            </div>
-                            <div class="card-body px-4 pb-4 pt-2">
-                                <p class="text-muted small mb-3">Number of interns by program.</p>
-                                <div style="position:relative; height:220px;"><canvas id="programChart"></canvas></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-12 col-xl-7">
-                        <div class="card border-0 shadow-sm h-100 ojtc-panel-card">
-                            <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
-                                <i class="bi bi-graph-up" style="color:#272f54;"></i>
-                                <h6 class="fw-bold mb-0" style="color:#272f54;">Submissions Trend</h6>
-                            </div>
-                            <div class="card-body px-4 pb-4 pt-2">
-                                <p class="text-muted small mb-3">Students' internship submitted per day, last 14 days.
-                                </p>
-                                <div style="position:relative; height:220px;"><canvas id="trendChart"></canvas></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-12 col-xl-5">
-                        <div class="card border-0 shadow-sm h-100 ojtc-panel-card">
-                            <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
-                                <i class="bi bi-buildings" style="color:#272f54;"></i>
-                                <h6 class="fw-bold mb-0" style="color:#272f54;">Top Companies</h6>
-                            </div>
-                            <div class="card-body px-4 pb-4 pt-2">
-                                <p class="text-muted small mb-3">Companies with the most interns.</p>
-                                <div style="position:relative; height:220px;"><canvas id="companyChart"></canvas></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- addtl e -->
-                <div class="row g-4">
-                    <div class="col-lg-7">
-                        <div class="card border-0 shadow-sm h-100 ojtc-panel-card">
-                            <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
-                                <i class="bi bi-file-earmark-text" style="color:#272f54;"></i>
-                                <h6 class="fw-bold mb-0" style="color:#272f54;">Students' Internship List</h6>
-                            </div>
-                            <div class="card-body px-4 pb-4 pt-2">
-                                <?php if (empty($recentInterested)): ?>
-                                    <p class="text-muted small mb-0">No applications yet.</p>
-                                <?php else: ?>
-                                    <div class="dash-table-scroll">
-                                        <table style="width:100%; border-collapse:collapse; font-size:13px;">
-                                            <thead>
-                                                <tr class="ojtc-th-tab"
-                                                    style="color:#aaa; font-size:12px; text-transform:uppercase; letter-spacing:.04em;">
-                                                    <th
-                                                        style="padding:8px 10px; border-bottom:1px solid #f0f2f7; font-weight:600;">
-                                                        Student</th>
-                                                    <th
-                                                        style="padding:8px 10px; border-bottom:1px solid #f0f2f7; font-weight:600;">
-                                                        Company</th>
-                                                    <th
-                                                        style="padding:8px 10px; border-bottom:1px solid #f0f2f7; font-weight:600;">
-                                                        Date</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <?php foreach ($recentInterested as $ri): ?>
-                                                    <tr class="ojtc-row-hover">
-                                                        <td style="padding:10px; border-bottom:1px solid #f0f2f7;">
-                                                            <div style="display:flex; align-items:center; gap:8px;">
-                                                                <div
-                                                                    style="width:30px;height:30px;min-width:30px;border-radius:50%;background:#eef1ff;color:#272f54;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;">
-                                                                    <?= strtoupper(substr($ri['full_name'], 0, 1)) ?>
-                                                                </div>
-                                                                <span
-                                                                    style="font-weight:500;color:#272f54;"><?= htmlspecialchars($ri['full_name']) ?></span>
-                                                            </div>
-                                                        </td>
-                                                        <td
-                                                            style="padding:10px; border-bottom:1px solid #f0f2f7; color:#888; font-size:12px;">
-                                                            <?= htmlspecialchars($ri['company']) ?>
-                                                        </td>
-                                                        <td
-                                                            style="padding:10px; border-bottom:1px solid #f0f2f7; color:#aaa; font-size:12px;">
-                                                            <?= date("M d", strtotime($ri['submitted_at'])) ?>
-                                                        </td>
-                                                    </tr>
-                                                <?php endforeach; ?>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Recent Announcements -->
-                    <div class="col-lg-5">
-                        <div class="card border-0 shadow-sm h-100 ojtc-panel-card">
-                            <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
-                                <i class="bi bi-bell" style="color:#272f54;"></i>
-                                <h6 class="fw-bold mb-0" style="color:#272f54;">Recent Announcements</h6>
-                            </div>
-                            <div class="card-body px-4 pb-4 pt-2">
-                                <?php if (empty($recentAnnouncements)): ?>
-                                    <p class="text-muted small mb-0">No announcements yet.</p>
-                                <?php else: ?>
-                                    <div class="d-flex flex-column gap-3">
-                                        <?php foreach ($recentAnnouncements as $a):
-                                            $catColors = [
-                                                'news' => ['bg' => '#e6f1fb', 'color' => '#0c447c'],
-                                                'updates' => ['bg' => '#eaf3de', 'color' => '#27500a'],
-                                                'FAQs' => ['bg' => '#faeeda', 'color' => '#633806'],
-                                            ];
-                                            $c = $catColors[$a['category']] ?? ['bg' => '#f0f0f0', 'color' => '#444'];
-                                            ?>
-                                            <div class="d-flex align-items-start gap-3 ojtc-row-hover" style="padding:6px;">
-
-                                                <div style="flex:1;min-width:0;">
-                                                    <p
-                                                        style="font-weight:600;margin:0;color:#272f54;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
-                                                        <?= htmlspecialchars($a['title']) ?>
-                                                    </p>
-                                                    <p style="color:#aaa;margin:0;font-size:11px;">
-                                                        <?= date("M d, Y", strtotime($a['created_at'])) ?>
-                                                    </p>
-                                                </div>
-                                                <span
-                                                    style="background:<?= $c['bg'] ?>;color:<?= $c['color'] ?>;font-size:11px;padding:3px 10px;border-radius:6px;font-weight:600;white-space:nowrap;">
-                                                    <?= htmlspecialchars(ucfirst($a['category'])) ?>
-                                                </span>
+                    <!-- ANALYTICS -->
+                    <div class="row g-4 mb-4">
+                        <!-- 2. Documents passed by type (CE, EE, IT) -->
+                        <div class="col-12">
+                            <div class="card border-0 shadow-sm h-100 ojtc-panel-card">
+                                <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
+                                    <i class="bi bi-clipboard-check" style="color:#272f54;"></i>
+                                    <h6 class="fw-bold mb-0" style="color:#272f54;">Documents Passed by Type</h6>
+                                </div>
+                                <div class="card-body px-4 pb-4 pt-2">
+                                    <p class="text-muted small mb-3">Approved vs. not submitted, per program.</p>
+                                    <div class="row g-4">
+                                        <?php foreach ($docCharts as $k => $dc): ?>
+                                            <div class="col-12 <?= $progKey === 'all' ? 'col-lg-4' : '' ?>">
+                                                <p class="fw-semibold small mb-2" style="color:#272f54;"><?= htmlspecialchars($dc['title']) ?></p>
+                                                <div style="position:relative; height:280px;"><canvas id="docChart-<?= $k ?>"></canvas></div>
                                             </div>
                                         <?php endforeach; ?>
                                     </div>
-                                <?php endif; ?>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 3a. Needs follow-up -->
+                        <div class="col-12 col-xl-6">
+                            <div class="card border-0 shadow-sm h-100 ojtc-panel-card">
+                                <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
+                                    <i class="bi bi-exclamation-circle" style="color:#272f54;"></i>
+                                    <h6 class="fw-bold mb-0" style="color:#272f54;">Needs Follow-up</h6>
+                                </div>
+                                <div class="card-body px-4 pb-4 pt-2">
+                                    <p class="text-muted small mb-3">Students with documents not submitted.</p>
+                                    <?php if (empty($followUps)): ?>
+                                        <p class="text-muted small mb-0">Everyone is up to date.</p>
+                                    <?php else: ?>
+                                        <div class="dash-table-scroll">
+                                            <table style="width:100%; border-collapse:collapse; font-size:13px;">
+                                                <thead>
+                                                    <tr class="ojtc-th-tab" style="font-size:12px; text-transform:uppercase; letter-spacing:.04em;">
+                                                        <th style="padding:8px 10px; border-bottom:1px solid #f0f2f7; font-weight:600;">Student</th>
+                                                        <th style="padding:8px 10px; border-bottom:1px solid #f0f2f7; font-weight:600;">Section</th>
+                                                        <th style="padding:8px 10px; border-bottom:1px solid #f0f2f7; font-weight:600;">Not submitted</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <?php foreach ($followUps as $f): ?>
+                                                        <tr class="ojtc-row-hover">
+                                                            <td style="padding:10px; border-bottom:1px solid #f0f2f7; font-weight:500; color:#272f54;"><?= htmlspecialchars($f['full_name']) ?></td>
+                                                            <td style="padding:10px; border-bottom:1px solid #f0f2f7; color:#888; font-size:12px;"><?= htmlspecialchars($f['section'] ?: '—') ?></td>
+                                                            <td style="padding:10px; border-bottom:1px solid #f0f2f7; color:#a13d1f; font-weight:600;"><?= (int) $f['not_submitted'] ?></td>
+                                                        </tr>
+                                                    <?php endforeach; ?>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 3b. Students per section -->
+                        <div class="col-12 col-xl-6">
+                            <div class="card border-0 shadow-sm h-100 ojtc-panel-card">
+                                <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
+                                    <i class="bi bi-bar-chart" style="color:#272f54;"></i>
+                                    <h6 class="fw-bold mb-0" style="color:#272f54;">Students per Section</h6>
+                                </div>
+                                <div class="card-body px-4 pb-4 pt-2">
+                                    <p class="text-muted small mb-3">Students with an application, by section.</p>
+                                    <div style="position:relative; height:220px;"><canvas id="sectionChart"></canvas></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 4a. Partner companies -->
+                        <div class="col-12 col-xl-6">
+                            <div class="card border-0 shadow-sm h-100 ojtc-panel-card">
+                                <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
+                                    <i class="bi bi-buildings" style="color:#272f54;"></i>
+                                    <h6 class="fw-bold mb-0" style="color:#272f54;">Partner Companies</h6>
+                                </div>
+                                <div class="card-body px-4 pb-4 pt-2">
+                                    <p class="text-muted small mb-3">Applicants per company posting.</p>
+                                    <?php if (empty($partners)): ?>
+                                        <p class="text-muted small mb-0">No partner companies yet.</p>
+                                    <?php else: ?>
+                                        <div class="dash-table-scroll">
+                                            <table style="width:100%; border-collapse:collapse; font-size:13px;">
+                                                <thead>
+                                                    <tr class="ojtc-th-tab" style="font-size:12px; text-transform:uppercase; letter-spacing:.04em;">
+                                                        <th style="padding:8px 10px; border-bottom:1px solid #f0f2f7; font-weight:600;">Company</th>
+                                                        <th style="padding:8px 10px; border-bottom:1px solid #f0f2f7; font-weight:600;">Applicants</th>
+                                                        <th style="padding:8px 10px; border-bottom:1px solid #f0f2f7; font-weight:600;">Posting</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <?php foreach ($partners as $p): ?>
+                                                        <tr class="ojtc-row-hover">
+                                                            <td style="padding:10px; border-bottom:1px solid #f0f2f7; font-weight:500; color:#272f54;"><?= htmlspecialchars($p['company']) ?></td>
+                                                            <td style="padding:10px; border-bottom:1px solid #f0f2f7; color:#888;"><?= (int) $p['applicants'] ?></td>
+                                                            <td style="padding:10px; border-bottom:1px solid #f0f2f7; color:#888; font-size:12px;"><?= htmlspecialchars($p['title']) ?></td>
+                                                        </tr>
+                                                    <?php endforeach; ?>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 4b. Submissions trend -->
+                        <div class="col-12 col-xl-6">
+                            <div class="card border-0 shadow-sm h-100 ojtc-panel-card">
+                                <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
+                                    <i class="bi bi-graph-up" style="color:#272f54;"></i>
+                                    <h6 class="fw-bold mb-0" style="color:#272f54;">Submissions Trend</h6>
+                                </div>
+                                <div class="card-body px-4 pb-4 pt-2">
+                                    <p class="text-muted small mb-3">Documents submitted per day, last 14 days.</p>
+                                    <div style="position:relative; height:220px;"><canvas id="trendChart"></canvas></div>
+                                </div>
                             </div>
                         </div>
                     </div>
+
+                    <div class="row g-4">
 
                     <!-- Recent Internship Postings -->
                     <div class="col-lg-7">
@@ -1574,7 +1657,7 @@ for ($t = 13; $t >= 0; $t--) {
                                 <div class="d-flex flex-column gap-3">
                                     <?php
                                     $allDocs = [];
-                                    foreach ($documents as $r) {
+                                    foreach ($dashDocs as $r) {
                                         $allDocs[] = [
                                             'name' => $r['full_name'],
                                             'type' => htmlspecialchars(['mou' => 'MOU'][$r['step_key']] ?? ucwords(str_replace('_', ' ', $r['step_key']))),
@@ -3147,104 +3230,50 @@ for ($t = 13; $t >= 0; $t--) {
                 if (el) new Chart(el, cfg);
             };
 
-            // Phase doughnut
-            make('phaseChart', {
-                type: 'pie',
-                data: {
-                    labels: ['Internship Confirmed', 'In Progress', 'No Progress'],
-                    datasets: [{
-                        data: <?= json_encode(array_values($phaseCounts)) ?>,
-                        backgroundColor: ['#3E8E58', '#FFB62F', '#cbd5e1'],
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    maintainAspectRatio: false,
-                    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12 } } }
-                }
-            });
-
-            // Requirements doughnut
-            make('reqChart', {
-                type: 'pie',
-                data: {
-                    labels: ['Complete', 'Incomplete'],
-                    datasets: [{
-                        data: [<?= (int) $reqComplete ?>, <?= (int) $reqIncomplete ?>],
-                        backgroundColor: ['#3E8E58', '#E4572E'],
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    maintainAspectRatio: false,
-                    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12 } } }
-                }
-            });
-
-            // Interns per program
-            make('programChart', {
+            // Documents passed by type (one chart per program)
+            const docLabels = <?= json_encode(array_values($docTypes)) ?>;
+            const docCharts = <?= json_encode($docCharts) ?>;
+            Object.entries(docCharts).forEach(([k, d]) => make('docChart-' + k, {
                 type: 'bar',
                 data: {
-                    labels: <?= json_encode(array_keys($programCounts)) ?>,
-                    datasets: [{
-                        label: 'Interns',
-                        data: <?= json_encode(array_values($programCounts)) ?>,
-                        backgroundColor: '#ff8652fe',
-                        borderRadius: 6
-                    }]
+                    labels: docLabels,
+                    datasets: [
+                        { label: 'Approved', data: d.approved, backgroundColor: '#3E8E58', borderRadius: 4 },
+                        { label: 'Not submitted', data: d.missing, backgroundColor: '#cbd5e1', borderRadius: 4 }
+                    ]
                 },
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+                    indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12 } } },
+                    scales: { x: { stacked: true, beginAtZero: true, ticks: { precision: 0 } }, y: { stacked: true } }
                 }
-            });
+            }));
 
-            // Application trend (14 days)
-            make('trendChart', {
-                type: 'line',
-                data: {
-                    labels: <?= json_encode($trendLabels) ?>,
-                    datasets: [{
-                        label: 'Applications',
-                        data: <?= json_encode($trendData) ?>,
-                        borderColor: '#ff6b2c',
-                        backgroundColor: 'rgba(255,107,44,0.1)',
-                        tension: 0.3,
-                        fill: true,
-                        pointRadius: 3
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        y: { beginAtZero: true, ticks: { precision: 0 } },
-                        x: { ticks: { maxTicksLimit: 7 } }
-                    }
-                }
-            });
-
-            // Top companies (horizontal bar)
-            make('companyChart', {
+            // Students per section
+            make('sectionChart', {
                 type: 'bar',
                 data: {
-                    labels: <?= json_encode(array_keys($companyCounts)) ?>,
-                    datasets: [{
-                        label: 'Interns',
-                        data: <?= json_encode(array_values($companyCounts)) ?>,
-                        backgroundColor: '#272F54',
-                        borderRadius: 6
-                    }]
+                    labels: <?= json_encode(array_keys($sectionCounts)) ?>,
+                    datasets: [{ label: 'Students', data: <?= json_encode(array_values($sectionCounts)) ?>, backgroundColor: '#ff8652fe', borderRadius: 6 }]
                 },
                 options: {
-                    indexAxis: 'y',
-                    responsive: true,
-                    maintainAspectRatio: false,
+                    indexAxis: 'y', responsive: true, maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
                     scales: { x: { beginAtZero: true, ticks: { precision: 0 } } }
+                }
+            });
+
+            // Submissions trend (14 days)
+            make('trendChart', {
+                type: 'bar',
+                data: {
+                    labels: <?= json_encode($trendLabels) ?>,
+                    datasets: [{ label: 'Documents', data: <?= json_encode($trendData) ?>, backgroundColor: '#ff6b2c', borderRadius: 4 }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, ticks: { precision: 0 } }, x: { ticks: { maxTicksLimit: 7 } } }
                 }
             });
         })();
@@ -3258,8 +3287,8 @@ for ($t = 13; $t >= 0; $t--) {
         }
 
         [
-            ['phaseChart', 'interns'],
-            ['reqChart', 'interns'],
+            ['sectionChart', 'interns'],
+            ['trendChart', 'interns'],
             ['programChart', 'interns'],
             ['trendChart', 'interns'],
             ['companyChart', 'postings']
