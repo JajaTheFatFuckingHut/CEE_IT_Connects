@@ -101,7 +101,7 @@ try {
 
         $fh = fopen($tmp, 'rb');
         $stmt = $pdo->prepare("
-            INSERT INTO weekly_reports (student_id, week_number, wr_filepath, created_at, file_data, file_mime)
+            INSERT INTO weekly_reports (student_id, week_number, file_name, created_at, file_data, file_mime)
             VALUES (:sid, :week, :name, CURRENT_DATE, :data, :mime)
         ");
         $stmt->bindValue(':sid', $student_id, PDO::PARAM_INT);
@@ -146,7 +146,7 @@ try {
             $fh = fopen($tmp, 'rb');
             $stmt = $pdo->prepare("
                 UPDATE weekly_reports
-                SET week_number = :week, wr_filepath = :name, file_data = :data,
+                SET week_number = :week, file_name = :name, file_data = :data,
                     file_mime = :mime, created_at = CURRENT_DATE
                 WHERE id = :id AND student_id = :sid
             ");
