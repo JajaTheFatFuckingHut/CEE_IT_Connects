@@ -1,6 +1,7 @@
 <?php
 
 session_start();
+require_once 'db.php';
 require_once 'auth.php';
 // $_SESSION['user_id'] = 1;
 // $_SESSION['user_type'] = 'superadmin';
