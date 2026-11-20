@@ -11,7 +11,8 @@ $hideStudentNav = in_array($role, [
     'internship_admin',
     'adviser',
     'hte_adviser',
-    'internship_adviser'
+    'internship_adviser',
+    'superadministrator'
 ]);
 
 $hideAdviserNav = in_array($role, [

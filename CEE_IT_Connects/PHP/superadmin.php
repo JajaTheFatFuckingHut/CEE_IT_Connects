@@ -13,7 +13,7 @@ $saPrograms = [
 
 // ── DATA CONTRACT: variables the UI expects. Empty defaults = empty states. ──
 // Header
-$adminFullName = $adminFullName ?? 'Superadministrator';
+$adminFullName = $adminFullName ?? 'superadministrator';
 
 // Term
 $schoolYearOptions = $schoolYearOptions ?? [];
