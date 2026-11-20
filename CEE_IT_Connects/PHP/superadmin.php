@@ -2,8 +2,8 @@
 
 session_start();
 
-$_SESSION['user_id'] = 1;
-$_SESSION['user_type'] = 'superadmin';
+// $_SESSION['user_id'] = 1;
+// $_SESSION['user_type'] = 'superadmin';
 // ── UI config (labels only) ──
 $saPrograms = [
     'civil engineering' => 'CE',
@@ -17,7 +17,7 @@ $adminFullName = $adminFullName ?? 'Superadministrator';
 
 // Term
 $schoolYearOptions = $schoolYearOptions ?? [];
-$schoolYear = $schoolYear ?? ''; 
+$schoolYear = $schoolYear ?? '';
 
 // Cards (arrays keyed by lowercase program name, e.g. 'civil engineering' => 4)
 $saStudentsByProg = $saStudentsByProg ?? [];     // active students per program
@@ -522,7 +522,8 @@ function deptCode($department)
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php foreach ($saSysAdmins as $a): $archived = saBool($a['is_archived']); ?>
+                                    <?php foreach ($saSysAdmins as $a):
+                                        $archived = saBool($a['is_archived']); ?>
                                         <tr>
                                             <td class="fw-semibold" style="color:#272f54;">
                                                 <?= htmlspecialchars($a['name']) ?>
@@ -584,8 +585,8 @@ function deptCode($department)
                                                 <td class="text-end">
                                                     <?php if (!empty($sec['students'])): ?>
                                                         <button type="button" class="btn-update"
-                                                            style="height:32px;padding:0 12px;font-size:12px;"
-                                                            data-bs-toggle="collapse" data-bs-target="#saSec<?= (int) $rid ?>">
+                                                            style="height:32px;padding:0 12px;font-size:12px;" data-bs-toggle="collapse"
+                                                            data-bs-target="#saSec<?= (int) $rid ?>">
                                                             <i class="bi bi-chevron-down me-1"></i> Students
                                                         </button>
                                                     <?php endif; ?>
@@ -724,8 +725,7 @@ function deptCode($department)
     <div class="modal fade" id="addSystemAdminModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content rounded-4">
-                <form method="POST" autocomplete="off"
-                    onsubmit="return confirm('Create this system admin account?');">
+                <form method="POST" autocomplete="off" onsubmit="return confirm('Create this system admin account?');">
                     <div class="modal-header">
                         <h5 class="modal-title">
                             <i class="bi bi-person-plus me-2"></i><strong>Create System Admin</strong>
