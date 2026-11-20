@@ -25,6 +25,7 @@ $hideFromAdviser = in_array($role, [
     'adviser',
     'hte_adviser',
     'internship_adviser'
+    'superadmininistrator'
 ]);
 
 $roleMap = [
