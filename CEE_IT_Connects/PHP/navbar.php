@@ -830,6 +830,8 @@ function timeAgo($datetime)
             echo 'hte-adviser.php';
         } else if ($role == 'internship_adviser') {
             echo 'ojt-adviser.php';
+        } else if ($role == 'superadministrator') {
+            echo 'superadmin.php';
         } else {
             echo 'index.php';
         }
