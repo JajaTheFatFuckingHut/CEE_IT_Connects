@@ -69,6 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $dashboards = [
                 'superadmin' => '../systemadmin.php',
                 'internship_admin' => '../internship-admin.php',
+                'superadministrator' => '../superadmin.php'
                 // 'cma' => '../bsbsasdadw.php'
             ];
 
