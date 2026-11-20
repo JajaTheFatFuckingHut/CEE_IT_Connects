@@ -185,7 +185,7 @@ $myRoomsStmt = $pdo->prepare("
 $myRoomsStmt->execute([
     ':uid' => $user_id,
     ':utype' => $user_type,
-    ':utype2' => $user_type,99
+    ':utype2' => $user_type,
     ':uid2' => $user_id,
 ]);
 $myRooms = $myRoomsStmt->fetchAll(PDO::FETCH_ASSOC);
