@@ -331,7 +331,7 @@ function deptCode($department)
 
 <body>
     <?php include 'navbar.php'; ?>
-
+    <?= var_dump($_SESSION['role']); ?>
     <?php if (isset($_SESSION['success'])): ?>
         <div class="alert alert-success alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3"
             style="z-index:9999; min-width:350px;" role="alert" id="flashAlert">
