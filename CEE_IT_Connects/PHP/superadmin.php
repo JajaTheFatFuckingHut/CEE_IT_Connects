@@ -1,5 +1,7 @@
 <?php
 
+session_start();
+include_once 'auth.php';
 // ── UI config (labels only) ──
 $saPrograms = [
     'civil engineering' => 'CE',
