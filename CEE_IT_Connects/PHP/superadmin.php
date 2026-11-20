@@ -330,33 +330,36 @@ function deptCode($department)
 </head>
 
 <body>
-    <?php include 'navbar.php'; ?>
+    <?php include 'navbar.php';
+    var_dump($role, $userType, $user_id, $profileUser);
+    ?>
 
+    
     <?php if (isset($_SESSION['success'])): ?>
-        <div class="alert alert-success alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3"
-            style="z-index:9999; min-width:350px;" role="alert" id="flashAlert">
-            <i class="bi bi-check-circle-fill me-2"></i><?= htmlspecialchars($_SESSION['success']) ?>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-        <?php unset($_SESSION['success']); ?>
+            <div class="alert alert-success alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3"
+                style="z-index:9999; min-width:350px;" role="alert" id="flashAlert">
+                <i class="bi bi-check-circle-fill me-2"></i><?= htmlspecialchars($_SESSION['success']) ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            <?php unset($_SESSION['success']); ?>
     <?php endif; ?>
 
     <?php if (isset($_SESSION['info'])): ?>
-        <div class="alert alert-info alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3"
-            style="z-index:9999; min-width:350px;" role="alert" id="flashAlert">
-            <i class="bi bi-info-circle-fill me-2"></i><?= htmlspecialchars($_SESSION['info']) ?>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-        <?php unset($_SESSION['info']); ?>
+            <div class="alert alert-info alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3"
+                style="z-index:9999; min-width:350px;" role="alert" id="flashAlert">
+                <i class="bi bi-info-circle-fill me-2"></i><?= htmlspecialchars($_SESSION['info']) ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            <?php unset($_SESSION['info']); ?>
     <?php endif; ?>
 
     <?php if (isset($_SESSION['error'])): ?>
-        <div class="alert alert-danger alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3"
-            style="z-index:9999; min-width:350px;" role="alert" id="flashAlert">
-            <i class="bi bi-x-circle-fill me-2"></i><?= htmlspecialchars($_SESSION['error']) ?>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-        <?php unset($_SESSION['error']); ?>
+            <div class="alert alert-danger alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3"
+                style="z-index:9999; min-width:350px;" role="alert" id="flashAlert">
+                <i class="bi bi-x-circle-fill me-2"></i><?= htmlspecialchars($_SESSION['error']) ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            <?php unset($_SESSION['error']); ?>
     <?php endif; ?>
 
     <div class="sa-wrap">
@@ -378,9 +381,9 @@ function deptCode($department)
                 </label>
                 <select id="saTermSelect" name="sy" class="sa-field" onchange="this.form.submit()">
                     <?php foreach ($schoolYearOptions as $opt): ?>
-                        <option value="<?= htmlspecialchars($opt) ?>" <?= $opt === $schoolYear ? 'selected' : '' ?>>
-                            S.Y. <?= htmlspecialchars($opt) ?>
-                        </option>
+                            <option value="<?= htmlspecialchars($opt) ?>" <?= $opt === $schoolYear ? 'selected' : '' ?>>
+                                S.Y. <?= htmlspecialchars($opt) ?>
+                            </option>
                     <?php endforeach; ?>
                 </select>
             </form>
@@ -508,40 +511,40 @@ function deptCode($department)
                 <div class="card-body px-4 pb-4 pt-2">
                     <p class="text-muted small mb-3">Accounts created and managed by the superadministrator.</p>
                     <?php if (empty($saSysAdmins)): ?>
-                        <p class="text-muted small mb-0">No system administrators yet.</p>
+                            <p class="text-muted small mb-0">No system administrators yet.</p>
                     <?php else: ?>
-                        <div class="table-responsive">
-                            <table class="table table-hover align-middle mb-0" style="font-size:14px;">
-                                <thead>
-                                    <tr style="color:#aaa;font-size:12px;text-transform:uppercase;letter-spacing:.04em;">
-                                        <th class="border-0 pb-2 fw-semibold ojtc-th-tab">Name</th>
-                                        <th class="border-0 pb-2 fw-semibold ojtc-th-tab">Email</th>
-                                        <th class="border-0 pb-2 fw-semibold ojtc-th-tab">Department</th>
-                                        <th class="border-0 pb-2 fw-semibold ojtc-th-tab">Role</th>
-                                        <th class="border-0 pb-2 fw-semibold ojtc-th-tab">Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php foreach ($saSysAdmins as $a):
-                                        $archived = saBool($a['is_archived']); ?>
-                                        <tr>
-                                            <td class="fw-semibold" style="color:#272f54;">
-                                                <?= htmlspecialchars($a['name']) ?>
-                                            </td>
-                                            <td><?= htmlspecialchars($a['email']) ?></td>
-                                            <td><?= htmlspecialchars(saProgLabel($a['department'], $saPrograms)) ?></td>
-                                            <td><?= htmlspecialchars(saRoleLabel($a['role'])) ?></td>
-                                            <td>
-                                                <span class="badge rounded-pill px-3"
-                                                    style="font-weight:500;font-size:12px;background:<?= $archived ? '#fdeaea' : '#e6f4ea' ?>;color:<?= $archived ? '#a32d2d' : '#1b7a3d' ?>;">
-                                                    <?= $archived ? 'Archived' : 'Active' ?>
-                                                </span>
-                                            </td>
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0" style="font-size:14px;">
+                                    <thead>
+                                        <tr style="color:#aaa;font-size:12px;text-transform:uppercase;letter-spacing:.04em;">
+                                            <th class="border-0 pb-2 fw-semibold ojtc-th-tab">Name</th>
+                                            <th class="border-0 pb-2 fw-semibold ojtc-th-tab">Email</th>
+                                            <th class="border-0 pb-2 fw-semibold ojtc-th-tab">Department</th>
+                                            <th class="border-0 pb-2 fw-semibold ojtc-th-tab">Role</th>
+                                            <th class="border-0 pb-2 fw-semibold ojtc-th-tab">Status</th>
                                         </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
-                        </div>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($saSysAdmins as $a):
+                                            $archived = saBool($a['is_archived']); ?>
+                                                <tr>
+                                                    <td class="fw-semibold" style="color:#272f54;">
+                                                        <?= htmlspecialchars($a['name']) ?>
+                                                    </td>
+                                                    <td><?= htmlspecialchars($a['email']) ?></td>
+                                                    <td><?= htmlspecialchars(saProgLabel($a['department'], $saPrograms)) ?></td>
+                                                    <td><?= htmlspecialchars(saRoleLabel($a['role'])) ?></td>
+                                                    <td>
+                                                        <span class="badge rounded-pill px-3"
+                                                            style="font-weight:500;font-size:12px;background:<?= $archived ? '#fdeaea' : '#e6f4ea' ?>;color:<?= $archived ? '#a32d2d' : '#1b7a3d' ?>;">
+                                                            <?= $archived ? 'Archived' : 'Active' ?>
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
                     <?php endif; ?>
                 </div>
             </div>
@@ -549,70 +552,70 @@ function deptCode($department)
             <!-- 2-4. SECTIONS PER PROGRAM -->
             <?php foreach ($saPrograms as $pk => $pc):
                 $progSections = $saSecByProg[$pk] ?? []; ?>
-                <div class="card border-0 rounded-4 shadow-sm mb-4">
-                    <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
-                        <i class="bi bi-diagram-3" style="color:#272f54;"></i>
-                        <h6 class="fw-bold mb-0" style="color:#272f54;"><?= htmlspecialchars($pc) ?> Sections</h6>
-                    </div>
-                    <div class="card-body px-4 pb-4 pt-2">
-                        <p class="text-muted small mb-3">
-                            S.Y. <?= htmlspecialchars($schoolYear) ?> &middot;
-                            <?= (int) ($saOjt[$pk] ?? 0) ?> OJT advisers &middot;
-                            <?= (int) ($saHte[$pk] ?? 0) ?> HTE advisers &middot;
-                            <?= (int) ($saStudentsByProg[$pk] ?? 0) ?> students
-                        </p>
-                        <?php if (empty($progSections)): ?>
-                            <p class="text-muted small mb-0">No <?= htmlspecialchars($pc) ?> sections for this term.</p>
-                        <?php else: ?>
-                            <div class="table-responsive">
-                                <table class="table align-middle mb-0" style="font-size:14px;">
-                                    <thead>
-                                        <tr style="color:#aaa;font-size:12px;text-transform:uppercase;letter-spacing:.04em;">
-                                            <th class="border-0 pb-2 fw-semibold ojtc-th-tab">Section</th>
-                                            <th class="border-0 pb-2 fw-semibold ojtc-th-tab">Adviser</th>
-                                            <th class="border-0 pb-2 fw-semibold ojtc-th-tab">Students</th>
-                                            <th class="border-0 pb-2 fw-semibold ojtc-th-tab"></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php foreach ($progSections as $rid => $sec): ?>
-                                            <tr>
-                                                <td class="fw-semibold" style="color:#272f54;">
-                                                    <?= htmlspecialchars($sec['label']) ?>
-                                                </td>
-                                                <td><?= htmlspecialchars($sec['adviser']) ?></td>
-                                                <td><?= count($sec['students']) ?></td>
-                                                <td class="text-end">
-                                                    <?php if (!empty($sec['students'])): ?>
-                                                        <button type="button" class="btn-update"
-                                                            style="height:32px;padding:0 12px;font-size:12px;" data-bs-toggle="collapse"
-                                                            data-bs-target="#saSec<?= (int) $rid ?>">
-                                                            <i class="bi bi-chevron-down me-1"></i> Students
-                                                        </button>
-                                                    <?php endif; ?>
-                                                </td>
-                                            </tr>
-                                            <?php if (!empty($sec['students'])): ?>
-                                                <tr id="saSec<?= (int) $rid ?>" class="collapse">
-                                                    <td colspan="4" class="bg-light">
-                                                        <div class="d-flex flex-wrap gap-2 py-1">
-                                                            <?php foreach ($sec['students'] as $sn): ?>
-                                                                <span class="badge rounded-pill px-3 ojtc-badge-default"
-                                                                    style="font-weight:500;font-size:12px;">
-                                                                    <?= htmlspecialchars($sn) ?>
-                                                                </span>
-                                                            <?php endforeach; ?>
-                                                        </div>
-                                                    </td>
+                    <div class="card border-0 rounded-4 shadow-sm mb-4">
+                        <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center gap-2">
+                            <i class="bi bi-diagram-3" style="color:#272f54;"></i>
+                            <h6 class="fw-bold mb-0" style="color:#272f54;"><?= htmlspecialchars($pc) ?> Sections</h6>
+                        </div>
+                        <div class="card-body px-4 pb-4 pt-2">
+                            <p class="text-muted small mb-3">
+                                S.Y. <?= htmlspecialchars($schoolYear) ?> &middot;
+                                <?= (int) ($saOjt[$pk] ?? 0) ?> OJT advisers &middot;
+                                <?= (int) ($saHte[$pk] ?? 0) ?> HTE advisers &middot;
+                                <?= (int) ($saStudentsByProg[$pk] ?? 0) ?> students
+                            </p>
+                            <?php if (empty($progSections)): ?>
+                                    <p class="text-muted small mb-0">No <?= htmlspecialchars($pc) ?> sections for this term.</p>
+                            <?php else: ?>
+                                    <div class="table-responsive">
+                                        <table class="table align-middle mb-0" style="font-size:14px;">
+                                            <thead>
+                                                <tr style="color:#aaa;font-size:12px;text-transform:uppercase;letter-spacing:.04em;">
+                                                    <th class="border-0 pb-2 fw-semibold ojtc-th-tab">Section</th>
+                                                    <th class="border-0 pb-2 fw-semibold ojtc-th-tab">Adviser</th>
+                                                    <th class="border-0 pb-2 fw-semibold ojtc-th-tab">Students</th>
+                                                    <th class="border-0 pb-2 fw-semibold ojtc-th-tab"></th>
                                                 </tr>
-                                            <?php endif; ?>
-                                        <?php endforeach; ?>
-                                    </tbody>
-                                </table>
-                            </div>
-                        <?php endif; ?>
+                                            </thead>
+                                            <tbody>
+                                                <?php foreach ($progSections as $rid => $sec): ?>
+                                                        <tr>
+                                                            <td class="fw-semibold" style="color:#272f54;">
+                                                                <?= htmlspecialchars($sec['label']) ?>
+                                                            </td>
+                                                            <td><?= htmlspecialchars($sec['adviser']) ?></td>
+                                                            <td><?= count($sec['students']) ?></td>
+                                                            <td class="text-end">
+                                                                <?php if (!empty($sec['students'])): ?>
+                                                                        <button type="button" class="btn-update"
+                                                                            style="height:32px;padding:0 12px;font-size:12px;" data-bs-toggle="collapse"
+                                                                            data-bs-target="#saSec<?= (int) $rid ?>">
+                                                                            <i class="bi bi-chevron-down me-1"></i> Students
+                                                                        </button>
+                                                                <?php endif; ?>
+                                                            </td>
+                                                        </tr>
+                                                        <?php if (!empty($sec['students'])): ?>
+                                                                <tr id="saSec<?= (int) $rid ?>" class="collapse">
+                                                                    <td colspan="4" class="bg-light">
+                                                                        <div class="d-flex flex-wrap gap-2 py-1">
+                                                                            <?php foreach ($sec['students'] as $sn): ?>
+                                                                                    <span class="badge rounded-pill px-3 ojtc-badge-default"
+                                                                                        style="font-weight:500;font-size:12px;">
+                                                                                        <?= htmlspecialchars($sn) ?>
+                                                                                    </span>
+                                                                            <?php endforeach; ?>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                        <?php endif; ?>
+                                                <?php endforeach; ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                            <?php endif; ?>
+                        </div>
                     </div>
-                </div>
             <?php endforeach; ?>
 
             <!-- 5. ADMIN ACTIVITY LOG -->
@@ -624,36 +627,36 @@ function deptCode($department)
                 <div class="card-body px-4 pb-4 pt-2">
                     <p class="text-muted small mb-3">Latest actions by administrators.</p>
                     <?php if (empty($saLogs)): ?>
-                        <p class="text-muted small mb-0">No admin activity yet.</p>
+                            <p class="text-muted small mb-0">No admin activity yet.</p>
                     <?php else: ?>
-                        <div class="table-responsive" style="max-height:360px;overflow-y:auto;">
-                            <table class="table table-hover align-middle mb-0" style="font-size:14px;">
-                                <thead>
-                                    <tr style="color:#aaa;font-size:12px;text-transform:uppercase;letter-spacing:.04em;">
-                                        <th class="border-0 pb-2 fw-semibold ojtc-th-tab">Name</th>
-                                        <th class="border-0 pb-2 fw-semibold ojtc-th-tab">Role</th>
-                                        <th class="border-0 pb-2 fw-semibold ojtc-th-tab">Department</th>
-                                        <th class="border-0 pb-2 fw-semibold ojtc-th-tab">Activity</th>
-                                        <th class="border-0 pb-2 fw-semibold ojtc-th-tab">Date</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php foreach ($saLogs as $log): ?>
-                                        <tr>
-                                            <td class="fw-semibold" style="color:#272f54;">
-                                                <?= htmlspecialchars($log['name']) ?>
-                                            </td>
-                                            <td><?= htmlspecialchars(saRoleLabel($log['roles'])) ?></td>
-                                            <td><?= htmlspecialchars(saProgLabel($log['department'], $saPrograms)) ?></td>
-                                            <td><?= htmlspecialchars($log['activity']) ?></td>
-                                            <td class="text-muted" style="font-size:13px;white-space:nowrap;">
-                                                <?= date('M j, Y • g:i A', strtotime($log['activity_date'])) ?>
-                                            </td>
+                            <div class="table-responsive" style="max-height:360px;overflow-y:auto;">
+                                <table class="table table-hover align-middle mb-0" style="font-size:14px;">
+                                    <thead>
+                                        <tr style="color:#aaa;font-size:12px;text-transform:uppercase;letter-spacing:.04em;">
+                                            <th class="border-0 pb-2 fw-semibold ojtc-th-tab">Name</th>
+                                            <th class="border-0 pb-2 fw-semibold ojtc-th-tab">Role</th>
+                                            <th class="border-0 pb-2 fw-semibold ojtc-th-tab">Department</th>
+                                            <th class="border-0 pb-2 fw-semibold ojtc-th-tab">Activity</th>
+                                            <th class="border-0 pb-2 fw-semibold ojtc-th-tab">Date</th>
                                         </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
-                        </div>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($saLogs as $log): ?>
+                                                <tr>
+                                                    <td class="fw-semibold" style="color:#272f54;">
+                                                        <?= htmlspecialchars($log['name']) ?>
+                                                    </td>
+                                                    <td><?= htmlspecialchars(saRoleLabel($log['roles'])) ?></td>
+                                                    <td><?= htmlspecialchars(saProgLabel($log['department'], $saPrograms)) ?></td>
+                                                    <td><?= htmlspecialchars($log['activity']) ?></td>
+                                                    <td class="text-muted" style="font-size:13px;white-space:nowrap;">
+                                                        <?= date('M j, Y • g:i A', strtotime($log['activity_date'])) ?>
+                                                    </td>
+                                                </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
                     <?php endif; ?>
                 </div>
             </div>
@@ -666,27 +669,27 @@ function deptCode($department)
                 </div>
                 <div class="card-body px-4 pb-4 pt-2">
                     <?php if (empty($programHoursList)): ?>
-                        <p class="text-muted small mb-0">No programs configured yet.</p>
+                            <p class="text-muted small mb-0">No programs configured yet.</p>
                     <?php else: ?>
-                        <div class="d-flex flex-column gap-2">
-                            <?php foreach ($programHoursList as $ph):
-                                $ojtcBadgeClass = [
-                                    'BSIT' => 'ojtc-badge-it',
-                                    'BSCE' => 'ojtc-badge-ce',
-                                    'BSEE' => 'ojtc-badge-ee',
-                                ][deptCode($ph['program'])] ?? 'ojtc-badge-default';
-                                ?>
-                                <div class="d-flex align-items-center justify-content-between ojtc-hours-row">
-                                    <p class="fw-semibold mb-0" style="color:#272f54;font-size:14px;">
-                                        <?= htmlspecialchars($ph['program']) ?>
-                                    </p>
-                                    <span class="badge rounded-pill px-3 <?= $ojtcBadgeClass ?>"
-                                        style="font-weight:500;font-size:12px;">
-                                        <?= (int) $ph['required_hours'] ?> hrs
-                                    </span>
-                                </div>
-                            <?php endforeach; ?>
-                        </div>
+                            <div class="d-flex flex-column gap-2">
+                                <?php foreach ($programHoursList as $ph):
+                                    $ojtcBadgeClass = [
+                                        'BSIT' => 'ojtc-badge-it',
+                                        'BSCE' => 'ojtc-badge-ce',
+                                        'BSEE' => 'ojtc-badge-ee',
+                                    ][deptCode($ph['program'])] ?? 'ojtc-badge-default';
+                                    ?>
+                                        <div class="d-flex align-items-center justify-content-between ojtc-hours-row">
+                                            <p class="fw-semibold mb-0" style="color:#272f54;font-size:14px;">
+                                                <?= htmlspecialchars($ph['program']) ?>
+                                            </p>
+                                            <span class="badge rounded-pill px-3 <?= $ojtcBadgeClass ?>"
+                                                style="font-weight:500;font-size:12px;">
+                                                <?= (int) $ph['required_hours'] ?> hrs
+                                            </span>
+                                        </div>
+                                <?php endforeach; ?>
+                            </div>
                     <?php endif; ?>
                 </div>
             </div>
@@ -744,7 +747,7 @@ function deptCode($department)
                         <select name="department" required>
                             <option value="" disabled selected>Select Department</option>
                             <?php foreach ($saPrograms as $pk => $pc): ?>
-                                <option value="<?= htmlspecialchars($pk) ?>"><?= htmlspecialchars(ucwords($pk)) ?></option>
+                                    <option value="<?= htmlspecialchars($pk) ?>"><?= htmlspecialchars(ucwords($pk)) ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
