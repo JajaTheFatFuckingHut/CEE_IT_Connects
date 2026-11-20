@@ -837,6 +837,7 @@ function timeAgo($datetime)
         } else {
             echo 'index.php';
         }
+        var_dump($role, $userType, $user_id, $profileUser);
         ?>">
             <img src="/Sources/CEE IT Connects Logo.png" class="nav-logo">
             <span class="brand-text ms-1">CEE IT CONNECTS</span>
@@ -1351,88 +1352,88 @@ function timeAgo($datetime)
                     ],
 
                     'superadministrator' => [
-                    'title' => 'Superadministrator Guide',
-                    'icon' => 'bi-shield-fill-check',
-                    'tagline' => 'Oversee system admins, every department and platform-wide settings.',
-                    'flow' => ['Pick term', 'Review overview', 'Manage system admins', 'Check sections', 'Audit activity', 'Registration link'],
-                    'cards' => [
-                        [
-                            'bi-calendar3',
-                            'Choose a term',
-                            'Home › Term dropdown',
+                        'title' => 'Superadministrator Guide',
+                        'icon' => 'bi-shield-fill-check',
+                        'tagline' => 'Oversee system admins, every department and platform-wide settings.',
+                        'flow' => ['Pick term', 'Review overview', 'Manage system admins', 'Check sections', 'Audit activity', 'Registration link'],
+                        'cards' => [
                             [
-                                'Pick a school year from the <strong>Term</strong> dropdown.',
-                                'The cards and section tables update to show that term.',
-                            ]
-                        ],
-                        [
-                            'bi-speedometer2',
-                            'Overview cards',
-                            'Home › top cards',
+                                'bi-calendar3',
+                                'Choose a term',
+                                'Home › Term dropdown',
+                                [
+                                    'Pick a school year from the <strong>Term</strong> dropdown.',
+                                    'The cards and section tables update to show that term.',
+                                ]
+                            ],
                             [
-                                'See active <strong>Students</strong>, <strong>HTE Advisers</strong>, <strong>OJT Advisers</strong> and <strong>Internship Admins</strong>.',
-                                'Each card breaks the count down per program (CE, EE, IT).',
-                                '<strong>System Admins</strong> shows how many of the 3 seats are used and how many are open.',
-                            ]
-                        ],
-                        [
-                            'bi-person-plus-fill',
-                            'Create a System Admin',
-                            'Home › System Administrators',
+                                'bi-speedometer2',
+                                'Overview cards',
+                                'Home › top cards',
+                                [
+                                    'See active <strong>Students</strong>, <strong>HTE Advisers</strong>, <strong>OJT Advisers</strong> and <strong>Internship Admins</strong>.',
+                                    'Each card breaks the count down per program (CE, EE, IT).',
+                                    '<strong>System Admins</strong> shows how many of the 3 seats are used and how many are open.',
+                                ]
+                            ],
                             [
-                                'Click <strong>Create System Admin</strong> and fill in name, email, password and department.',
-                                'Passwords need 8+ characters with upper and lowercase letters, a number and a special character.',
-                                'The button is disabled when all <strong>3 seats</strong> are taken.',
-                            ]
-                        ],
-                        [
-                            'bi-shield-lock-fill',
-                            'Review admin accounts',
-                            'Home › System Administrators table',
+                                'bi-person-plus-fill',
+                                'Create a System Admin',
+                                'Home › System Administrators',
+                                [
+                                    'Click <strong>Create System Admin</strong> and fill in name, email, password and department.',
+                                    'Passwords need 8+ characters with upper and lowercase letters, a number and a special character.',
+                                    'The button is disabled when all <strong>3 seats</strong> are taken.',
+                                ]
+                            ],
                             [
-                                'See each admin\'s name, email, department and role.',
-                                'The <strong>Status</strong> badge shows whether the account is <strong>Active</strong> or <strong>Archived</strong>.',
-                            ]
-                        ],
-                        [
-                            'bi-diagram-3-fill',
-                            'Check sections per program',
-                            'Home › CE / EE / IT Sections',
+                                'bi-shield-lock-fill',
+                                'Review admin accounts',
+                                'Home › System Administrators table',
+                                [
+                                    'See each admin\'s name, email, department and role.',
+                                    'The <strong>Status</strong> badge shows whether the account is <strong>Active</strong> or <strong>Archived</strong>.',
+                                ]
+                            ],
                             [
-                                'Each program lists its sections, assigned adviser and student count.',
-                                'Click <strong>Students</strong> on a row to expand the list of students in that section.',
-                            ]
-                        ],
-                        [
-                            'bi-activity',
-                            'Admin activity log',
-                            'Home › Admin Activity Log',
+                                'bi-diagram-3-fill',
+                                'Check sections per program',
+                                'Home › CE / EE / IT Sections',
+                                [
+                                    'Each program lists its sections, assigned adviser and student count.',
+                                    'Click <strong>Students</strong> on a row to expand the list of students in that section.',
+                                ]
+                            ],
                             [
-                                'Review the latest actions by administrators, with name, role, department and date.',
-                                'Scroll inside the table to see older entries.',
-                            ]
-                        ],
-                        [
-                            'bi-clock-history',
-                            'Required OJT hours',
-                            'Home › OJT Hours by Program',
+                                'bi-activity',
+                                'Admin activity log',
+                                'Home › Admin Activity Log',
+                                [
+                                    'Review the latest actions by administrators, with name, role, department and date.',
+                                    'Scroll inside the table to see older entries.',
+                                ]
+                            ],
                             [
-                                'View the required hours set for each program.',
-                                'This is read-only here. System Admins change the values.',
-                            ]
-                        ],
-                        [
-                            'bi-toggle2-on',
-                            'Registration link',
-                            'Home › Registration Link',
+                                'bi-clock-history',
+                                'Required OJT hours',
+                                'Home › OJT Hours by Program',
+                                [
+                                    'View the required hours set for each program.',
+                                    'This is read-only here. System Admins change the values.',
+                                ]
+                            ],
                             [
-                                'Check whether the registration link on the login page is <strong>Visible</strong> or <strong>Hidden</strong>.',
-                                'Click <strong>Hide / Show Registration Link</strong> to switch it.',
-                            ]
+                                'bi-toggle2-on',
+                                'Registration link',
+                                'Home › Registration Link',
+                                [
+                                    'Check whether the registration link on the login page is <strong>Visible</strong> or <strong>Hidden</strong>.',
+                                    'Click <strong>Hide / Show Registration Link</strong> to switch it.',
+                                ]
+                            ],
                         ],
+                        'tip' => 'Only 3 System Admin seats exist. Archive an existing admin to free a seat before creating a new one.',
                     ],
-                    'tip' => 'Only 3 System Admin seats exist. Archive an existing admin to free a seat before creating a new one.',
-                ],
 
                     'sys_admin' => [
                         'title' => 'System Admin Guide',
