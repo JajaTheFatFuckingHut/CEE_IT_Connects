@@ -3144,8 +3144,8 @@ $page = 'messages';
                                 <h5 class="fw-bold mb-0"><i class="fa-solid fa-file-circle-check me-2" style="color:#ff6b2c;"></i>Documents
                                     Passed per Student</h5>
                                 <small class="text-muted">
-                                    <i class="fa-solid fa-circle-check" style="color:#16a36a;"></i> submitted &nbsp;
-                                    <i class="fa-solid fa-circle-xmark" style="color:#dc2626;"></i> not submitted
+                                    <i class="fa-solid fa-circle-check" style="color:#16a36a;"></i> Submitted &nbsp;
+                                    <i class="fa-solid fa-circle-xmark" style="color:#dc2626;"></i> Not submitted
                                 </small>
                             </div>
                             <a href="<?= $dashUrl ?>ojt_applications" class="btn btn-sm"
