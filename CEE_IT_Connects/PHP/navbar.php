@@ -837,7 +837,6 @@ function timeAgo($datetime)
         } else {
             echo 'index.php';
         }
-        var_dump($role, $userType, $user_id, $profileUser);
         ?>">
             <img src="/Sources/CEE IT Connects Logo.png" class="nav-logo">
             <span class="brand-text ms-1">CEE IT CONNECTS</span>
