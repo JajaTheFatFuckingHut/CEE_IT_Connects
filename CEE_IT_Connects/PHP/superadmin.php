@@ -242,9 +242,9 @@ foreach ($roomRows as $r) {
 
 // ── Admin activity log ──
 $saLogs = $pdo->query("
-    SELECT a.full_name AS name, au.roles, a.department, au.activity, au.activity_date
+    SELECT a.name, au.roles, a.department, au.activity, au.activity_date
     FROM audits au
-    LEFT JOIN advisers a ON a.id = au.user_id
+    LEFT JOIN admins a ON a.id = au.user_id
     WHERE au.roles IN ('superadmin', 'superadministrator', 'internship_admin')
     ORDER BY au.activity_date DESC
     LIMIT 100
