@@ -3123,9 +3123,6 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
 
                                         <td class="fw-semibold">
                                             Batch <?= htmlspecialchars(batchLabel($sy)) ?>
-                                            <?php if ($sy === $currentSY): ?>
-                                                <span class="badge bg-primary ms-1">Current</span>
-                                            <?php endif; ?>
                                         </td>
                                         <td style="color:#666; font-size:13px;"><?= htmlspecialchars($sy) ?></td>
                                         <td>
