@@ -201,15 +201,8 @@ $pdo->prepare("INSERT INTO school_years (school_year) VALUES (?) ON CONFLICT DO 
 $schoolYearOptions = $pdo->query("SELECT school_year FROM school_years ORDER BY school_year DESC")
     ->fetchAll(PDO::FETCH_COLUMN);
 
-if (!in_array($currentSY, $schoolYearOptions, true)) {
-    $schoolYearOptions[] = $currentSY;
-    rsort($schoolYearOptions);
-}
-
-// the section settings table now shows every batch, so no dropdown selection
 $schoolYear = $currentSY;
 
-// saved counts for ALL school years
 $allCounts = [];
 $rows = $pdo->query("SELECT school_year, year_level, section_count FROM section_settings")
     ->fetchAll(PDO::FETCH_ASSOC);
@@ -3122,36 +3115,36 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                             <?php foreach ($schoolYearOptions as $sy):
                                 $counts = $allCounts[$sy] ?? [];
                                 ?>
-                                    <tr>
-                                        <form method="POST" action="systemadmin-db.php">
-                                            <input type="hidden" name="save_section_settings" value="1">
-                                            <input type="hidden" name="school_year" value="<?= htmlspecialchars($sy) ?>">
+                                <tr>
+                                    <form method="POST" action="systemadmin-db.php">
+                                        <input type="hidden" name="save_section_settings" value="1">
+                                        <input type="hidden" name="school_year" value="<?= htmlspecialchars($sy) ?>">
 
-                                            <!-- keep year 1-3 values untouched so saving doesn't wipe them -->
-                                            <?php for ($yl = 1; $yl <= 3; $yl++): ?>
-                                                    <input type="hidden" name="section_count[<?= $yl ?>]"
-                                                        value="<?= $counts[$yl] ?? 0 ?>">
-                                            <?php endfor; ?>
+                                        <!-- keep year 1-3 values untouched so saving doesn't wipe them -->
+                                        <?php for ($yl = 1; $yl <= 3; $yl++): ?>
+                                            <input type="hidden" name="section_count[<?= $yl ?>]"
+                                                value="<?= $counts[$yl] ?? 0 ?>">
+                                        <?php endfor; ?>
 
-                                            <td class="fw-semibold">
-                                                Batch <?= htmlspecialchars(batchLabel($sy)) ?>
-                                                <?php if ($sy === $currentSY): ?>
-                                                        <span class="badge bg-primary ms-1">Current</span>
-                                                <?php endif; ?>
-                                            </td>
-                                            <td style="color:#666; font-size:13px;"><?= htmlspecialchars($sy) ?></td>
-                                            <td>
-                                                <input type="number" min="0" max="50" name="section_count[4]"
-                                                    value="<?= $counts[4] ?? 0 ?>"
-                                                    style="width:90px; padding:8px 10px; border-radius:10px; border:1px solid #ddd; font-size:13px;">
-                                            </td>
-                                            <td>
-                                                <button type="submit" class="btn-update" style="padding:8px 14px;">
-                                                    <i class="bi bi-save me-1"></i> Save
-                                                </button>
-                                            </td>
-                                        </form>
-                                    </tr>
+                                        <td class="fw-semibold">
+                                            Batch <?= htmlspecialchars(batchLabel($sy)) ?>
+                                            <?php if ($sy === $currentSY): ?>
+                                                <span class="badge bg-primary ms-1">Current</span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td style="color:#666; font-size:13px;"><?= htmlspecialchars($sy) ?></td>
+                                        <td>
+                                            <input type="number" min="0" max="50" name="section_count[4]"
+                                                value="<?= $counts[4] ?? 0 ?>"
+                                                style="width:90px; padding:8px 10px; border-radius:10px; border:1px solid #ddd; font-size:13px;">
+                                        </td>
+                                        <td>
+                                            <button type="submit" class="btn-update" style="padding:8px 14px;">
+                                                <i class="bi bi-save me-1"></i> Save
+                                            </button>
+                                        </td>
+                                    </form>
+                                </tr>
                             <?php endforeach; ?>
                         </tbody>
                     </table>
@@ -3183,9 +3176,9 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                             <option value="">All Advisers</option>
                             <option value="unassigned">Unassigned</option>
                             <?php foreach ($adviserList as $adv): ?>
-                                    <option value="<?= htmlspecialchars($adv['full_name']) ?>">
-                                        <?= htmlspecialchars($adv['full_name']) ?>
-                                    </option>
+                                <option value="<?= htmlspecialchars($adv['full_name']) ?>">
+                                    <?= htmlspecialchars($adv['full_name']) ?>
+                                </option>
                             <?php endforeach; ?>
                         </select>
                     </div>
@@ -3210,68 +3203,68 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                             <?php foreach ($adviserList as $adv):
                                 $mine = $assignedSections[$adv['id']] ?? [];
                                 $isAssigned = !empty($mine); ?>
-                                    <tr data-name="<?= htmlspecialchars(strtolower($adv['full_name'])) ?>"
-                                        data-has="<?= $isAssigned ? 'has' : 'none' ?>">
-                                        <td>
-                                            <div class="d-flex align-items-center gap-2">
-                                                <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold flex-shrink-0"
-                                                    style="width:34px;height:34px;background:#eef1ff;color:#272f54;font-size:11px;">
-                                                    <?= htmlspecialchars(deptCode($adv['department'])) ?>
-                                                </div>
-                                                <?= htmlspecialchars($adv['full_name']) ?>
+                                <tr data-name="<?= htmlspecialchars(strtolower($adv['full_name'])) ?>"
+                                    data-has="<?= $isAssigned ? 'has' : 'none' ?>">
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold flex-shrink-0"
+                                                style="width:34px;height:34px;background:#eef1ff;color:#272f54;font-size:11px;">
+                                                <?= htmlspecialchars(deptCode($adv['department'])) ?>
                                             </div>
-                                        </td>
-                                        <td><?= htmlspecialchars($adv['email']) ?></td>
-                                        <td>
-                                            <?php if ($isAssigned): ?>
-                                                    <?php foreach ($mine as $sectionKey => $label): ?>
-                                                            <?php [$yr, $sec] = explode('|', $sectionKey); ?>
-                                                            <form method="POST" action="systemadmin-db.php" class="d-inline unassign-form"
-                                                                onsubmit="return confirm('Unassign this adviser from Year <?= (int) $yr ?> - Section <?= htmlspecialchars($sec) ?>? This will delete the room and remove all its members.');">
-                                                                <input type="hidden" name="school_year"
-                                                                    value="<?= htmlspecialchars($schoolYear) ?>">
-                                                                <input type="hidden" name="adviser_id" value="<?= $adv['id'] ?>">
-                                                                <input type="hidden" name="year_level" value="<?= (int) $yr ?>">
-                                                                <input type="hidden" name="section" value="<?= htmlspecialchars($sec) ?>">
-                                                                <span
-                                                                    class="badge rounded-pill px-3 me-1 d-inline-flex align-items-center gap-1"
-                                                                    style="background:#eaf3de;color:#27500a;font-size:12px;font-weight:500;">
-                                                                    <?= htmlspecialchars($label) ?>
-                                                                    <button type="submit" name="unassign_section" class="btn-close btn-close-sm"
-                                                                        style="font-size:8px;" aria-label="Unassign"></button>
-                                                                </span>
-                                                            </form>
-                                                    <?php endforeach; ?>
-                                            <?php else: ?>
-                                                    <span class="badge rounded-pill px-3"
-                                                        style="background:#f8d7da;color:#721c24;font-size:12px;">
-                                                        No section yet
+                                            <?= htmlspecialchars($adv['full_name']) ?>
+                                        </div>
+                                    </td>
+                                    <td><?= htmlspecialchars($adv['email']) ?></td>
+                                    <td>
+                                        <?php if ($isAssigned): ?>
+                                            <?php foreach ($mine as $sectionKey => $label): ?>
+                                                <?php [$yr, $sec] = explode('|', $sectionKey); ?>
+                                                <form method="POST" action="systemadmin-db.php" class="d-inline unassign-form"
+                                                    onsubmit="return confirm('Unassign this adviser from Year <?= (int) $yr ?> - Section <?= htmlspecialchars($sec) ?>? This will delete the room and remove all its members.');">
+                                                    <input type="hidden" name="school_year"
+                                                        value="<?= htmlspecialchars($schoolYear) ?>">
+                                                    <input type="hidden" name="adviser_id" value="<?= $adv['id'] ?>">
+                                                    <input type="hidden" name="year_level" value="<?= (int) $yr ?>">
+                                                    <input type="hidden" name="section" value="<?= htmlspecialchars($sec) ?>">
+                                                    <span
+                                                        class="badge rounded-pill px-3 me-1 d-inline-flex align-items-center gap-1"
+                                                        style="background:#eaf3de;color:#27500a;font-size:12px;font-weight:500;">
+                                                        <?= htmlspecialchars($label) ?>
+                                                        <button type="submit" name="unassign_section" class="btn-close btn-close-sm"
+                                                            style="font-size:8px;" aria-label="Unassign"></button>
                                                     </span>
-                                            <?php endif; ?>
-                                        </td>
-                                        <td>
-                                            <form method="POST" action="systemadmin-db.php" id="assign-form-<?= $adv['id'] ?>">
-                                                <input type="hidden" name="school_year"
-                                                    value="<?= htmlspecialchars($schoolYear) ?>">
-                                                <input type="hidden" name="adviser_id" value="<?= $adv['id'] ?>">
-                                                <select name="section" class="assign-select" required <?= $isAssigned ? 'disabled title="Already assigned"' : '' ?>>
-                                                    <option value="">— Select Section —</option>
-                                                    <?php foreach ($openSections as $s): ?>
-                                                            <option value="<?= (int) $s['year_level'] . '|' . (int) $s['section'] ?>">
-                                                                Year <?= (int) $s['year_level'] ?> - Section <?= (int) $s['section'] ?>
-                                                            </option>
-                                                    <?php endforeach; ?>
-                                                </select>
-                                            </form>
-                                        </td>
-                                        <td>
-                                            <button type="submit" form="assign-form-<?= $adv['id'] ?>" name="assign_section"
-                                                class="btn-update" style="padding:8px 14px;" <?= $isAssigned ? 'disabled' : '' ?>>
-                                                <i class="bi bi-person-check me-1"></i>
-                                                <?= $isAssigned ? 'Assigned' : 'Assign' ?>
-                                            </button>
-                                        </td>
-                                    </tr>
+                                                </form>
+                                            <?php endforeach; ?>
+                                        <?php else: ?>
+                                            <span class="badge rounded-pill px-3"
+                                                style="background:#f8d7da;color:#721c24;font-size:12px;">
+                                                No section yet
+                                            </span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td>
+                                        <form method="POST" action="systemadmin-db.php" id="assign-form-<?= $adv['id'] ?>">
+                                            <input type="hidden" name="school_year"
+                                                value="<?= htmlspecialchars($schoolYear) ?>">
+                                            <input type="hidden" name="adviser_id" value="<?= $adv['id'] ?>">
+                                            <select name="section" class="assign-select" required <?= $isAssigned ? 'disabled title="Already assigned"' : '' ?>>
+                                                <option value="">— Select Section —</option>
+                                                <?php foreach ($openSections as $s): ?>
+                                                    <option value="<?= (int) $s['year_level'] . '|' . (int) $s['section'] ?>">
+                                                        Year <?= (int) $s['year_level'] ?> - Section <?= (int) $s['section'] ?>
+                                                    </option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </form>
+                                    </td>
+                                    <td>
+                                        <button type="submit" form="assign-form-<?= $adv['id'] ?>" name="assign_section"
+                                            class="btn-update" style="padding:8px 14px;" <?= $isAssigned ? 'disabled' : '' ?>>
+                                            <i class="bi bi-person-check me-1"></i>
+                                            <?= $isAssigned ? 'Assigned' : 'Assign' ?>
+                                        </button>
+                                    </td>
+                                </tr>
                             <?php endforeach; ?>
                         </tbody>
                     </table>
@@ -3293,145 +3286,145 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                 </div>
 
                 <?php if (empty($supervisorRequests)): ?>
-                        <div class="text-center text-muted py-5">
-                            <i class="bi bi-person-tie fs-1 d-block mb-2"></i>
-                            No supervisor requests yet.
-                        </div>
+                    <div class="text-center text-muted py-5">
+                        <i class="bi bi-person-tie fs-1 d-block mb-2"></i>
+                        No supervisor requests yet.
+                    </div>
                 <?php else: ?>
-                        <div style="display:flex; flex-direction:column; gap:12px;">
-                            <?php foreach ($supervisorRequests as $req):
-                                $avatarColors = ['#ff2c8f', '#2c6fff', '#1abc9c', '#9b59b6', '#e67e22'];
-                                $avatarColor = $avatarColors[crc32($req['student_name']) % count($avatarColors)];
-                                $statusStyles = [
-                                    'pending' => ['bg' => '#fffbeb', 'border' => '#fde68a', 'color' => '#92400e', 'label' => 'Pending Review'],
-                                    'approved' => ['bg' => '#f0fdf4', 'border' => '#bbf7d0', 'color' => '#065f46', 'label' => 'Approved'],
-                                    'rejected' => ['bg' => '#fef2f2', 'border' => '#fecaca', 'color' => '#dc2626', 'label' => 'Returned'],
-                                ];
-                                $st = $statusStyles[$req['status']] ?? $statusStyles['pending'];
-                                ?>
-                                    <div style="background:white; border:1px solid #eee; border-radius:12px;
+                    <div style="display:flex; flex-direction:column; gap:12px;">
+                        <?php foreach ($supervisorRequests as $req):
+                            $avatarColors = ['#ff2c8f', '#2c6fff', '#1abc9c', '#9b59b6', '#e67e22'];
+                            $avatarColor = $avatarColors[crc32($req['student_name']) % count($avatarColors)];
+                            $statusStyles = [
+                                'pending' => ['bg' => '#fffbeb', 'border' => '#fde68a', 'color' => '#92400e', 'label' => 'Pending Review'],
+                                'approved' => ['bg' => '#f0fdf4', 'border' => '#bbf7d0', 'color' => '#065f46', 'label' => 'Approved'],
+                                'rejected' => ['bg' => '#fef2f2', 'border' => '#fecaca', 'color' => '#dc2626', 'label' => 'Returned'],
+                            ];
+                            $st = $statusStyles[$req['status']] ?? $statusStyles['pending'];
+                            ?>
+                            <div style="background:white; border:1px solid #eee; border-radius:12px;
                             padding:18px 20px; box-shadow:0 1px 4px rgba(0,0,0,.04);">
 
-                                        <!-- Top row -->
-                                        <div style="display:flex; align-items:flex-start; gap:12px; flex-wrap:wrap;">
-                                            <div style="display:flex; align-items:center; gap:10px; flex:1; min-width:200px;">
-                                                <div style="width:40px;height:40px;border-radius:50%;background:<?= $avatarColor ?>;
+                                <!-- Top row -->
+                                <div style="display:flex; align-items:flex-start; gap:12px; flex-wrap:wrap;">
+                                    <div style="display:flex; align-items:center; gap:10px; flex:1; min-width:200px;">
+                                        <div style="width:40px;height:40px;border-radius:50%;background:<?= $avatarColor ?>;
                                         color:white;display:flex;align-items:center;justify-content:center;
                                         font-weight:700;font-size:16px;flex-shrink:0;">
-                                                    <?= strtoupper(substr($req['student_name'], 0, 1)) ?>
-                                                </div>
-                                                <div>
-                                                    <div style="font-weight:600;font-size:14px;">
-                                                        <?= htmlspecialchars($req['student_name']) ?>
-                                                    </div>
-                                                    <div style="font-size:12px;color:#888;">
-                                                        <?= htmlspecialchars($req['student_no']) ?> &middot;
-                                                        <?= htmlspecialchars($req['program']) ?>
-                                                    </div>
-                                                </div>
+                                            <?= strtoupper(substr($req['student_name'], 0, 1)) ?>
+                                        </div>
+                                        <div>
+                                            <div style="font-weight:600;font-size:14px;">
+                                                <?= htmlspecialchars($req['student_name']) ?>
                                             </div>
-                                            <span style="padding:4px 12px; border-radius:99px; font-size:11px; font-weight:600;
+                                            <div style="font-size:12px;color:#888;">
+                                                <?= htmlspecialchars($req['student_no']) ?> &middot;
+                                                <?= htmlspecialchars($req['program']) ?>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <span style="padding:4px 12px; border-radius:99px; font-size:11px; font-weight:600;
                                      background:<?= $st['bg'] ?>; color:<?= $st['color'] ?>;
                                      border:1px solid <?= $st['border'] ?>; white-space:nowrap; align-self:center;">
-                                                <?= $st['label'] ?>
-                                            </span>
-                                        </div>
+                                        <?= $st['label'] ?>
+                                    </span>
+                                </div>
 
-                                        <!-- Supervisor details -->
-                                        <div
-                                            style="margin-top:14px; display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+                                <!-- Supervisor details -->
+                                <div
+                                    style="margin-top:14px; display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
                                 gap:10px; background:#f9fafb; border-radius:8px; padding:12px 14px; border:1px solid #f0f0f0;">
-                                            <div>
-                                                <div
-                                                    style="font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;">
-                                                    Supervisor Name</div>
-                                                <div style="font-size:13px;font-weight:600;"><?= htmlspecialchars($req['full_name']) ?>
-                                                </div>
-                                            </div>
-                                            <div>
-                                                <div
-                                                    style="font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;">
-                                                    Email</div>
-                                                <div style="font-size:13px;"><?= htmlspecialchars($req['email'] ?? '—') ?></div>
-                                            </div>
-                                            <div>
-                                                <div
-                                                    style="font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;">
-                                                    Contact</div>
-                                                <div style="font-size:13px;"><?= htmlspecialchars($req['contact_number'] ?? '—') ?>
-                                                </div>
-                                            </div>
-                                            <div>
-                                                <div
-                                                    style="font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;">
-                                                    Submitted</div>
-                                                <div style="font-size:13px;"><?= date('M d, Y', strtotime($req['submitted_at'])) ?>
-                                                </div>
-                                            </div>
+                                    <div>
+                                        <div
+                                            style="font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;">
+                                            Supervisor Name</div>
+                                        <div style="font-size:13px;font-weight:600;"><?= htmlspecialchars($req['full_name']) ?>
                                         </div>
+                                    </div>
+                                    <div>
+                                        <div
+                                            style="font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;">
+                                            Email</div>
+                                        <div style="font-size:13px;"><?= htmlspecialchars($req['email'] ?? '—') ?></div>
+                                    </div>
+                                    <div>
+                                        <div
+                                            style="font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;">
+                                            Contact</div>
+                                        <div style="font-size:13px;"><?= htmlspecialchars($req['contact_number'] ?? '—') ?>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div
+                                            style="font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;">
+                                            Submitted</div>
+                                        <div style="font-size:13px;"><?= date('M d, Y', strtotime($req['submitted_at'])) ?>
+                                        </div>
+                                    </div>
+                                </div>
 
-                                        <!-- Actions -->
-                                        <?php if ($req['status'] === 'pending'): ?>
-                                                <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
-                                                    <form action="systemadmin-db.php" method="POST" style="margin:0;">
-                                                        <input type="hidden" name="submission_id" value="<?= $req['id'] ?>">
-                                                        <input type="hidden" name="student_id" value="<?= $req['student_id'] ?>">
-                                                        <input type="hidden" name="action" value="approve">
-                                                        <button type="submit" style="display:inline-flex;align-items:center;gap:6px;
+                                <!-- Actions -->
+                                <?php if ($req['status'] === 'pending'): ?>
+                                    <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+                                        <form action="systemadmin-db.php" method="POST" style="margin:0;">
+                                            <input type="hidden" name="submission_id" value="<?= $req['id'] ?>">
+                                            <input type="hidden" name="student_id" value="<?= $req['student_id'] ?>">
+                                            <input type="hidden" name="action" value="approve">
+                                            <button type="submit" style="display:inline-flex;align-items:center;gap:6px;
                                     padding:8px 16px; border-radius:8px; border:none; cursor:pointer;
                                     background:#16a34a; color:white; font-size:13px; font-weight:500;
                                     font-family:inherit; transition:filter .15s;"
-                                                            onmouseover="this.style.filter='brightness(.9)'" onmouseout="this.style.filter=''">
-                                                            <i class="bi bi-check-circle"></i> Approve & Create Account
-                                                        </button>
-                                                    </form>
-                                                    <button onclick="toggleRejectSupAdmin(<?= $req['id'] ?>)" style="display:inline-flex;align-items:center;gap:6px;
+                                                onmouseover="this.style.filter='brightness(.9)'" onmouseout="this.style.filter=''">
+                                                <i class="bi bi-check-circle"></i> Approve & Create Account
+                                            </button>
+                                        </form>
+                                        <button onclick="toggleRejectSupAdmin(<?= $req['id'] ?>)" style="display:inline-flex;align-items:center;gap:6px;
                                        padding:8px 16px; border-radius:8px; cursor:pointer;
                                        background:white; color:#dc2626; font-size:13px; font-weight:500;
                                        border:1.5px solid #fca5a5; font-family:inherit; transition:filter .15s;"
-                                                        onmouseover="this.style.filter='brightness(.95)'" onmouseout="this.style.filter=''">
-                                                        <i class="bi bi-x-circle"></i> Return to Student
-                                                    </button>
-                                                </div>
+                                            onmouseover="this.style.filter='brightness(.95)'" onmouseout="this.style.filter=''">
+                                            <i class="bi bi-x-circle"></i> Return to Student
+                                        </button>
+                                    </div>
 
-                                                <div id="reject-sup-admin-<?= $req['id'] ?>" style="display:none; margin-top:10px;">
-                                                    <form action="adviser-supervisor-action.php" method="POST">
-                                                        <input type="hidden" name="submission_id" value="<?= $req['id'] ?>">
-                                                        <input type="hidden" name="student_id" value="<?= $req['student_id'] ?>">
-                                                        <input type="hidden" name="action" value="reject">
-                                                        <textarea name="rejection_note" rows="2"
-                                                            placeholder="Reason for returning (optional)..." style="width:100%; padding:8px 12px; border:1.5px solid #fca5a5;
+                                    <div id="reject-sup-admin-<?= $req['id'] ?>" style="display:none; margin-top:10px;">
+                                        <form action="adviser-supervisor-action.php" method="POST">
+                                            <input type="hidden" name="submission_id" value="<?= $req['id'] ?>">
+                                            <input type="hidden" name="student_id" value="<?= $req['student_id'] ?>">
+                                            <input type="hidden" name="action" value="reject">
+                                            <textarea name="rejection_note" rows="2"
+                                                placeholder="Reason for returning (optional)..." style="width:100%; padding:8px 12px; border:1.5px solid #fca5a5;
                                            border-radius:8px; font-size:13px; font-family:inherit;
                                            outline:none; resize:vertical; margin-bottom:6px;"></textarea>
-                                                        <button type="submit" style="padding:7px 14px; border-radius:8px; border:none;
+                                            <button type="submit" style="padding:7px 14px; border-radius:8px; border:none;
                                     background:#dc2626; color:white; font-size:13px; font-weight:500;
                                     font-family:inherit; cursor:pointer;">
-                                                            <i class="bi bi-send me-1"></i> Confirm Return
-                                                        </button>
-                                                    </form>
-                                                </div>
-
-                                        <?php elseif ($req['status'] === 'approved'): ?>
-                                                <div
-                                                    style="margin-top:10px; font-size:12px; color:#16a34a; display:flex; align-items:center; gap:6px;">
-                                                    <i class="bi bi-check-circle-fill"></i>
-                                                    Account created &middot; Approved <?= date('M d, Y', strtotime($req['reviewed_at'])) ?>
-                                                </div>
-
-                                        <?php elseif ($req['status'] === 'rejected'): ?>
-                                                <div
-                                                    style="margin-top:10px; font-size:12px; color:#dc2626; display:flex; align-items:center; gap:6px;">
-                                                    <i class="bi bi-x-circle-fill"></i>
-                                                    Returned to student &middot; <?= date('M d, Y', strtotime($req['reviewed_at'])) ?>
-                                                    <?php if (!empty($req['rejection_note'])): ?>
-                                                            &middot; <em><?= htmlspecialchars($req['rejection_note']) ?></em>
-                                                    <?php endif; ?>
-                                                </div>
-                                        <?php endif; ?>
-
+                                                <i class="bi bi-send me-1"></i> Confirm Return
+                                            </button>
+                                        </form>
                                     </div>
-                            <?php endforeach; ?>
-                        </div>
+
+                                <?php elseif ($req['status'] === 'approved'): ?>
+                                    <div
+                                        style="margin-top:10px; font-size:12px; color:#16a34a; display:flex; align-items:center; gap:6px;">
+                                        <i class="bi bi-check-circle-fill"></i>
+                                        Account created &middot; Approved <?= date('M d, Y', strtotime($req['reviewed_at'])) ?>
+                                    </div>
+
+                                <?php elseif ($req['status'] === 'rejected'): ?>
+                                    <div
+                                        style="margin-top:10px; font-size:12px; color:#dc2626; display:flex; align-items:center; gap:6px;">
+                                        <i class="bi bi-x-circle-fill"></i>
+                                        Returned to student &middot; <?= date('M d, Y', strtotime($req['reviewed_at'])) ?>
+                                        <?php if (!empty($req['rejection_note'])): ?>
+                                            &middot; <em><?= htmlspecialchars($req['rejection_note']) ?></em>
+                                        <?php endif; ?>
+                                    </div>
+                                <?php endif; ?>
+
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
                 <?php endif; ?>
             </div>
 
@@ -3505,69 +3498,69 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                 </div>
 
                 <?php if (empty($programHoursList)): ?>
-                        <div class="text-center text-muted py-5">
-                            <i class="bi bi-inbox fs-1 d-block mb-2"></i>
-                            No programs found. Make sure internships have a program field set.
-                        </div>
+                    <div class="text-center text-muted py-5">
+                        <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                        No programs found. Make sure internships have a program field set.
+                    </div>
                 <?php else: ?>
 
-                        <form method="POST" action="systemadmin-db.php">
-                            <?php
-                            $countStmt = $pdo->query("
+                    <form method="POST" action="systemadmin-db.php">
+                        <?php
+                        $countStmt = $pdo->query("
                                 SELECT program, COUNT(*) AS total
                                 FROM internships
                                 WHERE program IS NOT NULL AND program <> ''
                                 GROUP BY program
                             ");
-                            $programCounts = [];
-                            foreach ($countStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
-                                $programCounts[$row['program']] = $row['total'];
-                            }
+                        $programCounts = [];
+                        foreach ($countStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+                            $programCounts[$row['program']] = $row['total'];
+                        }
 
-                            $hoursStmt = $pdo->prepare("
+                        $hoursStmt = $pdo->prepare("
                             SELECT programs
                             FROM internships
                         ");
 
-                            $cardStyles = [
-                                'Civil Engineering' => ['color' => '#E4572E', 'icon' => 'bi-pc-display'],
-                                'Information Technology' => ['color' => '#29335C', 'icon' => 'bi-code-slash'],
-                                'Electrical Engineering' => ['color' => '#f2b705', 'icon' => 'bi-lightning-charge'],
-                            ];
-                            ?>
+                        $cardStyles = [
+                            'Civil Engineering' => ['color' => '#E4572E', 'icon' => 'bi-pc-display'],
+                            'Information Technology' => ['color' => '#29335C', 'icon' => 'bi-code-slash'],
+                            'Electrical Engineering' => ['color' => '#f2b705', 'icon' => 'bi-lightning-charge'],
+                        ];
+                        ?>
 
-                            <div style="display:flex; flex-wrap:wrap; gap:20px; margin-bottom:24px;">
-                                <?php foreach ($programHoursList as $ph):
+                        <div style="display:flex; flex-wrap:wrap; gap:20px; margin-bottom:24px;">
+                            <?php foreach ($programHoursList as $ph):
 
-                                    $program = $ph['program'];
+                                $program = $ph['program'];
 
-                                    $style = $cardStyles[$program] ?? [
-                                        'color' => '#6b7280',
-                                        'icon' => 'bi-mortarboard'
-                                    ];
+                                $style = $cardStyles[$program] ?? [
+                                    'color' => '#6b7280',
+                                    'icon' => 'bi-mortarboard'
+                                ];
 
-                                    $count = (int) ($programCounts[$program] ?? 0);
-                                    ?>
-                                        <div style="flex:1; min-width:260px; background:#fff;
+                                $count = (int) ($programCounts[$program] ?? 0);
+                                ?>
+                                <div style="flex:1; min-width:260px; background:#fff;
                                         border:1.5px solid #e5e7eb;
                                         border-left:5px solid <?= $style['color'] ?>;
                                         border-radius:10px; padding:18px 20px;">
 
-                                            <!-- Header row: program name + icon -->
-                                            <div style="display:flex; justify-content:space-between;
+                                    <!-- Header row: program name + icon -->
+                                    <div style="display:flex; justify-content:space-between;
                                         align-items:flex-start; margin-bottom:16px;">
 
-                                                <div>
-                                                    <div style="font-weight:700; font-size:16px; color:#272f54;">
-                                                        <?= htmlspecialchars($program) ?>
-                                                    </div>
+                                        <div>
+                                            <div style="font-weight:700; font-size:16px; color:#272f54;">
+                                                <?= htmlspecialchars($program) ?>
+                                            </div>
 
-                                                    <div style="font-size:12.5px; color:#9ca3af;">
-                                                        <?= $count ?> internship(s) will be updated
-                                                    </div>
-                                                </div>
+                                            <div style="font-size:12.5px; color:#9ca3af;">
+                                                <?= $count ?> internship(s) will be updated
+                                            </div>
+                                        </div>
 
-                                                <div style="
+                                        <div style="
                                                 width:40px;
                                                 height:40px;
                                                 border-radius:10px;
@@ -3578,32 +3571,32 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                                                 justify-content:center;
                                                 font-size:20px;
                                             ">
-                                                    <i class="bi <?= $style['icon'] ?>"></i>
-                                                </div>
-
-                                            </div>
-                                            <div style="display:flex; align-items:baseline; gap:6px;">
-                                                <input type="hidden" name="program[]" value="<?= htmlspecialchars($program) ?>">
-
-                                                <input type="number" name="required_hours[]" value="<?= (int) $ph['required_hours'] ?>"
-                                                    min="1" max="9999" required style="width:100%; border:none; outline:none; background:transparent;
-                                                   font-size:28px; font-weight:700; color:#272f54;
-                                                   font-family:inherit; padding:0;">
-                                                <span style="font-size:13px; color:#9ca3af; white-space:nowrap;">hrs</span>
-                                            </div>
+                                            <i class="bi <?= $style['icon'] ?>"></i>
                                         </div>
 
-                                <?php endforeach; ?>
-                            </div>
+                                    </div>
+                                    <div style="display:flex; align-items:baseline; gap:6px;">
+                                        <input type="hidden" name="program[]" value="<?= htmlspecialchars($program) ?>">
+
+                                        <input type="number" name="required_hours[]" value="<?= (int) $ph['required_hours'] ?>"
+                                            min="1" max="9999" required style="width:100%; border:none; outline:none; background:transparent;
+                                                   font-size:28px; font-weight:700; color:#272f54;
+                                                   font-family:inherit; padding:0;">
+                                        <span style="font-size:13px; color:#9ca3af; white-space:nowrap;">hrs</span>
+                                    </div>
+                                </div>
+
+                            <?php endforeach; ?>
+                        </div>
 
 
 
-                            <div style="display:flex; justify-content:flex-end;">
-                                <button type="submit" name="save_program_hours" class="btn-update">
-                                    <i class="bi bi-floppy2 me-1"></i> Save Changes
-                                </button>
-                            </div>
-                        </form>
+                        <div style="display:flex; justify-content:flex-end;">
+                            <button type="submit" name="save_program_hours" class="btn-update">
+                                <i class="bi bi-floppy2 me-1"></i> Save Changes
+                            </button>
+                        </div>
+                    </form>
 
                 <?php endif; ?>
             </div>
@@ -3643,9 +3636,9 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                                 <select name="year" class="sa-input" onchange="this.form.submit()">
                                     <option value="all" <?= $filterYear === 'all' ? 'selected' : '' ?>>All years</option>
                                     <?php for ($y = (int) date('Y') - 1; $y <= (int) date('Y') + 5; $y++): ?>
-                                            <option value="<?= $y ?>" <?= (string) $y === (string) $filterYear ? 'selected' : '' ?>>
-                                                <?= $y ?>
-                                            </option>
+                                        <option value="<?= $y ?>" <?= (string) $y === (string) $filterYear ? 'selected' : '' ?>>
+                                            <?= $y ?>
+                                        </option>
                                     <?php endfor; ?>
                                 </select>
                             </form>
@@ -3653,29 +3646,29 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
 
                         <div class="sa-list">
                             <?php if (!$suspendedList): ?>
-                                    <div class="sa-empty">No suspended dates.</div>
+                                <div class="sa-empty">No suspended dates.</div>
                             <?php endif; ?>
 
                             <?php foreach ($suspendedList as $row):
                                 $dateStr = sprintf('%04d-%02d-%02d', $row['year'], $row['month'], $row['day']);
                                 $label = date('M j, Y', strtotime($dateStr));
                                 ?>
-                                    <div class="sa-item">
-                                        <div class="sa-item-text">
-                                            <b>
-                                                <?= htmlspecialchars($label) ?>
-                                            </b>
-                                            <span>
-                                                <?= htmlspecialchars($row['reason'] ?? '') ?>
-                                            </span>
-                                        </div>
-                                        <form method="POST" action="calendar-suspend.php"
-                                            onsubmit="return confirm('Lift the suspension on <?= $label ?>?');">
-                                            <input type="hidden" name="action" value="remove">
-                                            <input type="hidden" name="date" value="<?= $dateStr ?>">
-                                            <button type="submit" class="sa-del">Remove</button>
-                                        </form>
+                                <div class="sa-item">
+                                    <div class="sa-item-text">
+                                        <b>
+                                            <?= htmlspecialchars($label) ?>
+                                        </b>
+                                        <span>
+                                            <?= htmlspecialchars($row['reason'] ?? '') ?>
+                                        </span>
                                     </div>
+                                    <form method="POST" action="calendar-suspend.php"
+                                        onsubmit="return confirm('Lift the suspension on <?= $label ?>?');">
+                                        <input type="hidden" name="action" value="remove">
+                                        <input type="hidden" name="date" value="<?= $dateStr ?>">
+                                        <button type="submit" class="sa-del">Remove</button>
+                                    </form>
+                                </div>
                             <?php endforeach; ?>
                         </div>
                     </div>
