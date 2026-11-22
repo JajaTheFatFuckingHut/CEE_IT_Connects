@@ -255,9 +255,14 @@ foreach ($saLogs as &$lg) {
 unset($lg);
 
 // ── OJT hours ──
-// ASSUMPTION: program_hours(program, required_hours)
-$programHoursList = $pdo->query("SELECT program, required_hours FROM program_hours ORDER BY program")
-    ->fetchAll(PDO::FETCH_ASSOC);
+$programHoursStmt = $pdo->query("
+    SELECT program, required_hours
+    FROM internships
+    WHERE program IS NOT NULL AND program <> ''
+    GROUP BY program, required_hours
+    ORDER BY program ASC
+");
+$programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
 
 // ── Registration link ──
 $rv = $pdo->query("SELECT value FROM settings WHERE key = 'register_visible'")->fetchColumn();
