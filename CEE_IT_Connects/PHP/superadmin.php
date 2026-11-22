@@ -189,8 +189,8 @@ $countByRole = function (string $role) use ($pdo): array {
 $saHte = $countByRole('HTE_adviser');
 $saOjt = $countByRole('internship_adviser');
 
-$saInternshipAdmins = (int) $pdo->query("SELECT COUNT(*) FROM advisers WHERE role = 'internship_admin' AND is_archived = FALSE")->fetchColumn();
-$saSeatsUsed = (int) $pdo->query("SELECT COUNT(*) FROM advisers WHERE role = 'superadmin' AND is_archived = FALSE")->fetchColumn();
+$saInternshipAdmins = (int) $pdo->query("SELECT COUNT(*) FROM admins WHERE role = 'internship_admin' AND is_archived = FALSE")->fetchColumn();
+$saSeatsUsed = (int) $pdo->query("SELECT COUNT(*) FROM admins WHERE role = 'superadmin' AND is_archived = FALSE")->fetchColumn();
 $saSeatsOpen = max(0, $saSeatMax - $saSeatsUsed);
 
 $saTotalStudents = array_sum($saStudentsByProg);
@@ -200,7 +200,7 @@ $saTotalOjt = array_sum($saOjt);
 // ── System administrators table ──
 $saSysAdmins = $pdo->query("
     SELECT full_name AS name, email, LOWER(TRIM(department)) AS department, role, is_archived
-    FROM advisers WHERE role = 'superadmin' ORDER BY full_name
+    FROM admins WHERE role = 'superadmin' ORDER BY full_name
 ")->fetchAll(PDO::FETCH_ASSOC);
 
 // ── Sections of the selected batch, grouped by adviser department ──
