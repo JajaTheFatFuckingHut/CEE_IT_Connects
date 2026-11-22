@@ -194,8 +194,6 @@ $y = (int) date('Y');
 $currentSY = $m >= 6 ? "{$y}-" . ($y + 1) : ($y - 1) . "-{$y}";
 
 // all school years (batches), newest first
-$schoolYear = $currentSY;
-
 $allCounts = [];
 $rows = $pdo->query("SELECT school_year, year_level, section_count FROM section_settings")
     ->fetchAll(PDO::FETCH_ASSOC);
@@ -213,13 +211,14 @@ if (!function_exists('batchLabel')) {
     }
 }
 
-// saved counts for the selected school year, keyed by year level
-$stmt = $pdo->prepare("SELECT year_level, section_count FROM section_settings WHERE school_year = ?");
-$stmt->execute([$schoolYear]);
-$sectionCounts = [];
-foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
-    $sectionCounts[(int) $r['year_level']] = (int) $r['section_count'];
+$schoolYear = $_GET['batch'] ?? $currentSY;
+if (!isset($allCounts[$schoolYear])) {
+    $schoolYear = isset($allCounts[$currentSY])
+        ? $currentSY
+        : ($schoolYearOptions[0] ?? $currentSY);
 }
+
+$sectionCounts = $allCounts[$schoolYear] ?? [];
 
 // sections already taken in this school year
 $stmt = $pdo->prepare("
@@ -3083,7 +3082,7 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                         </div>
                         <div class="sysAdm-header-text">
                             <h2>Sections</h2>
-                            <p>Manage how many OJ T sections each batch has.</p>
+                            <p>Manage how many OJT sections each batch has.</p>
                         </div>
                     </div>
                     <!-- separate Add Batch button -->
@@ -3160,6 +3159,12 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                                 that
                                 adviser's room.</p>
                         </div>
+                        <div class="mb-2" style="font-size:13px; color:#272f54;">
+                            Showing advisers for <strong>Batch
+                                <?= htmlspecialchars(batchLabel($schoolYear)) ?></strong>
+                            (<?= htmlspecialchars($schoolYear) ?>) ·
+                            <?= count($takenKeys) ?> assigned, <?= count($openSections) ?> open sections
+                        </div>
                     </div>
                 </div>
 
@@ -3174,6 +3179,13 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                             <?php foreach ($adviserList as $adv): ?>
                                 <option value="<?= htmlspecialchars($adv['full_name']) ?>">
                                     <?= htmlspecialchars($adv['full_name']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <select id="assign-batch" onchange="changeBatch(this.value)" class="sa-field">
+                            <?php foreach ($allCounts as $sy => $c): ?>
+                                <option value="<?= htmlspecialchars($sy) ?>" <?= $sy === $schoolYear ? 'selected' : '' ?>>
+                                    Batch <?= htmlspecialchars(batchLabel($sy)) ?>
                                 </option>
                             <?php endforeach; ?>
                         </select>
@@ -4208,6 +4220,12 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
             }).observe(nav, { subtree: true, attributes: true, attributeFilter: ['class'] });
         })();
 
+        function changeBatch(sy) {
+            const url = new URL(window.location.href);
+            url.searchParams.set('batch', sy);
+            url.hash = 'assign_adviser';
+            window.location.href = url.toString();
+        }
         // For the calendar
         //
 
