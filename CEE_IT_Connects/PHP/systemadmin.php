@@ -193,14 +193,7 @@ $m = (int) date('n');
 $y = (int) date('Y');
 $currentSY = $m >= 6 ? "{$y}-" . ($y + 1) : ($y - 1) . "-{$y}";
 
-// make sure the current school year exists in the list
-$pdo->prepare("INSERT INTO school_years (school_year) VALUES (?) ON CONFLICT DO NOTHING")
-    ->execute([$currentSY]);
-
 // all school years (batches), newest first
-$schoolYearOptions = $pdo->query("SELECT school_year FROM school_years ORDER BY school_year DESC")
-    ->fetchAll(PDO::FETCH_COLUMN);
-
 $schoolYear = $currentSY;
 
 $allCounts = [];
@@ -209,6 +202,9 @@ $rows = $pdo->query("SELECT school_year, year_level, section_count FROM section_
 foreach ($rows as $r) {
     $allCounts[$r['school_year']][(int) $r['year_level']] = (int) $r['section_count'];
 }
+
+$schoolYearOptions = array_keys($allCounts);
+rsort($schoolYearOptions);
 
 if (!function_exists('batchLabel')) {
     function batchLabel(string $sy): string
