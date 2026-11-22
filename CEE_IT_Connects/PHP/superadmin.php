@@ -168,7 +168,7 @@ if (!in_array($schoolYear, $schoolYearOptions, true)) {
 // ASSUMPTION: students.department holds the program name, students.is_archived exists
 $saStudentsByProg = [];
 foreach ($pdo->query("
-    SELECT LOWER(TRIM(department)) AS dept, COUNT(*) AS c
+    SELECT LOWER(TRIM(program)) AS dept, COUNT(*) AS c
     FROM students WHERE is_archived = FALSE GROUP BY 1
 ")->fetchAll(PDO::FETCH_ASSOC) as $r) {
     $saStudentsByProg[$r['dept']] = (int) $r['c'];
@@ -723,13 +723,14 @@ $registerVisible = ($rv === 'hide') ? 'hide' : 'show';
                     </div>
                     <div class="card-body px-4 pb-4 pt-2">
                         <p class="text-muted small mb-3">
-                            S.Y. <?= htmlspecialchars($schoolYear) ?> &middot;
+                            Batch
+                            <?= htmlspecialchars(batchLabel($schoolYear)) ?> &middot;
                             <?= (int) ($saOjt[$pk] ?? 0) ?> OJT advisers &middot;
                             <?= (int) ($saHte[$pk] ?? 0) ?> HTE advisers &middot;
                             <?= (int) ($saStudentsByProg[$pk] ?? 0) ?> students
                         </p>
                         <?php if (empty($progSections)): ?>
-                            <p class="text-muted small mb-0">No <?= htmlspecialchars($pc) ?> sections for this term.</p>
+                            <p class="text-muted small mb-0">No <?= htmlspecialchars($pc) ?> sections for this batch.</p>
                         <?php else: ?>
                             <div class="table-responsive">
                                 <table class="table align-middle mb-0" style="font-size:14px;">
