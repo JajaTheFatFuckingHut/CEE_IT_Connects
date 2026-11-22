@@ -144,7 +144,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // ── Header ──
 $adminFullName = 'superadministrator';
-$stmt = $pdo->prepare("SELECT full_name FROM advisers WHERE id = ?"); // ASSUMPTION: superadmin row is in advisers
+$stmt = $pdo->prepare("SELECT full_name FROM admins WHERE id = ?"); // ASSUMPTION: superadmin row is in advisers
 $stmt->execute([$_SESSION['user_id'] ?? 0]);
 if ($n = $stmt->fetchColumn())
     $adminFullName = $n;
