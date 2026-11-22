@@ -199,8 +199,8 @@ $saTotalOjt = array_sum($saOjt);
 
 // ── System administrators table ──
 $saSysAdmins = $pdo->query("
-    SELECT full_name AS name, email, LOWER(TRIM(department)) AS department, role, is_archived
-    FROM admins WHERE role = 'superadmin' ORDER BY full_name
+    SELECT name, email, LOWER(TRIM(department)) AS department, role, is_archived
+    FROM admins WHERE role = 'superadmin' ORDER BY name
 ")->fetchAll(PDO::FETCH_ASSOC);
 
 // ── Sections of the selected batch, grouped by adviser department ──
