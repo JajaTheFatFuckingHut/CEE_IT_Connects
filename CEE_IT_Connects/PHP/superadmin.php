@@ -1,10 +1,8 @@
 <?php
-
 session_start();
 require_once 'db.php';
 require_once 'auth.php';
-// $_SESSION['user_id'] = 1;
-// $_SESSION['user_type'] = 'superadmin';
+
 // ── UI config (labels only) ──
 $saPrograms = [
     'civil engineering' => 'CE',
@@ -12,57 +10,16 @@ $saPrograms = [
     'information technology' => 'IT',
 ];
 
-// ── DATA CONTRACT: variables the UI expects. Empty defaults = empty states. ──
-// Header
-$adminFullName = $adminFullName ?? 'superadministrator';
-
-// Term
-$schoolYearOptions = $schoolYearOptions ?? [];
-$schoolYear = $schoolYear ?? '';
-
-// Cards (arrays keyed by lowercase program name, e.g. 'civil engineering' => 4)
-$saStudentsByProg = $saStudentsByProg ?? [];     // active students per program
-$saHte = $saHte ?? [];                           // active HTE advisers per department
-$saOjt = $saOjt ?? [];                           // active OJT advisers per department
-$saInternshipAdmins = $saInternshipAdmins ?? 0;  // active internship admins
-$saSeatMax = $saSeatMax ?? 3;                    // max system admins
-$saSeatsUsed = $saSeatsUsed ?? 0;                // active system admins
-$saSeatsOpen = $saSeatsOpen ?? max(0, $saSeatMax - $saSeatsUsed);
-
-// System administrators table: rows of
-//   ['name', 'email', 'department' (lowercase program name), 'role' ('superadmin'), 'is_archived' (bool)]
-$saSysAdmins = $saSysAdmins ?? [];
-
-// Sections of the selected term, grouped by the adviser's department:
-//   $saSecByProg['civil engineering'][room_id] = ['label' => 'Year 4 - Section 1', 'adviser' => 'Name', 'students' => ['Student A', ...]]
-$saSecByProg = $saSecByProg ?? [];
-
-// Admin activity log: rows of ['name', 'roles', 'department', 'activity', 'activity_date']
-$saLogs = $saLogs ?? [];
-
-// OJT hours: rows of ['program', 'required_hours']
-$programHoursList = $programHoursList ?? [];
-
-// Registration link state: 'show' | 'hide'
-$registerVisible = $registerVisible ?? 'show';
-
-// ── Presentation math ──
-$saTotalStudents = array_sum($saStudentsByProg);
-$saTotalHte = array_sum($saHte);
-$saTotalOjt = array_sum($saOjt);
-
-// ── Presentation helpers ──
+// ── Helpers ──
 function saBool($v)
 {
     return $v === true || $v === 't' || $v === 1 || $v === '1' || $v === 'true';
 }
-
 function saProgLabel($dept, array $programs)
 {
     $dept = strtolower(trim((string) $dept));
     return $programs[$dept] ?? ($dept === '' ? '—' : ucwords($dept));
 }
-
 function saBreak(array $map, array $programs)
 {
     $parts = [];
@@ -71,7 +28,6 @@ function saBreak(array $map, array $programs)
     }
     return implode(' · ', $parts);
 }
-
 function saRoleLabel($r)
 {
     $r = strtolower(trim((string) $r));
@@ -81,26 +37,231 @@ function saRoleLabel($r)
         'internship_admin' => 'Internship Admin',
     ][$r] ?? ucwords(str_replace('_', ' ', $r));
 }
-
-function deptCode($department)
-{
-    $department = strtolower(trim($department));
-    $map = [
-        'information technology' => 'BSIT',
-        'electrical engineering' => 'BSEE',
-        'civil engineering' => 'BSCE'
-    ];
-    if (isset($map[$department])) {
-        return $map[$department];
+if (!function_exists('deptCode')) {
+    function deptCode($department)
+    {
+        $department = strtolower(trim((string) ($department ?? '')));
+        if ($department === '')
+            return '—';
+        $map = [
+            'information technology' => 'BSIT',
+            'electrical engineering' => 'BSEE',
+            'civil engineering' => 'BSCE',
+        ];
+        if (isset($map[$department]))
+            return $map[$department];
+        $initials = '';
+        foreach (preg_split('/\s+/', $department) as $w) {
+            if ($w !== '')
+                $initials .= strtoupper($w[0]);
+        }
+        return $initials ?: '—';
     }
-    $words = preg_split('/\s+/', $department);
-    $initials = '';
-    foreach ($words as $w) {
-        if ($w !== '')
-            $initials .= strtoupper($w[0]);
-    }
-    return $initials ?: '—';
 }
+if (!function_exists('batchLabel')) {
+    function batchLabel(string $sy): string
+    {
+        return substr($sy, 5, 4);
+    }
+}
+
+$saSeatMax = 3; // max system admins
+
+// ── POST actions ──
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+    // Create system admin
+    if (isset($_POST['create_system_admin'])) {
+        $name = trim($_POST['name'] ?? '');
+        $email = trim($_POST['email'] ?? '');
+        $pass = $_POST['password'] ?? '';
+        $dept = strtolower(trim($_POST['department'] ?? ''));
+
+        $err = null;
+        if ($name === '' || $email === '' || $pass === '' || $dept === '') {
+            $err = "Please fill in all fields.";
+        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $err = "Invalid email address.";
+        } elseif (!isset($saPrograms[$dept])) {
+            $err = "Invalid department.";
+        } elseif (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/', $pass)) {
+            $err = "Password must be at least 8 characters with an uppercase letter, a lowercase letter, a number and a special character.";
+        }
+
+        if (!$err) {
+            // ASSUMPTION: system admins live in `advisers` with role = 'superadmin'
+            $seats = $pdo->query("SELECT COUNT(*) FROM advisers WHERE role = 'superadmin' AND is_archived = FALSE")->fetchColumn();
+            if ((int) $seats >= $saSeatMax) {
+                $err = "All system admin seats are taken.";
+            } else {
+                $dup = $pdo->prepare("SELECT 1 FROM advisers WHERE LOWER(email) = LOWER(?)");
+                $dup->execute([$email]);
+                if ($dup->fetchColumn())
+                    $err = "That email is already in use.";
+            }
+        }
+
+        if ($err) {
+            $_SESSION['error'] = $err;
+        } else {
+            try {
+                $pdo->beginTransaction();
+                $pdo->prepare("
+                    INSERT INTO advisers (full_name, email, password, department, role, is_archived)
+                    VALUES (?, ?, ?, ?, 'superadmin', FALSE)
+                ")->execute([$name, $email, password_hash($pass, PASSWORD_DEFAULT), $dept]);
+
+                $pdo->prepare("
+                    INSERT INTO audits (user_id, roles, activity, activity_date)
+                    VALUES (?, 'superadministrator', ?, NOW())
+                ")->execute([$_SESSION['user_id'], "Created system admin account for {$name}"]);
+                $pdo->commit();
+                $_SESSION['success'] = "System admin {$name} created.";
+            } catch (Exception $e) {
+                if ($pdo->inTransaction())
+                    $pdo->rollBack();
+                $_SESSION['error'] = "Could not create the account.";
+            }
+        }
+        header("Location: " . strtok($_SERVER['REQUEST_URI'], '#'));
+        exit;
+    }
+
+    // Toggle registration link
+    if (isset($_POST['toggle_register'])) {
+        // ASSUMPTION: settings(key PRIMARY KEY, value)
+        $cur = $pdo->query("SELECT value FROM settings WHERE key = 'register_visible'")->fetchColumn();
+        $new = ($cur === 'hide') ? 'show' : 'hide';
+        $pdo->prepare("
+            INSERT INTO settings (key, value) VALUES ('register_visible', ?)
+            ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value
+        ")->execute([$new]);
+        $_SESSION['success'] = $new === 'show' ? "Registration link is now visible." : "Registration link is now hidden.";
+        header("Location: " . strtok($_SERVER['REQUEST_URI'], '#') . "#register-toggle");
+        exit;
+    }
+}
+
+// ── Header ──
+$adminFullName = 'superadministrator';
+$stmt = $pdo->prepare("SELECT full_name FROM advisers WHERE id = ?"); // ASSUMPTION: superadmin row is in advisers
+$stmt->execute([$_SESSION['user_id'] ?? 0]);
+if ($n = $stmt->fetchColumn())
+    $adminFullName = $n;
+
+// ── Term (batches come from section_settings) ──
+$m = (int) date('n');
+$y = (int) date('Y');
+$currentSY = $m >= 6 ? "{$y}-" . ($y + 1) : ($y - 1) . "-{$y}";
+
+$schoolYearOptions = $pdo->query("SELECT DISTINCT school_year FROM section_settings ORDER BY school_year DESC")
+    ->fetchAll(PDO::FETCH_COLUMN);
+
+$schoolYear = $_GET['sy'] ?? $currentSY;
+if (!in_array($schoolYear, $schoolYearOptions, true)) {
+    $schoolYear = in_array($currentSY, $schoolYearOptions, true)
+        ? $currentSY
+        : ($schoolYearOptions[0] ?? $currentSY);
+}
+
+// ── Cards ──
+// ASSUMPTION: students.department holds the program name, students.is_archived exists
+$saStudentsByProg = [];
+foreach ($pdo->query("
+    SELECT LOWER(TRIM(department)) AS dept, COUNT(*) AS c
+    FROM students WHERE is_archived = FALSE GROUP BY 1
+")->fetchAll(PDO::FETCH_ASSOC) as $r) {
+    $saStudentsByProg[$r['dept']] = (int) $r['c'];
+}
+
+// ASSUMPTION: adviser roles are 'hte_adviser' and 'ojt_adviser'
+$countByRole = function (string $role) use ($pdo): array {
+    $st = $pdo->prepare("
+        SELECT LOWER(TRIM(department)) AS dept, COUNT(*) AS c
+        FROM advisers WHERE role = ? AND is_archived = FALSE GROUP BY 1
+    ");
+    $st->execute([$role]);
+    $out = [];
+    foreach ($st->fetchAll(PDO::FETCH_ASSOC) as $r)
+        $out[$r['dept']] = (int) $r['c'];
+    return $out;
+};
+$saHte = $countByRole('hte_adviser');
+$saOjt = $countByRole('ojt_adviser');
+
+$saInternshipAdmins = (int) $pdo->query("SELECT COUNT(*) FROM advisers WHERE role = 'internship_admin' AND is_archived = FALSE")->fetchColumn();
+$saSeatsUsed = (int) $pdo->query("SELECT COUNT(*) FROM advisers WHERE role = 'superadmin' AND is_archived = FALSE")->fetchColumn();
+$saSeatsOpen = max(0, $saSeatMax - $saSeatsUsed);
+
+$saTotalStudents = array_sum($saStudentsByProg);
+$saTotalHte = array_sum($saHte);
+$saTotalOjt = array_sum($saOjt);
+
+// ── System administrators table ──
+$saSysAdmins = $pdo->query("
+    SELECT full_name AS name, email, LOWER(TRIM(department)) AS department, role, is_archived
+    FROM advisers WHERE role = 'superadmin' ORDER BY full_name
+")->fetchAll(PDO::FETCH_ASSOC);
+
+// ── Sections of the selected batch, grouped by adviser department ──
+$saSecByProg = [];
+$st = $pdo->prepare("
+    SELECT r.id AS room_id, r.year_level, r.section,
+           a.full_name AS adviser, LOWER(TRIM(a.department)) AS department
+    FROM rooms r
+    JOIN advisers a ON a.id = r.adviser_id
+    WHERE r.school_year = ? AND r.is_archived = FALSE AND a.role = 'internship_adviser'
+    ORDER BY r.year_level, r.section::int
+");
+$st->execute([$schoolYear]);
+$roomRows = $st->fetchAll(PDO::FETCH_ASSOC);
+
+$studentsByRoom = [];
+if ($roomRows) {
+    $ids = array_column($roomRows, 'room_id');
+    $in = implode(',', array_fill(0, count($ids), '?'));
+    $st = $pdo->prepare("
+        SELECT rm.room_id, s.full_name  -- ASSUMPTION: students.full_name
+        FROM room_members rm
+        JOIN students s ON s.id = rm.user_id
+        WHERE rm.user_type = 'student' AND rm.room_id IN ($in)
+        ORDER BY s.full_name
+    ");
+    $st->execute($ids);
+    foreach ($st->fetchAll(PDO::FETCH_ASSOC) as $r) {
+        $studentsByRoom[$r['room_id']][] = $r['full_name'];
+    }
+}
+foreach ($roomRows as $r) {
+    $saSecByProg[$r['department']][$r['room_id']] = [
+        'label' => "Year {$r['year_level']} - Section {$r['section']}",
+        'adviser' => $r['adviser'],
+        'students' => $studentsByRoom[$r['room_id']] ?? [],
+    ];
+}
+
+// ── Admin activity log ──
+$saLogs = $pdo->query("
+    SELECT a.full_name AS name, au.roles, a.department, au.activity, au.activity_date
+    FROM audits au
+    LEFT JOIN advisers a ON a.id = au.user_id
+    WHERE au.roles IN ('superadmin', 'superadministrator', 'internship_admin')
+    ORDER BY au.activity_date DESC
+    LIMIT 100
+")->fetchAll(PDO::FETCH_ASSOC);
+foreach ($saLogs as &$lg) {
+    $lg['name'] = $lg['name'] ?? 'Unknown';
+}
+unset($lg);
+
+// ── OJT hours ──
+// ASSUMPTION: program_hours(program, required_hours)
+$programHoursList = $pdo->query("SELECT program, required_hours FROM program_hours ORDER BY program")
+    ->fetchAll(PDO::FETCH_ASSOC);
+
+// ── Registration link ──
+$rv = $pdo->query("SELECT value FROM settings WHERE key = 'register_visible'")->fetchColumn();
+$registerVisible = ($rv === 'hide') ? 'hide' : 'show';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -373,15 +534,19 @@ function deptCode($department)
                 </div>
             </div>
 
-            <!-- TERM -->
+            <!-- BATCH -->
             <form method="GET" class="d-flex align-items-center flex-wrap gap-2 mb-4">
                 <label for="saTermSelect" class="fw-semibold small mb-0" style="color:#272f54;">
-                    <i class="bi bi-calendar3 me-1"></i> Term
+                    <i class="bi bi-calendar3 me-1"></i> Batch
                 </label>
-                <select id="saTermSelect" name="sy" class="sa-field" onchange="this.form.submit()">
+                <select id="saTermSelect" name="sy" class="sa-field" onchange="this.form.submit()"
+                    <?= empty($schoolYearOptions) ? 'disabled' : '' ?>>
+                    <?php if (empty($schoolYearOptions)): ?>
+                        <option>No batches yet</option>
+                    <?php endif; ?>
                     <?php foreach ($schoolYearOptions as $opt): ?>
                         <option value="<?= htmlspecialchars($opt) ?>" <?= $opt === $schoolYear ? 'selected' : '' ?>>
-                            S.Y. <?= htmlspecialchars($opt) ?>
+                            Batch <?= htmlspecialchars(batchLabel($opt)) ?> (<?= htmlspecialchars($opt) ?>)
                         </option>
                     <?php endforeach; ?>
                 </select>
