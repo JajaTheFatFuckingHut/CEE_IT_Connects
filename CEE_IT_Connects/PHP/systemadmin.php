@@ -3085,8 +3085,8 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                             <p>Manage how many OJT sections each batch has.</p>
                         </div>
                     </div>
-                    <!-- separate Add Batch button -->
-                    <button type="button" class="btn-update" style="padding:8px 14px;" onclick="confirmAddBatch()">
+                    <button type="button" class="btn-update" style="padding:8px 14px;" data-bs-toggle="modal"
+                        data-bs-target="#addBatchModal">
                         <i class="bi bi-plus-lg me-1"></i> Add new batch
                     </button>
                 </div>
@@ -3609,7 +3609,7 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                 <?php endif; ?>
             </div>
 
-            <!-- <div id="calendar" class="section active sysAdm-section"> -->
+            <!-- CALENDAR -->
             <div id="calendar" class="section sysAdm-section">
                 <div class="sysAdm-header--danger sysAdm-header--blue">
                     <div class="sysAdm-header-left">
@@ -3683,15 +3683,43 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
 
                 </div>
             </div>
+
+            <!-- OJT NEW BATCH MODAL -->
+            <?php
+            // suggest the next batch: newest existing batch + 1, or the current batch
+            $newestBatch = !empty($schoolYearOptions) ? (int) batchLabel($schoolYearOptions[0]) : (int) substr($currentSY, 5, 4) - 1;
+            $suggestedBatch = $newestBatch + 1;
+            ?>
+            <div class="modal fade" id="addBatchModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <form method="POST" action="systemadmin-db.php" class="modal-content">
+                        <input type="hidden" name="add_school_year" value="1">
+                        <div class="modal-header">
+                            <h5 class="modal-title"><i class="bi bi-plus-lg me-1"></i> Add new batch</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <label for="batchYear" class="form-label fw-semibold" style="font-size:13px;">Batch
+                                (graduating year)</label>
+                            <input type="number" id="batchYear" name="batch" class="form-control" min="2000" max="2100"
+                                value="<?= $suggestedBatch ?>" required>
+                            <div class="form-text">
+                                Batch 2027 means school year 2026-2027.
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn-update" style="padding:8px 14px;">
+                                <i class="bi bi-plus-lg me-1"></i> Add batch
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div><!-- /.main-content -->
     </div><!-- /.layout -->
 
     <script>
-        function confirmAddBatch() {
-            if (confirm('Add a new batch?')) {
-                document.getElementById('addSyForm').submit();
-            }
-        }
         setTimeout(() => {
             const alert = document.getElementById('flashAlert');
             if (alert) {

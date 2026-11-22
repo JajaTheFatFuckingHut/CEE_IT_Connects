@@ -303,14 +303,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    // ---- data for the table ----
-    $adviserList = $pdo->query("
-    SELECT id, full_name, email
-    FROM advisers
-    WHERE role = 'internship_adviser'
-    ORDER BY full_name
-")->fetchAll(PDO::FETCH_ASSOC);
-
     if (isset($_POST['unassign_section'])) {
         $adviserId = $_POST['adviser_id'];
         $schoolYear = $_POST['school_year'];
@@ -358,6 +350,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
+    if (isset($_POST['add_school_year'])) {
+        $batch = (int) ($_POST['batch'] ?? 0);
+        if ($batch < 2000 || $batch > 2100) {
+            $_SESSION['error'] = "Invalid batch year.";
+            header("Location: systemadmin.php#section_settings");
+            exit;
+        }
+        $newSY = ($batch - 1) . '-' . $batch;
+
+        // already exists?
+        $chk = $pdo->prepare("SELECT 1 FROM section_settings WHERE school_year = ? LIMIT 1");
+        $chk->execute([$newSY]);
+        if ($chk->fetchColumn()) {
+            $_SESSION['error'] = "Batch {$batch} already exists.";
+            header("Location: systemadmin.php#section_settings");
+            exit;
+        }
+
+        $stmt = $pdo->prepare("
+        INSERT INTO section_settings (school_year, year_level, section_count)
+        VALUES (?, ?, 0)
+        ON CONFLICT (school_year, year_level) DO NOTHING
+    ");
+        for ($yl = 1; $yl <= 4; $yl++) {
+            $stmt->execute([$newSY, $yl]);
+        }
+
+        $_SESSION['success'] = "Batch {$batch} ({$newSY}) added.";
+        header("Location: systemadmin.php#section_settings");
+        exit;
+    }
 
     //admin 
     if (isset($_POST['create-admin'])) {
