@@ -186,8 +186,8 @@ $countByRole = function (string $role) use ($pdo): array {
         $out[$r['dept']] = (int) $r['c'];
     return $out;
 };
-$saHte = $countByRole('hte_adviser');
-$saOjt = $countByRole('ojt_adviser');
+$saHte = $countByRole('HTE_adviser');
+$saOjt = $countByRole('internship_adviser');
 
 $saInternshipAdmins = (int) $pdo->query("SELECT COUNT(*) FROM advisers WHERE role = 'internship_admin' AND is_archived = FALSE")->fetchColumn();
 $saSeatsUsed = (int) $pdo->query("SELECT COUNT(*) FROM advisers WHERE role = 'superadmin' AND is_archived = FALSE")->fetchColumn();
