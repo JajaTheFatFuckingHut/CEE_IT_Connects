@@ -65,7 +65,7 @@ if (!function_exists('batchLabel')) {
     }
 }
 
-$saSeatMax = 3; // max system admins
+$saSeatMax = 10; // max system admins
 
 // ── POST actions ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -199,7 +199,7 @@ $saTotalOjt = array_sum($saOjt);
 
 // ── System administrators table ──
 $saSysAdmins = $pdo->query("
-    SELECT name, email, LOWER(TRIM(department)) AS department, role, is_archived
+    SELECT id, name, email, LOWER(TRIM(department)) AS department, role, is_archived
     FROM admins WHERE role = 'superadmin' ORDER BY name
 ")->fetchAll(PDO::FETCH_ASSOC);
 
@@ -263,6 +263,36 @@ $programHoursStmt = $pdo->query("
     ORDER BY program ASC
 ");
 $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
+
+if (isset($_POST['delete_system_admin'])) {
+    $adminId = (int) ($_POST['admin_id'] ?? 0);
+
+    $st = $pdo->prepare("SELECT name FROM admins WHERE id = ? AND role::text = 'superadmin'");
+    $st->execute([$adminId]);
+    $target = $st->fetchColumn();
+
+    if (!$target) {
+        $_SESSION['error'] = "System admin not found.";
+    } else {
+        try {
+            $pdo->beginTransaction();
+            $pdo->prepare("DELETE FROM admins WHERE id = ? AND role::text = 'superadmin'")
+                ->execute([$adminId]);
+            $pdo->prepare("
+                INSERT INTO audits (user_id, roles, activity, activity_date)
+                VALUES (?, 'superadministrator', ?, NOW())
+            ")->execute([$_SESSION['user_id'], "Deleted system admin account of {$target}"]);
+            $pdo->commit();
+            $_SESSION['success'] = "System admin {$target} deleted.";
+        } catch (Exception $e) {
+            if ($pdo->inTransaction())
+                $pdo->rollBack();
+            $_SESSION['error'] = "Could not delete {$target}. They may still have records linked to their account.";
+        }
+    }
+    header("Location: " . strtok($_SERVER['REQUEST_URI'], '#'));
+    exit;
+}
 
 // ── Registration link ──
 $rv = $pdo->query("SELECT value FROM settings WHERE key = 'register_visible'")->fetchColumn();
@@ -663,8 +693,6 @@ $registerVisible = ($rv === 'hide') ? 'hide' : 'show';
                     </div>
                 </div>
             </div>
-
-            <!-- 1. SYSTEM ADMINISTRATORS -->
             <div class="card border-0 rounded-4 shadow-sm mb-4">
                 <div
                     class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex align-items-center justify-content-between flex-wrap gap-2">
@@ -691,6 +719,7 @@ $registerVisible = ($rv === 'hide') ? 'hide' : 'show';
                                         <th class="border-0 pb-2 fw-semibold ojtc-th-tab">Department</th>
                                         <th class="border-0 pb-2 fw-semibold ojtc-th-tab">Role</th>
                                         <th class="border-0 pb-2 fw-semibold ojtc-th-tab">Status</th>
+                                        <th class="border-0 pb-2 fw-semibold ojtc-th-tab text-end">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -708,6 +737,16 @@ $registerVisible = ($rv === 'hide') ? 'hide' : 'show';
                                                     style="font-weight:500;font-size:12px;background:<?= $archived ? '#fdeaea' : '#e6f4ea' ?>;color:<?= $archived ? '#a32d2d' : '#1b7a3d' ?>;">
                                                     <?= $archived ? 'Archived' : 'Active' ?>
                                                 </span>
+                                            </td>
+                                            <td class="text-end">
+                                                <form method="POST" class="d-inline"
+                                                    onsubmit="return confirm('Delete <?= htmlspecialchars(addslashes($a['name']), ENT_QUOTES) ?>? This cannot be undone.');">
+                                                    <input type="hidden" name="admin_id" value="<?= (int) $a['id'] ?>">
+                                                    <button type="submit" name="delete_system_admin" class="btn-update"
+                                                        style="height:32px;padding:0 12px;font-size:12px;background:#fdeaea !important;color:#a32d2d !important;">
+                                                        <i class="bi bi-trash me-1"></i> Delete
+                                                    </button>
+                                                </form>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>
