@@ -105,7 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             try {
                 $pdo->beginTransaction();
                 $pdo->prepare("
-                    INSERT INTO admins (full_name, email, password, department, role, is_archived)
+                    INSERT INTO admins (name, email, password, department, role, is_archived)
                     VALUES (?, ?, ?, ?, 'superadmin', FALSE)
                 ")->execute([$name, $email, password_hash($pass, PASSWORD_DEFAULT), $dept]);
 
