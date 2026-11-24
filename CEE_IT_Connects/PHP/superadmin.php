@@ -67,7 +67,6 @@ if (!function_exists('batchLabel')) {
 
 $saSeatMax = 10; // max system admins
 
-// ── POST actions ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Create system admin
@@ -89,12 +88,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         if (!$err) {
-            // ASSUMPTION: system admins live in `advisers` with role = 'superadmin'
-            $seats = $pdo->query("SELECT COUNT(*) FROM advisers WHERE role = 'superadmin' AND is_archived = FALSE")->fetchColumn();
+            $seats = $pdo->query("SELECT COUNT(*) FROM admins WHERE role = 'superadmin' AND is_archived = FALSE")->fetchColumn();
             if ((int) $seats >= $saSeatMax) {
                 $err = "All system admin seats are taken.";
             } else {
-                $dup = $pdo->prepare("SELECT 1 FROM advisers WHERE LOWER(email) = LOWER(?)");
+                $dup = $pdo->prepare("SELECT 1 FROM admins WHERE LOWER(email) = LOWER(?) AND role = 'superadmin'");
                 $dup->execute([$email]);
                 if ($dup->fetchColumn())
                     $err = "That email is already in use.";
@@ -107,7 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             try {
                 $pdo->beginTransaction();
                 $pdo->prepare("
-                    INSERT INTO advisers (full_name, email, password, department, role, is_archived)
+                    INSERT INTO admins (full_name, email, password, department, role, is_archived)
                     VALUES (?, ?, ?, ?, 'superadmin', FALSE)
                 ")->execute([$name, $email, password_hash($pass, PASSWORD_DEFAULT), $dept]);
 
