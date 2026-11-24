@@ -936,41 +936,50 @@ $registerVisible = ($rv === 'hide') ? 'hide' : 'show';
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content rounded-4">
                 <form method="POST" autocomplete="off" onsubmit="return confirm('Create this system admin account?');">
+
                     <div class="modal-header">
                         <h5 class="modal-title">
                             <i class="bi bi-person-plus me-2"></i><strong>Create System Admin</strong>
                         </h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
+
                     <div class="modal-body admin-form">
                         <p class="text-muted small mb-0">
                             <?= (int) $saSeatsUsed ?> of <?= (int) $saSeatMax ?> system admin seats used.
                         </p>
+
                         <input type="text" name="name" placeholder="Full Name" required>
                         <input type="email" name="email" placeholder="Email Address" required>
+
                         <div class="input-icon password-group">
                             <i class="fa-solid fa-lock field-icon"></i>
                             <input type="password" name="password" id="password" placeholder="Password" required>
                             <i class="fa fa-eye-slash toggle-password" id="togglePasswordIcon"></i>
                         </div>
+
+                        <div style="color:#888;font-size:10px;">
+                            Password must be at least 8 characters long, contains an uppercase and lowercase
+                            letter, a number, and a special character.
+                        </div>
+
+                        <select name="department" required>
+                            <option value="" disabled selected>Select Department</option>
+                            <?php foreach ($saPrograms as $pk => $pc): ?>
+                                <option value="<?= htmlspecialchars($pk) ?>"><?= htmlspecialchars(ucwords($pk)) ?></option>
+                            <?php endforeach; ?>
+                        </select>
                     </div>
-                    <div style="color:#888;font-size:10px;">Password must be at least 8 characters long, contains
-                        an uppercase and lowercase letter, a number, and a special character.</div>
-                    <select name="department" required>
-                        <option value="" disabled selected>Select Department</option>
-                        <?php foreach ($saPrograms as $pk => $pc): ?>
-                            <option value="<?= htmlspecialchars($pk) ?>"><?= htmlspecialchars(ucwords($pk)) ?></option>
-                        <?php endforeach; ?>
-                    </select>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn-update" data-bs-dismiss="modal"
+                            style="background:#eee !important;color:#555 !important;">Cancel</button>
+                        <button type="submit" name="create_system_admin" class="btn-update">Create System Admin</button>
+                    </div>
+
+                </form>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn-update" data-bs-dismiss="modal"
-                    style="background:#eee !important;color:#555 !important;">Cancel</button>
-                <button type="submit" name="create_system_admin" class="btn-update">Create System Admin</button>
-            </div>
-            </form>
         </div>
-    </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
