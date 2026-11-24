@@ -2611,9 +2611,9 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                         </select>
                     </div>
                     <div class="sa-toolbar-actions">
-                        <button type="button" class="btn-update" onclick="showSection(event, 'add-admin')">
+                        <!-- <button type="button" class="btn-update" onclick="showSection(event, 'add-admin')">
                             <i class="bi bi-person-plus me-1"></i>Add Admin
-                        </button>
+                        </button> -->
                         <button type="button" class="btn-update" onclick="showSection(event, 'add-adviser')">
                             <i class="bi bi-person-plus me-1"></i>Add Adviser
                         </button>
@@ -2658,7 +2658,7 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
             </div>
 
             <!-- ADD ADMIN -->
-            <div id="add-admin" class="section sysAdm-section">
+            <!-- <div id="add-admin" class="section sysAdm-section">
                 <div class="sysAdm-header--danger sysAdm-header--blue">
                     <div class="sysAdm-header-left">
                         <div class="sysAdm-header-icon">
@@ -2687,7 +2687,7 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                         <button type="submit" name="create-admin" class="btn-update">Create Admin</button>
                     </div>
                 </form>
-            </div>
+            </div> -->
 
             <!-- ADD ADVISER -->
             <div id="add-adviser" class="section sysAdm-section">
