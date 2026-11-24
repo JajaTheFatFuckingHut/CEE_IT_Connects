@@ -138,6 +138,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header("Location: " . strtok($_SERVER['REQUEST_URI'], '#') . "#register-toggle");
         exit;
     }
+
+    if (isset($_POST['delete_system_admin'])) {
+        $adminId = (int) ($_POST['admin_id'] ?? 0);
+
+        $st = $pdo->prepare("SELECT name FROM admins WHERE id = ? AND role::text = 'superadmin'");
+        $st->execute([$adminId]);
+        $target = $st->fetchColumn();
+
+        if (!$target) {
+            $_SESSION['error'] = "System admin not found.";
+        } else {
+            try {
+                $pdo->beginTransaction();
+                $pdo->prepare("DELETE FROM admins WHERE id = ? AND role::text = 'superadmin'")
+                    ->execute([$adminId]);
+                $pdo->prepare("
+                INSERT INTO audits (user_id, roles, activity, activity_date)
+                VALUES (?, 'superadministrator', ?, NOW())
+            ")->execute([$_SESSION['user_id'], "Deleted system admin account of {$target}"]);
+                $pdo->commit();
+                $_SESSION['success'] = "System admin {$target} deleted.";
+            } catch (Exception $e) {
+                if ($pdo->inTransaction())
+                    $pdo->rollBack();
+                $_SESSION['error'] = "Could not delete {$target}. They may still have records linked to their account.";
+            }
+        }
+        header("Location: " . strtok($_SERVER['REQUEST_URI'], '#'));
+        exit;
+    }
 }
 
 // ── Header ──
@@ -261,36 +291,6 @@ $programHoursStmt = $pdo->query("
     ORDER BY program ASC
 ");
 $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
-
-if (isset($_POST['delete_system_admin'])) {
-    $adminId = (int) ($_POST['admin_id'] ?? 0);
-
-    $st = $pdo->prepare("SELECT name FROM admins WHERE id = ? AND role::text = 'superadmin'");
-    $st->execute([$adminId]);
-    $target = $st->fetchColumn();
-
-    if (!$target) {
-        $_SESSION['error'] = "System admin not found.";
-    } else {
-        try {
-            $pdo->beginTransaction();
-            $pdo->prepare("DELETE FROM admins WHERE id = ? AND role::text = 'superadmin'")
-                ->execute([$adminId]);
-            $pdo->prepare("
-                INSERT INTO audits (user_id, roles, activity, activity_date)
-                VALUES (?, 'superadministrator', ?, NOW())
-            ")->execute([$_SESSION['user_id'], "Deleted system admin account of {$target}"]);
-            $pdo->commit();
-            $_SESSION['success'] = "System admin {$target} deleted.";
-        } catch (Exception $e) {
-            if ($pdo->inTransaction())
-                $pdo->rollBack();
-            $_SESSION['error'] = "Could not delete {$target}. They may still have records linked to their account.";
-        }
-    }
-    header("Location: " . strtok($_SERVER['REQUEST_URI'], '#'));
-    exit;
-}
 
 // ── Registration link ──
 $rv = $pdo->query("SELECT value FROM settings WHERE key = 'register_visible'")->fetchColumn();
