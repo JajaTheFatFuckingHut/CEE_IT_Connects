@@ -953,7 +953,6 @@ $registerVisible = ($rv === 'hide') ? 'hide' : 'show';
                         <input type="email" name="email" placeholder="Email Address" required>
 
                         <div class="input-icon password-group">
-                            <i class="fa-solid fa-lock field-icon"></i>
                             <input type="password" name="password" id="password" placeholder="Password" required>
                             <i class="fa fa-eye-slash toggle-password" id="togglePasswordIcon"></i>
                         </div>
