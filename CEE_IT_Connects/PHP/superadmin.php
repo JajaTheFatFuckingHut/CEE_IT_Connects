@@ -948,28 +948,50 @@ $registerVisible = ($rv === 'hide') ? 'hide' : 'show';
                         </p>
                         <input type="text" name="name" placeholder="Full Name" required>
                         <input type="email" name="email" placeholder="Email Address" required>
-                        <input type="password" name="password" placeholder="Password" required>
-                        <div style="color:#888;font-size:10px;">Password must be at least 8 characters long, contains
-                            an uppercase and lowercase letter, a number, and a special character.</div>
-                        <select name="department" required>
-                            <option value="" disabled selected>Select Department</option>
-                            <?php foreach ($saPrograms as $pk => $pc): ?>
-                                <option value="<?= htmlspecialchars($pk) ?>"><?= htmlspecialchars(ucwords($pk)) ?></option>
-                            <?php endforeach; ?>
-                        </select>
+                        <div class="input-icon password-group">
+                            <i class="fa-solid fa-lock field-icon"></i>
+                            <input type="password" name="password" id="password" placeholder="Password" required>
+                            <i class="fa fa-eye-slash toggle-password" id="togglePasswordIcon"></i>
+                        </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn-update" data-bs-dismiss="modal"
-                            style="background:#eee !important;color:#555 !important;">Cancel</button>
-                        <button type="submit" name="create_system_admin" class="btn-update">Create System Admin</button>
-                    </div>
-                </form>
+                    <div style="color:#888;font-size:10px;">Password must be at least 8 characters long, contains
+                        an uppercase and lowercase letter, a number, and a special character.</div>
+                    <select name="department" required>
+                        <option value="" disabled selected>Select Department</option>
+                        <?php foreach ($saPrograms as $pk => $pc): ?>
+                            <option value="<?= htmlspecialchars($pk) ?>"><?= htmlspecialchars(ucwords($pk)) ?></option>
+                        <?php endforeach; ?>
+                    </select>
             </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-update" data-bs-dismiss="modal"
+                    style="background:#eee !important;color:#555 !important;">Cancel</button>
+                <button type="submit" name="create_system_admin" class="btn-update">Create System Admin</button>
+            </div>
+            </form>
         </div>
+    </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        const togglePasswordIcon = document.getElementById('togglePasswordIcon');
+        const passwordInput = document.getElementById('password');
+
+        if (togglePasswordIcon && passwordInput) {
+            togglePasswordIcon.addEventListener('click', function () {
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    this.classList.remove('fa-eye-slash');
+                    this.classList.add('fa-eye');
+                } else {
+                    passwordInput.type = 'password';
+                    this.classList.remove('fa-eye');
+                    this.classList.add('fa-eye-slash');
+                }
+            });
+        }
+
         setTimeout(() => {
             const alert = document.getElementById('flashAlert');
             if (alert) {
