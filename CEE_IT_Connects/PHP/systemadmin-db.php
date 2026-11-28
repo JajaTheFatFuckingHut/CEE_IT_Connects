@@ -303,14 +303,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    // ---- data for the table ----
-    $adviserList = $pdo->query("
-    SELECT id, full_name, email
-    FROM advisers
-    WHERE role = 'internship_adviser'
-    ORDER BY full_name
-")->fetchAll(PDO::FETCH_ASSOC);
-
     if (isset($_POST['unassign_section'])) {
         $adviserId = $_POST['adviser_id'];
         $schoolYear = $_POST['school_year'];
@@ -358,67 +350,98 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
+    if (isset($_POST['add_school_year'])) {
+        $batch = (int) ($_POST['batch'] ?? 0);
+        if ($batch < 2000 || $batch > 2100) {
+            $_SESSION['error'] = "Invalid batch year.";
+            header("Location: systemadmin.php#section_settings");
+            exit;
+        }
+        $newSY = ($batch - 1) . '-' . $batch;
 
-    //admin 
-    if (isset($_POST['create-admin'])) {
-
-        $name = $_POST['name'];
-        $email = $_POST['email'];
-        $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-        $role = $_POST['role'];
-
-        $allowed = ['internship_admin', 'cma'];
-
-        if (!in_array($role, $allowed)) {
-            die("Invalid role");
+        // already exists?
+        $chk = $pdo->prepare("SELECT 1 FROM section_settings WHERE school_year = ? LIMIT 1");
+        $chk->execute([$newSY]);
+        if ($chk->fetchColumn()) {
+            $_SESSION['error'] = "Batch {$batch} already exists.";
+            header("Location: systemadmin.php#section_settings");
+            exit;
         }
 
         $stmt = $pdo->prepare("
-        INSERT INTO admins (name, email, password, role, is_archived)
-        VALUES (:name, :email, :password, :role, FALSE)
-        ");
-
-        $stmt->execute([
-            'name' => $name,
-            'email' => $email,
-            'password' => $password,
-            'role' => $role
-        ]);
-        $newAdminId = $pdo->lastInsertId();
-
-        $notifStmt = $pdo->prepare("
-            INSERT INTO notifications (user_id, user_type, title, message, link, is_read, created_at)
-            VALUES (?, 'admin', ?, ?, ?, FALSE, NOW())
-        ");
-
-        $notifStmt->execute([
-            $newAdminId,
-            'Welcome to CEE IT Connects',
-            'Your admin account has been created. Role: ' . $role . '.',
-            'internship-admin.php'
-        ]);
-
-        $allAdmins = $pdo->query("SELECT id FROM admins WHERE id != " . $newAdminId)->fetchAll(PDO::FETCH_ASSOC);
-        foreach ($allAdmins as $admin) {
-            $notifStmt->execute([
-                $admin['id'],
-                'New Admin Account Created',
-                'A new ' . $role . ' account has been created for ' . $name . '.',
-                'systemadmin.php'
-            ]);
+        INSERT INTO section_settings (school_year, year_level, section_count)
+        VALUES (?, ?, 0)
+        ON CONFLICT (school_year, year_level) DO NOTHING
+    ");
+        for ($yl = 1; $yl <= 4; $yl++) {
+            $stmt->execute([$newSY, $yl]);
         }
 
-        $stmtActivity = $pdo->prepare("INSERT INTO audits (user_id, roles, activity, activity_date) VALUES (:user_id, :roles, :activity, NOW())");
-        $stmtActivity->execute([
-            ':user_id' => $_SESSION['user_id'],
-            ':roles' => $_SESSION['role'],
-            ':activity' => 'Created new admin: ' . $name
-        ]);
-
-        $_SESSION['success'] = "Successfully created an account.";
-        header("Location: systemadmin.php?success=1");
-        exit();
+        $_SESSION['success'] = "Batch {$batch} ({$newSY}) added.";
+        header("Location: systemadmin.php#section_settings");
+        exit;
     }
+
+    //admin 
+    // if (isset($_POST['create-admin'])) {
+
+    //     $name = $_POST['name'];
+    //     $email = $_POST['email'];
+    //     $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+    //     $role = $_POST['role'];
+
+    //     $allowed = ['internship_admin', 'cma'];
+
+    //     if (!in_array($role, $allowed)) {
+    //         die("Invalid role");
+    //     }
+
+    //     $stmt = $pdo->prepare("
+    //     INSERT INTO admins (name, email, password, role, is_archived)
+    //     VALUES (:name, :email, :password, :role, FALSE)
+    //     ");
+
+    //     $stmt->execute([
+    //         'name' => $name,
+    //         'email' => $email,
+    //         'password' => $password,
+    //         'role' => $role
+    //     ]);
+    //     $newAdminId = $pdo->lastInsertId();
+
+    //     $notifStmt = $pdo->prepare("
+    //         INSERT INTO notifications (user_id, user_type, title, message, link, is_read, created_at)
+    //         VALUES (?, 'admin', ?, ?, ?, FALSE, NOW())
+    //     ");
+
+    //     $notifStmt->execute([
+    //         $newAdminId,
+    //         'Welcome to CEE IT Connects',
+    //         'Your admin account has been created. Role: ' . $role . '.',
+    //         'internship-admin.php'
+    //     ]);
+
+    //     $allAdmins = $pdo->query("SELECT id FROM admins WHERE id != " . $newAdminId)->fetchAll(PDO::FETCH_ASSOC);
+    //     foreach ($allAdmins as $admin) {
+    //         $notifStmt->execute([
+    //             $admin['id'],
+    //             'New Admin Account Created',
+    //             'A new ' . $role . ' account has been created for ' . $name . '.',
+    //             'systemadmin.php'
+    //         ]);
+    //     }
+
+    //     $stmtActivity = $pdo->prepare("INSERT INTO audits (user_id, roles, activity, activity_date) VALUES (:user_id, :roles, :activity, NOW())");
+    //     $stmtActivity->execute([
+    //         ':user_id' => $_SESSION['user_id'],
+    //         ':roles' => $_SESSION['role'],
+    //         ':activity' => 'Created new admin: ' . $name
+    //     ]);
+
+    //     $_SESSION['success'] = "Successfully created an account.";
+    //     header("Location: systemadmin.php?success=1");
+    //     exit();
+    // }
 
     //adviser
     if (isset($_POST['create-adviser'])) {

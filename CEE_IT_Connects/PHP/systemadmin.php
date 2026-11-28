@@ -193,35 +193,32 @@ $m = (int) date('n');
 $y = (int) date('Y');
 $currentSY = $m >= 6 ? "{$y}-" . ($y + 1) : ($y - 1) . "-{$y}";
 
-// make sure the current school year exists in the list
-$pdo->prepare("INSERT INTO school_years (school_year) VALUES (?) ON CONFLICT DO NOTHING")
-    ->execute([$currentSY]);
+// all school years (batches), newest first
+$allCounts = [];
+$rows = $pdo->query("SELECT school_year, year_level, section_count FROM section_settings")
+    ->fetchAll(PDO::FETCH_ASSOC);
+foreach ($rows as $r) {
+    $allCounts[$r['school_year']][(int) $r['year_level']] = (int) $r['section_count'];
+}
 
-// all school years, oldest first
-$schoolYearOptions = $pdo->query("SELECT school_year FROM school_years ORDER BY school_year")
-    ->fetchAll(PDO::FETCH_COLUMN);
+$schoolYearOptions = array_keys($allCounts);
+rsort($schoolYearOptions);
 
-// selected school year (?sy=...), falls back to current if unknown
-$schoolYear = $_GET['sy'] ?? $currentSY;
-if (!in_array($schoolYear, $schoolYearOptions, true))
-    $schoolYear = $currentSY;
-
-$startY = (int) substr($currentSY, 0, 4);
-for ($i = -1; $i <= 1; $i++) {
-    $sy = ($startY + $i) . '-' . ($startY + $i + 1);
-    if (!in_array($sy, $schoolYearOptions, true)) {
-        $schoolYearOptions[] = $sy;
+if (!function_exists('batchLabel')) {
+    function batchLabel(string $sy): string
+    {
+        return substr($sy, 5, 4);
     }
 }
-sort($schoolYearOptions);
 
-// saved counts for the selected school year, keyed by year level
-$stmt = $pdo->prepare("SELECT year_level, section_count FROM section_settings WHERE school_year = ?");
-$stmt->execute([$schoolYear]);
-$sectionCounts = [];
-foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
-    $sectionCounts[(int) $r['year_level']] = (int) $r['section_count'];
+$schoolYear = $_GET['batch'] ?? $currentSY;
+if (!isset($allCounts[$schoolYear])) {
+    $schoolYear = isset($allCounts[$currentSY])
+        ? $currentSY
+        : ($schoolYearOptions[0] ?? $currentSY);
 }
+
+$sectionCounts = $allCounts[$schoolYear] ?? [];
 
 // sections already taken in this school year
 $stmt = $pdo->prepare("
@@ -525,8 +522,8 @@ $programHoursList = $programHoursStmt->fetchAll(PDO::FETCH_ASSOC);
 //     $saRoleActData[] = (int) $saRa['total'];
 // }
 // ── DASHBOARD ANALYTICS (scoped to the logged-in admin's department) ──
-$saDept      = $adminDept;
-$saDeptQ     = $pdo->quote($saDept);           // safely quoted for the queries below
+$saDept = $adminDept;
+$saDeptQ = $pdo->quote($saDept);           // safely quoted for the queries below
 $saDeptLabel = $saDept !== '' ? ucwords($saDept) : '';
 
 // Card: internships in this department's program
@@ -544,8 +541,8 @@ $saAcc = $pdo->query("
       + (SELECT COUNT(*) FROM advisers WHERE LOWER(TRIM(department)) = $saDeptQ AND COALESCE(is_archived, FALSE) = TRUE)
       + (SELECT COUNT(*) FROM admins   WHERE LOWER(TRIM(department)) = $saDeptQ AND COALESCE(is_archived, FALSE) = TRUE) AS archived
 ")->fetch(PDO::FETCH_ASSOC);
-$saAccTotal  = (int) $saAcc['total'];
-$saArchived  = (int) $saAcc['archived'];
+$saAccTotal = (int) $saAcc['total'];
+$saArchived = (int) $saAcc['archived'];
 $saActivePct = $saAccTotal > 0 ? (int) round((($saAccTotal - $saArchived) / $saAccTotal) * 100) : 0;
 
 // Accounts by role (active only, this department). Also feeds the OJT / HTE adviser cards.
@@ -565,10 +562,10 @@ $saRoleRows = $pdo->query("
         WHERE LOWER(TRIM(department)) = $saDeptQ AND COALESCE(is_archived, FALSE) = FALSE
 ")->fetchAll(PDO::FETCH_KEY_PAIR);
 $saRoleCounts = [
-    'Students'            => (int) ($saRoleRows['Students'] ?? 0),
-    'HTE Advisers'        => (int) ($saRoleRows['HTE Advisers'] ?? 0),
+    'Students' => (int) ($saRoleRows['Students'] ?? 0),
+    'HTE Advisers' => (int) ($saRoleRows['HTE Advisers'] ?? 0),
     'Internship Advisers' => (int) ($saRoleRows['Internship Advisers'] ?? 0),
-    'Admins'              => (int) ($saRoleRows['Admins'] ?? 0),
+    'Admins' => (int) ($saRoleRows['Admins'] ?? 0),
 ];
 
 // System activity per day, last 14 days — only actions done by users of this department
@@ -592,11 +589,11 @@ foreach ($saActStmt->fetchAll(PDO::FETCH_ASSOC) as $saR) {
     $saActByDay[$saR['day']] = (int) $saR['total'];
 }
 $saTrendLabels = [];
-$saTrendData   = [];
+$saTrendData = [];
 for ($saT = 13; $saT >= 0; $saT--) {
     $saKey = date('Y-m-d', strtotime("-{$saT} days"));
     $saTrendLabels[] = date('M j', strtotime($saKey));
-    $saTrendData[]   = $saActByDay[$saKey] ?? 0;
+    $saTrendData[] = $saActByDay[$saKey] ?? 0;
 }
 
 // Sections for the selected term (school year) whose adviser belongs to this department,
@@ -621,8 +618,8 @@ foreach ($secStmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
     $rid = $r['room_id'];
     if (!isset($saSections[$rid])) {
         $saSections[$rid] = [
-            'label'    => "Year {$r['year_level']} - Section {$r['section']}",
-            'adviser'  => $r['adviser_name'],
+            'label' => "Year {$r['year_level']} - Section {$r['section']}",
+            'adviser' => $r['adviser_name'],
             'students' => [],   // student_id => name
         ];
     }
@@ -638,9 +635,9 @@ $saStudentIds = array_keys($saStudentIds);
 // Leave it empty to count every step_key found in student_progress.
 $saDocSteps = [];
 
-$saDocTypes  = [];   // step_key => display label
+$saDocTypes = [];   // step_key => display label
 $saSubmitted = [];   // student_id => [step_key => true]  (only rows where is_done = TRUE)
-$saDocError  = false;
+$saDocError = false;
 try {
     $allKeys = $pdo->query("
         SELECT DISTINCT step_key FROM student_progress ORDER BY step_key
@@ -685,8 +682,8 @@ foreach ($saDocTypes as $tid => $tname) {
 $saFollow = [];
 foreach ($saSections as $rid => $sec) {
     $slots = 0;
-    $done  = 0;
-    $rows  = [];
+    $done = 0;
+    $rows = [];
     foreach ($sec['students'] as $sid => $sname) {
         $docs = [];
         $miss = [];
@@ -705,10 +702,10 @@ foreach ($saSections as $rid => $sec) {
             $saFollow[] = ['name' => $sname, 'section' => $sec['label'], 'missing' => $miss];
         }
     }
-    $saSections[$rid]['rows']  = $rows;
+    $saSections[$rid]['rows'] = $rows;
     $saSections[$rid]['slots'] = $slots;
-    $saSections[$rid]['done']  = $done;
-    $saSections[$rid]['pct']   = $slots > 0 ? (int) round($done / $slots * 100) : 0;
+    $saSections[$rid]['done'] = $done;
+    $saSections[$rid]['pct'] = $slots > 0 ? (int) round($done / $slots * 100) : 0;
 }
 usort($saFollow, fn($a, $b) => count($b['missing']) <=> count($a['missing']));
 
@@ -723,20 +720,20 @@ foreach ($saSections as $sec) {
 }
 $saExportData = [
     'department' => $saDeptLabel,
-    'term'       => $schoolYear,
-    'cards'      => [
+    'term' => $schoolYear,
+    'cards' => [
         ['Internships', $totalInternships],
         ['Accounts', $saAccTotal],
         ['OJT Advisers', $saRoleCounts['Internship Advisers']],
         ['HTE Advisers', $saRoleCounts['HTE Advisers']],
     ],
-    'types'      => array_map(fn($n, $t) => [$n, $t['submitted'], $t['total']], array_keys($saTypeStats), $saTypeStats),
-    'sections'   => array_values(array_map(
+    'types' => array_map(fn($n, $t) => [$n, $t['submitted'], $t['total']], array_keys($saTypeStats), $saTypeStats),
+    'sections' => array_values(array_map(
         fn($s) => [$s['label'], $s['adviser'], count($s['students']), $s['done'], $s['slots'], $s['pct'] . '%'],
         $saSections
     )),
-    'students'   => $saExportStudents,
-    'follow'     => array_map(fn($f) => [$f['name'], $f['section'], implode('; ', $f['missing'])], $saFollow),
+    'students' => $saExportStudents,
+    'follow' => array_map(fn($f) => [$f['name'], $f['section'], implode('; ', $f['missing'])], $saFollow),
 ];
 // addtl e
 function deptCode($department)
@@ -2103,7 +2100,8 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                         <?php endforeach; ?>
                     </select>
                     <?php if ($saDeptLabel !== ''): ?>
-                        <span class="badge rounded-pill px-3 ojtc-badge-default"><?= htmlspecialchars($saDeptLabel) ?></span>
+                        <span
+                            class="badge rounded-pill px-3 ojtc-badge-default"><?= htmlspecialchars($saDeptLabel) ?></span>
                     <?php endif; ?>
                     <div class="d-flex flex-wrap gap-2 ms-md-auto">
                         <button type="button" class="btn btn-update" onclick="downloadDashboardCSV()">
@@ -2128,7 +2126,8 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                                     <div class="flex-grow-1" style="min-width:90px;">
                                         <p class="small mb-1 fw-semibold text-uppercase"
                                             style="letter-spacing:.05em;font-size:11px;color:#272f54;">Internships</p>
-                                        <h2 class="fw-bold mb-0" style="color:#272f54;"><?= (int) $totalInternships ?></h2>
+                                        <h2 class="fw-bold mb-0" style="color:#272f54;"><?= (int) $totalInternships ?>
+                                        </h2>
                                     </div>
                                 </div>
                             </div>
@@ -2136,7 +2135,8 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                     </div>
 
                     <div class="col-md-3">
-                        <div class="card border-0 rounded-4 h-100 ojtc-stat-card" data-go="restore" style="background:#FDEEE8;">
+                        <div class="card border-0 rounded-4 h-100 ojtc-stat-card" data-go="restore"
+                            style="background:#FDEEE8;">
                             <div class="card-body p-4">
                                 <div class="d-flex flex-wrap align-items-center gap-3">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0"
@@ -2157,7 +2157,8 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                     </div>
 
                     <div class="col-md-3">
-                        <div class="card border-0 rounded-4 h-100 ojtc-stat-card" data-go="assign_adviser" style="background:#FFF6E3;">
+                        <div class="card border-0 rounded-4 h-100 ojtc-stat-card" data-go="assign_adviser"
+                            style="background:#FFF6E3;">
                             <div class="card-body p-4">
                                 <div class="d-flex flex-wrap align-items-center gap-3">
                                     <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0"
@@ -2167,7 +2168,9 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                                     <div class="flex-grow-1" style="min-width:90px;">
                                         <p class="small mb-1 fw-semibold text-uppercase"
                                             style="letter-spacing:.05em;font-size:11px;color:#7a5200;">OJT Advisers</p>
-                                        <h2 class="fw-bold mb-0" style="color:#3b2600;"><?= (int) $saRoleCounts['Internship Advisers'] ?></h2>
+                                        <h2 class="fw-bold mb-0" style="color:#3b2600;">
+                                            <?= (int) $saRoleCounts['Internship Advisers'] ?>
+                                        </h2>
                                     </div>
                                 </div>
                             </div>
@@ -2185,7 +2188,9 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                                     <div class="flex-grow-1" style="min-width:90px;">
                                         <p class="small mb-1 fw-semibold text-uppercase"
                                             style="letter-spacing:.05em;font-size:11px;color:#14614a;">HTE Advisers</p>
-                                        <h2 class="fw-bold mb-0" style="color:#0f4a38;"><?= (int) $saRoleCounts['HTE Advisers'] ?></h2>
+                                        <h2 class="fw-bold mb-0" style="color:#0f4a38;">
+                                            <?= (int) $saRoleCounts['HTE Advisers'] ?>
+                                        </h2>
                                     </div>
                                 </div>
                             </div>
@@ -2215,7 +2220,8 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                             </div>
                             <div class="card-body px-4 pb-4 pt-2">
                                 <p class="text-muted small mb-3">Logged actions per day, last 14 days.</p>
-                                <div style="position:relative; height:220px;"><canvas id="saActivityChart"></canvas></div>
+                                <div style="position:relative; height:220px;"><canvas id="saActivityChart"></canvas>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -2228,7 +2234,9 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                         <h6 class="fw-bold mb-0" style="color:#272f54;">Documents Passed by Type</h6>
                     </div>
                     <div class="card-body px-4 pb-4 pt-2">
-                        <p class="text-muted small mb-3">Students who submitted each document, S.Y. <?= htmlspecialchars($schoolYear) ?>.</p>
+                        <p class="text-muted small mb-3">Students who submitted each document, S.Y.
+                            <?= htmlspecialchars($schoolYear) ?>.
+                        </p>
                         <?php if ($saDocError): ?>
                             <p class="text-muted small mb-0">Document data could not be loaded.</p>
                         <?php elseif (empty($saTypeStats) || empty($saStudentIds)): ?>
@@ -2237,12 +2245,14 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                             <?php foreach ($saTypeStats as $tname => $ts):
                                 $subPct = $ts['total'] > 0 ? $ts['submitted'] / $ts['total'] * 100 : 0; ?>
                                 <div class="d-flex align-items-center gap-3 mb-2">
-                                    <span class="small fw-semibold" style="width:170px;color:#272f54;"><?= htmlspecialchars($tname) ?></span>
+                                    <span class="small fw-semibold"
+                                        style="width:170px;color:#272f54;"><?= htmlspecialchars($tname) ?></span>
                                     <div class="progress flex-grow-1" style="height:10px;">
                                         <div class="progress-bar" style="width:<?= $subPct ?>%;background:#1D9E75;"></div>
                                         <div class="progress-bar" style="width:<?= 100 - $subPct ?>%;background:#dee2e6;"></div>
                                     </div>
-                                    <span class="small text-muted text-end" style="width:64px;"><?= (int) $ts['submitted'] ?>/<?= (int) $ts['total'] ?></span>
+                                    <span class="small text-muted text-end"
+                                        style="width:64px;"><?= (int) $ts['submitted'] ?>/<?= (int) $ts['total'] ?></span>
                                 </div>
                             <?php endforeach; ?>
                             <div class="d-flex gap-3 mt-3 small text-muted">
@@ -2260,14 +2270,16 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                         <h6 class="fw-bold mb-0" style="color:#272f54;">Students per Section</h6>
                     </div>
                     <div class="card-body px-4 pb-4 pt-2">
-                        <p class="text-muted small mb-3">Term, section, adviser, and the documents each student submitted. Open a section to see them.</p>
+                        <p class="text-muted small mb-3">Term, section, adviser, and the documents each student
+                            submitted. Open a section to see them.</p>
                         <?php if (empty($saSections)): ?>
                             <p class="text-muted small mb-0">No sections with an assigned adviser for this term.</p>
                         <?php else: ?>
                             <div class="table-responsive">
                                 <table class="table align-middle mb-0" style="font-size:14px;">
                                     <thead>
-                                        <tr style="color:#aaa;font-size:12px;text-transform:uppercase;letter-spacing:.04em;">
+                                        <tr
+                                            style="color:#aaa;font-size:12px;text-transform:uppercase;letter-spacing:.04em;">
                                             <th class="border-0 pb-2 fw-semibold ojtc-th-tab">Section</th>
                                             <th class="border-0 pb-2 fw-semibold ojtc-th-tab">Term</th>
                                             <th class="border-0 pb-2 fw-semibold ojtc-th-tab">Adviser</th>
@@ -2279,7 +2291,9 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                                     <tbody>
                                         <?php foreach ($saSections as $rid => $sec): ?>
                                             <tr>
-                                                <td class="fw-semibold" style="color:#272f54;"><?= htmlspecialchars($sec['label']) ?></td>
+                                                <td class="fw-semibold" style="color:#272f54;">
+                                                    <?= htmlspecialchars($sec['label']) ?>
+                                                </td>
                                                 <td class="text-muted">S.Y. <?= htmlspecialchars($schoolYear) ?></td>
                                                 <td><?= htmlspecialchars($sec['adviser']) ?></td>
                                                 <td><?= count($sec['students']) ?></td>
@@ -2293,8 +2307,9 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                                                 </td>
                                                 <td class="text-end">
                                                     <?php if (!empty($sec['students'])): ?>
-                                                        <button type="button" class="btn-update" style="padding:6px 12px;font-size:12px;"
-                                                            data-bs-toggle="collapse" data-bs-target="#saSec<?= (int) $rid ?>">
+                                                        <button type="button" class="btn-update"
+                                                            style="padding:6px 12px;font-size:12px;" data-bs-toggle="collapse"
+                                                            data-bs-target="#saSec<?= (int) $rid ?>">
                                                             <i class="bi bi-chevron-down me-1"></i> Students
                                                         </button>
                                                     <?php endif; ?>
@@ -2314,7 +2329,8 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                                                                 <?php foreach ($stu['docs'] as $dname => $ok): ?>
                                                                     <span class="badge rounded-pill px-3"
                                                                         style="font-weight:500;font-size:12px;background:<?= $ok ? '#e6f4ea' : '#fdeaea' ?>;color:<?= $ok ? '#1b7a3d' : '#a32d2d' ?>;">
-                                                                        <i class="bi <?= $ok ? 'bi-check-circle-fill' : 'bi-x-circle-fill' ?> me-1"></i><?= htmlspecialchars($dname) ?>
+                                                                        <i
+                                                                            class="bi <?= $ok ? 'bi-check-circle-fill' : 'bi-x-circle-fill' ?> me-1"></i><?= htmlspecialchars($dname) ?>
                                                                     </span>
                                                                 <?php endforeach; ?>
                                                             </div>
@@ -2345,9 +2361,11 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                         <?php else: ?>
                             <?php foreach ($saSecWithDocs as $sec): ?>
                                 <div class="d-flex align-items-center gap-3 mb-2">
-                                    <span class="small fw-semibold" style="width:170px;color:#272f54;"><?= htmlspecialchars($sec['label']) ?></span>
+                                    <span class="small fw-semibold"
+                                        style="width:170px;color:#272f54;"><?= htmlspecialchars($sec['label']) ?></span>
                                     <div class="progress flex-grow-1" style="height:10px;">
-                                        <div class="progress-bar" style="width:<?= (int) $sec['pct'] ?>%;background:#E4572E;"></div>
+                                        <div class="progress-bar" style="width:<?= (int) $sec['pct'] ?>%;background:#E4572E;">
+                                        </div>
                                     </div>
                                     <span class="small text-muted text-end" style="width:64px;"><?= (int) $sec['pct'] ?>%</span>
                                 </div>
@@ -2363,14 +2381,16 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                         <h6 class="fw-bold mb-0" style="color:#272f54;">Needs Follow-up</h6>
                     </div>
                     <div class="card-body px-4 pb-4 pt-2">
-                        <p class="text-muted small mb-3">Students with documents not yet submitted, most missing first.</p>
+                        <p class="text-muted small mb-3">Students with documents not yet submitted, most missing first.
+                        </p>
                         <?php if (empty($saFollow)): ?>
                             <p class="text-muted small mb-0">No students need follow-up.</p>
                         <?php else: ?>
                             <div class="table-responsive" style="max-height:340px;overflow-y:auto;">
                                 <table class="table table-hover align-middle mb-0" style="font-size:14px;">
                                     <thead>
-                                        <tr style="color:#aaa;font-size:12px;text-transform:uppercase;letter-spacing:.04em;">
+                                        <tr
+                                            style="color:#aaa;font-size:12px;text-transform:uppercase;letter-spacing:.04em;">
                                             <th class="border-0 pb-2 fw-semibold ojtc-th-tab">Student</th>
                                             <th class="border-0 pb-2 fw-semibold ojtc-th-tab">Section</th>
                                             <th class="border-0 pb-2 fw-semibold ojtc-th-tab">Not submitted</th>
@@ -2379,7 +2399,9 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                                     <tbody>
                                         <?php foreach ($saFollow as $f): ?>
                                             <tr>
-                                                <td class="fw-semibold" style="color:#272f54;"><?= htmlspecialchars($f['name']) ?></td>
+                                                <td class="fw-semibold" style="color:#272f54;">
+                                                    <?= htmlspecialchars($f['name']) ?>
+                                                </td>
                                                 <td class="text-muted"><?= htmlspecialchars($f['section']) ?></td>
                                                 <td>
                                                     <?php foreach ($f['missing'] as $m): ?>
@@ -2589,9 +2611,9 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                         </select>
                     </div>
                     <div class="sa-toolbar-actions">
-                        <button type="button" class="btn-update" onclick="showSection(event, 'add-admin')">
+                        <!-- <button type="button" class="btn-update" onclick="showSection(event, 'add-admin')">
                             <i class="bi bi-person-plus me-1"></i>Add Admin
-                        </button>
+                        </button> -->
                         <button type="button" class="btn-update" onclick="showSection(event, 'add-adviser')">
                             <i class="bi bi-person-plus me-1"></i>Add Adviser
                         </button>
@@ -2636,7 +2658,7 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
             </div>
 
             <!-- ADD ADMIN -->
-            <div id="add-admin" class="section sysAdm-section">
+            <!-- <div id="add-admin" class="section sysAdm-section">
                 <div class="sysAdm-header--danger sysAdm-header--blue">
                     <div class="sysAdm-header-left">
                         <div class="sysAdm-header-icon">
@@ -2665,7 +2687,7 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                         <button type="submit" name="create-admin" class="btn-update">Create Admin</button>
                     </div>
                 </form>
-            </div>
+            </div> -->
 
             <!-- ADD ADVISER -->
             <div id="add-adviser" class="section sysAdm-section">
@@ -3051,6 +3073,7 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                 </div>
             </div>
 
+            <!-- Section Settings -->
             <div id="section_settings" class="section sysAdm-section">
                 <div class="sysAdm-header--danger sysAdm-header--blue mb-4">
                     <div class="sysAdm-header-left">
@@ -3059,55 +3082,67 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                         </div>
                         <div class="sysAdm-header-text">
                             <h2>Sections</h2>
-                            <p>Manage which sections are available for each program.</p>
+                            <p>Manage how many OJT sections each batch has.</p>
                         </div>
                     </div>
+                    <button type="button" class="btn-update" style="padding:8px 14px;" data-bs-toggle="modal"
+                        data-bs-target="#addBatchModal">
+                        <i class="bi bi-plus-lg me-1"></i> Add new batch
+                    </button>
                 </div>
 
-                <!-- school year picker -->
-                <form method="GET" id="syForm" class="sa-toolbar-filters mb-3" style="align-items:center;">
-                    <label style="font-size:13px; color:#272f54;" class="fw-semibold">School year</label>
-                    <select name="sy" onchange="handleSyChange(this)" class="sa-field">
-                        style="padding:8px 14px; border-radius:10px; border:1px solid #ddd; font-size:13px;">
-                        <?php foreach ($schoolYearOptions as $opt): ?>
-                            <option value="<?= htmlspecialchars($opt) ?>" <?= $opt === $schoolYear ? 'selected' : '' ?>>
-                                <?= htmlspecialchars($opt) ?>
-                            </option>
-                        <?php endforeach; ?>
-                        <option value="__add__">+ Add new school year</option>
-                    </select>
-                </form>
-
-                <!-- Handle the adding of sy -->
+                <!-- Handle adding of a batch -->
                 <form method="POST" action="systemadmin-db.php" id="addSyForm" style="display:none;">
                     <input type="hidden" name="add_school_year" value="1">
                 </form>
 
                 <div class="sysAdm-table-wrapper mb-3">
-                    <form method="POST" class="p-3" action="systemadmin-db.php">
-                        <input type="hidden" name="save_section_settings" value="1">
-                        <input type="hidden" name="school_year" value="<?= htmlspecialchars($schoolYear) ?>">
-                        <div class="fw-semibold mb-2" style="font-size:13px; color:#272f54;">
-                            <i class="bi bi-sliders me-1"></i> Sections per year level
-                            (<?= htmlspecialchars($schoolYear) ?>)
-                        </div>
-                        <div class="d-flex flex-wrap align-items-end gap-3">
-                            <?php for ($yl = 1; $yl <= 4; $yl++): ?>
-                                <div>
-                                    <label style="font-size:12px; color:#666;">Year <?= $yl ?></label>
-                                    <input type="number" min="0" max="50" name="section_count[<?= $yl ?>]"
-                                        value="<?= $sectionCounts[$yl] ?? 0 ?>"
-                                        style="display:block; width:90px; padding:8px 10px; border-radius:10px; border:1px solid #ddd; font-size:13px;">
-                                </div>
-                            <?php endfor; ?>
-                            <button type="submit" name="save_section_settings" class="btn-update"
-                                style="padding:8px 14px;">
-                                <i class="bi bi-save me-1"></i> Save
-                            </button>
-                        </div>
-                    </form>
+                    <table class="table align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Batch</th>
+                                <th>School year</th>
+                                <th>4th year sections</th>
+                                <th style="width:120px;"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($schoolYearOptions as $sy):
+                                $counts = $allCounts[$sy] ?? [];
+                                ?>
+                                <tr>
+                                    <form method="POST" action="systemadmin-db.php">
+                                        <input type="hidden" name="save_section_settings" value="1">
+                                        <input type="hidden" name="school_year" value="<?= htmlspecialchars($sy) ?>">
+
+                                        <!-- keep year 1-3 values untouched so saving doesn't wipe them -->
+                                        <?php for ($yl = 1; $yl <= 3; $yl++): ?>
+                                            <input type="hidden" name="section_count[<?= $yl ?>]"
+                                                value="<?= $counts[$yl] ?? 0 ?>">
+                                        <?php endfor; ?>
+
+                                        <td class="fw-semibold">
+                                            Batch <?= htmlspecialchars(batchLabel($sy)) ?>
+                                        </td>
+                                        <td style="color:#666; font-size:13px;"><?= htmlspecialchars($sy) ?></td>
+                                        <td>
+                                            <input type="number" min="0" max="50" name="section_count[4]"
+                                                value="<?= $counts[4] ?? 0 ?>"
+                                                style="width:90px; padding:8px 10px; border-radius:10px; border:1px solid #ddd; font-size:13px;">
+                                        </td>
+                                        <td>
+                                            <button type="submit" class="btn-update" style="padding:8px 14px;">
+                                                <i class="bi bi-save me-1"></i> Save
+                                            </button>
+                                        </td>
+                                    </form>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
                 </div>
             </div>
+
             <!-- ASSIGN ADVISER -->
             <div id="assign_adviser" class="section sysAdm-section">
                 <div class="sysAdm-header--danger sysAdm-header--blue">
@@ -3120,6 +3155,12 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                             <p>Assign an internship adviser to a section. The section will automatically be linked to
                                 that
                                 adviser's room.</p>
+                        </div>
+                        <div class="mb-2" style="font-size:13px; color:#272f54;">
+                            Showing advisers for <strong>Batch
+                                <?= htmlspecialchars(batchLabel($schoolYear)) ?></strong>
+                            (<?= htmlspecialchars($schoolYear) ?>) ·
+                            <?= count($takenKeys) ?> assigned, <?= count($openSections) ?> open sections
                         </div>
                     </div>
                 </div>
@@ -3135,6 +3176,13 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                             <?php foreach ($adviserList as $adv): ?>
                                 <option value="<?= htmlspecialchars($adv['full_name']) ?>">
                                     <?= htmlspecialchars($adv['full_name']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <select id="assign-batch" onchange="changeBatch(this.value)" class="sa-field">
+                            <?php foreach ($allCounts as $sy => $c): ?>
+                                <option value="<?= htmlspecialchars($sy) ?>" <?= $sy === $schoolYear ? 'selected' : '' ?>>
+                                    Batch <?= htmlspecialchars(batchLabel($sy)) ?>
                                 </option>
                             <?php endforeach; ?>
                         </select>
@@ -3558,7 +3606,7 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                 <?php endif; ?>
             </div>
 
-            <!-- <div id="calendar" class="section active sysAdm-section"> -->
+            <!-- CALENDAR -->
             <div id="calendar" class="section sysAdm-section">
                 <div class="sysAdm-header--danger sysAdm-header--blue">
                     <div class="sysAdm-header-left">
@@ -3630,6 +3678,39 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
                         </div>
                     </div>
 
+                </div>
+            </div>
+
+            <!-- OJT NEW BATCH MODAL -->
+            <?php
+            // suggest the next batch: newest existing batch + 1, or the current batch
+            $newestBatch = !empty($schoolYearOptions) ? (int) batchLabel($schoolYearOptions[0]) : (int) substr($currentSY, 5, 4) - 1;
+            $suggestedBatch = $newestBatch + 1;
+            ?>
+            <div class="modal fade" id="addBatchModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <form method="POST" action="systemadmin-db.php" class="modal-content">
+                        <input type="hidden" name="add_school_year" value="1">
+                        <div class="modal-header">
+                            <h5 class="modal-title"><i class="bi bi-plus-lg me-1"></i> Add new batch</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <label for="batchYear" class="form-label fw-semibold" style="font-size:13px;">Batch
+                                (graduating year)</label>
+                            <input type="number" id="batchYear" name="batch" class="form-control" min="2000" max="2100"
+                                value="<?= $suggestedBatch ?>" required>
+                            <div class="form-text">
+                                Batch 2027 means school year 2026-2027.
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn-update" style="padding:8px 14px;">
+                                <i class="bi bi-plus-lg me-1"></i> Add batch
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div><!-- /.main-content -->
@@ -4073,22 +4154,22 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
 
             // Students by program
             // make('saProgramChart', {
-                // type: 'bar',
-                // data: {
-                //     labels: json_encode($saProgLabels) ?>,
-                //     datasets: [{
-                //         label: 'Students',
-                //         data: json_encode($saProgData) ?>,
-                //         backgroundColor: json_encode($saProgColors) ?>,
-                //         borderRadius: 6
-                //     }]
-                // },
-                // options: {
-                //     responsive: true,
-                //     maintainAspectRatio: false,
-                //     plugins: { legend: { display: false } },
-                //     scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
-                // }
+            // type: 'bar',
+            // data: {
+            //     labels: json_encode($saProgLabels) ?>,
+            //     datasets: [{
+            //         label: 'Students',
+            //         data: json_encode($saProgData) ?>,
+            //         backgroundColor: json_encode($saProgColors) ?>,
+            //         borderRadius: 6
+            //     }]
+            // },
+            // options: {
+            //     responsive: true,
+            //     maintainAspectRatio: false,
+            //     plugins: { legend: { display: false } },
+            //     scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+            // }
             // });
 
             // System activity (14 days)
@@ -4164,6 +4245,12 @@ $suspendedList = $lStmt->fetchAll(PDO::FETCH_ASSOC);
             }).observe(nav, { subtree: true, attributes: true, attributeFilter: ['class'] });
         })();
 
+        function changeBatch(sy) {
+            const url = new URL(window.location.href);
+            url.searchParams.set('batch', sy);
+            url.hash = 'assign_adviser';
+            window.location.href = url.toString();
+        }
         // For the calendar
         //
 
