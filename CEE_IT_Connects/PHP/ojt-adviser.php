@@ -3029,8 +3029,8 @@ $page = 'messages';
                         ")->fetchAll(PDO::FETCH_ASSOC);
                         usort($dashStudents, fn($a, $b) => strcmp($a['full_name'], $b['full_name']));
                     }
+                    $dashStudentsAll = $dashStudents;
                     $dashStudents = array_slice($dashStudents, 0, 6);
-
                     // ── Weekly reports ──
                     $dashReportsAll = [];
                     if ($dashIds) {
@@ -3063,6 +3063,44 @@ $page = 'messages';
                         $docAvailability,
                         fn($d) => !empty($d['mou_available']) || !empty($d['recommendation_letter_available']) || !empty($d['waiver_available'])
                     ));
+
+                    // ── Chart data (same term / section as the rest of the dashboard) ──
+                    $completeCount = max(0, $totalStudents - $incompleteCount);
+
+                    // Attendance trend: hours logged per day, last 14 days
+                    $attByDay = [];
+                    if ($dashIds) {
+                        $attRows = $pdo->query("
+                            SELECT h.date AS log_day,
+                                SUM(
+                                    COALESCE(GREATEST(0, EXTRACT(EPOCH FROM (h.m_out - h.m_in)) / 3600), 0) +
+                                    COALESCE(GREATEST(0, EXTRACT(EPOCH FROM (h.a_out - h.a_in)) / 3600), 0)
+                                ) AS hours
+                            FROM ojt_hours h
+                            WHERE h.user_type = 'student'
+                            AND h.user_id IN ($idList)
+                            AND h.date >= (CURRENT_DATE - INTERVAL '13 days')
+                            GROUP BY h.date
+                            ORDER BY h.date
+                        ")->fetchAll(PDO::FETCH_ASSOC);
+                        foreach ($attRows as $r) {
+                            $attByDay[$r['log_day']] = round((float) $r['hours'], 1);
+                        }
+                    }
+                    $attLabels = [];
+                    $attData = [];
+                    for ($i = 13; $i >= 0; $i--) {
+                        $d = date('Y-m-d', strtotime("-{$i} days"));
+                        $attLabels[] = date('M j', strtotime($d));
+                        $attData[] = $attByDay[$d] ?? 0;
+                    }
+
+                    // Hours rendered: top 6 students
+                    $barStudents = $dashStudentsAll;
+                    usort($barStudents, fn($a, $b) => (float) $b['total_hours'] <=> (float) $a['total_hours']);
+                    $barStudents = array_slice($barStudents, 0, 6);
+                    $barLabels = array_map(fn($s) => $s['full_name'], $barStudents);
+                    $barData = array_map(fn($s) => round((float) $s['total_hours'], 1), $barStudents);
                     ?>
 
                     <div class="home-hero">
@@ -3378,6 +3416,54 @@ $page = 'messages';
                                     <?php endforeach; ?>
                                 </div>
                             <?php endif; ?>
+                        </div>
+                    </div>
+
+                    <!-- CHARTS (one row) -->
+                    <div class="row g-3 mt-1">
+                        <div class="col-12 col-lg-5">
+                            <div class="home-card accent-blue h-100">
+                                <div class="dash-head">
+                                    <div>
+                                        <h5 class="fw-bold mb-0"><i class="fa-solid fa-chart-line me-2"
+                                                style="color:#ff6b2c;"></i>Attendance Trend</h5>
+                                        <small class="text-muted">Total hours logged per day, last 14 days.</small>
+                                    </div>
+                                </div>
+                                <div style="position:relative; height:220px;">
+                                    <canvas id="attendanceChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-lg-4">
+                            <div class="home-card accent-amber h-100">
+                                <div class="dash-head">
+                                    <div>
+                                        <h5 class="fw-bold mb-0"><i class="fa-solid fa-chart-bar me-2"
+                                                style="color:#ff6b2c;"></i>Hours Rendered</h5>
+                                        <small class="text-muted">Top students by OJT hours.</small>
+                                    </div>
+                                </div>
+                                <div style="position:relative; height:220px;">
+                                    <canvas id="hoursBarChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-lg-3">
+                            <div class="home-card accent-orange h-100">
+                                <div class="dash-head">
+                                    <div>
+                                        <h5 class="fw-bold mb-0"><i class="fa-solid fa-chart-pie me-2"
+                                                style="color:#ff6b2c;"></i>Requirements</h5>
+                                        <small class="text-muted">Students who finished all.</small>
+                                    </div>
+                                </div>
+                                <div style="position:relative; height:220px;">
+                                    <canvas id="completionChart"></canvas>
+                                </div>
+                            </div>
                         </div>
                     </div>
         <?php elseif ($section === 'room' || $section === 'rooms'): ?>
