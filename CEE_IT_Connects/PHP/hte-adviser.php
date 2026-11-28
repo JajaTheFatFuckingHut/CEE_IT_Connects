@@ -3203,7 +3203,7 @@ foreach ($roomStatuses as $s) {
             </form>
 
             <!-- CARDS -->
-            <div class="dash-stats" style="margin-top:0;">
+            <div class="dash-stats" style="margin-top:0; grid-template-columns:repeat(2, minmax(0, 1fr));">
                 <a href="<?= $dashUrl ?>status" class="dash-stat tone-blue">
                     <div class="dash-stat-icon"><i class="fa-solid fa-users"></i></div>
                     <div>
