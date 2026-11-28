@@ -410,25 +410,10 @@ $registerVisible = ($rv === 'hide') ? 'hide' : 'show';
             background: #f7f8fb;
         }
 
-        .ojtc-badge-it {
-            background: #e7effe;
-            color: #1b4fce;
-        }
-
-        .ojtc-badge-ce {
-            background: #fff1e0;
-            color: #b85c00;
-        }
-
-        .ojtc-badge-ee {
-            background: #fff8dc;
-            color: #8a6d00;
-        }
-
-        .ojtc-badge-default {
-            background: #f0f4ff;
-            color: #272f54;
-        }
+        .ojtc-badge-it { background: #e7effe; color: #1b4fce !important; }
+        .ojtc-badge-ce { background: #fff1e0; color: #b85c00 !important; }
+        .ojtc-badge-ee { background: #fff8dc; color: #8a6d00 !important; }
+        .ojtc-badge-default { background: #f0f4ff; color: #272f54 !important; }
 
         .ojtc-stat-card {
             transition: transform .15s ease, box-shadow .15s ease;
@@ -891,7 +876,7 @@ $registerVisible = ($rv === 'hide') ? 'hide' : 'show';
                                         <?= htmlspecialchars($ph['program']) ?>
                                     </p>
                                     <span class="badge rounded-pill px-3 <?= $ojtcBadgeClass ?>"
-                                        style="font-weight:500;font-size:12px;opacity:1.1;">
+                                        style="font-weight:500;font-size:12px;">
                                         <?= (int) $ph['required_hours'] ?> hrs
                                     </span>
                                 </div>
