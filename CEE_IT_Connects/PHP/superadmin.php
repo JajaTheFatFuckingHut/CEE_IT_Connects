@@ -682,7 +682,7 @@ function deptCode($department)
                                         <?= htmlspecialchars($ph['program']) ?>
                                     </p>
                                     <span class="badge rounded-pill px-3 <?= $ojtcBadgeClass ?>"
-                                        style="font-weight:500;font-size:12px;">
+                                        style="font-weight:500;font-size:12px;opacity:1.1;">
                                         <?= (int) $ph['required_hours'] ?> hrs
                                     </span>
                                 </div>
